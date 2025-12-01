@@ -1,0 +1,218 @@
+/**
+ * Navigation Constants
+ * Role-based navigation items for dashboard
+ */
+
+import {
+  LayoutDashboard,
+  BookOpen,
+  ClipboardList,
+  BarChart3,
+  Trophy,
+  Users,
+  Settings,
+  FileText,
+  UserCircle,
+  Bell,
+  Calendar,
+  MessageSquare,
+  Award,
+  Target,
+  BookMarked,
+} from "lucide-react";
+
+export const STUDENT_NAV_ITEMS = [
+  {
+    id: "dashboard",
+    label: "Dashboard",
+    path: "/dashboard",
+    icon: LayoutDashboard,
+  },
+  {
+    id: "exams",
+    label: "Available Exams",
+    path: "/exams",
+    icon: BookOpen,
+  },
+  {
+    id: "my-exams",
+    label: "My Exams",
+    path: "/my-exams",
+    icon: ClipboardList,
+  },
+  {
+    id: "results",
+    label: "Results",
+    path: "/results",
+    icon: BarChart3,
+  },
+  {
+    id: "leaderboard",
+    label: "Leaderboard",
+    path: "/leaderboard",
+    icon: Trophy,
+  },
+  {
+    id: "study-materials",
+    label: "Study Materials",
+    path: "/study-materials",
+    icon: BookMarked,
+  },
+  {
+    id: "profile",
+    label: "Profile",
+    path: "/profile",
+    icon: UserCircle,
+  },
+  {
+    id: "settings",
+    label: "Settings",
+    path: "/settings",
+    icon: Settings,
+  },
+];
+
+export const INSTRUCTOR_NAV_ITEMS = [
+  {
+    id: "dashboard",
+    label: "Dashboard",
+    path: "/instructor/dashboard",
+    icon: LayoutDashboard,
+  },
+  {
+    id: "exams",
+    label: "Manage Exams",
+    path: "/instructor/exams",
+    icon: BookOpen,
+  },
+  {
+    id: "questions",
+    label: "Question Bank",
+    path: "/instructor/questions",
+    icon: FileText,
+  },
+  {
+    id: "groups",
+    label: "Groups",
+    path: "/instructor/groups",
+    icon: Users,
+  },
+  {
+    id: "students",
+    label: "Students",
+    path: "/instructor/students",
+    icon: UserCircle,
+  },
+  {
+    id: "results",
+    label: "Results & Analytics",
+    path: "/instructor/results",
+    icon: BarChart3,
+  },
+  {
+    id: "grading",
+    label: "Grading",
+    path: "/instructor/grading",
+    icon: Award,
+  },
+  {
+    id: "schedule",
+    label: "Schedule",
+    path: "/instructor/schedule",
+    icon: Calendar,
+  },
+  {
+    id: "announcements",
+    label: "Announcements",
+    path: "/instructor/announcements",
+    icon: Bell,
+  },
+  {
+    id: "profile",
+    label: "Profile",
+    path: "/instructor/profile",
+    icon: UserCircle,
+  },
+  {
+    id: "settings",
+    label: "Settings",
+    path: "/instructor/settings",
+    icon: Settings,
+  },
+];
+
+export const ADMIN_NAV_ITEMS = [
+  {
+    id: "dashboard",
+    label: "Dashboard",
+    path: "/admin/dashboard",
+    icon: LayoutDashboard,
+  },
+  {
+    id: "users",
+    label: "User Management",
+    path: "/admin/users",
+    icon: Users,
+  },
+  {
+    id: "instructors",
+    label: "Instructors",
+    path: "/admin/instructors",
+    icon: UserCircle,
+  },
+  {
+    id: "students",
+    label: "Students",
+    path: "/admin/students",
+    icon: UserCircle,
+  },
+  {
+    id: "exams",
+    label: "Exams",
+    path: "/admin/exams",
+    icon: BookOpen,
+  },
+  {
+    id: "groups",
+    label: "Groups",
+    path: "/admin/groups",
+    icon: Users,
+  },
+  {
+    id: "analytics",
+    label: "Analytics",
+    path: "/admin/analytics",
+    icon: BarChart3,
+  },
+  {
+    id: "reports",
+    label: "Reports",
+    path: "/admin/reports",
+    icon: FileText,
+  },
+  {
+    id: "notifications",
+    label: "Notifications",
+    path: "/admin/notifications",
+    icon: Bell,
+  },
+  {
+    id: "system",
+    label: "System Settings",
+    path: "/admin/system",
+    icon: Settings,
+  },
+];
+
+export const getNavigationByRole = (role) => {
+  switch (role?.toLowerCase()) {
+    case "admin":
+      return ADMIN_NAV_ITEMS;
+    case "instructor":
+      return INSTRUCTOR_NAV_ITEMS;
+    case "student":
+      return STUDENT_NAV_ITEMS;
+    default:
+      return STUDENT_NAV_ITEMS;
+  }
+};

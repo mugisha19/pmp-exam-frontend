@@ -1,0 +1,144 @@
+@import "tailwindcss";
+
+@theme {
+  /* Backgrounds */
+  --color-bg-primary: #050505;
+  --color-bg-secondary: #0a0a0a;
+  --color-bg-tertiary: #0f0f0f;
+  --color-bg-quaternary: #141414;
+
+  /* Surfaces */
+  --color-surface-primary: #1a1a1a;
+  --color-surface-secondary: #1f1f1f;
+  --color-surface-tertiary: #252525;
+
+  /* Borders */
+  --color-border-primary: #2a2a2a;
+  --color-border-secondary: #303030;
+  --color-border-tertiary: #383838;
+
+  /* Text */
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #f0f0f0;
+  --color-text-tertiary: #a0a0a0;
+  --color-text-quaternary: #707070;
+
+  /* Accent */
+  --color-accent-primary: #7c7cff;
+  --color-accent-secondary: #5a5aff;
+
+  /* Semantic */
+  --color-error: #ff6b6b;
+  --color-success: #4ecdc4;
+  --color-warning: #ffc107;
+
+  /* Font Family */
+  --font-family-sans: "Poppins", sans-serif;
+}
+
+* {
+  border-color: var(--color-border-primary);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+a {
+  color: var(--color-accent-primary);
+  transition: color 0.2s;
+}
+
+a:hover {
+  color: var(--color-accent-secondary);
+}
+
+/* Animations */
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-4px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(4px);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-shake {
+  animation: shake 0.5s;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.4s ease-out;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.4s ease-out;
+}
