@@ -123,6 +123,44 @@ export const useGroupQuizzes = (groupId, filters = {}, options = {}) => {
 };
 
 /**
+ * Get group quiz stats query hook
+ * @param {string} groupId - Group ID
+ * @param {Object} options - Query options
+ */
+export const useGroupQuizStats = (groupId, options = {}) => {
+  return useQuery({
+    queryKey: ["group-quiz-stats", groupId],
+    queryFn: () => groupService.getGroupQuizStats(groupId),
+    enabled: !!groupId,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    onError: (error) => {
+      const errorMessage = error.message || "Failed to fetch group quiz stats";
+      toast.error(errorMessage);
+    },
+    ...options,
+  });
+};
+
+/**
+ * Get user's groups query hook
+ * @param {string} userId - User ID
+ * @param {Object} options - Query options
+ */
+export const useUserGroups = (userId, options = {}) => {
+  return useQuery({
+    queryKey: ["user-groups", userId],
+    queryFn: () => groupService.getUserGroups(userId),
+    enabled: !!userId,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    onError: (error) => {
+      const errorMessage = error.message || "Failed to fetch user groups";
+      toast.error(errorMessage);
+    },
+    ...options,
+  });
+};
+
+/**
  * Create group mutation hook
  */
 export const useCreateGroupMutation = () => {
@@ -131,11 +169,17 @@ export const useCreateGroupMutation = () => {
   return useMutation({
     mutationFn: (groupData) => groupService.createGroup(groupData),
     onSuccess: () => {
-      // Invalidate groups list
-      queryClient.invalidateQueries({ queryKey: queryKeys.groups.all });
+      // Invalidate and refetch groups list
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.groups.all,
+        refetchType: "active",
+      });
 
       // Also invalidate my groups
-      queryClient.invalidateQueries({ queryKey: queryKeys.groups.myGroups() });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.groups.myGroups(),
+        refetchType: "active",
+      });
 
       toast.success("Group created");
     },
@@ -169,11 +213,17 @@ export const useUpdateGroupMutation = () => {
         data
       );
 
-      // Invalidate groups list
-      queryClient.invalidateQueries({ queryKey: queryKeys.groups.all });
+      // Invalidate and refetch groups list
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.groups.all,
+        refetchType: "active",
+      });
 
       // Also invalidate my groups
-      queryClient.invalidateQueries({ queryKey: queryKeys.groups.myGroups() });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.groups.myGroups(),
+        refetchType: "active",
+      });
 
       toast.success("Group updated");
     },
@@ -211,11 +261,17 @@ export const useDeleteGroupMutation = () => {
         queryKey: queryKeys.groups.members(groupId),
       });
 
-      // Invalidate groups list
-      queryClient.invalidateQueries({ queryKey: queryKeys.groups.all });
+      // Invalidate and refetch groups list
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.groups.all,
+        refetchType: "active",
+      });
 
       // Also invalidate my groups
-      queryClient.invalidateQueries({ queryKey: queryKeys.groups.myGroups() });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.groups.myGroups(),
+        refetchType: "active",
+      });
 
       toast.success("Group deleted");
     },
@@ -240,11 +296,19 @@ export const useAddMemberMutation = () => {
       // Invalidate group members
       queryClient.invalidateQueries({
         queryKey: queryKeys.groups.members(variables.groupId),
+        refetchType: "active",
       });
 
       // Invalidate group detail to update member count
       queryClient.invalidateQueries({
         queryKey: queryKeys.groups.detail(variables.groupId),
+        refetchType: "active",
+      });
+
+      // Invalidate groups list to update counts
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.groups.all,
+        refetchType: "active",
       });
 
       toast.success("Member added to group");
@@ -270,11 +334,19 @@ export const useRemoveMemberMutation = () => {
       // Invalidate group members
       queryClient.invalidateQueries({
         queryKey: queryKeys.groups.members(variables.groupId),
+        refetchType: "active",
       });
 
       // Invalidate group detail to update member count
       queryClient.invalidateQueries({
         queryKey: queryKeys.groups.detail(variables.groupId),
+        refetchType: "active",
+      });
+
+      // Invalidate groups list to update counts
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.groups.all,
+        refetchType: "active",
       });
 
       toast.success("Member removed from group");
@@ -303,17 +375,26 @@ export const useApproveJoinRequestMutation = () => {
       // Invalidate join requests
       queryClient.invalidateQueries({
         queryKey: ["group-join-requests", variables.groupId],
+        refetchType: "active",
       });
 
       // If approved, also invalidate members
       if (variables.approved) {
         queryClient.invalidateQueries({
           queryKey: queryKeys.groups.members(variables.groupId),
+          refetchType: "active",
         });
 
         // Invalidate group detail to update member count
         queryClient.invalidateQueries({
           queryKey: queryKeys.groups.detail(variables.groupId),
+          refetchType: "active",
+        });
+
+        // Invalidate groups list to update counts
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.groups.all,
+          refetchType: "active",
         });
       }
 
@@ -346,13 +427,48 @@ export const useGenerateInviteLinkMutation = () => {
   });
 };
 
+/**
+ * Create join request mutation hook
+ */
+export const useCreateJoinRequestMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data) => groupService.createJoinRequest(data),
+    onSuccess: (_, variables) => {
+      // Invalidate my groups to show pending request
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.groups.myGroups(),
+        refetchType: "active",
+      });
+
+      // Invalidate join requests if groupId is available
+      if (variables?.group_id) {
+        queryClient.invalidateQueries({
+          queryKey: ["group-join-requests", variables.group_id],
+          refetchType: "active",
+        });
+      }
+
+      toast.success("Join request sent successfully");
+    },
+    onError: (error) => {
+      const errorMessage =
+        error.message || "Failed to send join request. Please try again.";
+      toast.error(errorMessage);
+    },
+  });
+};
+
 export default {
   useGroups,
   useGroup,
   useMyGroups,
+  useUserGroups,
   useGroupMembers,
   useGroupJoinRequests,
   useGroupQuizzes,
+  useGroupQuizStats,
   useCreateGroupMutation,
   useUpdateGroupMutation,
   useDeleteGroupMutation,
@@ -360,4 +476,5 @@ export default {
   useRemoveMemberMutation,
   useApproveJoinRequestMutation,
   useGenerateInviteLinkMutation,
+  useCreateJoinRequestMutation,
 };

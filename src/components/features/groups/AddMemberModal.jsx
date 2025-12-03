@@ -1,0 +1,213 @@
+/**
+ * Add Member Modal
+ * Modal for adding members to a group
+ */
+
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { UserPlus, Search, Users } from "lucide-react";
+import { useAddMemberMutation } from "@/hooks/queries/useGroupQueries";
+import { useUsers } from "@/hooks/queries/useUserQueries";
+import { Modal, ModalFooter } from "@/components/ui/Modal";
+import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
+import { Button } from "@/components/ui/Button";
+import { UserCell } from "@/components/shared/UserCell";
+import { Badge } from "@/components/ui/Badge";
+
+// Validation schema
+const addMemberSchema = z.object({
+  user_id: z.string().min(1, "Please select a user"),
+  role: z.enum(["member", "instructor", "admin"]),
+});
+
+const ROLE_OPTIONS = [
+  { value: "member", label: "Member" },
+  { value: "instructor", label: "Instructor" },
+  { value: "admin", label: "Admin" },
+];
+
+export const AddMemberModal = ({ isOpen, onClose, group }) => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const addMemberMutation = useAddMemberMutation();
+
+  // Fetch users for selection
+  const { data: usersData, isLoading: usersLoading } = useUsers(
+    {
+      page: 1,
+      per_page: 50,
+      search: searchQuery,
+    },
+    { enabled: isOpen }
+  );
+
+  const users = usersData?.users || [];
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: zodResolver(addMemberSchema),
+    defaultValues: {
+      user_id: "",
+      role: "member",
+    },
+  });
+
+  const selectedUserId = watch("user_id");
+  const selectedUser = users.find(
+    (u) => (u.user_id || u.id) === selectedUserId
+  );
+
+  const onSubmit = async (data) => {
+    if (!group) return;
+
+    try {
+      await addMemberMutation.mutateAsync({
+        groupId: group.group_id || group.id,
+        data: {
+          user_id: data.user_id,
+          role: data.role,
+        },
+      });
+      reset();
+      setSearchQuery("");
+      onClose();
+    } catch (error) {
+      console.error("Failed to add member:", error);
+    }
+  };
+
+  const handleClose = () => {
+    reset();
+    setSearchQuery("");
+    onClose();
+  };
+
+  const handleUserSelect = (user) => {
+    setValue("user_id", user.user_id || user.id);
+  };
+
+  if (!group) return null;
+
+  return (
+    <Modal isOpen={isOpen} onClose={handleClose} title="Add Member" size="md">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        {/* Group Info */}
+        <div className="flex items-center gap-3 p-4 bg-gray-100 rounded-xl">
+          <div className="p-2 bg-blue-100 rounded-lg">
+            <Users className="w-5 h-5 text-blue-600" />
+          </div>
+          <div>
+            <p className="font-medium text-gray-900">{group.name}</p>
+            <p className="text-xs text-gray-500">
+              {group.member_count || 0} current members
+            </p>
+          </div>
+        </div>
+
+        {/* Search Users */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-gray-700">
+            Search Users
+          </label>
+          <Input
+            placeholder="Search by name or email..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            leftIcon={<Search className="w-4 h-4" />}
+          />
+        </div>
+
+        {/* User List */}
+        <div className="max-h-48 overflow-y-auto border border-gray-200 rounded-xl">
+          {usersLoading ? (
+            <div className="p-4 text-center text-gray-500">
+              Loading users...
+            </div>
+          ) : users.length === 0 ? (
+            <div className="p-4 text-center text-gray-500">No users found</div>
+          ) : (
+            <div className="divide-y divide-gray-100">
+              {users.map((user) => {
+                const userId = user.user_id || user.id;
+                const isSelected = selectedUserId === userId;
+                return (
+                  <div
+                    key={userId}
+                    onClick={() => handleUserSelect(user)}
+                    className={`p-3 cursor-pointer transition-colors ${
+                      isSelected ? "bg-blue-50" : "hover:bg-gray-50"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <UserCell user={user} showEmail size="sm" />
+                      {isSelected && (
+                        <Badge variant="primary" size="sm">
+                          Selected
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+        {errors.user_id && (
+          <p className="text-sm text-red-500">{errors.user_id.message}</p>
+        )}
+
+        {/* Selected User Preview */}
+        {selectedUser && (
+          <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl">
+            <p className="text-sm text-blue-700 font-medium mb-2">
+              Selected User
+            </p>
+            <UserCell user={selectedUser} showEmail />
+          </div>
+        )}
+
+        {/* Role Selection */}
+        <Select
+          label="Member Role"
+          options={ROLE_OPTIONS}
+          error={errors.role?.message}
+          {...register("role")}
+        />
+
+        {/* Hidden field for user_id */}
+        <input type="hidden" {...register("user_id")} />
+
+        {/* Footer */}
+        <ModalFooter>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={handleClose}
+            disabled={isSubmitting || addMemberMutation.isPending}
+          >
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            variant="primary"
+            loading={isSubmitting || addMemberMutation.isPending}
+            disabled={!selectedUserId}
+            leftIcon={<UserPlus className="w-4 h-4" />}
+          >
+            Add Member
+          </Button>
+        </ModalFooter>
+      </form>
+    </Modal>
+  );
+};
+
+export default AddMemberModal;

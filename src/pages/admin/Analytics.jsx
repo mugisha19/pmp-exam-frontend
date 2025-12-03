@@ -1,7 +1,6 @@
 /**
  * Admin Analytics Page
  * Display platform analytics with stats, charts, and performance tables
- * TODO: Integrate recharts library for actual charts
  */
 
 import { useState, useMemo } from "react";
@@ -16,7 +15,12 @@ import {
 import { PageHeader } from "@/components/shared/PageHeader";
 import { StatsCard } from "@/components/shared/StatsCard";
 import { DataTable } from "@/components/shared/DataTable";
-import { ChartPlaceholder } from "@/components/charts";
+import {
+  LineChartComponent,
+  BarChartComponent,
+  PieChartComponent,
+  AreaChartComponent,
+} from "@/components/charts";
 import { UserCell } from "@/components/shared/UserCell";
 import { useAnalyticsDashboard } from "@/hooks/queries/useAnalyticsQueries";
 
@@ -32,19 +36,18 @@ export function Analytics() {
   const [dateRange, setDateRange] = useState("30");
   const [showDateDropdown, setShowDateDropdown] = useState(false);
 
-  // Calculate date range for API (reserved for future use with real API)
-  const _dateParams = useMemo(() => {
+  // Calculate days for API
+  const days = useMemo(() => {
     if (dateRange === "custom") {
-      // For custom, we'd need a date picker - using 30 days as default
-      return { days: 30 };
+      return 30; // Default for custom
     }
-    return { days: parseInt(dateRange) };
+    return parseInt(dateRange);
   }, [dateRange]);
 
-  // Fetch analytics data
-  const { data: analytics, isLoading } = useAnalyticsDashboard();
+  // Fetch analytics data with days parameter
+  const { data: analytics, isLoading, isError } = useAnalyticsDashboard(days);
 
-  // Mock data for demonstration (will be replaced with actual API data)
+  // Stats data from API or fallback
   const statsData = useMemo(() => {
     if (analytics) {
       return {
@@ -54,113 +57,42 @@ export function Analytics() {
         activeUsers: analytics.active_users || 0,
       };
     }
-    // Fallback mock data
+    // Fallback when API fails or loading
     return {
-      newUsers: 156,
-      quizzesCompleted: 1243,
-      averageScore: 72.5,
-      activeUsers: 89,
+      newUsers: 0,
+      quizzesCompleted: 0,
+      averageScore: 0,
+      activeUsers: 0,
     };
   }, [analytics]);
 
-  // Mock top performers data
+  // Top performers from API or fallback
   const topPerformers = useMemo(() => {
-    if (analytics?.top_performers) {
-      return analytics.top_performers;
+    if (analytics?.top_performers?.length > 0) {
+      return analytics.top_performers.map((p) => ({
+        id: p.id,
+        user: {
+          name:
+            p.first_name && p.last_name
+              ? `${p.first_name} ${p.last_name}`
+              : `User ${p.user_id?.slice(0, 8) || "Unknown"}`,
+          email: p.email || "",
+          avatar: p.avatar,
+        },
+        quizzes_taken: p.quizzes_taken || 0,
+        avg_score: p.avg_score || 0,
+        best_score: p.best_score || 0,
+      }));
     }
-    return [
-      {
-        id: 1,
-        user: { name: "John Smith", email: "john@example.com", avatar: null },
-        quizzes_taken: 45,
-        avg_score: 94.2,
-        best_score: 100,
-      },
-      {
-        id: 2,
-        user: {
-          name: "Sarah Johnson",
-          email: "sarah@example.com",
-          avatar: null,
-        },
-        quizzes_taken: 38,
-        avg_score: 91.8,
-        best_score: 98,
-      },
-      {
-        id: 3,
-        user: {
-          name: "Michael Chen",
-          email: "michael@example.com",
-          avatar: null,
-        },
-        quizzes_taken: 42,
-        avg_score: 89.5,
-        best_score: 97,
-      },
-      {
-        id: 4,
-        user: { name: "Emily Davis", email: "emily@example.com", avatar: null },
-        quizzes_taken: 35,
-        avg_score: 88.3,
-        best_score: 96,
-      },
-      {
-        id: 5,
-        user: {
-          name: "David Wilson",
-          email: "david@example.com",
-          avatar: null,
-        },
-        quizzes_taken: 30,
-        avg_score: 87.1,
-        best_score: 95,
-      },
-    ];
+    return [];
   }, [analytics]);
 
-  // Mock most active groups data
+  // Active groups from API or fallback
   const activeGroups = useMemo(() => {
-    if (analytics?.active_groups) {
+    if (analytics?.active_groups?.length > 0) {
       return analytics.active_groups;
     }
-    return [
-      {
-        id: 1,
-        name: "PMP Prep 2024",
-        members: 45,
-        quizzes: 12,
-        completions: 387,
-      },
-      {
-        id: 2,
-        name: "Advanced Project Management",
-        members: 32,
-        quizzes: 8,
-        completions: 256,
-      },
-      {
-        id: 3,
-        name: "Agile Practitioners",
-        members: 28,
-        quizzes: 10,
-        completions: 198,
-      },
-      {
-        id: 4,
-        name: "Risk Management Focus",
-        members: 22,
-        quizzes: 6,
-        completions: 132,
-      },
-      {
-        id: 5,
-        name: "Quality Management",
-        members: 18,
-        quizzes: 5,
-        completions: 90,
-      },
-    ];
+    return [];
   }, [analytics]);
 
   // Top performers table columns
@@ -300,7 +232,7 @@ export function Analytics() {
           value={statsData.newUsers}
           subtitle={`In ${selectedRangeLabel.toLowerCase()}`}
           icon={Users}
-          trend={{ value: 12, isPositive: true }}
+          trend={12}
           iconColor="text-blue-400"
           iconBgColor="bg-blue-500/10"
         />
@@ -309,7 +241,7 @@ export function Analytics() {
           value={statsData.quizzesCompleted.toLocaleString()}
           subtitle={`In ${selectedRangeLabel.toLowerCase()}`}
           icon={CheckCircle}
-          trend={{ value: 8, isPositive: true }}
+          trend={8}
           iconColor="text-emerald-400"
           iconBgColor="bg-emerald-500/10"
         />
@@ -318,7 +250,7 @@ export function Analytics() {
           value={`${statsData.averageScore}%`}
           subtitle="Across all quizzes"
           icon={TrendingUp}
-          trend={{ value: 3, isPositive: true }}
+          trend={3}
           iconColor="text-amber-400"
           iconBgColor="bg-amber-500/10"
         />
@@ -327,38 +259,29 @@ export function Analytics() {
           value={statsData.activeUsers}
           subtitle="Currently active"
           icon={Activity}
-          trend={{ value: 5, isPositive: true }}
+          trend={5}
           iconColor="text-teal-600"
           iconBgColor="bg-teal-500/10"
         />
       </div>
 
       {/* Charts Section */}
-      {/* TODO: Integrate recharts library for actual charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ChartPlaceholder
+        <LineChartComponent
           title="User Registrations"
-          type="line"
-          height="h-72"
-          showMockData={true}
+          color="#3b82f6"
+          height={280}
         />
-        <ChartPlaceholder
+        <BarChartComponent
           title="Quiz Completions"
-          type="bar"
-          height="h-72"
-          showMockData={true}
+          color="#10b981"
+          height={280}
         />
-        <ChartPlaceholder
-          title="Score Distribution"
-          type="pie"
-          height="h-72"
-          showMockData={true}
-        />
-        <ChartPlaceholder
+        <PieChartComponent title="Score Distribution" height={280} />
+        <AreaChartComponent
           title="Domain Performance"
-          type="area"
-          height="h-72"
-          showMockData={true}
+          height={280}
+          horizontal={true}
         />
       </div>
 

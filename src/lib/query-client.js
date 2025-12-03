@@ -10,23 +10,23 @@ import { QueryClient } from "@tanstack/react-query";
  */
 const defaultOptions = {
   queries: {
-    // Data is considered fresh for 5 minutes
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    // Data is considered fresh for 2 minutes
+    staleTime: 2 * 60 * 1000, // 2 minutes
 
     // Retry failed requests once
     retry: 1,
 
-    // Don't refetch on window focus
-    refetchOnWindowFocus: false,
+    // Refetch on window focus when data is stale
+    refetchOnWindowFocus: true,
 
     // Refetch on mount if data is stale
     refetchOnMount: true,
 
-    // Don't refetch on reconnect
-    refetchOnReconnect: false,
+    // Refetch on reconnect
+    refetchOnReconnect: true,
 
-    // Keep unused data in cache for 10 minutes
-    cacheTime: 10 * 60 * 1000, // 10 minutes
+    // Keep unused data in cache for 5 minutes
+    cacheTime: 5 * 60 * 1000, // 5 minutes
 
     // Suspense mode disabled by default
     suspense: false,
@@ -128,7 +128,12 @@ export const queryKeys = {
 
   // Analytics
   analytics: {
+    all: ["analytics"],
+    dashboard: (filters) => ["analytics", "dashboard", filters],
     user: (userId) => ["analytics", "user", userId],
+    overview: () => ["analytics", "overview"],
+    quizStats: (filters) => ["analytics", "quiz-stats", filters],
+    userActivity: (filters) => ["analytics", "user-activity", filters],
   },
 };
 

@@ -222,6 +222,53 @@ export const getMyGroups = async () => {
 };
 
 /**
+ * Get groups for a specific user
+ * @param {string} userId - User ID
+ * @returns {Promise<Array>} List of groups the user belongs to
+ */
+export const getUserGroups = async (userId) => {
+  try {
+    const response = await api.get(GROUP_ENDPOINTS.USER_GROUPS(userId));
+    return response.data;
+  } catch (error) {
+    throw handleGroupError(error);
+  }
+};
+
+/**
+ * Create a join request for a group
+ * @param {Object} data - Join request data
+ * @param {string} data.group_id - Group ID to join
+ * @param {string} [data.message] - Optional message with the request
+ * @returns {Promise<Object>} Created join request
+ */
+export const createJoinRequest = async (data) => {
+  try {
+    const response = await api.post(GROUP_ENDPOINTS.JOIN_REQUEST, data);
+    return response.data;
+  } catch (error) {
+    throw handleGroupError(error);
+  }
+};
+
+/**
+ * Get quiz statistics for a group
+ * @param {string} groupId - Group ID
+ * @param {Object} [params] - Query parameters
+ * @returns {Promise<Object>} Group quiz statistics
+ */
+export const getGroupQuizStats = async (groupId, params = {}) => {
+  try {
+    const response = await api.get(GROUP_ENDPOINTS.GROUP_QUIZ_STATS(groupId), {
+      params,
+    });
+    return response.data;
+  } catch (error) {
+    throw handleGroupError(error);
+  }
+};
+
+/**
  * Handle group service errors
  * @param {Error} error - Error object
  * @returns {Error} Formatted error
@@ -266,8 +313,11 @@ export default {
   addGroupMember,
   removeGroupMember,
   getJoinRequests,
+  createJoinRequest,
   approveJoinRequest,
   generateInviteLink,
   getGroupQuizzes,
+  getGroupQuizStats,
   getMyGroups,
+  getUserGroups,
 };

@@ -55,7 +55,7 @@ const QUICK_ACTIONS = [
   {
     label: "Create Group",
     icon: Users,
-    href: "/instructor/groups/new",
+    href: "/instructor/groups",
     color: "text-amber-400",
     bgColor: "bg-amber-500/10",
   },

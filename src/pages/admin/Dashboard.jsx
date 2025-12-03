@@ -573,7 +573,7 @@ export const Dashboard = () => {
               title="No groups yet"
               description="Groups will appear here once they are created."
               actionLabel="Create Group"
-              onAction={() => navigate("/admin/groups/new")}
+              onAction={() => navigate("/admin/groups")}
             />
           )}
         </CardContent>

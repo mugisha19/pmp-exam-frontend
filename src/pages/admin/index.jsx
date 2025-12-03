@@ -6,7 +6,7 @@
 // Implemented Pages
 export { Dashboard as AdminDashboard } from "./Dashboard";
 export { UserManagement as UserManagementPage } from "./UserManagement";
-export { GroupManagement as AdminGroupsPage } from "./GroupManagement";
+export { default as AdminGroupsPage } from "./GroupManagement";
 export { GroupDetails as AdminGroupDetailsPage } from "./GroupDetails";
 export { Analytics as AnalyticsPage } from "./Analytics";
 export { Settings as SystemSettingsPage } from "./Settings";

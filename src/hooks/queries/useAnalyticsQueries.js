@@ -10,11 +10,12 @@ import analyticsService from "@/services/analytics.service";
 /**
  * Hook to fetch admin dashboard analytics
  */
-export function useAnalyticsDashboard() {
+export function useAnalyticsDashboard(days = 30) {
   return useQuery({
-    queryKey: queryKeys.analytics.dashboard(),
-    queryFn: () => analyticsService.getDashboard(),
+    queryKey: queryKeys.analytics.dashboard({ days }),
+    queryFn: () => analyticsService.getDashboard({ days }),
     staleTime: 1000 * 60 * 5, // 5 minutes
+    retry: 1,
   });
 }
 

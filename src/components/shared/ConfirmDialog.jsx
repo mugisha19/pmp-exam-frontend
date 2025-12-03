@@ -73,7 +73,9 @@ export const ConfirmDialog = ({
             <AlertTriangle className={cn("w-6 h-6", styles.icon)} />
           </div>
           <div className="flex-1">
-            <p className="text-gray-200">{message}</p>
+            <p className="text-gray-800 text-base font-medium leading-relaxed">
+              {message}
+            </p>
           </div>
         </div>
       </ModalBody>

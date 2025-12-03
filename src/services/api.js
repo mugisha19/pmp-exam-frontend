@@ -13,6 +13,9 @@ import {
 } from "@/constants/storage.constants";
 import { AUTH_ENDPOINTS, API_BASE_URL } from "@/constants/api.constants";
 
+// Direct auth service URL for token refresh (bypass proxy)
+const AUTH_SERVICE_URL = "http://localhost:8001/api/v1";
+
 // Debug: Log what we're using
 console.log("Creating axios with baseURL:", API_BASE_URL);
 
@@ -123,13 +126,20 @@ api.interceptors.response.use(
       }
 
       try {
-        // Attempt to refresh token
+        // Attempt to refresh token using direct auth service URL
+        console.log("Attempting token refresh...");
         const response = await axios.post(
-          `${API_BASE_URL}${AUTH_ENDPOINTS.REFRESH_TOKEN}`,
-          { refresh_token: refreshToken }
+          `${AUTH_SERVICE_URL}${AUTH_ENDPOINTS.REFRESH_TOKEN}`,
+          { refresh_token: refreshToken },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
         );
 
         const { access_token, refresh_token: newRefreshToken } = response.data;
+        console.log("Token refresh successful");
 
         // Store new tokens
         setStorageItem(TOKEN_KEYS.ACCESS_TOKEN, access_token);
@@ -228,8 +238,13 @@ export const refreshAccessToken = async () => {
   }
 
   const response = await axios.post(
-    `${API_BASE_URL}${AUTH_ENDPOINTS.REFRESH_TOKEN}`,
-    { refresh_token: refreshToken }
+    `${AUTH_SERVICE_URL}${AUTH_ENDPOINTS.REFRESH_TOKEN}`,
+    { refresh_token: refreshToken },
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
   );
 
   const { access_token, refresh_token: newRefreshToken } = response.data;

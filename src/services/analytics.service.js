@@ -146,11 +146,13 @@ export const getLearningGoals = async () => {
 
 /**
  * Get admin dashboard data
+ * @param {Object} params - Query parameters
+ * @param {number} params.days - Number of days to look back (default: 30)
  * @returns {Promise<Object>} Dashboard statistics
  */
-export const getDashboard = async () => {
+export const getDashboard = async (params = {}) => {
   try {
-    const response = await api.get(ANALYTICS_ENDPOINTS.DASHBOARD);
+    const response = await api.get(ANALYTICS_ENDPOINTS.DASHBOARD, { params });
     return response.data;
   } catch (error) {
     throw handleAnalyticsError(error);
