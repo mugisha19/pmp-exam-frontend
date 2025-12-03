@@ -217,9 +217,10 @@ export const updateUserStatus = async (userId, active, reason = "") => {
  */
 export const updateUserRole = async (userId, role) => {
   try {
-    const response = await api.put(USER_ENDPOINTS.UPDATE_USER_ROLE(userId), {
-      role,
-    });
+    // Role is sent as query parameter, not body
+    const response = await api.put(
+      `${USER_ENDPOINTS.UPDATE_USER_ROLE(userId)}?role=${role}`
+    );
     return response.data;
   } catch (error) {
     throw handleUserError(error);

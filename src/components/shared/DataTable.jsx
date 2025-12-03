@@ -33,11 +33,14 @@ export const DataTable = ({
   const [sortDirection, setSortDirection] = useState("asc");
   const [currentPage, setCurrentPage] = useState(1);
 
+  // Ensure data is always an array
+  const safeData = Array.isArray(data) ? data : [];
+
   // Sorting logic
   const sortedData = useMemo(() => {
-    if (!sortColumn || !sortable) return data;
+    if (!sortColumn || !sortable) return safeData;
 
-    return [...data].sort((a, b) => {
+    return [...safeData].sort((a, b) => {
       const aValue = a[sortColumn];
       const bValue = b[sortColumn];
 
@@ -46,7 +49,7 @@ export const DataTable = ({
       const comparison = aValue < bValue ? -1 : 1;
       return sortDirection === "asc" ? comparison : -comparison;
     });
-  }, [data, sortColumn, sortDirection, sortable]);
+  }, [safeData, sortColumn, sortDirection, sortable]);
 
   // Pagination logic
   const paginatedData = useMemo(() => {
@@ -195,9 +198,9 @@ export const DataTable = ({
   }
 
   return (
-    <Card className={className}>
-      <div className="overflow-x-auto">
-        <table className="w-full">
+    <div className={cn("overflow-visible", className)}>
+      <div className="overflow-x-auto overflow-y-visible">
+        <table className="w-full min-w-full table-auto">
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
               {selectable && (
@@ -352,7 +355,7 @@ export const DataTable = ({
           </div>
         </div>
       )}
-    </Card>
+    </div>
   );
 };
 

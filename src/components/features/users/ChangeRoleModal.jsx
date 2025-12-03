@@ -69,7 +69,7 @@ export const ChangeRoleModal = ({ isOpen, onClose, user }) => {
 
     try {
       await updateRoleMutation.mutateAsync({
-        userId: user.id,
+        userId: user.user_id || user.id,
         role: data.role,
       });
       onClose();

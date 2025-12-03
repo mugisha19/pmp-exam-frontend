@@ -9,6 +9,7 @@ import { studentRoutes } from "@/routes/student.routes";
 import { instructorRoutes } from "@/routes/instructor.routes";
 import { adminRoutes } from "@/routes/admin.routes";
 import Unauthorized from "@/pages/Unauthorized";
+import { RoleBasedRedirect } from "@/components/routes/RoleBasedRedirect";
 
 function App() {
   return (
@@ -31,11 +32,14 @@ function App() {
             {/* Admin routes */}
             {adminRoutes}
 
+            {/* Role-based dashboard redirect */}
+            <Route path="/dashboard" element={<RoleBasedRedirect />} />
+
             {/* Default redirect to dashboard */}
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/" element={<RoleBasedRedirect />} />
 
             {/* 404 - Redirect to dashboard */}
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            <Route path="*" element={<RoleBasedRedirect />} />
           </Routes>
         </InitializeAuth>
       </BrowserRouter>

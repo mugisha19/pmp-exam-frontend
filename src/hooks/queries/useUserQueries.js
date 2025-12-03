@@ -243,9 +243,11 @@ export const useUpdateUserMutation = () => {
       const errorMessage =
         error.message || "Failed to update user. Please try again.";
 
-      if (error.errors) {
-        Object.values(error.errors).forEach((err) => {
-          toast.error(err);
+      if (error.errors && Array.isArray(error.errors)) {
+        error.errors.forEach((err) => {
+          // Handle both string errors and {field, message} objects
+          const msg = typeof err === "string" ? err : err.message || err.field;
+          if (msg) toast.error(msg);
         });
       } else {
         toast.error(errorMessage);

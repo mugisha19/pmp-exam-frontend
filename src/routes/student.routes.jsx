@@ -7,7 +7,6 @@
 import { Route, Navigate } from "react-router-dom";
 import { RoleRoute } from "@/components/routes";
 import StudentLayout from "@/components/layouts/StudentLayout";
-import Dashboard from "@/pages/Dashboard";
 import {
   ExamsPage,
   MyExamsPage,
@@ -20,18 +19,6 @@ import {
 
 export const studentRoutes = (
   <>
-    {/* Root dashboard redirect */}
-    <Route
-      path="/dashboard"
-      element={
-        <RoleRoute allowedRoles={["student", "instructor", "admin"]}>
-          <StudentLayout />
-        </RoleRoute>
-      }
-    >
-      <Route index element={<Dashboard />} />
-    </Route>
-
     {/* Student routes with layout */}
     <Route
       element={

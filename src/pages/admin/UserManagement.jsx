@@ -7,16 +7,12 @@ import { useState, useMemo, useCallback } from "react";
 import {
   Plus,
   Search,
-  Filter,
-  MoreVertical,
   Edit,
   Trash2,
   UserCog,
   Key,
   Shield,
   Users,
-  Download,
-  Upload,
   RefreshCcw,
   CheckSquare,
   X,
@@ -46,7 +42,6 @@ import { EditUserModal } from "@/components/features/users/EditUserModal";
 import { ChangeRoleModal } from "@/components/features/users/ChangeRoleModal";
 import { ChangeStatusModal } from "@/components/features/users/ChangeStatusModal";
 import { ROLE_OPTIONS, STATUS_OPTIONS } from "@/schemas/user.schema";
-import { cn } from "@/utils/cn";
 
 // Items per page options
 const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
@@ -83,18 +78,14 @@ export const UserManagement = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 
-  // Bulk action state
-  // Bulk action menu state (for future implementation)
-  const [, setBulkActionMenu] = useState(false);
-
   // Build query params
   const queryParams = useMemo(
     () => ({
-      skip: (page - 1) * pageSize,
-      limit: pageSize,
+      page: page,
+      per_page: pageSize,
       ...(searchQuery && { search: searchQuery }),
       ...(roleFilter && { role: roleFilter }),
-      ...(statusFilter && { status: statusFilter }),
+      ...(statusFilter && { active: statusFilter === "active" }),
     }),
     [page, pageSize, searchQuery, roleFilter, statusFilter]
   );
@@ -115,7 +106,7 @@ export const UserManagement = () => {
 
   // Extract data - wrapped in useMemo to prevent useCallback dependency issues
   const users = useMemo(() => {
-    return usersData?.items || usersData || [];
+    return usersData?.users || usersData?.items || [];
   }, [usersData]);
   const totalItems = usersData?.total || users.length;
   const totalPages = Math.ceil(totalItems / pageSize);
@@ -144,22 +135,9 @@ export const UserManagement = () => {
     setPage(1);
   };
 
-  // Selection handlers
-  const handleSelectAll = useCallback(
-    (checked) => {
-      if (checked) {
-        setSelectedUsers(users.map((u) => u.id));
-      } else {
-        setSelectedUsers([]);
-      }
-    },
-    [users]
-  );
-
-  const handleSelectUser = useCallback((userId, checked) => {
-    setSelectedUsers((prev) =>
-      checked ? [...prev, userId] : prev.filter((id) => id !== userId)
-    );
+  // Selection handler for DataTable
+  const handleSelectionChange = useCallback((newSelection) => {
+    setSelectedUsers(newSelection);
   }, []);
 
   // Action handlers
@@ -173,17 +151,17 @@ export const UserManagement = () => {
     setChangeRoleModalOpen(true);
   };
 
-  const handleChangeStatus = (user) => {
+  const _handleChangeStatus = (user) => {
     setSelectedUser(user);
     setChangeStatusModalOpen(true);
   };
 
-  const handleDelete = (user) => {
+  const _handleDelete = (user) => {
     setSelectedUser(user);
     setDeleteDialogOpen(true);
   };
 
-  const handleResendCredentials = async (user) => {
+  const _handleResendCredentials = async (user) => {
     await resendCredentialsMutation.mutateAsync(user.id);
   };
 
@@ -202,16 +180,20 @@ export const UserManagement = () => {
       await deleteUserMutation.mutateAsync(userId);
     }
     setSelectedUsers([]);
-    setBulkActionMenu(false);
   };
 
-  const handleBulkStatusChange = async (status) => {
-    const active = status === "active";
+  const handleBulkActivate = async () => {
     for (const userId of selectedUsers) {
-      await updateStatusMutation.mutateAsync({ userId, active });
+      await updateStatusMutation.mutateAsync({ userId, active: true });
     }
     setSelectedUsers([]);
-    setBulkActionMenu(false);
+  };
+
+  const handleBulkDeactivate = async () => {
+    for (const userId of selectedUsers) {
+      await updateStatusMutation.mutateAsync({ userId, active: false });
+    }
+    setSelectedUsers([]);
   };
 
   // Close modals
@@ -230,40 +212,25 @@ export const UserManagement = () => {
     {
       key: "user",
       header: "User",
-      render: (user) => <UserCell user={user} showEmail />,
+      render: (_, row) => <UserCell user={row} showEmail />,
     },
     {
       key: "role",
       header: "Role",
-      render: (user) => <RoleBadge role={user.role} />,
+      render: (_, row) => <RoleBadge role={row?.role} />,
     },
     {
       key: "status",
       header: "Status",
-      render: (user) => <StatusBadge status={user.status || "active"} />,
+      render: (_, row) => (
+        <StatusBadge status={row?.active ? "active" : "inactive"} />
+      ),
     },
     {
       key: "created_at",
       header: "Joined",
-      render: (user) =>
-        user.created_at
-          ? new Date(user.created_at).toLocaleDateString()
-          : "N/A",
-    },
-    {
-      key: "actions",
-      header: "",
-      className: "w-12",
-      render: (user) => (
-        <ActionMenu
-          user={user}
-          onEdit={() => handleEdit(user)}
-          onChangeRole={() => handleChangeRole(user)}
-          onChangeStatus={() => handleChangeStatus(user)}
-          onDelete={() => handleDelete(user)}
-          onResendCredentials={() => handleResendCredentials(user)}
-        />
-      ),
+      render: (value, row) =>
+        row?.created_at ? new Date(row.created_at).toLocaleDateString() : "N/A",
     },
   ];
 
@@ -362,17 +329,41 @@ export const UserManagement = () => {
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => handleBulkStatusChange("active")}
-            >
+            {/* Edit - only when single user selected */}
+            {selectedUsers.length === 1 && (
+              <Button
+                variant="secondary"
+                size="sm"
+                leftIcon={<Edit className="w-4 h-4" />}
+                onClick={() => {
+                  const user = users.find((u) => u.user_id === selectedUsers[0]);
+                  if (user) handleEdit(user);
+                }}
+              >
+                Edit
+              </Button>
+            )}
+            {/* Change Role - only when single user selected */}
+            {selectedUsers.length === 1 && (
+              <Button
+                variant="secondary"
+                size="sm"
+                leftIcon={<Shield className="w-4 h-4" />}
+                onClick={() => {
+                  const user = users.find((u) => u.user_id === selectedUsers[0]);
+                  if (user) handleChangeRole(user);
+                }}
+              >
+                Change Role
+              </Button>
+            )}
+            <Button variant="secondary" size="sm" onClick={handleBulkActivate}>
               Activate
             </Button>
             <Button
               variant="secondary"
               size="sm"
-              onClick={() => handleBulkStatusChange("inactive")}
+              onClick={handleBulkDeactivate}
             >
               Deactivate
             </Button>
@@ -391,8 +382,8 @@ export const UserManagement = () => {
       )}
 
       {/* Users Table */}
-      <Card>
-        <CardContent className="p-0">
+      <Card className="overflow-visible">
+        <CardContent className="p-0 overflow-visible">
           {isLoading ? (
             <div className="p-8">
               <TableSkeleton rows={pageSize} />
@@ -431,9 +422,9 @@ export const UserManagement = () => {
               data={users}
               selectable
               selectedRows={selectedUsers}
-              onSelectAll={handleSelectAll}
-              onSelectRow={handleSelectUser}
-              rowKey="id"
+              onSelectionChange={handleSelectionChange}
+              rowKey="user_id"
+              paginated={false}
             />
           )}
         </CardContent>
@@ -521,69 +512,7 @@ export const UserManagement = () => {
 /**
  * Action Menu Component
  */
-const ActionMenu = ({
-  onEdit,
-  onChangeRole,
-  onChangeStatus,
-  onDelete,
-  onResendCredentials,
-}) => {
-  const [isOpen, setIsOpen] = useState(false);
 
-  const actions = [
-    { label: "Edit", icon: Edit, onClick: onEdit },
-    { label: "Change Role", icon: Shield, onClick: onChangeRole },
-    { label: "Change Status", icon: UserCog, onClick: onChangeStatus },
-    { label: "Resend Credentials", icon: Key, onClick: onResendCredentials },
-    { label: "Delete", icon: Trash2, onClick: onDelete, danger: true },
-  ];
-
-  return (
-    <div className="relative">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-      >
-        <MoreVertical className="w-4 h-4 text-gray-500" />
-      </button>
-
-      {isOpen && (
-        <>
-          {/* Backdrop */}
-          <div
-            className="fixed inset-0 z-10"
-            onClick={() => setIsOpen(false)}
-          />
-
-          {/* Menu */}
-          <div className="absolute right-0 top-full mt-1 z-20 w-48 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden">
-            {actions.map((action, index) => {
-              const Icon = action.icon;
-              return (
-                <button
-                  key={index}
-                  onClick={() => {
-                    action.onClick();
-                    setIsOpen(false);
-                  }}
-                  className={cn(
-                    "w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors",
-                    action.danger
-                      ? "text-red-600 hover:bg-red-50"
-                      : "text-gray-700 hover:bg-gray-50"
-                  )}
-                >
-                  <Icon className="w-4 h-4" />
-                  {action.label}
-                </button>
-              );
-            })}
-          </div>
-        </>
-      )}
-    </div>
-  );
-};
 
 /**
  * Table Skeleton Component

@@ -61,7 +61,7 @@ export const EditUserModal = ({ isOpen, onClose, user }) => {
       }
 
       await updateUserMutation.mutateAsync({
-        userId: user.id,
+        userId: user.user_id || user.id,
         userData: updates,
       });
       onClose();
