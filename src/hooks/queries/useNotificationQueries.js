@@ -27,10 +27,14 @@ const hasValidToken = () => {
 export const useNotifications = (filters = {}, options = {}) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const isLoading = useAuthStore((state) => state.isLoading);
-  
+
   // Only fetch when authenticated, not loading, has token, and enabled
-  const canFetch = isAuthenticated && !isLoading && hasValidToken() && (options.enabled !== false);
-  
+  const canFetch =
+    isAuthenticated &&
+    !isLoading &&
+    hasValidToken() &&
+    options.enabled !== false;
+
   return useQuery({
     queryKey: queryKeys.notifications.list(filters),
     queryFn: () => notificationService.getNotifications(filters),
@@ -53,10 +57,10 @@ export const useNotifications = (filters = {}, options = {}) => {
 export const useUnreadNotificationCount = (options = {}) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const isLoading = useAuthStore((state) => state.isLoading);
-  
+
   // Only fetch when authenticated, not loading, and has token
   const canFetch = isAuthenticated && !isLoading && hasValidToken();
-  
+
   return useQuery({
     queryKey: queryKeys.notifications.unreadCount(),
     queryFn: async () => {

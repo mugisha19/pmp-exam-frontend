@@ -40,7 +40,11 @@ const profileSchema = z.object({
   avatar_url: z
     .string()
     .refine(
-      (val) => !val || val.startsWith("data:image/") || val.startsWith("http://") || val.startsWith("https://"),
+      (val) =>
+        !val ||
+        val.startsWith("data:image/") ||
+        val.startsWith("http://") ||
+        val.startsWith("https://"),
       "Please enter a valid URL or upload an image"
     )
     .optional()
@@ -325,7 +329,7 @@ export function Profile() {
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">
                     Profile Picture
                   </label>
-                  
+
                   {/* Upload info */}
                   <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
                     <div className="shrink-0">
@@ -338,16 +342,18 @@ export function Profile() {
                       <p className="text-xs text-gray-500 mt-1">
                         Supported formats: JPEG, PNG, GIF, WebP (max 2MB)
                       </p>
-                      
+
                       {/* Toggle URL input */}
                       <button
                         type="button"
                         onClick={() => setShowUrlInput(!showUrlInput)}
                         className="text-xs text-blue-600 hover:text-blue-700 mt-2"
                       >
-                        {showUrlInput ? "Hide URL input" : "Or enter image URL instead"}
+                        {showUrlInput
+                          ? "Hide URL input"
+                          : "Or enter image URL instead"}
                       </button>
-                      
+
                       {/* URL Input (optional) */}
                       {showUrlInput && (
                         <div className="mt-3">
@@ -364,7 +370,7 @@ export function Profile() {
                       )}
                     </div>
                   </div>
-                  
+
                   {avatarPreview && (
                     <p className="text-xs text-green-600 mt-2 flex items-center gap-1">
                       <CheckCircle className="w-3 h-3" />

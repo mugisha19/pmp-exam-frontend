@@ -128,7 +128,7 @@ export const useUpdateSettingsMutation = () => {
  */
 export const useChangePasswordMutation = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: ({ currentPassword, newPassword }) =>
       userService.changePassword(currentPassword, newPassword),

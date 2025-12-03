@@ -243,13 +243,17 @@ export function Settings() {
             <div>
               <p className="text-gray-900 font-medium">Password</p>
               <p className="text-gray-500 text-sm">
-                Last changed: {user?.password_changed_at 
-                  ? new Date(user.password_changed_at).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })
-                  : 'Never'}
+                Last changed:{" "}
+                {user?.password_changed_at
+                  ? new Date(user.password_changed_at).toLocaleDateString(
+                      "en-US",
+                      {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      }
+                    )
+                  : "Never"}
               </p>
             </div>
             <Button variant="outline" onClick={() => setShowPasswordForm(true)}>
