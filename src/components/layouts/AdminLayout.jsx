@@ -1,19 +1,16 @@
 /**
  * AdminLayout Component
- * Dashboard layout wrapper for admin role
+ * Dashboard layout wrapper for admin role with Outlet for nested routes
  */
 
+import { Outlet } from "react-router-dom";
 import DashboardLayout from "./DashboardLayout";
 import { ADMIN_NAV_ITEMS } from "@/constants/navigation.constants";
 
-export const AdminLayout = ({ children, title, subtitle }) => {
+export const AdminLayout = () => {
   return (
-    <DashboardLayout
-      title={title}
-      subtitle={subtitle}
-      sidebarConfig={ADMIN_NAV_ITEMS}
-    >
-      {children}
+    <DashboardLayout navItems={ADMIN_NAV_ITEMS} role="admin">
+      <Outlet />
     </DashboardLayout>
   );
 };

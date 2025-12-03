@@ -1,19 +1,16 @@
 /**
  * InstructorLayout Component
- * Dashboard layout wrapper for instructor role
+ * Dashboard layout wrapper for instructor role with Outlet for nested routes
  */
 
+import { Outlet } from "react-router-dom";
 import DashboardLayout from "./DashboardLayout";
 import { INSTRUCTOR_NAV_ITEMS } from "@/constants/navigation.constants";
 
-export const InstructorLayout = ({ children, title, subtitle }) => {
+export const InstructorLayout = () => {
   return (
-    <DashboardLayout
-      title={title}
-      subtitle={subtitle}
-      sidebarConfig={INSTRUCTOR_NAV_ITEMS}
-    >
-      {children}
+    <DashboardLayout navItems={INSTRUCTOR_NAV_ITEMS} role="instructor">
+      <Outlet />
     </DashboardLayout>
   );
 };

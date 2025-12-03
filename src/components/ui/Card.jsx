@@ -1,6 +1,6 @@
 /**
  * Card Component
- * Container with dark surface background
+ * Container with light surface background
  */
 
 import { cn } from "@/utils/cn";
@@ -25,10 +25,10 @@ export const Card = ({
   return (
     <div
       className={cn(
-        "bg-gray-800/50 backdrop-blur-sm rounded-2xl border border-gray-700/50",
+        "bg-white backdrop-blur-sm rounded-2xl border border-gray-200 shadow-sm",
         paddingStyles[padding],
         hover &&
-          "transition-all duration-200 hover:bg-gray-800/70 hover:border-gray-600/50",
+          "transition-all duration-200 hover:bg-gray-50 hover:border-gray-300",
         isClickable && "cursor-pointer",
         className
       )}
@@ -52,7 +52,7 @@ export const CardHeader = ({ children, className, ...props }) => {
 
 export const CardTitle = ({ children, className, ...props }) => {
   return (
-    <h3 className={cn("text-xl font-bold text-white", className)} {...props}>
+    <h3 className={cn("text-xl font-bold text-gray-900", className)} {...props}>
       {children}
     </h3>
   );
@@ -60,7 +60,7 @@ export const CardTitle = ({ children, className, ...props }) => {
 
 export const CardDescription = ({ children, className, ...props }) => {
   return (
-    <p className={cn("text-sm text-gray-400 mt-1", className)} {...props}>
+    <p className={cn("text-sm text-gray-600 mt-1", className)} {...props}>
       {children}
     </p>
   );
@@ -77,7 +77,7 @@ export const CardContent = ({ children, className, ...props }) => {
 export const CardFooter = ({ children, className, ...props }) => {
   return (
     <div
-      className={cn("mt-4 pt-4 border-t border-gray-700/50", className)}
+      className={cn("mt-4 pt-4 border-t border-gray-200", className)}
       {...props}
     >
       {children}

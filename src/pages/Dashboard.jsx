@@ -26,11 +26,11 @@ export const DashboardPage = () => {
           <CardContent padding="md">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-400">Total Exams</p>
-                <p className="text-2xl font-bold text-white mt-1">24</p>
+                <p className="text-sm text-gray-500">Total Exams</p>
+                <p className="text-2xl font-bold text-gray-900 mt-1">24</p>
               </div>
-              <div className="p-3 bg-purple-600/20 rounded-xl">
-                <BookOpen className="w-6 h-6 text-purple-400" />
+              <div className="p-3 bg-blue-100 rounded-xl">
+                <BookOpen className="w-6 h-6 text-blue-600" />
               </div>
             </div>
           </CardContent>
@@ -40,11 +40,11 @@ export const DashboardPage = () => {
           <CardContent padding="md">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-400">Completed</p>
-                <p className="text-2xl font-bold text-white mt-1">18</p>
+                <p className="text-sm text-gray-500">Completed</p>
+                <p className="text-2xl font-bold text-gray-900 mt-1">18</p>
               </div>
               <div className="p-3 bg-green-600/20 rounded-xl">
-                <Trophy className="w-6 h-6 text-green-400" />
+                <Trophy className="w-6 h-6 text-green-500" />
               </div>
             </div>
           </CardContent>
@@ -54,11 +54,11 @@ export const DashboardPage = () => {
           <CardContent padding="md">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-400">Average Score</p>
-                <p className="text-2xl font-bold text-white mt-1">85%</p>
+                <p className="text-sm text-gray-500">Average Score</p>
+                <p className="text-2xl font-bold text-gray-900 mt-1">85%</p>
               </div>
               <div className="p-3 bg-blue-600/20 rounded-xl">
-                <BarChart3 className="w-6 h-6 text-blue-400" />
+                <BarChart3 className="w-6 h-6 text-blue-500" />
               </div>
             </div>
           </CardContent>
@@ -68,11 +68,11 @@ export const DashboardPage = () => {
           <CardContent padding="md">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-400">Study Time</p>
-                <p className="text-2xl font-bold text-white mt-1">42h</p>
+                <p className="text-sm text-gray-500">Study Time</p>
+                <p className="text-2xl font-bold text-gray-900 mt-1">42h</p>
               </div>
               <div className="p-3 bg-yellow-600/20 rounded-xl">
-                <Clock className="w-6 h-6 text-yellow-400" />
+                <Clock className="w-6 h-6 text-yellow-500" />
               </div>
             </div>
           </CardContent>
@@ -91,13 +91,13 @@ export const DashboardPage = () => {
               {[1, 2, 3].map((item) => (
                 <div
                   key={item}
-                  className="flex items-center justify-between p-4 bg-gray-900/50 rounded-xl"
+                  className="flex items-center justify-between p-4 bg-gray-50 rounded-xl"
                 >
                   <div>
-                    <p className="font-medium text-white">
+                    <p className="font-medium text-gray-900">
                       PMP Practice Exam {item}
                     </p>
-                    <p className="text-sm text-gray-400 mt-1">2 days ago</p>
+                    <p className="text-sm text-gray-500 mt-1">2 days ago</p>
                   </div>
                   <Badge variant="success">Passed</Badge>
                 </div>
@@ -116,13 +116,13 @@ export const DashboardPage = () => {
               {[1, 2, 3].map((item) => (
                 <div
                   key={item}
-                  className="flex items-center justify-between p-4 bg-gray-900/50 rounded-xl"
+                  className="flex items-center justify-between p-4 bg-gray-50 rounded-xl"
                 >
                   <div>
-                    <p className="font-medium text-white">
+                    <p className="font-medium text-gray-900">
                       Final Assessment {item}
                     </p>
-                    <p className="text-sm text-gray-400 mt-1">Due in 3 days</p>
+                    <p className="text-sm text-gray-500 mt-1">Due in 3 days</p>
                   </div>
                   <Badge variant="warning">Pending</Badge>
                 </div>

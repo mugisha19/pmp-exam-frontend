@@ -4,41 +4,41 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Backgrounds
+        // Backgrounds - Light Theme
         bg: {
-          primary: "#050505",
-          secondary: "#0a0a0a",
-          tertiary: "#0f0f0f",
-          quaternary: "#141414",
+          primary: "#f8fafc",
+          secondary: "#f1f5f9",
+          tertiary: "#e2e8f0",
+          quaternary: "#cbd5e1",
         },
-        // Surfaces
+        // Surfaces - Light Theme
         surface: {
-          primary: "#1a1a1a",
-          secondary: "#1f1f1f",
-          tertiary: "#252525",
-        },
-        // Borders
-        border: {
-          primary: "#2a2a2a",
-          secondary: "#303030",
-          tertiary: "#383838",
-        },
-        // Text
-        text: {
           primary: "#ffffff",
-          secondary: "#f0f0f0",
-          tertiary: "#a0a0a0",
-          quaternary: "#707070",
+          secondary: "#f8fafc",
+          tertiary: "#f1f5f9",
+        },
+        // Borders - Light Theme
+        border: {
+          primary: "#e2e8f0",
+          secondary: "#cbd5e1",
+          tertiary: "#94a3b8",
+        },
+        // Text - Light Theme
+        text: {
+          primary: "#0f172a",
+          secondary: "#1e293b",
+          tertiary: "#64748b",
+          quaternary: "#94a3b8",
         },
         // Accent
         accent: {
-          primary: "#7c7cff",
-          secondary: "#5a5aff",
+          primary: "#7c3aed",
+          secondary: "#6d28d9",
         },
         // Semantic colors
-        error: "#ff6b6b",
-        success: "#4ecdc4",
-        warning: "#ffc107",
+        error: "#ef4444",
+        success: "#10b981",
+        warning: "#f59e0b",
       },
       fontFamily: {
         sans: ["Poppins", "sans-serif"],

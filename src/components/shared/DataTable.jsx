@@ -1,6 +1,6 @@
 /**
  * DataTable Component
- * Reusable table with sorting, pagination, and loading states
+ * Reusable table with sorting, pagination, selection, and loading states
  */
 
 import { useState, useMemo } from "react";
@@ -16,10 +16,17 @@ export const DataTable = ({
   loading = false,
   emptyMessage = "No data available",
   emptyDescription = "There are no items to display at the moment.",
+  emptyIcon,
+  emptyAction,
   onRowClick,
   sortable = true,
   paginated = true,
   pageSize = 10,
+  // Selection props
+  selectable = false,
+  selectedRows = [],
+  onSelectionChange,
+  rowKey = "id",
   className,
 }) => {
   const [sortColumn, setSortColumn] = useState(null);
@@ -67,6 +74,53 @@ export const DataTable = ({
     setCurrentPage(Math.max(1, Math.min(page, totalPages)));
   };
 
+  // Selection handlers
+  const isRowSelected = (row) => {
+    const key = row[rowKey];
+    return selectedRows.includes(key);
+  };
+
+  const isAllSelected = () => {
+    if (paginatedData.length === 0) return false;
+    return paginatedData.every((row) => selectedRows.includes(row[rowKey]));
+  };
+
+  const isSomeSelected = () => {
+    return (
+      paginatedData.some((row) => selectedRows.includes(row[rowKey])) &&
+      !isAllSelected()
+    );
+  };
+
+  const handleSelectAll = () => {
+    if (!onSelectionChange) return;
+
+    if (isAllSelected()) {
+      // Deselect all on current page
+      const currentPageKeys = paginatedData.map((row) => row[rowKey]);
+      onSelectionChange(
+        selectedRows.filter((key) => !currentPageKeys.includes(key))
+      );
+    } else {
+      // Select all on current page
+      const currentPageKeys = paginatedData.map((row) => row[rowKey]);
+      const newSelection = [...new Set([...selectedRows, ...currentPageKeys])];
+      onSelectionChange(newSelection);
+    }
+  };
+
+  const handleSelectRow = (row, e) => {
+    e?.stopPropagation();
+    if (!onSelectionChange) return;
+
+    const key = row[rowKey];
+    if (isRowSelected(row)) {
+      onSelectionChange(selectedRows.filter((k) => k !== key));
+    } else {
+      onSelectionChange([...selectedRows, key]);
+    }
+  };
+
   const renderSortIcon = (columnKey) => {
     if (!sortable) return null;
 
@@ -86,21 +140,32 @@ export const DataTable = ({
       <Card className={className}>
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-800/50 border-b border-gray-700">
+            <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
+                {selectable && (
+                  <th className="px-4 py-4 w-12">
+                    <Skeleton width={18} height={18} />
+                  </th>
+                )}
                 {columns.map((column, index) => (
                   <th
                     key={index}
-                    className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider"
+                    className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    style={{ width: column.width }}
                   >
-                    {column.label}
+                    {column.header || column.label}
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {Array.from({ length: 5 }).map((_, rowIndex) => (
-                <tr key={rowIndex} className="border-b border-gray-800">
+                <tr key={rowIndex} className="border-b border-gray-200">
+                  {selectable && (
+                    <td className="px-4 py-4">
+                      <Skeleton width={18} height={18} />
+                    </td>
+                  )}
                   {columns.map((_, colIndex) => (
                     <td key={colIndex} className="px-6 py-4">
                       <Skeleton height={20} />
@@ -119,7 +184,12 @@ export const DataTable = ({
   if (!data || data.length === 0) {
     return (
       <Card className={className}>
-        <EmptyState title={emptyMessage} description={emptyDescription} />
+        <EmptyState
+          title={emptyMessage}
+          description={emptyDescription}
+          icon={emptyIcon}
+          action={emptyAction}
+        />
       </Card>
     );
   }
@@ -128,8 +198,21 @@ export const DataTable = ({
     <Card className={className}>
       <div className="overflow-x-auto">
         <table className="w-full">
-          <thead className="bg-gray-800/50 border-b border-gray-700">
+          <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
+              {selectable && (
+                <th className="px-4 py-4 w-12">
+                  <input
+                    type="checkbox"
+                    checked={isAllSelected()}
+                    ref={(input) => {
+                      if (input) input.indeterminate = isSomeSelected();
+                    }}
+                    onChange={handleSelectAll}
+                    className="w-4 h-4 rounded border-gray-300 bg-white text-blue-600 focus:ring-blue-500 focus:ring-offset-white"
+                  />
+                </th>
+              )}
               {columns.map((column) => (
                 <th
                   key={column.key}
@@ -137,36 +220,66 @@ export const DataTable = ({
                     column.sortable !== false && handleSort(column.key)
                   }
                   className={cn(
-                    "px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider",
+                    "px-6 py-4 text-xs font-medium text-gray-500 uppercase tracking-wider",
+                    column.align === "center" && "text-center",
+                    column.align === "right" && "text-right",
+                    !column.align && "text-left",
                     sortable &&
                       column.sortable !== false &&
-                      "cursor-pointer hover:text-white select-none"
+                      "cursor-pointer hover:text-gray-900 select-none"
                   )}
+                  style={{ width: column.width }}
                 >
-                  <div className="flex items-center gap-2">
-                    {column.label}
+                  <div
+                    className={cn(
+                      "flex items-center gap-2",
+                      column.align === "center" && "justify-center",
+                      column.align === "right" && "justify-end"
+                    )}
+                  >
+                    {column.header || column.label}
                     {column.sortable !== false && renderSortIcon(column.key)}
                   </div>
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-800">
+          <tbody className="divide-y divide-gray-200">
             {paginatedData.map((row, rowIndex) => (
               <tr
-                key={row.id || rowIndex}
+                key={row[rowKey] || rowIndex}
                 onClick={() => onRowClick?.(row)}
                 className={cn(
-                  "transition-colors",
-                  onRowClick && "cursor-pointer hover:bg-gray-800/50"
+                  "transition-colors hover:bg-gray-50",
+                  onRowClick && "cursor-pointer",
+                  isRowSelected(row) && "bg-blue-50"
                 )}
               >
+                {selectable && (
+                  <td className="px-4 py-4">
+                    <input
+                      type="checkbox"
+                      checked={isRowSelected(row)}
+                      onChange={(e) => handleSelectRow(row, e)}
+                      onClick={(e) => e.stopPropagation()}
+                      className="w-4 h-4 rounded border-gray-300 bg-white text-blue-600 focus:ring-blue-500 focus:ring-offset-white"
+                    />
+                  </td>
+                )}
                 {columns.map((column) => (
-                  <td key={column.key} className="px-6 py-4 whitespace-nowrap">
+                  <td
+                    key={column.key}
+                    className={cn(
+                      "px-6 py-4 whitespace-nowrap",
+                      column.align === "center" && "text-center",
+                      column.align === "right" && "text-right"
+                    )}
+                    style={{ width: column.width }}
+                  >
                     {column.render ? (
                       column.render(row[column.key], row)
                     ) : (
-                      <span className="text-sm text-gray-200">
+                      <span className="text-sm text-gray-700">
                         {row[column.key]}
                       </span>
                     )}
@@ -180,8 +293,8 @@ export const DataTable = ({
 
       {/* Pagination */}
       {paginated && totalPages > 1 && (
-        <div className="flex items-center justify-between px-6 py-4 border-t border-gray-800">
-          <div className="text-sm text-gray-400">
+        <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200">
+          <div className="text-sm text-gray-500">
             Showing {(currentPage - 1) * pageSize + 1} to{" "}
             {Math.min(currentPage * pageSize, sortedData.length)} of{" "}
             {sortedData.length} results
@@ -190,7 +303,7 @@ export const DataTable = ({
             <button
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
-              className="px-3 py-1.5 text-sm bg-gray-800 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-3 py-1.5 text-sm bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               Previous
             </button>
@@ -219,8 +332,8 @@ export const DataTable = ({
                         className={cn(
                           "px-3 py-1.5 text-sm rounded-lg transition-colors",
                           currentPage === page
-                            ? "bg-purple-600 text-white"
-                            : "bg-gray-800 text-white hover:bg-gray-700"
+                            ? "bg-blue-600 text-white"
+                            : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
                         )}
                       >
                         {page}
@@ -232,7 +345,7 @@ export const DataTable = ({
             <button
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="px-3 py-1.5 text-sm bg-gray-800 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-3 py-1.5 text-sm bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               Next
             </button>

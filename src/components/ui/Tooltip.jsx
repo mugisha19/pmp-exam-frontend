@@ -14,12 +14,12 @@ const positionStyles = {
 };
 
 const arrowStyles = {
-  top: "top-full left-1/2 -translate-x-1/2 -mt-1 border-t-gray-800 border-x-transparent border-b-transparent",
+  top: "top-full left-1/2 -translate-x-1/2 -mt-1 border-t-gray-900 border-x-transparent border-b-transparent",
   bottom:
-    "bottom-full left-1/2 -translate-x-1/2 -mb-1 border-b-gray-800 border-x-transparent border-t-transparent",
-  left: "left-full top-1/2 -translate-y-1/2 -ml-1 border-l-gray-800 border-y-transparent border-r-transparent",
+    "bottom-full left-1/2 -translate-x-1/2 -mb-1 border-b-gray-900 border-x-transparent border-t-transparent",
+  left: "left-full top-1/2 -translate-y-1/2 -ml-1 border-l-gray-900 border-y-transparent border-r-transparent",
   right:
-    "right-full top-1/2 -translate-y-1/2 -mr-1 border-r-gray-800 border-y-transparent border-l-transparent",
+    "right-full top-1/2 -translate-y-1/2 -mr-1 border-r-gray-900 border-y-transparent border-l-transparent",
 };
 
 export const Tooltip = ({
@@ -62,9 +62,9 @@ export const Tooltip = ({
         <div
           className={cn(
             "absolute z-50 whitespace-nowrap",
-            "px-3 py-2 text-sm text-white bg-gray-800 rounded-lg shadow-xl",
+            "px-3 py-2 text-sm text-white bg-gray-900 rounded-lg shadow-xl",
             "pointer-events-none animate-in fade-in zoom-in-95 duration-200",
-            "border border-gray-700/50",
+            "border border-gray-700",
             positionStyles[position],
             className
           )}

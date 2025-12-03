@@ -13,6 +13,9 @@ import {
 } from "@/constants/storage.constants";
 import { AUTH_ENDPOINTS, API_BASE_URL } from "@/constants/api.constants";
 
+// Debug: Log what we're using
+console.log("Creating axios with baseURL:", API_BASE_URL);
+
 // Create axios instance
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -21,6 +24,9 @@ const api = axios.create({
     "Content-Type": "application/json",
   },
 });
+
+// Debug: Verify the instance configuration
+console.log("Axios instance baseURL:", api.defaults.baseURL);
 
 // Flag to prevent multiple refresh attempts
 let isRefreshing = false;
@@ -47,6 +53,13 @@ const processQueue = (error, token = null) => {
  */
 api.interceptors.request.use(
   (config) => {
+    // Debug: Log request details
+    console.log("API Request:", {
+      baseURL: config.baseURL,
+      url: config.url,
+      fullURL: `${config.baseURL}${config.url}`,
+    });
+
     const token = getStorageItem(TOKEN_KEYS.ACCESS_TOKEN);
 
     if (token) {

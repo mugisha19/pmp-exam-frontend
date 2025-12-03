@@ -1,17 +1,20 @@
 /**
  * PublicRoute Component
- * Redirect to dashboard if already authenticated
+ * Redirect to role-based dashboard if already authenticated
  */
 
 import { Navigate } from "react-router-dom";
 import { useAuthStore } from "@/stores/auth.store";
+import { ROLE_ROUTES } from "@/constants/roles.constants";
 
 export const PublicRoute = ({ children }) => {
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
 
-  // Redirect to dashboard if already logged in
-  if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
+  // Redirect to role-based dashboard if already logged in
+  if (isAuthenticated && user) {
+    const userRole = user.role?.toLowerCase();
+    const defaultRoute = ROLE_ROUTES[userRole] || "/dashboard";
+    return <Navigate to={defaultRoute} replace />;
   }
 
   return children;

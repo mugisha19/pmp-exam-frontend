@@ -29,9 +29,9 @@ export const ROLE_DESCRIPTIONS = {
 
 // Role-based dashboard routes
 export const ROLE_ROUTES = {
-  [ROLES.STUDENT]: "/student",
-  [ROLES.INSTRUCTOR]: "/instructor",
-  [ROLES.ADMIN]: "/admin",
+  [ROLES.STUDENT]: "/dashboard",
+  [ROLES.INSTRUCTOR]: "/instructor/dashboard",
+  [ROLES.ADMIN]: "/admin/dashboard",
 };
 
 // Role permissions map

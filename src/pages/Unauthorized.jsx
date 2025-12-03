@@ -42,10 +42,6 @@ export const Unauthorized = () => {
           >
             Go to Dashboard
           </Button>
-
-          <Button as={Link} to="/login" variant="secondary" size="md" fullWidth>
-            Back to Login
-          </Button>
         </div>
       </div>
     </div>

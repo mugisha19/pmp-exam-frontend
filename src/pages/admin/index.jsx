@@ -1,66 +1,43 @@
 /**
- * Admin Pages - Placeholders
- * Replace these with actual implementations
+ * Admin Pages Index
+ * Export all admin page components
  */
 
-import AdminLayout from "@/components/layouts/AdminLayout";
+// Implemented Pages
+export { Dashboard as AdminDashboard } from "./Dashboard";
+export { UserManagement as UserManagementPage } from "./UserManagement";
+export { GroupManagement as AdminGroupsPage } from "./GroupManagement";
+export { GroupDetails as AdminGroupDetailsPage } from "./GroupDetails";
+export { Analytics as AnalyticsPage } from "./Analytics";
+export { Settings as SystemSettingsPage } from "./Settings";
+export { Notifications as NotificationsPage } from "./Notifications";
+export { Profile as AdminProfilePage } from "./Profile";
 
-export const AdminDashboard = () => (
-  <AdminLayout title="Dashboard" subtitle="System overview and analytics">
-    <div className="text-white">Admin Dashboard - Coming Soon</div>
-  </AdminLayout>
-);
-
-export const UserManagementPage = () => (
-  <AdminLayout title="User Management" subtitle="Manage all users">
-    <div className="text-white">User Management Page - Coming Soon</div>
-  </AdminLayout>
-);
-
+// Placeholder Pages - To be implemented
 export const AdminInstructorsPage = () => (
-  <AdminLayout title="Instructors" subtitle="Manage instructor accounts">
-    <div className="text-white">Instructors Page - Coming Soon</div>
-  </AdminLayout>
+  <div className="p-6">
+    <h1 className="text-2xl font-bold text-gray-900 mb-2">Instructors</h1>
+    <p className="text-gray-500">Manage instructor accounts - Coming Soon</p>
+  </div>
 );
 
 export const AdminStudentsPage = () => (
-  <AdminLayout title="Students" subtitle="Manage student accounts">
-    <div className="text-white">Students Page - Coming Soon</div>
-  </AdminLayout>
+  <div className="p-6">
+    <h1 className="text-2xl font-bold text-gray-900 mb-2">Students</h1>
+    <p className="text-gray-500">Manage student accounts - Coming Soon</p>
+  </div>
 );
 
 export const AdminExamsPage = () => (
-  <AdminLayout title="Exams" subtitle="Oversee all exams">
-    <div className="text-white">Exams Page - Coming Soon</div>
-  </AdminLayout>
-);
-
-export const AdminGroupsPage = () => (
-  <AdminLayout title="Groups" subtitle="Manage all groups">
-    <div className="text-white">Groups Page - Coming Soon</div>
-  </AdminLayout>
-);
-
-export const AnalyticsPage = () => (
-  <AdminLayout title="Analytics" subtitle="System-wide analytics and reports">
-    <div className="text-white">Analytics Page - Coming Soon</div>
-  </AdminLayout>
+  <div className="p-6">
+    <h1 className="text-2xl font-bold text-gray-900 mb-2">Exams</h1>
+    <p className="text-gray-500">Oversee all exams - Coming Soon</p>
+  </div>
 );
 
 export const ReportsPage = () => (
-  <AdminLayout title="Reports" subtitle="Generate and view reports">
-    <div className="text-white">Reports Page - Coming Soon</div>
-  </AdminLayout>
-);
-
-export const NotificationsPage = () => (
-  <AdminLayout title="Notifications" subtitle="Manage system notifications">
-    <div className="text-white">Notifications Page - Coming Soon</div>
-  </AdminLayout>
-);
-
-export const SystemSettingsPage = () => (
-  <AdminLayout title="System Settings" subtitle="Configure system settings">
-    <div className="text-white">System Settings Page - Coming Soon</div>
-  </AdminLayout>
+  <div className="p-6">
+    <h1 className="text-2xl font-bold text-gray-900 mb-2">Reports</h1>
+    <p className="text-gray-500">Generate and view reports - Coming Soon</p>
+  </div>
 );

@@ -1,10 +1,12 @@
 /**
  * Student Routes Configuration
  * Routes accessible to students
+ * Uses StudentLayout as parent with nested child routes
  */
 
-import { Route } from "react-router-dom";
+import { Route, Navigate } from "react-router-dom";
 import { RoleRoute } from "@/components/routes";
+import StudentLayout from "@/components/layouts/StudentLayout";
 import Dashboard from "@/pages/Dashboard";
 import {
   ExamsPage,
@@ -18,69 +20,33 @@ import {
 
 export const studentRoutes = (
   <>
+    {/* Root dashboard redirect */}
     <Route
       path="/dashboard"
       element={
         <RoleRoute allowedRoles={["student", "instructor", "admin"]}>
-          <Dashboard />
+          <StudentLayout />
         </RoleRoute>
       }
-    />
+    >
+      <Route index element={<Dashboard />} />
+    </Route>
+
+    {/* Student routes with layout */}
     <Route
-      path="/exams"
       element={
         <RoleRoute allowedRoles={["student", "instructor", "admin"]}>
-          <ExamsPage />
+          <StudentLayout />
         </RoleRoute>
       }
-    />
-    <Route
-      path="/my-exams"
-      element={
-        <RoleRoute allowedRoles={["student", "instructor", "admin"]}>
-          <MyExamsPage />
-        </RoleRoute>
-      }
-    />
-    <Route
-      path="/results"
-      element={
-        <RoleRoute allowedRoles={["student", "instructor", "admin"]}>
-          <ResultsPage />
-        </RoleRoute>
-      }
-    />
-    <Route
-      path="/leaderboard"
-      element={
-        <RoleRoute allowedRoles={["student", "instructor", "admin"]}>
-          <LeaderboardPage />
-        </RoleRoute>
-      }
-    />
-    <Route
-      path="/study-materials"
-      element={
-        <RoleRoute allowedRoles={["student", "instructor", "admin"]}>
-          <StudyMaterialsPage />
-        </RoleRoute>
-      }
-    />
-    <Route
-      path="/profile"
-      element={
-        <RoleRoute allowedRoles={["student", "instructor", "admin"]}>
-          <ProfilePage />
-        </RoleRoute>
-      }
-    />
-    <Route
-      path="/settings"
-      element={
-        <RoleRoute allowedRoles={["student", "instructor", "admin"]}>
-          <SettingsPage />
-        </RoleRoute>
-      }
-    />
+    >
+      <Route path="/exams" element={<ExamsPage />} />
+      <Route path="/my-exams" element={<MyExamsPage />} />
+      <Route path="/results" element={<ResultsPage />} />
+      <Route path="/leaderboard" element={<LeaderboardPage />} />
+      <Route path="/study-materials" element={<StudyMaterialsPage />} />
+      <Route path="/profile" element={<ProfilePage />} />
+      <Route path="/settings" element={<SettingsPage />} />
+    </Route>
   </>
 );

@@ -30,7 +30,7 @@ export const login = async (email, password) => {
       throw new Error("Invalid response from server");
     }
 
-    const { access_token, refresh_token, user } = response.data;
+    const { access_token, refresh_token } = response.data;
 
     // Validate required fields
     if (!access_token || !refresh_token) {
@@ -40,13 +40,16 @@ export const login = async (email, password) => {
     // Store tokens
     setAuthToken(access_token, refresh_token);
 
+    // Fetch user data after successful login
+    const user = await validateSession();
+
     // Store user data
     if (user) {
       setStorageItem(STORAGE_KEYS.USER, user);
       setStorageItem(STORAGE_KEYS.USER_ROLE, user.role);
     }
 
-    return response.data;
+    return { access_token, refresh_token, user };
   } catch (error) {
     throw handleAuthError(error);
   }
@@ -236,16 +239,21 @@ export const handleGoogleCallback = async (code) => {
       code,
     });
 
-    const { access_token, refresh_token, user } = response.data;
+    const { access_token, refresh_token } = response.data;
 
-    // Store tokens and user data
+    // Store tokens
     setAuthToken(access_token, refresh_token);
+
+    // Fetch user data after successful OAuth
+    const user = await validateSession();
+
+    // Store user data
     if (user) {
       setStorageItem(STORAGE_KEYS.USER, user);
       setStorageItem(STORAGE_KEYS.USER_ROLE, user.role);
     }
 
-    return response.data;
+    return { access_token, refresh_token, user };
   } catch (error) {
     throw handleAuthError(error);
   }
@@ -279,6 +287,23 @@ export const changePassword = async (currentPassword, newPassword) => {
 
     return response.data;
   } catch (error) {
+    throw handleAuthError(error);
+  }
+};
+
+/**
+ * Validate current session by fetching user profile
+ * @returns {Promise<Object|null>} User data if session is valid, null otherwise
+ */
+export const validateSession = async () => {
+  try {
+    const response = await api.get("/users/me");
+    return response.data;
+  } catch (error) {
+    // If unauthorized or any error, session is invalid
+    if (error.response?.status === 401) {
+      return null;
+    }
     throw handleAuthError(error);
   }
 };
@@ -333,4 +358,5 @@ export default {
   getAppleAuthUrl,
   handleGoogleCallback,
   changePassword,
+  validateSession,
 };

@@ -108,9 +108,9 @@ export const FilterDropdown = ({
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
           "flex items-center gap-2 px-4 py-2.5 rounded-xl",
-          "bg-gray-800 text-white border border-gray-700",
-          "hover:bg-gray-700 hover:border-gray-600 transition-colors",
-          "focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+          "bg-white text-gray-700 border border-gray-300",
+          "hover:bg-gray-50 hover:border-gray-400 transition-colors",
+          "focus:outline-none focus:ring-2 focus:ring-blue-500/50"
         )}
       >
         <Filter className="w-4 h-4 text-gray-400" />
@@ -132,7 +132,7 @@ export const FilterDropdown = ({
         <div
           className={cn(
             "absolute z-50 mt-2 min-w-[200px] right-0",
-            "bg-gray-800 rounded-xl shadow-2xl border border-gray-700/50",
+            "bg-white rounded-xl shadow-2xl border border-gray-200",
             "py-2 animate-in fade-in slide-in-from-top-2 duration-200"
           )}
         >
@@ -145,20 +145,20 @@ export const FilterDropdown = ({
                 "w-full flex items-center justify-between gap-3 px-4 py-2.5 text-left text-sm",
                 "transition-colors",
                 isSelected(option.value)
-                  ? "bg-purple-600/20 text-white"
-                  : "text-gray-200 hover:bg-gray-700/50",
+                  ? "bg-blue-50 text-blue-700"
+                  : "text-gray-700 hover:bg-gray-100",
                 option.disabled && "opacity-50 cursor-not-allowed"
               )}
             >
               <span>{option.label}</span>
               {isSelected(option.value) && (
-                <Check className="w-4 h-4 text-purple-400" />
+                <Check className="w-4 h-4 text-blue-600" />
               )}
             </button>
           ))}
 
           {options.length === 0 && (
-            <div className="px-4 py-3 text-sm text-gray-400 text-center">
+            <div className="px-4 py-3 text-sm text-gray-500 text-center">
               No options available
             </div>
           )}

@@ -103,15 +103,16 @@ export const getUserById = async (userId) => {
 };
 
 /**
- * List users with filters (admin/instructor only)
+ * Get users with filters (admin/instructor only)
  * @param {Object} params - Query parameters
  * @param {number} params.page - Page number
  * @param {number} params.per_page - Items per page
  * @param {string} params.role - Filter by role
  * @param {string} params.search - Search query
+ * @param {boolean} params.active - Filter by active status
  * @returns {Promise<Object>} Users list with pagination
  */
-export const listUsers = async (params = {}) => {
+export const getUsers = async (params = {}) => {
   try {
     const response = await api.get(USER_ENDPOINTS.LIST_USERS, { params });
     return response.data;
@@ -119,6 +120,9 @@ export const listUsers = async (params = {}) => {
     throw handleUserError(error);
   }
 };
+
+// Alias for backward compatibility
+export const listUsers = getUsers;
 
 /**
  * Create new user (admin only)
@@ -277,6 +281,7 @@ export default {
   updateSettings,
   changePassword,
   getUserById,
+  getUsers,
   listUsers,
   createUser,
   updateUser,

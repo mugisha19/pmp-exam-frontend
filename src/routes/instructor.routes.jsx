@@ -1,10 +1,12 @@
 /**
  * Instructor Routes Configuration
  * Routes accessible to instructors
+ * Uses InstructorLayout as parent with nested child routes
  */
 
-import { Route } from "react-router-dom";
+import { Route, Navigate } from "react-router-dom";
 import { RoleRoute } from "@/components/routes";
+import InstructorLayout from "@/components/layouts/InstructorLayout";
 import {
   InstructorDashboard,
   ManageExamsPage,
@@ -20,94 +22,25 @@ import {
 } from "@/pages/instructor";
 
 export const instructorRoutes = (
-  <>
-    <Route
-      path="/instructor/dashboard"
-      element={
-        <RoleRoute allowedRoles={["instructor", "admin"]}>
-          <InstructorDashboard />
-        </RoleRoute>
-      }
-    />
-    <Route
-      path="/instructor/exams"
-      element={
-        <RoleRoute allowedRoles={["instructor", "admin"]}>
-          <ManageExamsPage />
-        </RoleRoute>
-      }
-    />
-    <Route
-      path="/instructor/questions"
-      element={
-        <RoleRoute allowedRoles={["instructor", "admin"]}>
-          <QuestionBankPage />
-        </RoleRoute>
-      }
-    />
-    <Route
-      path="/instructor/groups"
-      element={
-        <RoleRoute allowedRoles={["instructor", "admin"]}>
-          <GroupsPage />
-        </RoleRoute>
-      }
-    />
-    <Route
-      path="/instructor/students"
-      element={
-        <RoleRoute allowedRoles={["instructor", "admin"]}>
-          <StudentsPage />
-        </RoleRoute>
-      }
-    />
-    <Route
-      path="/instructor/results"
-      element={
-        <RoleRoute allowedRoles={["instructor", "admin"]}>
-          <InstructorResultsPage />
-        </RoleRoute>
-      }
-    />
-    <Route
-      path="/instructor/grading"
-      element={
-        <RoleRoute allowedRoles={["instructor", "admin"]}>
-          <GradingPage />
-        </RoleRoute>
-      }
-    />
-    <Route
-      path="/instructor/schedule"
-      element={
-        <RoleRoute allowedRoles={["instructor", "admin"]}>
-          <SchedulePage />
-        </RoleRoute>
-      }
-    />
-    <Route
-      path="/instructor/announcements"
-      element={
-        <RoleRoute allowedRoles={["instructor", "admin"]}>
-          <AnnouncementsPage />
-        </RoleRoute>
-      }
-    />
-    <Route
-      path="/instructor/profile"
-      element={
-        <RoleRoute allowedRoles={["instructor", "admin"]}>
-          <InstructorProfilePage />
-        </RoleRoute>
-      }
-    />
-    <Route
-      path="/instructor/settings"
-      element={
-        <RoleRoute allowedRoles={["instructor", "admin"]}>
-          <InstructorSettingsPage />
-        </RoleRoute>
-      }
-    />
-  </>
+  <Route
+    path="/instructor"
+    element={
+      <RoleRoute allowedRoles={["instructor", "admin"]}>
+        <InstructorLayout />
+      </RoleRoute>
+    }
+  >
+    <Route index element={<Navigate to="dashboard" replace />} />
+    <Route path="dashboard" element={<InstructorDashboard />} />
+    <Route path="exams" element={<ManageExamsPage />} />
+    <Route path="questions" element={<QuestionBankPage />} />
+    <Route path="groups" element={<GroupsPage />} />
+    <Route path="students" element={<StudentsPage />} />
+    <Route path="results" element={<InstructorResultsPage />} />
+    <Route path="grading" element={<GradingPage />} />
+    <Route path="schedule" element={<SchedulePage />} />
+    <Route path="announcements" element={<AnnouncementsPage />} />
+    <Route path="profile" element={<InstructorProfilePage />} />
+    <Route path="settings" element={<InstructorSettingsPage />} />
+  </Route>
 );

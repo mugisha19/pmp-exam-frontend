@@ -6,7 +6,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { AuthLayout, AuthFormWrapper } from "../components/layouts";
 import { WelcomeIllustration } from "../components/illustrations";
 import { Button } from "../components/ui";
@@ -26,7 +26,6 @@ const loginSchema = z.object({
 });
 
 export const Login = () => {
-  const navigate = useNavigate();
   const loginMutation = useLoginMutation();
 
   const { control, handleSubmit } = useForm({
@@ -41,7 +40,7 @@ export const Login = () => {
   const onSubmit = async (data) => {
     try {
       await loginMutation.mutateAsync(data);
-      navigate("/dashboard");
+      // Navigation handled by useLoginMutation based on user role
     } catch {
       // Error handled by mutation's onError callback
     }
@@ -107,10 +106,11 @@ export const Login = () => {
 
           <Button
             type="submit"
-            variant="primary"
+            variant="glass"
             size="lg"
             fullWidth
             loading={loginMutation.isPending}
+            className="font-semibold"
           >
             Log in
           </Button>

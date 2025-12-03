@@ -1,10 +1,12 @@
 /**
  * Admin Routes Configuration
  * Routes accessible to admins only
+ * Uses AdminLayout as parent with nested child routes
  */
 
-import { Route } from "react-router-dom";
+import { Route, Navigate } from "react-router-dom";
 import { RoleRoute } from "@/components/routes";
+import AdminLayout from "@/components/layouts/AdminLayout";
 import {
   AdminDashboard,
   UserManagementPage,
@@ -12,93 +14,36 @@ import {
   AdminStudentsPage,
   AdminExamsPage,
   AdminGroupsPage,
+  AdminGroupDetailsPage,
   AnalyticsPage,
   ReportsPage,
   NotificationsPage,
   SystemSettingsPage,
+  AdminProfilePage,
 } from "@/pages/admin";
 
 export const adminRoutes = (
-  <>
-    <Route
-      path="/admin/dashboard"
-      element={
-        <RoleRoute allowedRoles={["admin"]}>
-          <AdminDashboard />
-        </RoleRoute>
-      }
-    />
-    <Route
-      path="/admin/users"
-      element={
-        <RoleRoute allowedRoles={["admin"]}>
-          <UserManagementPage />
-        </RoleRoute>
-      }
-    />
-    <Route
-      path="/admin/instructors"
-      element={
-        <RoleRoute allowedRoles={["admin"]}>
-          <AdminInstructorsPage />
-        </RoleRoute>
-      }
-    />
-    <Route
-      path="/admin/students"
-      element={
-        <RoleRoute allowedRoles={["admin"]}>
-          <AdminStudentsPage />
-        </RoleRoute>
-      }
-    />
-    <Route
-      path="/admin/exams"
-      element={
-        <RoleRoute allowedRoles={["admin"]}>
-          <AdminExamsPage />
-        </RoleRoute>
-      }
-    />
-    <Route
-      path="/admin/groups"
-      element={
-        <RoleRoute allowedRoles={["admin"]}>
-          <AdminGroupsPage />
-        </RoleRoute>
-      }
-    />
-    <Route
-      path="/admin/analytics"
-      element={
-        <RoleRoute allowedRoles={["admin"]}>
-          <AnalyticsPage />
-        </RoleRoute>
-      }
-    />
-    <Route
-      path="/admin/reports"
-      element={
-        <RoleRoute allowedRoles={["admin"]}>
-          <ReportsPage />
-        </RoleRoute>
-      }
-    />
-    <Route
-      path="/admin/notifications"
-      element={
-        <RoleRoute allowedRoles={["admin"]}>
-          <NotificationsPage />
-        </RoleRoute>
-      }
-    />
-    <Route
-      path="/admin/system"
-      element={
-        <RoleRoute allowedRoles={["admin"]}>
-          <SystemSettingsPage />
-        </RoleRoute>
-      }
-    />
-  </>
+  <Route
+    path="/admin"
+    element={
+      <RoleRoute allowedRoles={["admin"]}>
+        <AdminLayout />
+      </RoleRoute>
+    }
+  >
+    <Route index element={<Navigate to="dashboard" replace />} />
+    <Route path="dashboard" element={<AdminDashboard />} />
+    <Route path="users" element={<UserManagementPage />} />
+    <Route path="instructors" element={<AdminInstructorsPage />} />
+    <Route path="students" element={<AdminStudentsPage />} />
+    <Route path="exams" element={<AdminExamsPage />} />
+    <Route path="groups" element={<AdminGroupsPage />} />
+    <Route path="groups/:groupId" element={<AdminGroupDetailsPage />} />
+    <Route path="analytics" element={<AnalyticsPage />} />
+    <Route path="reports" element={<ReportsPage />} />
+    <Route path="notifications" element={<NotificationsPage />} />
+    <Route path="settings" element={<SystemSettingsPage />} />
+    <Route path="profile" element={<AdminProfilePage />} />
+    <Route path="system" element={<SystemSettingsPage />} />
+  </Route>
 );

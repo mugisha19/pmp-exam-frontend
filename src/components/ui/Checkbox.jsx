@@ -19,10 +19,10 @@ export const Checkbox = forwardRef(
             disabled={disabled}
             className={cn(
               "peer h-5 w-5 appearance-none rounded border-2 cursor-pointer",
-              "bg-gray-900/50 border-gray-600",
+              "bg-white border-gray-300",
               "transition-all duration-200",
-              "checked:bg-purple-600 checked:border-purple-600",
-              "focus:outline-none focus:ring-4 focus:ring-purple-500/20",
+              "checked:bg-blue-600 checked:border-blue-600",
+              "focus:outline-none focus:ring-4 focus:ring-blue-500/20",
               "disabled:opacity-50 disabled:cursor-not-allowed",
               error && "border-error",
               className
@@ -36,7 +36,7 @@ export const Checkbox = forwardRef(
           <label
             htmlFor={id}
             className={cn(
-              "ml-3 text-sm text-gray-300 select-none",
+              "ml-3 text-sm text-gray-700 select-none",
               !disabled && "cursor-pointer",
               disabled && "opacity-50 cursor-not-allowed"
             )}

@@ -34,8 +34,10 @@ export const useLoginMutation = () => {
       // Show success message
       toast.success(`Welcome back, ${user.first_name}!`);
 
-      // Navigate to default route based on role
-      const defaultRoute = ROLE_ROUTES[user.role] || AUTH_ROUTES.LOGIN;
+      // Navigate to default route based on role (case-insensitive)
+      const userRole = user.role?.toLowerCase();
+      const defaultRoute = ROLE_ROUTES[userRole] || "/dashboard";
+      console.log("User role:", user.role, "Navigating to:", defaultRoute);
       navigate(defaultRoute, { replace: true });
     },
     onError: (error) => {

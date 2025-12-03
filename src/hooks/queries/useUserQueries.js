@@ -127,10 +127,14 @@ export const useUpdateSettingsMutation = () => {
  * Changes authenticated user's password
  */
 export const useChangePasswordMutation = () => {
+  const queryClient = useQueryClient();
+  
   return useMutation({
     mutationFn: ({ currentPassword, newPassword }) =>
       userService.changePassword(currentPassword, newPassword),
     onSuccess: () => {
+      // Refetch user data to update password_changed_at
+      queryClient.invalidateQueries({ queryKey: queryKeys.users.current() });
       toast.success(
         "Password changed successfully! Please login with your new password."
       );
@@ -171,14 +175,15 @@ export const useUser = (userId, options = {}) => {
 
 /**
  * List users query hook (Admin/Instructor)
- * @param {Object} filters - Query filters
+ * @param {Object} filters - Query filters (page, per_page, role, search, active)
  * @param {Object} options - Query options
  */
 export const useUsers = (filters = {}, options = {}) => {
   return useQuery({
     queryKey: queryKeys.users.list(filters),
-    queryFn: () => userService.listUsers(filters),
+    queryFn: () => userService.getUsers(filters),
     staleTime: 1 * 60 * 1000, // 1 minute
+    keepPreviousData: true, // Keep previous data on filter change
     onError: (error) => {
       const errorMessage = error.message || "Failed to fetch users";
       toast.error(errorMessage);
@@ -199,7 +204,7 @@ export const useCreateUserMutation = () => {
       // Invalidate users list
       queryClient.invalidateQueries({ queryKey: queryKeys.users.all });
 
-      toast.success("User created successfully!");
+      toast.success("User created. Credentials sent via email.");
     },
     onError: (error) => {
       const errorMessage =
@@ -264,7 +269,7 @@ export const useDeleteUserMutation = () => {
       // Invalidate users list
       queryClient.invalidateQueries({ queryKey: queryKeys.users.all });
 
-      toast.success("User deleted successfully!");
+      toast.success("User deleted");
     },
     onError: (error) => {
       const errorMessage =
@@ -342,7 +347,7 @@ export const useUpdateUserRoleMutation = () => {
       // Invalidate users list
       queryClient.invalidateQueries({ queryKey: queryKeys.users.all });
 
-      toast.success("User role updated successfully!");
+      toast.success("Role updated");
     },
     onError: (error) => {
       const errorMessage =
@@ -359,7 +364,7 @@ export const useResendCredentialsMutation = () => {
   return useMutation({
     mutationFn: (userId) => userService.resendCredentials(userId),
     onSuccess: () => {
-      toast.success("Credentials sent successfully!");
+      toast.success("Credentials resent to user's email");
     },
     onError: (error) => {
       const errorMessage =

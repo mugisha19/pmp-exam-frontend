@@ -1,8 +1,3 @@
-/**
- * SecurityIllustration Component
- * Lock/shield for password security
- */
-
 export const SecurityIllustration = () => {
   return (
     <svg

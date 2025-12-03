@@ -21,14 +21,14 @@ export const Skeleton = ({
 }) => {
   const animationStyles = {
     pulse: "animate-pulse",
-    wave: "animate-shimmer bg-gradient-to-r from-gray-800 via-gray-700 to-gray-800 bg-[length:200%_100%]",
+    wave: "animate-shimmer bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%]",
     none: "",
   };
 
   return (
     <div
       className={cn(
-        "bg-gray-800/50",
+        "bg-gray-200",
         variantStyles[variant],
         animationStyles[animation],
         className
@@ -58,7 +58,12 @@ export const SkeletonText = ({ lines = 3, className }) => {
 
 export const SkeletonCard = ({ className }) => {
   return (
-    <div className={cn("bg-gray-800/50 rounded-2xl p-6 space-y-4", className)}>
+    <div
+      className={cn(
+        "bg-white border border-gray-200 rounded-2xl p-6 space-y-4",
+        className
+      )}
+    >
       <div className="flex items-center gap-4">
         <Skeleton variant="circle" width={48} height={48} />
         <div className="flex-1 space-y-2">

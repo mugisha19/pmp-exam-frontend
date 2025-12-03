@@ -9,7 +9,7 @@ import { Spinner } from "@/components/ui";
 import { hasAnyRole } from "../../utils/role.utils";
 
 export const RoleRoute = ({ children, allowedRoles = [] }) => {
-  const { user, isLoading } = useAuthStore();
+  const { user, isAuthenticated, isLoading } = useAuthStore();
 
   // Show loading while checking auth
   if (isLoading) {
@@ -20,8 +20,13 @@ export const RoleRoute = ({ children, allowedRoles = [] }) => {
     );
   }
 
-  // Check if user has any of the allowed roles
-  if (!user || !hasAnyRole(user, allowedRoles)) {
+  // If not authenticated, redirect to login
+  if (!isAuthenticated || !user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // If authenticated but doesn't have required role, show unauthorized
+  if (!hasAnyRole(user, allowedRoles)) {
     return <Navigate to="/unauthorized" replace />;
   }
 

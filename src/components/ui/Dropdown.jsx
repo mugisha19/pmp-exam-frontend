@@ -47,7 +47,7 @@ export const Dropdown = ({ trigger, children, align = "left", className }) => {
       {/* Trigger */}
       <div onClick={() => setIsOpen(!isOpen)}>
         {trigger || (
-          <button className="flex items-center gap-2 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors">
+          <button className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-900 rounded-lg hover:bg-gray-200 transition-colors">
             Menu
             <ChevronDown
               className={cn(
@@ -63,9 +63,9 @@ export const Dropdown = ({ trigger, children, align = "left", className }) => {
       {isOpen && (
         <div
           className={cn(
-            "absolute z-50 mt-2 min-w-[200px]",
-            "bg-gray-800 rounded-xl shadow-2xl border border-gray-700/50",
-            "py-2 animate-in fade-in slide-in-from-top-2 duration-200",
+            "absolute z-50 mt-1.5 min-w-[160px]",
+            "bg-white rounded-lg shadow-lg border border-gray-200/80",
+            "py-1 animate-in fade-in slide-in-from-top-1 duration-150",
             alignmentStyles[align],
             className
           )}
@@ -92,9 +92,9 @@ export const DropdownItem = ({
       className={cn(
         "w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm",
         "transition-colors",
-        !disabled && !danger && "text-gray-200 hover:bg-gray-700/50",
-        !disabled && danger && "text-red-400 hover:bg-red-600/10",
-        disabled && "text-gray-500 cursor-not-allowed opacity-50",
+        !disabled && !danger && "text-gray-700 hover:bg-gray-100",
+        !disabled && danger && "text-red-600 hover:bg-red-50",
+        disabled && "text-gray-400 cursor-not-allowed opacity-50",
         className
       )}
     >
@@ -105,7 +105,7 @@ export const DropdownItem = ({
 };
 
 export const DropdownDivider = () => {
-  return <div className="my-1 border-t border-gray-700/50" />;
+  return <div className="my-1 border-t border-gray-200" />;
 };
 
 export const DropdownLabel = ({ children, className }) => {

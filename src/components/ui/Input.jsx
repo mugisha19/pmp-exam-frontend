@@ -32,7 +32,7 @@ export const Input = forwardRef(
         {label && (
           <label
             htmlFor={props.id}
-            className="block text-sm font-medium text-gray-300 mb-2"
+            className="block text-sm font-medium text-gray-700 mb-2"
           >
             {label}
           </label>
@@ -49,10 +49,10 @@ export const Input = forwardRef(
             ref={ref}
             className={cn(
               // Base styles
-              "w-full rounded-xl bg-gray-900/50 border border-gray-600",
-              "text-white placeholder:text-gray-500",
+              "w-full rounded-xl bg-white border border-gray-300",
+              "text-gray-900 placeholder:text-gray-400",
               "transition-all duration-200",
-              "focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50",
+              "focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50",
               // Size styles
               sizeStyles[size],
               // Icon padding
@@ -61,9 +61,9 @@ export const Input = forwardRef(
               // Error state
               error
                 ? "border-red-500 focus:ring-red-500/50 focus:border-red-500"
-                : "hover:border-gray-500",
+                : "hover:border-gray-400",
               // Disabled state
-              props.disabled && "opacity-50 cursor-not-allowed bg-gray-900/30",
+              props.disabled && "opacity-50 cursor-not-allowed bg-gray-100",
               // Custom className
               className
             )}

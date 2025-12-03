@@ -6,20 +6,27 @@
 import { useEffect } from "react";
 import { useAuthStore } from "@/stores/auth.store";
 import * as authService from "@/services/auth.service";
+import { TOKEN_KEYS, getStorageItem } from "@/constants/storage.constants";
 
 export const useInitializeAuth = () => {
   const setUser = useAuthStore((state) => state.setUser);
   const setLoading = useAuthStore((state) => state.setLoading);
-  const accessToken = useAuthStore((state) => state.accessToken);
   const clearAuth = useAuthStore((state) => state.clearAuth);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   useEffect(() => {
     const initAuth = async () => {
       try {
         setLoading(true);
 
-        // Check if tokens exist
+        // Check if tokens exist in localStorage
+        const accessToken = getStorageItem(TOKEN_KEYS.ACCESS_TOKEN);
+
         if (!accessToken) {
+          // No token, clear any stale auth state
+          if (isAuthenticated) {
+            clearAuth();
+          }
           setLoading(false);
           return;
         }
@@ -43,7 +50,7 @@ export const useInitializeAuth = () => {
     };
 
     initAuth();
-  }, [accessToken, clearAuth, setLoading, setUser]);
+  }, [clearAuth, setLoading, setUser, isAuthenticated]);
 
   return null;
 };

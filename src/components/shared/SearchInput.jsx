@@ -60,11 +60,11 @@ export const SearchInput = ({
         placeholder={placeholder}
         className={cn(
           "w-full pl-12 pr-12 py-3 rounded-xl",
-          "bg-gray-900/50 border border-gray-600",
-          "text-white placeholder:text-gray-500",
+          "bg-white border border-gray-300",
+          "text-gray-900 placeholder:text-gray-400",
           "transition-all duration-200",
-          "focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50",
-          "hover:border-gray-500"
+          "focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50",
+          "hover:border-gray-400"
         )}
         {...props}
       />
@@ -72,7 +72,7 @@ export const SearchInput = ({
       {internalValue && (
         <button
           onClick={handleClear}
-          className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+          className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-900 transition-colors"
           aria-label="Clear search"
         >
           <X className="w-5 h-5" />

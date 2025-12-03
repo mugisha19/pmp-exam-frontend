@@ -1,87 +1,82 @@
 /**
- * Instructor Pages - Placeholders
- * Replace these with actual implementations
+ * Instructor Pages Index
+ * Export all instructor page components
  */
 
-import InstructorLayout from "@/components/layouts/InstructorLayout";
+// Implemented Pages
+export { Dashboard as InstructorDashboard } from "./Dashboard";
 
-export const InstructorDashboard = () => (
-  <InstructorLayout
-    title="Dashboard"
-    subtitle="Instructor overview and analytics"
-  >
-    <div className="text-white">Instructor Dashboard - Coming Soon</div>
-  </InstructorLayout>
-);
-
+// Placeholder Pages - To be implemented
 export const ManageExamsPage = () => (
-  <InstructorLayout
-    title="Manage Exams"
-    subtitle="Create and manage your exams"
-  >
-    <div className="text-white">Manage Exams Page - Coming Soon</div>
-  </InstructorLayout>
+  <div className="p-6">
+    <h1 className="text-2xl font-bold text-gray-900 mb-2">Manage Exams</h1>
+    <p className="text-gray-500">Create and manage your exams - Coming Soon</p>
+  </div>
 );
 
 export const QuestionBankPage = () => (
-  <InstructorLayout
-    title="Question Bank"
-    subtitle="Create and organize questions"
-  >
-    <div className="text-white">Question Bank Page - Coming Soon</div>
-  </InstructorLayout>
+  <div className="p-6">
+    <h1 className="text-2xl font-bold text-gray-900 mb-2">Question Bank</h1>
+    <p className="text-gray-500">Create and organize questions - Coming Soon</p>
+  </div>
 );
 
 export const GroupsPage = () => (
-  <InstructorLayout title="Groups" subtitle="Manage student groups">
-    <div className="text-white">Groups Page - Coming Soon</div>
-  </InstructorLayout>
+  <div className="p-6">
+    <h1 className="text-2xl font-bold text-gray-900 mb-2">Groups</h1>
+    <p className="text-gray-500">Manage student groups - Coming Soon</p>
+  </div>
 );
 
 export const StudentsPage = () => (
-  <InstructorLayout title="Students" subtitle="View and manage students">
-    <div className="text-white">Students Page - Coming Soon</div>
-  </InstructorLayout>
+  <div className="p-6">
+    <h1 className="text-2xl font-bold text-gray-900 mb-2">Students</h1>
+    <p className="text-gray-500">View and manage students - Coming Soon</p>
+  </div>
 );
 
 export const InstructorResultsPage = () => (
-  <InstructorLayout
-    title="Results & Analytics"
-    subtitle="View student performance"
-  >
-    <div className="text-white">Results & Analytics Page - Coming Soon</div>
-  </InstructorLayout>
+  <div className="p-6">
+    <h1 className="text-2xl font-bold text-gray-900 mb-2">
+      Results & Analytics
+    </h1>
+    <p className="text-gray-500">View student performance - Coming Soon</p>
+  </div>
 );
 
 export const GradingPage = () => (
-  <InstructorLayout title="Grading" subtitle="Grade student submissions">
-    <div className="text-white">Grading Page - Coming Soon</div>
-  </InstructorLayout>
+  <div className="p-6">
+    <h1 className="text-2xl font-bold text-gray-900 mb-2">Grading</h1>
+    <p className="text-gray-500">Grade student submissions - Coming Soon</p>
+  </div>
 );
 
 export const SchedulePage = () => (
-  <InstructorLayout title="Schedule" subtitle="Manage exam schedules">
-    <div className="text-white">Schedule Page - Coming Soon</div>
-  </InstructorLayout>
+  <div className="p-6">
+    <h1 className="text-2xl font-bold text-gray-900 mb-2">Schedule</h1>
+    <p className="text-gray-500">Manage exam schedules - Coming Soon</p>
+  </div>
 );
 
 export const AnnouncementsPage = () => (
-  <InstructorLayout
-    title="Announcements"
-    subtitle="Post announcements to students"
-  >
-    <div className="text-white">Announcements Page - Coming Soon</div>
-  </InstructorLayout>
+  <div className="p-6">
+    <h1 className="text-2xl font-bold text-gray-900 mb-2">Announcements</h1>
+    <p className="text-gray-500">
+      Post announcements to students - Coming Soon
+    </p>
+  </div>
 );
 
 export const InstructorProfilePage = () => (
-  <InstructorLayout title="Profile" subtitle="Manage your profile">
-    <div className="text-white">Profile Page - Coming Soon</div>
-  </InstructorLayout>
+  <div className="p-6">
+    <h1 className="text-2xl font-bold text-gray-900 mb-2">Profile</h1>
+    <p className="text-gray-500">Manage your profile - Coming Soon</p>
+  </div>
 );
 
 export const InstructorSettingsPage = () => (
-  <InstructorLayout title="Settings" subtitle="Customize your preferences">
-    <div className="text-white">Settings Page - Coming Soon</div>
-  </InstructorLayout>
+  <div className="p-6">
+    <h1 className="text-2xl font-bold text-gray-900 mb-2">Settings</h1>
+    <p className="text-gray-500">Customize your preferences - Coming Soon</p>
+  </div>
 );

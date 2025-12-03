@@ -1,19 +1,16 @@
 /**
  * StudentLayout Component
- * Dashboard layout wrapper for student role
+ * Dashboard layout wrapper for student role with Outlet for nested routes
  */
 
+import { Outlet } from "react-router-dom";
 import DashboardLayout from "./DashboardLayout";
 import { STUDENT_NAV_ITEMS } from "@/constants/navigation.constants";
 
-export const StudentLayout = ({ children, title, subtitle }) => {
+export const StudentLayout = () => {
   return (
-    <DashboardLayout
-      title={title}
-      subtitle={subtitle}
-      sidebarConfig={STUDENT_NAV_ITEMS}
-    >
-      {children}
+    <DashboardLayout navItems={STUDENT_NAV_ITEMS} role="student">
+      <Outlet />
     </DashboardLayout>
   );
 };

@@ -6,12 +6,12 @@
 import { cn } from "@/utils/cn";
 
 const variantStyles = {
-  default: "bg-gray-700 text-gray-200",
-  success: "bg-green-600/20 text-green-400 ring-1 ring-green-600/30",
-  warning: "bg-yellow-600/20 text-yellow-400 ring-1 ring-yellow-600/30",
-  error: "bg-red-600/20 text-red-400 ring-1 ring-red-600/30",
-  info: "bg-blue-600/20 text-blue-400 ring-1 ring-blue-600/30",
-  purple: "bg-purple-600/20 text-purple-400 ring-1 ring-purple-600/30",
+  default: "bg-gray-100 text-gray-700",
+  success: "bg-green-50 text-green-700 ring-1 ring-green-200",
+  warning: "bg-amber-50 text-amber-700 ring-1 ring-amber-200",
+  error: "bg-red-50 text-red-700 ring-1 ring-red-200",
+  info: "bg-blue-50 text-blue-700 ring-1 ring-blue-200",
+  primary: "bg-blue-50 text-blue-700 ring-1 ring-blue-200",
 };
 
 const sizeStyles = {

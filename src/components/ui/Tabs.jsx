@@ -61,7 +61,7 @@ export const TabsTrigger = ({
       onClick={() => onValueChange(value)}
       className={cn(
         "relative px-4 py-3 text-sm font-medium transition-colors",
-        "focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500",
+        "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
         isActive ? "text-white" : "text-gray-400 hover:text-gray-200",
         className
       )}
@@ -70,7 +70,7 @@ export const TabsTrigger = ({
     >
       {children}
       {isActive && (
-        <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-purple-600 to-indigo-600" />
+        <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600" />
       )}
     </button>
   );

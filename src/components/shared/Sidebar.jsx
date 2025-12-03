@@ -1,25 +1,16 @@
 /**
  * Sidebar Component
- * Dark themed collapsible sidebar navigation
+ * Light themed collapsible sidebar navigation - Prodex style
  */
 
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/utils/cn";
-import { LogOut, ChevronLeft, ChevronRight } from "lucide-react";
-import { useAuthStore } from "@/stores/auth.store";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useUIStore } from "@/stores/ui.store";
-import { Avatar } from "../ui/Avatar";
 
 export const Sidebar = ({ navItems = [] }) => {
   const location = useLocation();
-  const navigate = useNavigate();
-  const { user, logout } = useAuthStore();
   const { sidebarCollapsed, toggleSidebarCollapsed } = useUIStore();
-
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
-  };
 
   const isActive = (path) => {
     return (
@@ -30,25 +21,25 @@ export const Sidebar = ({ navItems = [] }) => {
   return (
     <aside
       className={cn(
-        "fixed left-0 top-0 h-screen bg-[#0a0a0a] border-r border-gray-800",
+        "fixed left-0 top-0 h-screen bg-white border-r border-gray-200",
         "transition-all duration-300 ease-in-out z-40",
         "flex flex-col",
-        sidebarCollapsed ? "w-20" : "w-64"
+        sidebarCollapsed ? "w-20" : "w-[280px]"
       )}
     >
       {/* Logo Section */}
-      <div className="h-16 flex items-center justify-between px-4 border-b border-gray-800">
+      <div className="h-16 flex items-center justify-between px-4 border-b border-gray-200">
         {!sidebarCollapsed && (
           <Link to="/dashboard" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center">
-              <span className="text-white font-bold text-sm">PMP</span>
+            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
+              <span className="text-white font-bold text-sm">PM</span>
             </div>
-            <span className="text-white font-bold text-lg">Exam Platform</span>
+            <span className="text-gray-900 font-bold text-lg">PMP Exam</span>
           </Link>
         )}
         {sidebarCollapsed && (
-          <div className="w-8 h-8 mx-auto rounded-lg bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center">
-            <span className="text-white font-bold text-sm">P</span>
+          <div className="w-8 h-8 mx-auto rounded-lg bg-blue-600 flex items-center justify-center">
+            <span className="text-white font-bold text-sm">PM</span>
           </div>
         )}
       </div>
@@ -58,9 +49,9 @@ export const Sidebar = ({ navItems = [] }) => {
         onClick={toggleSidebarCollapsed}
         className={cn(
           "absolute -right-3 top-20 w-6 h-6 rounded-full",
-          "bg-gray-800 border border-gray-700",
-          "flex items-center justify-center text-gray-400",
-          "hover:bg-gray-700 hover:text-white transition-colors"
+          "bg-white border border-gray-300 shadow-sm",
+          "flex items-center justify-center text-gray-500",
+          "hover:bg-gray-50 hover:text-gray-900 transition-colors"
         )}
       >
         {sidebarCollapsed ? (
@@ -70,9 +61,18 @@ export const Sidebar = ({ navItems = [] }) => {
         )}
       </button>
 
+      {/* Section Label */}
+      {!sidebarCollapsed && (
+        <div className="px-6 pt-6 pb-2">
+          <span className="text-[11px] font-medium text-gray-400 uppercase tracking-wider">
+            Main
+          </span>
+        </div>
+      )}
+
       {/* Navigation Items */}
-      <nav className="flex-1 overflow-y-auto py-6 px-3 scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent">
-        <ul className="space-y-1">
+      <nav className="flex-1 overflow-y-auto px-3 pb-6 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+        <ul className="space-y-0.5">
           {navItems.map((item) => {
             const Icon = item.icon;
             const active = isActive(item.path);
@@ -82,27 +82,27 @@ export const Sidebar = ({ navItems = [] }) => {
                 <Link
                   to={item.path}
                   className={cn(
-                    "flex items-center gap-3 px-3 py-3 rounded-xl",
-                    "transition-all duration-200 group relative",
+                    "flex items-center gap-3 px-3 py-2 rounded-md",
+                    "transition-all duration-150 group relative",
                     active
-                      ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg"
-                      : "text-gray-400 hover:text-white hover:bg-gray-800/50"
+                      ? "bg-gray-100 text-gray-900 font-medium"
+                      : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"
                   )}
                   title={sidebarCollapsed ? item.label : undefined}
                 >
                   <Icon
                     className={cn(
-                      "w-5 h-5 flex-shrink-0",
+                      "w-4 h-4 shrink-0",
                       sidebarCollapsed && "mx-auto"
                     )}
                   />
                   {!sidebarCollapsed && (
-                    <span className="font-medium">{item.label}</span>
+                    <span className="text-[14px]">{item.label}</span>
                   )}
 
                   {/* Tooltip for collapsed state */}
                   {sidebarCollapsed && (
-                    <div className="absolute left-full ml-2 px-3 py-2 bg-gray-800 text-white text-sm rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50 border border-gray-700">
+                    <div className="absolute left-full ml-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50 shadow-lg">
                       {item.label}
                     </div>
                   )}
@@ -112,62 +112,6 @@ export const Sidebar = ({ navItems = [] }) => {
           })}
         </ul>
       </nav>
-
-      {/* User Section */}
-      <div className="border-t border-gray-800 p-3">
-        {/* User Info */}
-        <div
-          className={cn(
-            "flex items-center gap-3 px-3 py-3 rounded-xl mb-2",
-            "bg-gray-800/50",
-            sidebarCollapsed && "justify-center"
-          )}
-        >
-          <Avatar
-            name={user?.name || user?.email}
-            size="sm"
-            showStatus
-            isOnline
-          />
-          {!sidebarCollapsed && (
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white truncate">
-                {user?.name || "User"}
-              </p>
-              <p className="text-xs text-gray-400 truncate capitalize">
-                {user?.role || "Student"}
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* Logout Button */}
-        <button
-          onClick={handleLogout}
-          className={cn(
-            "w-full flex items-center gap-3 px-3 py-3 rounded-xl",
-            "text-red-400 hover:text-red-300 hover:bg-red-600/10",
-            "transition-all duration-200 group relative",
-            sidebarCollapsed && "justify-center"
-          )}
-          title={sidebarCollapsed ? "Logout" : undefined}
-        >
-          <LogOut
-            className={cn(
-              "w-5 h-5 flex-shrink-0",
-              sidebarCollapsed && "mx-auto"
-            )}
-          />
-          {!sidebarCollapsed && <span className="font-medium">Logout</span>}
-
-          {/* Tooltip for collapsed state */}
-          {sidebarCollapsed && (
-            <div className="absolute left-full ml-2 px-3 py-2 bg-gray-800 text-white text-sm rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50 border border-gray-700">
-              Logout
-            </div>
-          )}
-        </button>
-      </div>
     </aside>
   );
 };

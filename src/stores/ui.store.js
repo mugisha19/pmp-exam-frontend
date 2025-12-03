@@ -10,7 +10,6 @@ import {
   getStorageItem,
   setStorageItem,
 } from "@/constants/storage.constants";
-import { THEME_OPTIONS } from "@/constants/storage.constants";
 
 /**
  * Initial state
@@ -19,7 +18,6 @@ const getInitialState = () => ({
   sidebarOpen: true,
   sidebarCollapsed: getStorageItem(STORAGE_KEYS.SIDEBAR_COLLAPSED) ?? false,
   mobileSidebarOpen: false,
-  theme: getStorageItem(STORAGE_KEYS.THEME) ?? THEME_OPTIONS.DARK,
 });
 
 /**
@@ -104,49 +102,6 @@ export const useUIStore = create(
         },
 
         /**
-         * Set theme
-         * @param {string} theme - Theme ('light' | 'dark' | 'system')
-         */
-        setTheme: (theme) => {
-          set({ theme }, false, "ui/setTheme");
-          setStorageItem(STORAGE_KEYS.THEME, theme);
-
-          // Apply theme to document
-          if (typeof window !== "undefined") {
-            const root = window.document.documentElement;
-
-            if (theme === THEME_OPTIONS.SYSTEM) {
-              const systemTheme = window.matchMedia(
-                "(prefers-color-scheme: dark)"
-              ).matches
-                ? THEME_OPTIONS.DARK
-                : THEME_OPTIONS.LIGHT;
-              root.classList.remove(THEME_OPTIONS.LIGHT, THEME_OPTIONS.DARK);
-              root.classList.add(systemTheme);
-            } else {
-              root.classList.remove(
-                THEME_OPTIONS.LIGHT,
-                THEME_OPTIONS.DARK,
-                THEME_OPTIONS.SYSTEM
-              );
-              root.classList.add(theme);
-            }
-          }
-        },
-
-        /**
-         * Toggle theme (switch between light and dark)
-         */
-        toggleTheme: () => {
-          const currentTheme = get().theme;
-          const newTheme =
-            currentTheme === THEME_OPTIONS.DARK
-              ? THEME_OPTIONS.LIGHT
-              : THEME_OPTIONS.DARK;
-          get().setTheme(newTheme);
-        },
-
-        /**
          * Reset UI state to defaults
          */
         resetUI: () => {
@@ -169,34 +124,11 @@ export const useUIStore = create(
         isSidebarCollapsed: () => {
           return get().sidebarCollapsed;
         },
-
-        /**
-         * Get current theme
-         * @returns {string}
-         */
-        getCurrentTheme: () => {
-          return get().theme;
-        },
-
-        /**
-         * Check if dark mode is active
-         * @returns {boolean}
-         */
-        isDarkMode: () => {
-          const theme = get().theme;
-
-          if (theme === THEME_OPTIONS.SYSTEM && typeof window !== "undefined") {
-            return window.matchMedia("(prefers-color-scheme: dark)").matches;
-          }
-
-          return theme === THEME_OPTIONS.DARK;
-        },
       }),
       {
         name: "ui-storage",
         partialize: (state) => ({
           sidebarCollapsed: state.sidebarCollapsed,
-          theme: state.theme,
         }),
       }
     ),
@@ -212,6 +144,5 @@ export const useUIStore = create(
  */
 export const selectSidebarOpen = (state) => state.sidebarOpen;
 export const selectSidebarCollapsed = (state) => state.sidebarCollapsed;
-export const selectTheme = (state) => state.theme;
 
 export default useUIStore;

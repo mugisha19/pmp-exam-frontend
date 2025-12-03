@@ -46,7 +46,7 @@ export const Avatar = ({
     <div className={cn("relative inline-block", className)}>
       <div
         className={cn(
-          "rounded-full overflow-hidden bg-gradient-to-br from-purple-600 to-indigo-600",
+          "rounded-full overflow-hidden bg-gradient-to-br from-blue-500 to-cyan-600",
           "flex items-center justify-center font-medium text-white",
           sizeStyles[size]
         )}

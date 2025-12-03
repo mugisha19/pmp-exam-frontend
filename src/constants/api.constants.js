@@ -4,8 +4,28 @@
  */
 
 // Base API configuration
-export const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:8000/api/v1";
+// In development, use relative URL so Vite proxy can intercept
+// In production, use the full URL from environment variable
+const getApiBaseUrl = () => {
+  if (import.meta.env.PROD) {
+    return import.meta.env.VITE_API_URL || "http://localhost:8000/api/v1";
+  }
+  // In development, always use relative URL - Vite proxy will handle it
+  return "/api/v1";
+};
+
+export const API_BASE_URL = getApiBaseUrl();
+
+// Debug: Log the API URL being used (remove in production)
+if (import.meta.env.DEV) {
+  console.log(
+    "API Base URL:",
+    API_BASE_URL,
+    "(mode:",
+    import.meta.env.MODE,
+    ")"
+  );
+}
 
 // Authentication endpoints
 export const AUTH_ENDPOINTS = {
@@ -51,6 +71,7 @@ export const GROUP_ENDPOINTS = {
   LIST_MEMBERS: (groupId) => `/groups/${groupId}/members`,
   GENERATE_INVITE: (groupId) => `/groups/${groupId}/invite-link`,
   JOIN_REQUEST: "/groups/join-request",
+  JOIN_REQUESTS: (groupId) => `/groups/${groupId}/join-requests`,
   APPROVE_REQUEST: (groupId, requestId) =>
     `/groups/${groupId}/approve-request/${requestId}`,
   MY_GROUPS: "/groups/me/groups",
@@ -142,6 +163,16 @@ export const NOTIFICATION_ENDPOINTS = {
 // Analytics endpoints
 export const ANALYTICS_ENDPOINTS = {
   USER_ANALYTICS: (userId) => `/analytics/user/${userId}`,
+  DASHBOARD: "/analytics/dashboard",
+  INSTRUCTOR_DASHBOARD: "/analytics/instructor/dashboard",
+  PLATFORM_STATS: "/analytics/platform-stats",
+  USER_REGISTRATIONS: "/analytics/user-registrations",
+  QUIZ_COMPLETIONS: "/analytics/quiz-completions",
+  SCORE_DISTRIBUTION: "/analytics/score-distribution",
+  DOMAIN_PERFORMANCE: "/analytics/domain-performance",
+  TOP_PERFORMERS: "/analytics/top-performers",
+  ACTIVE_GROUPS: "/analytics/active-groups",
+  RECENT_ACTIVITY: "/analytics/recent-activity",
 };
 
 // HTTP status codes
