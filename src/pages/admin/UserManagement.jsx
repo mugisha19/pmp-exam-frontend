@@ -336,7 +336,9 @@ export const UserManagement = () => {
                 size="sm"
                 leftIcon={<Edit className="w-4 h-4" />}
                 onClick={() => {
-                  const user = users.find((u) => u.user_id === selectedUsers[0]);
+                  const user = users.find(
+                    (u) => u.user_id === selectedUsers[0]
+                  );
                   if (user) handleEdit(user);
                 }}
               >
@@ -350,7 +352,9 @@ export const UserManagement = () => {
                 size="sm"
                 leftIcon={<Shield className="w-4 h-4" />}
                 onClick={() => {
-                  const user = users.find((u) => u.user_id === selectedUsers[0]);
+                  const user = users.find(
+                    (u) => u.user_id === selectedUsers[0]
+                  );
                   if (user) handleChangeRole(user);
                 }}
               >
@@ -512,7 +516,6 @@ export const UserManagement = () => {
 /**
  * Action Menu Component
  */
-
 
 /**
  * Table Skeleton Component
