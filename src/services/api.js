@@ -14,7 +14,7 @@ import {
 import { AUTH_ENDPOINTS, API_BASE_URL } from "@/constants/api.constants";
 
 // Direct auth service URL for token refresh (bypass proxy)
-const AUTH_SERVICE_URL = "http://localhost:8001/api/v1";
+const AUTH_SERVICE_URL = "http://localhost:8000/api/v1";
 
 // Debug: Log what we're using
 console.log("Creating axios with baseURL:", API_BASE_URL);

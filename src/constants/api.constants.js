@@ -4,17 +4,9 @@
  */
 
 // Base API configuration
-// In development, use relative URL so Vite proxy can intercept
-// In production, use the full URL from environment variable
-const getApiBaseUrl = () => {
-  if (import.meta.env.PROD) {
-    return import.meta.env.VITE_API_URL || "http://localhost:8000/api/v1";
-  }
-  // In development, always use relative URL - Vite proxy will handle it
-  return "/api/v1";
-};
-
-export const API_BASE_URL = getApiBaseUrl();
+// Use relative path for Vite proxy to handle, which avoids CORS and port issues
+// In production, this should be set to the full API URL via VITE_API_URL env variable
+export const API_BASE_URL = import.meta.env.VITE_API_URL || "/api/v1";
 
 // Debug: Log the API URL being used (remove in production)
 if (import.meta.env.DEV) {
@@ -157,7 +149,7 @@ export const NOTIFICATION_ENDPOINTS = {
   MARK_AS_READ: (notificationId) => `/notifications/${notificationId}/read`,
   MARK_ALL_READ: "/notifications/mark-all-read",
   DELETE_NOTIFICATION: (notificationId) => `/notifications/${notificationId}`,
-  WEBSOCKET_URL: (userIdentifier) => `ws://localhost:8004/ws/${userIdentifier}`,
+  WEBSOCKET_URL: (userIdentifier) => `ws://localhost:8000/ws/${userIdentifier}`,
 };
 
 // Analytics endpoints

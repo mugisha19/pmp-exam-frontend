@@ -3,6 +3,7 @@
  * Handles group management, membership, and related operations
  */
 
+import axios from "axios";
 import api from "./api";
 import { GROUP_ENDPOINTS } from "@/constants/api.constants";
 
