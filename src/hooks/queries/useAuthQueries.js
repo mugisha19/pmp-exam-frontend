@@ -14,8 +14,10 @@ import { ROLE_ROUTES } from "@/constants/roles.constants";
 /**
  * Login mutation hook
  * Authenticates user and updates store
+ * @param {Object} options - Options
+ * @param {string} options.redirectUrl - URL to redirect after login
  */
-export const useLoginMutation = () => {
+export const useLoginMutation = ({ redirectUrl } = {}) => {
   const navigate = useNavigate();
   const setUser = useAuthStore((state) => state.setUser);
   const setError = useAuthStore((state) => state.setError);
@@ -34,11 +36,19 @@ export const useLoginMutation = () => {
       // Show success message
       toast.success(`Welcome back, ${user.first_name}!`);
 
-      // Navigate to default route based on role (case-insensitive)
-      const userRole = user.role?.toLowerCase();
-      const defaultRoute = ROLE_ROUTES[userRole] || "/dashboard";
-      console.log("User role:", user.role, "Navigating to:", defaultRoute);
-      navigate(defaultRoute, { replace: true });
+      // Navigate to redirect URL if provided, otherwise to default route based on role
+      if (redirectUrl) {
+        console.log("Redirecting to:", redirectUrl);
+        // Use setTimeout to ensure auth state is fully updated before navigation
+        setTimeout(() => {
+          navigate(redirectUrl, { replace: true });
+        }, 100);
+      } else {
+        const userRole = user.role?.toLowerCase();
+        const defaultRoute = ROLE_ROUTES[userRole] || "/dashboard";
+        console.log("User role:", user.role, "Navigating to:", defaultRoute);
+        navigate(defaultRoute, { replace: true });
+      }
     },
     onError: (error) => {
       const errorMessage = error.message || "Login failed. Please try again.";

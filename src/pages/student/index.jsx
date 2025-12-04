@@ -49,3 +49,7 @@ export const SettingsPage = () => (
     <div className="text-gray-900">Settings Page - Coming Soon</div>
   </StudentLayout>
 );
+
+// Export group pages
+export { Groups } from "./Groups";
+export { GroupDetail } from "./GroupDetail";

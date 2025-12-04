@@ -15,6 +15,11 @@ export const AUTH_ROUTES = {
   APPLE_CALLBACK: "/auth/apple/callback",
 };
 
+// Public route paths
+export const PUBLIC_ROUTE_PATHS = {
+  JOIN_GROUP: "/join-group",
+};
+
 // Student routes
 export const STUDENT_ROUTES = {
   ROOT: "/student",
@@ -162,6 +167,7 @@ export const PUBLIC_ROUTES = [
   AUTH_ROUTES.VERIFY_EMAIL,
   AUTH_ROUTES.GOOGLE_CALLBACK,
   AUTH_ROUTES.APPLE_CALLBACK,
+  PUBLIC_ROUTE_PATHS.JOIN_GROUP,
   COMMON_ROUTES.HOME,
   COMMON_ROUTES.HELP,
   COMMON_ROUTES.PRIVACY_POLICY,

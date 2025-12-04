@@ -53,6 +53,8 @@ export const GROUP_ENDPOINTS = {
   REMOVE_MEMBER: (groupId, userId) => `/groups/${groupId}/members/${userId}`,
   LIST_MEMBERS: (groupId) => `/groups/${groupId}/members`,
   GENERATE_INVITE: (groupId) => `/groups/${groupId}/invite-link`,
+  PREVIEW_BY_TOKEN: (token) => `/groups/preview/${token}`,
+  JOIN_BY_TOKEN: (token) => `/groups/join/${token}`,
   JOIN_REQUEST: "/groups/join-request",
   JOIN_REQUESTS: (groupId) => `/groups/${groupId}/join-requests`,
   APPROVE_REQUEST: (groupId, requestId) =>

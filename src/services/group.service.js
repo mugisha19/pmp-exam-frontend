@@ -304,6 +304,34 @@ const handleGroupError = (error) => {
   };
 };
 
+/**
+ * Get group preview by invite token (public endpoint)
+ * @param {string} token - Invite token
+ * @returns {Promise<Object>} Group preview data
+ */
+export const getGroupPreviewByToken = async (token) => {
+  try {
+    const response = await api.get(GROUP_ENDPOINTS.PREVIEW_BY_TOKEN(token));
+    return response.data;
+  } catch (error) {
+    throw handleGroupError(error);
+  }
+};
+
+/**
+ * Join group by invite token
+ * @param {string} token - Invite token
+ * @returns {Promise<Object>} Join response
+ */
+export const joinGroupByToken = async (token) => {
+  try {
+    const response = await api.post(GROUP_ENDPOINTS.JOIN_BY_TOKEN(token));
+    return response.data;
+  } catch (error) {
+    throw handleGroupError(error);
+  }
+};
+
 export default {
   getGroups,
   getGroupById,
@@ -321,4 +349,6 @@ export default {
   getGroupQuizStats,
   getMyGroups,
   getUserGroups,
+  getGroupPreviewByToken,
+  joinGroupByToken,
 };

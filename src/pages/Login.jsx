@@ -6,7 +6,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { AuthLayout, AuthFormWrapper } from "../components/layouts";
 import { WelcomeIllustration } from "../components/illustrations";
 import { Button } from "../components/ui";
@@ -26,7 +26,15 @@ const loginSchema = z.object({
 });
 
 export const Login = () => {
-  const loginMutation = useLoginMutation();
+  const [searchParams] = useSearchParams();
+  const redirectUrl = searchParams.get("redirect_url");
+  // Decode the redirect URL if it exists
+  const decodedRedirectUrl = redirectUrl
+    ? decodeURIComponent(redirectUrl)
+    : null;
+  console.log("Login - redirectUrl:", redirectUrl);
+  console.log("Login - decodedRedirectUrl:", decodedRedirectUrl);
+  const loginMutation = useLoginMutation({ redirectUrl: decodedRedirectUrl });
 
   const { control, handleSubmit } = useForm({
     resolver: zodResolver(loginSchema),

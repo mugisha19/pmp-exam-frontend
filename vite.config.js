@@ -11,8 +11,10 @@ export default defineConfig({
     },
   },
   server: {
+    host: true, // 👉 expose dev server to network (LAN)
     port: 5173,
     strictPort: false,
+
     proxy: {
       "/api/v1": {
         target: "http://localhost:8000",

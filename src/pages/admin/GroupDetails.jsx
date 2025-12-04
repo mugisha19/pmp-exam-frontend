@@ -15,8 +15,13 @@ import {
   Globe,
   Lock,
   User,
+  Copy,
 } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 import { useGroup } from "@/hooks/queries/useGroupQueries";
+import { useUser } from "@/hooks/queries/useUserQueries";
+import * as groupService from "@/services/group.service";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { EmptyState } from "@/components/shared/EmptyState";
@@ -60,9 +65,96 @@ export const GroupDetails = () => {
   const { groupId } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("members");
+  const [clickCount, setClickCount] = useState(0);
+
+  // Frontend URL from environment variable
+  const frontendUrl =
+    import.meta.env.VITE_FRONTEND_URL || window.location.origin;
 
   // Fetch group details
   const { data: group, isLoading, isError, error } = useGroup(groupId);
+
+  // Fetch creator information
+  const { data: creator } = useUser(group?.created_by, {
+    enabled: !!group?.created_by,
+  });
+
+  // Generate invite link mutation
+  const generateInviteMutation = useMutation({
+    mutationFn: () => groupService.generateInviteLink(groupId),
+    onSuccess: (data) => {
+      console.log("=== COPY INVITE LINK DEBUG ===");
+      console.log("Backend response:", data);
+      console.log("Frontend URL:", frontendUrl);
+      console.log("Invite token from backend:", data.invite_token);
+
+      // Backend returns invite_token, construct full URL with frontend base URL
+      const inviteLink = `${frontendUrl}/join-group?token=${data.invite_token}`;
+      console.log("Constructed full invite link:", inviteLink);
+      console.log("Link length:", inviteLink.length);
+
+      // Try to copy to clipboard
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard
+          .writeText(inviteLink)
+          .then(() => {
+            console.log(
+              "✅ Successfully copied to clipboard via navigator.clipboard"
+            );
+            console.log("Copied text:", inviteLink);
+            toast.success("Invite link copied to clipboard!");
+          })
+          .catch((err) => {
+            console.error("❌ Failed to copy via navigator.clipboard:", err);
+            // Fallback method
+            copyToClipboardFallback(inviteLink);
+          });
+      } else {
+        console.warn("navigator.clipboard not available, using fallback");
+        copyToClipboardFallback(inviteLink);
+      }
+    },
+    onError: (error) => {
+      console.error("Error generating invite link:", error);
+      toast.error(error.message || "Failed to generate invite link");
+    },
+  });
+
+  // Fallback clipboard copy method
+  const copyToClipboardFallback = (text) => {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.position = "fixed";
+    textArea.style.left = "-999999px";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+
+    try {
+      document.execCommand("copy");
+      console.log("✅ Successfully copied via fallback method");
+      console.log("Copied text:", text);
+      toast.success("Invite link copied to clipboard!");
+    } catch (err) {
+      console.error("❌ Fallback copy also failed:", err);
+      toast.error("Failed to copy link to clipboard");
+    }
+
+    document.body.removeChild(textArea);
+  };
+
+  // Handle copy invite link
+  const handleCopyInviteLink = () => {
+    setClickCount((prev) => prev + 1);
+    console.log("🔵 Copy Invite Link button clicked! Count:", clickCount + 1);
+    alert(`Button clicked ${clickCount + 1} times!`);
+    generateInviteMutation.mutate();
+  };
+
+  // Debug: Log group data to see what's available
+  if (group) {
+    console.log("Group data:", group);
+  }
 
   // Check if group is private (for showing join requests tab)
   const isPrivateGroup =
@@ -146,14 +238,31 @@ export const GroupDetails = () => {
         }
         subtitle={group.description || "No description provided"}
         actions={
-          <Button
-            variant="ghost"
-            size="sm"
-            leftIcon={<ArrowLeft className="w-4 h-4" />}
-            onClick={() => navigate("/admin/groups")}
-          >
-            Back to Groups
-          </Button>
+          <div className="flex items-center gap-2">
+            {isPrivateGroup && (
+              <Button
+                variant="primary"
+                size="sm"
+                leftIcon={<Copy className="w-4 h-4" />}
+                onClick={(e) => {
+                  console.log("DIRECT ONCLICK FIRED!", e);
+                  alert("Direct onClick working!");
+                  handleCopyInviteLink();
+                }}
+                loading={generateInviteMutation.isPending}
+              >
+                {clickCount > 0 ? `Clicked ${clickCount}x` : "Copy Invite Link"}
+              </Button>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              leftIcon={<ArrowLeft className="w-4 h-4" />}
+              onClick={() => navigate("/admin/groups")}
+            >
+              Back to Groups
+            </Button>
+          </div>
         }
       />
 
@@ -189,10 +298,13 @@ export const GroupDetails = () => {
               icon={User}
               label="Created By"
               value={
-                group.created_by_name ||
-                group.creator?.first_name ||
-                group.owner?.first_name ||
-                "Unknown"
+                creator
+                  ? `${creator.first_name} ${creator.last_name}`
+                  : group.created_by_name ||
+                    group.created_by_email ||
+                    group.creator?.first_name ||
+                    group.owner?.first_name ||
+                    "Loading..."
               }
             />
 
@@ -207,14 +319,14 @@ export const GroupDetails = () => {
             <InfoItem
               icon={Calendar}
               label="Start Date"
-              value={formatDate(group.start_date)}
+              value={formatDate(group.from_date || group.start_date)}
             />
 
             {/* End Date */}
             <InfoItem
               icon={Calendar}
               label="End Date"
-              value={formatDate(group.end_date)}
+              value={formatDate(group.to_date || group.end_date)}
             />
 
             {/* Member Count */}
@@ -222,15 +334,21 @@ export const GroupDetails = () => {
               icon={Users}
               label="Members"
               value={
-                <span>
-                  <span className="text-gray-900 font-medium">
+                group.max_members ? (
+                  <span>
+                    <span className="text-gray-900 font-semibold">
+                      {group.member_count || 0}
+                    </span>
+                    <span className="text-gray-700 font-medium">
+                      {" "}
+                      / {group.max_members}
+                    </span>
+                  </span>
+                ) : (
+                  <span className="text-gray-900 font-semibold">
                     {group.member_count || 0}
                   </span>
-                  <span className="text-gray-500">
-                    {" "}
-                    / {group.max_members || "∞"}
-                  </span>
-                </span>
+                )
               }
             />
 
@@ -308,12 +426,12 @@ export const GroupDetails = () => {
  */
 const InfoItem = ({ icon: Icon, label, value }) => (
   <div className="flex items-start gap-3">
-    <div className="p-2 bg-gray-100 rounded-lg">
-      <Icon className="w-4 h-4 text-gray-500" />
+    <div className="p-2 bg-blue-50 rounded-lg">
+      <Icon className="w-4 h-4 text-blue-600" />
     </div>
     <div>
-      <p className="text-xs text-gray-500 mb-1">{label}</p>
-      <div className="text-sm text-gray-700">{value}</div>
+      <p className="text-xs font-medium text-gray-700 mb-1">{label}</p>
+      <div className="text-sm font-medium text-gray-900">{value}</div>
     </div>
   </div>
 );

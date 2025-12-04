@@ -14,6 +14,7 @@ import {
   X,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
+import { useMutation } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -33,6 +34,7 @@ import {
   useGroups,
   useDeleteGroupMutation,
 } from "@/hooks/queries/useGroupQueries";
+import * as groupService from "@/services/group.service";
 
 const GROUP_TYPE_OPTIONS = [
   { value: "", label: "All Types" },
@@ -82,6 +84,10 @@ export default function GroupManagement() {
     return params;
   }, [searchQuery, groupType, status, page, pageSize]);
 
+  // Frontend URL from environment variable
+  const frontendUrl =
+    import.meta.env.VITE_FRONTEND_URL || window.location.origin;
+
   // Fetch groups
   const { data: groupsData, isLoading, refetch } = useGroups(queryParams);
   const deleteGroupMutation = useDeleteGroupMutation();
@@ -89,6 +95,56 @@ export default function GroupManagement() {
   const groups = useMemo(() => {
     return groupsData?.groups || groupsData?.items || groupsData || [];
   }, [groupsData]);
+
+  // Generate invite link mutation
+  const generateInviteMutation = useMutation({
+    mutationFn: (groupId) => groupService.generateInviteLink(groupId),
+    onSuccess: (data) => {
+      // Backend returns invite_token, construct full URL with frontend base URL
+      const inviteLink = `${frontendUrl}/join-group?token=${data.invite_token}`;
+
+      // Try to copy to clipboard
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard
+          .writeText(inviteLink)
+          .then(() => {
+            toast.success("Invite link copied to clipboard!");
+          })
+          .catch((err) => {
+            console.error("Failed to copy via navigator.clipboard:", err);
+            // Fallback method
+            copyToClipboardFallback(inviteLink);
+          });
+      } else {
+        copyToClipboardFallback(inviteLink);
+      }
+    },
+    onError: (error) => {
+      console.error("Error generating invite link:", error);
+      toast.error(error.message || "Failed to generate invite link");
+    },
+  });
+
+  // Fallback clipboard copy method
+  const copyToClipboardFallback = (text) => {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.position = "fixed";
+    textArea.style.left = "-999999px";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+
+    try {
+      document.execCommand("copy");
+      toast.success("Invite link copied to clipboard!");
+    } catch (err) {
+      console.error("Fallback copy also failed:", err);
+      toast.error("Failed to copy link to clipboard");
+    }
+
+    document.body.removeChild(textArea);
+  };
 
   // Selection handlers
   const handleSelectGroup = useCallback((groupId, isSelected) => {
@@ -181,14 +237,16 @@ export default function GroupManagement() {
     [navigate]
   );
 
-  const handleCopyInviteLink = useCallback((group) => {
-    if (group.invite_link) {
-      navigator.clipboard.writeText(group.invite_link);
-      toast.success("Invite link copied to clipboard");
-    } else {
-      toast.error("No invite link available for this group");
-    }
-  }, []);
+  const handleCopyInviteLink = useCallback(
+    (group) => {
+      if (!group?.group_id) {
+        toast.error("Invalid group data");
+        return;
+      }
+      generateInviteMutation.mutate(group.group_id);
+    },
+    [generateInviteMutation]
+  );
 
   // Modal close handlers
   const handleCreateModalClose = useCallback(() => {
@@ -410,14 +468,16 @@ export default function GroupManagement() {
               <Users className="w-4 h-4 mr-1" />
               View Members
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleCopyInviteLink(getSelectedGroup())}
-            >
-              <Link className="w-4 h-4 mr-1" />
-              Copy Link
-            </Button>
+            {getSelectedGroup()?.group_type !== "public" && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleCopyInviteLink(getSelectedGroup())}
+              >
+                <Link className="w-4 h-4 mr-1" />
+                Copy Link
+              </Button>
+            )}
             <Button
               variant="danger"
               size="sm"

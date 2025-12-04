@@ -10,3 +10,4 @@ export { ForgotPassword } from "./ForgotPassword";
 export { ResetPassword } from "./ResetPassword";
 export { OAuthCallback } from "./OAuthCallback";
 export { Unauthorized } from "./Unauthorized";
+export { JoinGroup } from "./JoinGroup";

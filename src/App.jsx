@@ -9,6 +9,7 @@ import { studentRoutes } from "@/routes/student.routes";
 import { instructorRoutes } from "@/routes/instructor.routes";
 import { adminRoutes } from "@/routes/admin.routes";
 import Unauthorized from "@/pages/Unauthorized";
+import JoinGroup from "@/pages/JoinGroup";
 import { RoleBasedRedirect } from "@/components/routes/RoleBasedRedirect";
 
 function App() {
@@ -19,6 +20,9 @@ function App() {
           <Routes>
             {/* Auth routes (login, signup, etc.) */}
             {authRoutes}
+
+            {/* Public routes */}
+            <Route path="/join-group" element={<JoinGroup />} />
 
             {/* Unauthorized page */}
             <Route path="/unauthorized" element={<Unauthorized />} />

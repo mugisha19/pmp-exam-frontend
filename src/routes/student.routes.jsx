@@ -15,6 +15,8 @@ import {
   StudyMaterialsPage,
   ProfilePage,
   SettingsPage,
+  Groups,
+  GroupDetail,
 } from "@/pages/student";
 
 export const studentRoutes = (
@@ -34,6 +36,8 @@ export const studentRoutes = (
       <Route path="/study-materials" element={<StudyMaterialsPage />} />
       <Route path="/profile" element={<ProfilePage />} />
       <Route path="/settings" element={<SettingsPage />} />
+      <Route path="/groups" element={<Groups />} />
+      <Route path="/groups/:groupId" element={<GroupDetail />} />
     </Route>
   </>
 );
