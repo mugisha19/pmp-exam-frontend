@@ -76,7 +76,13 @@ export const UserCell = ({
 }) => {
   // Support both user object and individual props
   const displayName =
-    name || user?.name || user?.full_name || user?.username || "Unknown User";
+    name ||
+    (user?.first_name && user?.last_name
+      ? `${user.first_name} ${user.last_name}`
+      : user?.first_name ||
+        user?.last_name ||
+        user?.email?.split("@")[0] ||
+        "Unknown User");
   const displayEmail = email || user?.email;
   const displayAvatarUrl =
     avatarUrl || user?.avatar_url || user?.profile_picture;
@@ -141,7 +147,13 @@ export const UserAvatar = ({
   className,
 }) => {
   const displayName =
-    name || user?.name || user?.full_name || user?.username || "Unknown User";
+    name ||
+    (user?.first_name && user?.last_name
+      ? `${user.first_name} ${user.last_name}`
+      : user?.first_name ||
+        user?.last_name ||
+        user?.email?.split("@")[0] ||
+        "Unknown User");
   const displayEmail = email || user?.email;
   const displayAvatarUrl =
     avatarUrl || user?.avatar_url || user?.profile_picture;

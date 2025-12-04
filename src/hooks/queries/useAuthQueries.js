@@ -95,7 +95,7 @@ export const useRegisterMutation = () => {
  */
 export const useForgotPasswordMutation = () => {
   return useMutation({
-    mutationFn: (email) => authService.forgotPassword(email),
+    mutationFn: (data) => authService.forgotPassword(data.email || data),
     onSuccess: () => {
       toast.success(
         "Password reset instructions have been sent to your email."
@@ -147,7 +147,7 @@ export const useVerifyEmailMutation = ({ autoLogin = false } = {}) => {
   const updateUser = useAuthStore((state) => state.updateUser);
 
   return useMutation({
-    mutationFn: (token) => authService.verifyEmail(token),
+    mutationFn: (data) => authService.verifyEmail(data.token || data),
     onSuccess: (data) => {
       toast.success("Email verified successfully!");
 
@@ -187,9 +187,9 @@ export const useVerifyEmailMutation = ({ autoLogin = false } = {}) => {
  */
 export const useResendVerificationMutation = () => {
   return useMutation({
-    mutationFn: (email) => authService.resendVerification(email),
+    mutationFn: (data) => authService.resendVerification(data.email || data),
     onSuccess: () => {
-      toast.success("Verification email sent! Please check your inbox.");
+      toast.success("Verification link sent! Please check your inbox.");
     },
     onError: (error) => {
       const errorMessage =

@@ -55,20 +55,40 @@ export const ResetPassword = () => {
     try {
       await resetPasswordMutation.mutateAsync({
         token,
-        password: data.password,
+        newPassword: data.password,
       });
-      toast.success("Password reset successfully!");
-      navigate("/login");
+      // Navigation to login is handled by the mutation hook
     } catch {
       // Error handled by mutation
     }
   };
 
-  // Redirect if no token
+  // Show error message if no token but don't redirect immediately
   if (!token) {
-    toast.error("Invalid reset link");
-    navigate("/forgot-password");
-    return null;
+    return (
+      <AuthLayout illustration={SecurityIllustration}>
+        <AuthFormWrapper
+          title="Invalid Reset Link"
+          subtitle="The password reset link is invalid or has expired"
+          footer={
+            <p>
+              <a
+                href="/forgot-password"
+                className="text-accent hover:text-accent/80 font-medium"
+              >
+                Request a new reset link
+              </a>
+            </p>
+          }
+        >
+          <div className="text-center py-6">
+            <p className="text-gray-600">
+              Please request a new password reset link to continue.
+            </p>
+          </div>
+        </AuthFormWrapper>
+      </AuthLayout>
+    );
   }
 
   return (

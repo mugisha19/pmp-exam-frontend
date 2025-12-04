@@ -79,7 +79,12 @@ export const UserDropdown = ({ className }) => {
       {/* User info - compact */}
       <div className="px-3 py-2 border-b border-gray-100">
         <p className="text-sm font-medium text-gray-900 truncate">
-          {user?.name || user?.full_name || "User"}
+          {user?.first_name && user?.last_name
+            ? `${user.first_name} ${user.last_name}`
+            : user?.first_name ||
+              user?.last_name ||
+              user?.email?.split("@")[0] ||
+              "User"}
         </p>
         <p className="text-xs text-gray-500 truncate">{user?.email}</p>
       </div>

@@ -55,6 +55,7 @@ const passwordSchema = z
 
 export function Settings() {
   const { user } = useAuthStore();
+  const updateUser = useAuthStore((state) => state.updateUser);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -116,6 +117,10 @@ export function Settings() {
         currentPassword: data.current_password,
         newPassword: data.new_password,
       });
+
+      // Update password_changed_at in global state
+      updateUser({ password_changed_at: new Date().toISOString() });
+
       toast.success("Password changed successfully");
       resetPasswordForm();
       setShowPasswordForm(false);

@@ -1,14 +1,5 @@
-/**
- * API Endpoint Constants
- * Centralized API endpoint definitions for the application
- */
-
-// Base API configuration
-// Use relative path for Vite proxy to handle, which avoids CORS and port issues
-// In production, this should be set to the full API URL via VITE_API_URL env variable
 export const API_BASE_URL = import.meta.env.VITE_API_URL || "/api/v1";
 
-// Debug: Log the API URL being used (remove in production)
 if (import.meta.env.DEV) {
   console.log(
     "API Base URL:",
@@ -144,7 +135,7 @@ export const QUIZ_ENDPOINTS = {
 
 // Notification endpoints
 export const NOTIFICATION_ENDPOINTS = {
-  LIST_NOTIFICATIONS: "/notifications",
+  LIST_NOTIFICATIONS: "/notifications/",
   GET_NOTIFICATION: (notificationId) => `/notifications/${notificationId}`,
   MARK_AS_READ: (notificationId) => `/notifications/${notificationId}/read`,
   MARK_ALL_READ: "/notifications/mark-all-read",

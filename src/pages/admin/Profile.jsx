@@ -12,12 +12,12 @@ import {
   Mail,
   Shield,
   Calendar,
-  Camera,
   Save,
   Loader2,
   CheckCircle,
   X,
   Upload,
+  Camera,
 } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { Button } from "@/components/ui/Button";
@@ -25,6 +25,7 @@ import { Input } from "@/components/ui/Input";
 import { Card, CardContent } from "@/components/ui/Card";
 import { useAuthStore } from "@/stores/auth.store";
 import { useUpdateProfileMutation } from "@/hooks/queries/useUserQueries";
+import api from "@/services/api";
 import toast from "react-hot-toast";
 
 // Profile form schema
@@ -39,27 +40,25 @@ const profileSchema = z.object({
     .min(2, "Last name must be at least 2 characters"),
   avatar_url: z
     .string()
+    .optional()
     .refine(
       (val) =>
         !val ||
-        val.startsWith("data:image/") ||
+        val === "" ||
+        val === "file_upload_pending" ||
         val.startsWith("http://") ||
-        val.startsWith("https://"),
-      "Please enter a valid URL or upload an image"
-    )
-    .optional()
-    .or(z.literal("")),
+        val.startsWith("https://") ||
+        val.startsWith("/api/"),
+      "Please enter a valid image URL (http:// or https://)"
+    ),
 });
-
-// Max file size: 2MB
-const MAX_FILE_SIZE = 2 * 1024 * 1024;
-const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
 
 export function Profile() {
   const { user } = useAuthStore();
+  const updateUser = useAuthStore((state) => state.updateUser);
   const [isEditing, setIsEditing] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState(null);
-  const [showUrlInput, setShowUrlInput] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
   const fileInputRef = useRef(null);
 
   // Mutations
@@ -85,55 +84,98 @@ export function Profile() {
   const currentAvatarUrl = watch("avatar_url");
 
   // Handle file selection
-  const handleFileSelect = (event) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  const handleFileSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith("image/")) {
+        alert("Please select an image file");
+        return;
+      }
+      // Validate file size (5MB max)
+      if (file.size > 5 * 1024 * 1024) {
+        alert("File size must be less than 5MB");
+        return;
+      }
+      setSelectedFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatarPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
 
-    // Validate file type
-    if (!ALLOWED_TYPES.includes(file.type)) {
-      toast.error("Please select a valid image file (JPEG, PNG, GIF, or WebP)");
-      return;
+      // Mark form as dirty to enable Save button
+      setValue("avatar_url", "file_upload_pending", { shouldDirty: true });
     }
-
-    // Validate file size
-    if (file.size > MAX_FILE_SIZE) {
-      toast.error("Image size must be less than 2MB");
-      return;
-    }
-
-    // Create preview and convert to base64
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const base64String = reader.result;
-      setAvatarPreview(base64String);
-      setValue("avatar_url", base64String, { shouldDirty: true });
-    };
-    reader.readAsDataURL(file);
-  };
-
-  // Trigger file input
-  const handleCameraClick = () => {
-    fileInputRef.current?.click();
   };
 
   // Remove avatar
   const handleRemoveAvatar = () => {
     setAvatarPreview(null);
-    setValue("avatar_url", "", { shouldDirty: true });
+    setSelectedFile(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
+    setValue("avatar_url", "", { shouldDirty: true });
   };
 
   // Handle profile update
   const onSubmit = async (data) => {
     try {
-      await updateProfileMutation.mutateAsync(data);
+      // Upload avatar if file is selected
+      if (selectedFile) {
+        const formData = new FormData();
+        formData.append("file", selectedFile);
+
+        // Use axios API instance with automatic token refresh
+        const response = await api.post("/users/me/avatar", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+
+        const avatarUrl = response.data.avatar_url;
+        data.avatar_url = avatarUrl;
+
+        // Update global state immediately with new avatar
+        // Prepend base URL if it's a relative path
+        const fullAvatarUrl = avatarUrl.startsWith("http")
+          ? avatarUrl
+          : `http://localhost:8000${avatarUrl}`;
+        updateUser({ avatar_url: fullAvatarUrl });
+      } else if (data.avatar_url === "file_upload_pending") {
+        // If marked as pending but no file, clear it
+        data.avatar_url = "";
+      }
+
+      // Only send the update if there's actual data to update
+      const updateData = {
+        first_name: data.first_name,
+        last_name: data.last_name,
+      };
+
+      // Only include avatar_url if it's a valid URL
+      if (data.avatar_url && data.avatar_url !== "file_upload_pending") {
+        updateData.avatar_url = data.avatar_url;
+      }
+
+      await updateProfileMutation.mutateAsync(updateData);
       setIsEditing(false);
       setAvatarPreview(null);
-      setShowUrlInput(false);
-    } catch {
-      // Error handled by mutation
+      setSelectedFile(null);
+    } catch (error) {
+      console.error("Profile update error:", error);
+
+      // Handle specific error cases
+      if (error.response?.status === 401) {
+        toast.error("Session expired. Please log in again.");
+      } else if (error.response?.status === 413) {
+        toast.error("File too large. Maximum size is 5MB.");
+      } else if (error.response?.data?.detail) {
+        toast.error(error.response.data.detail);
+      } else {
+        toast.error(error.message || "Failed to update profile");
+      }
     }
   };
 
@@ -146,7 +188,7 @@ export function Profile() {
     });
     setIsEditing(false);
     setAvatarPreview(null);
-    setShowUrlInput(false);
+    setSelectedFile(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -181,15 +223,6 @@ export function Profile() {
       <Card>
         <CardContent className="p-6">
           <form onSubmit={handleSubmit(onSubmit)}>
-            {/* Hidden file input */}
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/jpeg,image/png,image/gif,image/webp"
-              onChange={handleFileSelect}
-              className="hidden"
-            />
-
             {/* Avatar Section */}
             <div className="flex items-start gap-6 mb-8 pb-6 border-b border-gray-200">
               <div className="relative">
@@ -198,34 +231,47 @@ export function Profile() {
                     src={displayAvatar}
                     alt={`${user?.first_name} ${user?.last_name}`}
                     className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg"
+                    onError={(e) => {
+                      e.target.style.display = "none";
+                      e.target.nextSibling.style.display = "flex";
+                    }}
                   />
-                ) : (
-                  <div className="w-24 h-24 rounded-full bg-linear-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white text-3xl font-bold border-4 border-white shadow-lg">
-                    {user?.first_name?.[0]}
-                    {user?.last_name?.[0]}
-                  </div>
-                )}
+                ) : null}
+                <div
+                  className="w-24 h-24 rounded-full bg-linear-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white text-3xl font-bold border-4 border-white shadow-lg"
+                  style={{ display: displayAvatar ? "none" : "flex" }}
+                >
+                  {user?.first_name?.[0]}
+                  {user?.last_name?.[0]}
+                </div>
                 {isEditing && (
-                  <div className="absolute -bottom-1 -right-1 flex gap-1">
+                  <>
                     <button
                       type="button"
-                      onClick={handleCameraClick}
-                      className="p-2 bg-white border border-gray-200 rounded-full shadow-md hover:bg-gray-50 transition-colors"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="absolute -bottom-1 -right-1 p-2 bg-blue-600 border-2 border-white rounded-full shadow-md hover:bg-blue-700 transition-colors"
                       title="Upload photo"
                     >
-                      <Camera className="w-4 h-4 text-gray-600" />
+                      <Camera className="w-4 h-4 text-white" />
                     </button>
                     {displayAvatar && (
                       <button
                         type="button"
                         onClick={handleRemoveAvatar}
-                        className="p-2 bg-white border border-gray-200 rounded-full shadow-md hover:bg-red-50 transition-colors"
+                        className="absolute -top-1 -right-1 p-1.5 bg-white border border-gray-200 rounded-full shadow-md hover:bg-red-50 transition-colors"
                         title="Remove photo"
                       >
-                        <X className="w-4 h-4 text-red-500" />
+                        <X className="w-3.5 h-3.5 text-red-500" />
                       </button>
                     )}
-                  </div>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileSelect}
+                      className="hidden"
+                    />
+                  </>
                 )}
               </div>
 
@@ -323,60 +369,51 @@ export function Profile() {
                 </div>
               </div>
 
-              {/* Avatar URL (when editing) */}
+              {/* Avatar Upload/URL (when editing) */}
               {isEditing && (
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Profile Picture
-                  </label>
-
-                  {/* Upload info */}
-                  <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                    <div className="shrink-0">
-                      <Upload className="w-8 h-8 text-gray-400" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm text-gray-700 font-medium">
-                        Click the camera icon to upload a photo
-                      </p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        Supported formats: JPEG, PNG, GIF, WebP (max 2MB)
-                      </p>
-
-                      {/* Toggle URL input */}
-                      <button
+                <div className="md:col-span-2 space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Upload Profile Picture
+                    </label>
+                    <div className="flex items-center gap-3">
+                      <Button
                         type="button"
-                        onClick={() => setShowUrlInput(!showUrlInput)}
-                        className="text-xs text-blue-600 hover:text-blue-700 mt-2"
+                        variant="secondary"
+                        onClick={() => fileInputRef.current?.click()}
                       >
-                        {showUrlInput
-                          ? "Hide URL input"
-                          : "Or enter image URL instead"}
-                      </button>
+                        <Upload className="w-4 h-4 mr-2" />
+                        Choose File
+                      </Button>
+                      <span className="text-sm text-gray-500">
+                        {selectedFile ? selectedFile.name : "No file selected"}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Supported formats: JPEG, PNG, GIF, WebP (max 5MB)
+                    </p>
+                  </div>
 
-                      {/* URL Input (optional) */}
-                      {showUrlInput && (
-                        <div className="mt-3">
-                          <Input
-                            {...register("avatar_url")}
-                            placeholder="https://example.com/avatar.jpg"
-                            error={errors.avatar_url?.message}
-                            onChange={(e) => {
-                              register("avatar_url").onChange(e);
-                              setAvatarPreview(null); // Clear file preview when URL is entered
-                            }}
-                          />
-                        </div>
-                      )}
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-gray-300" />
+                    </div>
+                    <div className="relative flex justify-center text-sm">
+                      <span className="px-2 bg-white text-gray-500">or</span>
                     </div>
                   </div>
 
-                  {avatarPreview && (
-                    <p className="text-xs text-green-600 mt-2 flex items-center gap-1">
-                      <CheckCircle className="w-3 h-3" />
-                      New image selected - save to apply changes
-                    </p>
-                  )}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      Profile Picture URL
+                    </label>
+                    <Input
+                      {...register("avatar_url")}
+                      placeholder="https://example.com/avatar.jpg"
+                      error={errors.avatar_url?.message}
+                      helperText="Enter a publicly accessible image URL (max 500 characters)"
+                    />
+                  </div>
                 </div>
               )}
             </div>
@@ -386,7 +423,10 @@ export function Profile() {
               <div className="flex items-center gap-3 mt-8 pt-6 border-t border-gray-200">
                 <Button
                   type="submit"
-                  disabled={!isDirty || updateProfileMutation.isPending}
+                  disabled={
+                    (!isDirty && !selectedFile) ||
+                    updateProfileMutation.isPending
+                  }
                 >
                   {updateProfileMutation.isPending ? (
                     <>

@@ -53,6 +53,8 @@ export const Signup = () => {
   const onSubmit = async (data) => {
     try {
       await registerMutation.mutateAsync(data);
+      // Store email for resend verification
+      localStorage.setItem("verification_email", data.email);
       navigate("/verify-email");
     } catch {
       // Error handled by mutation

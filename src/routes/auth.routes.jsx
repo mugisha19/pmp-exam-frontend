@@ -48,11 +48,7 @@ export const authRoutes = (
     />
     <Route
       path="/reset-password"
-      element={
-        <PublicRoute>
-          <ResetPassword />
-        </PublicRoute>
-      }
+      element={<ResetPassword />}
     />
     <Route path="/auth/callback" element={<OAuthCallback />} />
   </>
