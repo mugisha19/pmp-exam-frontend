@@ -19,6 +19,7 @@ import {
   Award,
   Target,
   BookMarked,
+  FileQuestion,
 } from "lucide-react";
 
 export const STUDENT_NAV_ITEMS = [
@@ -171,6 +172,24 @@ export const ADMIN_NAV_ITEMS = [
     label: "Exams",
     path: "/admin/exams",
     icon: BookOpen,
+  },
+  {
+    id: "topics",
+    label: "Topics",
+    path: "/admin/topics",
+    icon: BookMarked,
+  },
+  {
+    id: "questions",
+    label: "Questions",
+    path: "/admin/questions",
+    icon: FileQuestion,
+  },
+  {
+    id: "quiz-banks",
+    label: "Quiz Banks",
+    path: "/admin/quiz-banks",
+    icon: FileText,
   },
   {
     id: "groups",

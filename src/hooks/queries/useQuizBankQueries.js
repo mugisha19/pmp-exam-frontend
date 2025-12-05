@@ -257,6 +257,9 @@ export const useRemoveQuestionFromBankMutation = () => {
   });
 };
 
+// Alias for consistency with the component
+export const useAddQuestionsToQuizBankMutation = useAddQuestionsToBankMutation;
+
 export default {
   useQuizBanks,
   useQuizBank,
@@ -266,5 +269,6 @@ export default {
   useDeleteQuizBankMutation,
   useAddQuestionToBankMutation,
   useAddQuestionsToBankMutation,
+  useAddQuestionsToQuizBankMutation,
   useRemoveQuestionFromBankMutation,
 };

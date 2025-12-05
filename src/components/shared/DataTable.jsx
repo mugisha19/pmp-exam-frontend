@@ -156,7 +156,9 @@ export const DataTable = ({
                     className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                     style={{ width: column.width }}
                   >
-                    {column.header || column.label}
+                    {typeof column.header === "function"
+                      ? column.header()
+                      : column.header || column.label}
                   </th>
                 ))}
               </tr>
@@ -240,7 +242,9 @@ export const DataTable = ({
                       column.align === "right" && "justify-end"
                     )}
                   >
-                    {column.header || column.label}
+                    {typeof column.header === "function"
+                      ? column.header()
+                      : column.header || column.label}
                     {column.sortable !== false && renderSortIcon(column.key)}
                   </div>
                 </th>

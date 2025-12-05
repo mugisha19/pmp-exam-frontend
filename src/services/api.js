@@ -60,6 +60,7 @@ api.interceptors.request.use(
     console.log("API Request:", {
       baseURL: config.baseURL,
       url: config.url,
+      params: config.params,
       fullURL: `${config.baseURL}${config.url}`,
     });
 

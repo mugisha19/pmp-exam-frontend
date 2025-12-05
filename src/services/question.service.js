@@ -58,6 +58,7 @@ export const createQuestion = async (data) => {
     const response = await api.post(QUIZ_ENDPOINTS.CREATE_QUESTION, data);
     return response.data;
   } catch (error) {
+    console.log(error);
     throw handleQuestionError(error);
   }
 };
@@ -118,20 +119,39 @@ const handleQuestionError = (error) => {
   if (error.response) {
     const { status, data } = error.response;
 
-    // Handle validation errors
-    if (status === 422 && error.validationErrors) {
+    // Handle validation errors (422)
+    if (status === 422) {
+      // FastAPI validation errors come as array in detail
+      if (Array.isArray(data?.detail)) {
+        const errorMessages = data.detail.map((err) => {
+          const field = err.loc ? err.loc.join(".") : "field";
+          return `${field}: ${err.msg}`;
+        });
+        return {
+          message: errorMessages.join(", "),
+          errors: errorMessages,
+          status,
+        };
+      }
+
+      // Single validation error
+      const message =
+        typeof data?.detail === "string"
+          ? data.detail
+          : data?.message || "Validation failed";
+
       return {
-        message: "Validation failed",
-        errors: error.validationErrors,
+        message,
+        errors: [message],
         status,
       };
     }
 
-    // Handle specific error messages
+    // Handle other error messages
     const message = data?.detail || data?.message || "An error occurred";
 
     return {
-      message,
+      message: typeof message === "string" ? message : JSON.stringify(message),
       status,
       data,
     };

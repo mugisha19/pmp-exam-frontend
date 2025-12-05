@@ -114,9 +114,22 @@ export const ADMIN_ROUTES = {
   QUIZZES: "/admin/quizzes",
   QUIZ_DETAIL: "/admin/quizzes/:quizId",
 
+  // Topic Management
+  TOPICS: "/admin/topics",
+  TOPIC_CREATE: "/admin/topics/create",
+  TOPIC_EDIT: "/admin/topics/:topicId/edit",
+  TOPIC_DETAIL: "/admin/topics/:topicId",
+
   // Question Bank
   QUESTIONS: "/admin/questions",
   QUESTION_DETAIL: "/admin/questions/:questionId",
+
+  // Quiz Bank Management
+  QUIZ_BANKS: "/admin/quiz-banks",
+  QUIZ_BANK_CREATE: "/admin/quiz-banks/create",
+  QUIZ_BANK_EDIT: "/admin/quiz-banks/:quizBankId/edit",
+  QUIZ_BANK_DETAIL: "/admin/quiz-banks/:quizBankId",
+  QUIZ_BANK_ADD_QUESTIONS: "/admin/quiz-banks/:quizBankId/add-questions",
 
   // Group Management
   GROUPS: "/admin/groups",
