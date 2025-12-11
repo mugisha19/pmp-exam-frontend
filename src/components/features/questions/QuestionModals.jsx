@@ -632,10 +632,6 @@ export function CreateQuestionModal({
           <textarea
             {...register("explanation", {
               required: "Explanation is required",
-              minLength: {
-                value: 20,
-                message: "Explanation must be at least 20 characters",
-              },
             })}
             rows={3}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -1243,10 +1239,6 @@ export function EditQuestionModal({
           <textarea
             {...register("explanation", {
               required: "Explanation is required",
-              minLength: {
-                value: 20,
-                message: "Explanation must be at least 20 characters",
-              },
             })}
             rows={3}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
