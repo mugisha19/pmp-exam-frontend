@@ -79,13 +79,89 @@ const QuestionReviewCard = ({ question, index }) => {
   const correctAnswer = question.correct_answer;
   const questionType = question.question_type;
 
+  // Render user's answer
+  const renderUserAnswer = () => {
+    if (!userAnswer) return null;
+
+    if (questionType === 'matching') {
+      if (!Array.isArray(userAnswer)) return null;
+      return (
+        <div className="space-y-2">
+          <p className="text-sm font-semibold text-gray-700">Your Answer:</p>
+          {userAnswer.map((pair, idx) => {
+            const leftItem = question.options?.left_items?.find(l => l.id === pair.left_id);
+            const rightItem = question.options?.right_items?.find(r => r.id === pair.right_id);
+            return (
+              <div key={idx} className="p-2 bg-blue-500/5 rounded border border-blue-500/20">
+                <p className="text-sm text-gray-900">
+                  {leftItem?.text} → {rightItem?.text}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
+
+    // For choice-based questions
+    const userOptions = Array.isArray(userAnswer) ? userAnswer : [userAnswer];
+    const optionLabels = userOptions.map(optId => {
+      const opt = question.options?.find(o => o.id === optId);
+      return opt ? `${opt.id}. ${opt.text}` : optId;
+    }).join(', ');
+
+    return (
+      <div className="p-3 bg-blue-500/5 rounded border border-blue-500/20">
+        <p className="text-sm font-semibold text-gray-700 mb-1">Your Answer:</p>
+        <p className="text-sm text-gray-900">{optionLabels}</p>
+      </div>
+    );
+  };
+
+  // Render correct answer
+  const renderCorrectAnswer = () => {
+    if (questionType === 'matching') {
+      if (!Array.isArray(correctAnswer)) return null;
+      return (
+        <div className="space-y-2">
+          <p className="text-sm font-semibold text-gray-700">Correct Answer:</p>
+          {correctAnswer.map((pair, idx) => {
+            const leftItem = question.options?.left_items?.find(l => l.id === pair.left_id);
+            const rightItem = question.options?.right_items?.find(r => r.id === pair.right_id);
+            return (
+              <div key={idx} className="p-2 bg-green-500/5 rounded border border-green-500/20">
+                <p className="text-sm text-gray-900">
+                  {leftItem?.text} → {rightItem?.text}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
+
+    // For choice-based questions
+    const correctOptions = Array.isArray(correctAnswer) ? correctAnswer : [correctAnswer];
+    const optionLabels = correctOptions.map(optId => {
+      const opt = question.options?.find(o => o.id === optId);
+      return opt ? `${opt.id}. ${opt.text}` : optId;
+    }).join(', ');
+
+    return (
+      <div className="p-3 bg-green-500/5 rounded border border-green-500/20">
+        <p className="text-sm font-semibold text-gray-700 mb-1">Correct Answer:</p>
+        <p className="text-sm text-gray-900">{optionLabels}</p>
+      </div>
+    );
+  };
+
   // Handle different option formats based on question type
   const renderOptions = () => {
     if (questionType === 'matching') {
       // Matching questions have a special structure
       return (
         <div className="space-y-3">
-          <p className="text-sm font-semibold text-gray-700">Left Items → Right Items</p>
+          <p className="text-sm font-semibold text-gray-700">Options:</p>
           {question.options?.left_items?.map((leftItem, idx) => {
             const correctMatch = question.options.correct_matches?.find(
               m => m.left_id === leftItem.id
@@ -204,18 +280,39 @@ const QuestionReviewCard = ({ question, index }) => {
       {/* Options */}
       {renderOptions()}
 
-      {/* User didn't answer */}
-      {userAnswer === null && (
-        <div className="mt-3 p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
-          <p className="text-sm text-yellow-700">No answer provided</p>
+      {/* User Answer */}
+      {userAnswer !== null ? (
+        <div className="mt-4 space-y-3">
+          {renderUserAnswer()}
+          
+          {/* Show correct answer only if user was incorrect */}
+          {!isCorrect && renderCorrectAnswer()}
+          
+          {/* Show explanation only if user was incorrect */}
+          {!isCorrect && question.explanation && (
+            <div className="p-4 bg-orange-500/10 border border-orange-500/20 rounded-lg">
+              <p className="text-sm font-semibold text-orange-700 mb-1">Explanation:</p>
+              <p className="text-sm text-gray-700">{question.explanation}</p>
+            </div>
+          )}
         </div>
-      )}
-
-      {/* Explanation */}
-      {question.explanation && (
-        <div className="mt-4 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-          <p className="text-sm font-semibold text-blue-600 mb-1">Explanation</p>
-          <p className="text-sm text-gray-700">{question.explanation}</p>
+      ) : (
+        /* User didn't answer */
+        <div className="mt-4 space-y-3">
+          <div className="p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+            <p className="text-sm text-yellow-700">No answer provided</p>
+          </div>
+          
+          {/* Show correct answer for unanswered questions */}
+          {renderCorrectAnswer()}
+          
+          {/* Show explanation for unanswered questions */}
+          {question.explanation && (
+            <div className="p-4 bg-orange-500/10 border border-orange-500/20 rounded-lg">
+              <p className="text-sm font-semibold text-orange-700 mb-1">Explanation:</p>
+              <p className="text-sm text-gray-700">{question.explanation}</p>
+            </div>
+          )}
         </div>
       )}
     </Card>
