@@ -27,6 +27,8 @@ const formatDate = (dateStr) => {
     month: "short",
     day: "numeric",
     year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
   });
 };
 
@@ -34,6 +36,9 @@ const formatDate = (dateStr) => {
  * Format date range
  */
 const formatDateRange = (startDate, endDate) => {
+  if (!startDate && !endDate) return "N/A";
+  if (!startDate) return `Until ${formatDate(endDate)}`;
+  if (!endDate) return `From ${formatDate(startDate)}`;
   return `${formatDate(startDate)} - ${formatDate(endDate)}`;
 };
 
@@ -169,14 +174,21 @@ export const GroupQuizzesTab = ({ groupId }) => {
     {
       key: "dates",
       header: "Available Dates",
-      render: (_, quiz) => (
-        <span className="text-sm text-gray-400">
-          {formatDateRange(
-            quiz.start_date || quiz.available_from,
-            quiz.end_date || quiz.available_until
-          )}
-        </span>
-      ),
+      render: (_, quiz) => {
+        const startDate = quiz.starts_at || quiz.start_date || quiz.available_from;
+        const endDate = quiz.ends_at || quiz.end_date || quiz.available_until;
+        
+        // If scheduling is not enabled, show "Always Available"
+        if (!quiz.scheduling_enabled && !startDate && !endDate) {
+          return <span className="text-sm text-gray-600">Always Available</span>;
+        }
+        
+        return (
+          <span className="text-sm text-gray-700">
+            {formatDateRange(startDate, endDate)}
+          </span>
+        );
+      },
     },
   ];
 
