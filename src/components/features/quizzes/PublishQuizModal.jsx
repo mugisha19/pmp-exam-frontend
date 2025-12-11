@@ -28,14 +28,14 @@ const publishSchema = z.object({
   title: z.string().optional(),
   description: z.string().optional(),
   quiz_mode: z.enum(["practice", "exam"]),
-  time_limit_minutes: z.number().min(1).max(480).optional().nullable(),
+  time_limit_minutes: z.union([z.number().min(1).max(480), z.nan(), z.undefined()]).optional().nullable().transform(val => (isNaN(val) || val === undefined) ? null : val),
   passing_score: z.number().min(0).max(100).default(70),
   shuffle_questions: z.boolean().default(true),
   shuffle_options: z.boolean().default(true),
   show_results_immediately: z.boolean().default(true),
-  max_attempts: z.number().min(1).optional().nullable(),
+  max_attempts: z.union([z.number().min(1), z.nan(), z.undefined()]).optional().nullable().transform(val => (isNaN(val) || val === undefined) ? null : val),
   use_all_questions: z.boolean().default(true),
-  subset_count: z.number().min(1).optional().nullable(),
+  subset_count: z.union([z.number().min(1), z.nan(), z.undefined()]).optional().nullable().transform(val => (isNaN(val) || val === undefined) ? null : val),
   starts_at: z.string().optional().nullable(),
   ends_at: z.string().optional().nullable(),
 }).refine(
@@ -297,9 +297,12 @@ export const PublishQuizModal = ({ isOpen, onClose, quizBank }) => {
             <Input
               type="number"
               {...register("max_attempts", { valueAsNumber: true })}
-              placeholder="Unlimited"
+              placeholder="None (Infinite)"
               error={errors.max_attempts?.message}
             />
+            <p className="text-xs text-gray-500 mt-1">
+              Leave empty for unlimited attempts
+            </p>
           </div>
         </div>
 
