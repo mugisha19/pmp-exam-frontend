@@ -194,9 +194,21 @@ export const GroupQuizzesTab = ({ groupId }) => {
         }
         
         return (
-          <span className="text-sm text-gray-700">
-            {formatDateRange(startDate, endDate)}
-          </span>
+          <div className="flex flex-col gap-1 text-sm text-gray-700">
+            {startDate && (
+              <div>
+                <span className="text-gray-500">From: </span>
+                <span className="font-medium">{formatDate(startDate)}</span>
+              </div>
+            )}
+            {endDate && (
+              <div>
+                <span className="text-gray-500">Until: </span>
+                <span className="font-medium">{formatDate(endDate)}</span>
+              </div>
+            )}
+            {!startDate && !endDate && <span className="text-gray-400">N/A</span>}
+          </div>
         );
       },
     },
