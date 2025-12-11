@@ -38,7 +38,7 @@ export const STUDENT_NAV_ITEMS = [
   {
     id: "my-exams",
     label: "My Exams",
-    path: "/my-exams",
+    path: "/exams",
     icon: ClipboardList,
   },
   {
