@@ -98,7 +98,15 @@ export const JoinRequestsTab = ({ groupId }) => {
       key: "user",
       header: "User",
       render: (_, request) => (
-        <UserCell user={request.user || request} showEmail />
+        <UserCell 
+          user={{
+            first_name: request.first_name,
+            last_name: request.last_name,
+            email: request.email,
+            user_id: request.user_id,
+          }} 
+          showEmail 
+        />
       ),
     },
     {
