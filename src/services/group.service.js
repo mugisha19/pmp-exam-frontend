@@ -223,6 +223,23 @@ export const getMyGroups = async () => {
 };
 
 /**
+ * Get available public groups (not joined by current user)
+ * @param {Object} params - Query parameters
+ * @param {string} [params.search] - Search query
+ * @param {number} [params.skip] - Number of items to skip
+ * @param {number} [params.limit] - Maximum number of items to return
+ * @returns {Promise<Array>} List of available public groups
+ */
+export const getAvailableGroups = async (params = {}) => {
+  try {
+    const response = await api.get(GROUP_ENDPOINTS.AVAILABLE_GROUPS, { params });
+    return response.data;
+  } catch (error) {
+    throw handleGroupError(error);
+  }
+};
+
+/**
  * Get groups for a specific user
  * @param {string} userId - User ID
  * @returns {Promise<Array>} List of groups the user belongs to

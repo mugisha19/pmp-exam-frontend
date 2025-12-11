@@ -61,6 +61,7 @@ export const GROUP_ENDPOINTS = {
     `/groups/${groupId}/approve-request/${requestId}`,
   MY_GROUPS: "/groups/me/groups",
   USER_GROUPS: (userId) => `/groups/users/${userId}/groups`,
+  AVAILABLE_GROUPS: "/groups/available", // Public groups user hasn't joined
   GROUP_QUIZZES: (groupId) => `/groups/${groupId}/quizzes`,
   GROUP_QUIZ_STATS: (groupId) => `/groups/${groupId}/quiz-stats`,
 };
