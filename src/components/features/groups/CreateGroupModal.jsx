@@ -27,18 +27,12 @@ const createGroupSchema = z.object({
   group_type: z.enum(["public", "private"], {
     required_error: "Please select a group type",
   }),
-  join_method: z.enum(["direct", "link"]).optional(),
   from_date: z.string().min(1, "Start date is required"),
 });
 
 const GROUP_TYPE_OPTIONS = [
   { value: "public", label: "Public - Anyone can join" },
   { value: "private", label: "Private - Invite only" },
-];
-
-const JOIN_METHOD_OPTIONS = [
-  { value: "direct", label: "Direct - Accept requests directly" },
-  { value: "link", label: "Link - Join via invite link" },
 ];
 
 export const CreateGroupModal = ({ isOpen, onClose }) => {
@@ -56,7 +50,6 @@ export const CreateGroupModal = ({ isOpen, onClose }) => {
       name: "",
       description: "",
       group_type: "public",
-      join_method: "direct",
       from_date: new Date().toISOString().split("T")[0],
     },
   });
@@ -70,11 +63,6 @@ export const CreateGroupModal = ({ isOpen, onClose }) => {
         ...data,
         from_date: new Date(data.from_date).toISOString(),
       };
-
-      // Remove join_method for public groups
-      if (groupData.group_type === "public") {
-        delete groupData.join_method;
-      }
 
       await createGroupMutation.mutateAsync(groupData);
       reset();
@@ -173,16 +161,6 @@ export const CreateGroupModal = ({ isOpen, onClose }) => {
             <p className="text-sm text-red-500">{errors.group_type.message}</p>
           )}
         </div>
-
-        {/* Join Method (only for private groups) */}
-        {groupType === "private" && (
-          <Select
-            label="Join Method"
-            options={JOIN_METHOD_OPTIONS}
-            error={errors.join_method?.message}
-            {...register("join_method")}
-          />
-        )}
 
         {/* Start Date */}
         <Input
