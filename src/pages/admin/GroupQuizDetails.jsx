@@ -68,8 +68,8 @@ const StatCard = ({ icon: Icon, label, value, color = "blue" }) => {
           <Icon className={`w-6 h-6 ${classes.text}`} />
         </div>
         <div>
-          <p className="text-sm text-gray-400">{label}</p>
-          <p className="text-2xl font-bold text-white">{value}</p>
+          <p className="text-sm text-gray-600">{label}</p>
+          <p className="text-2xl font-bold text-gray-900">{value}</p>
         </div>
       </div>
     </Card>
@@ -101,12 +101,12 @@ export const GroupQuizDetails = () => {
             <Trophy 
               className={`w-5 h-5 ${
                 entry.rank === 1 ? 'text-yellow-500' : 
-                entry.rank === 2 ? 'text-gray-400' : 
+                entry.rank === 2 ? 'text-gray-600' : 
                 'text-orange-600'
               }`} 
             />
           )}
-          <span className="font-semibold text-white">#{entry.rank}</span>
+          <span className="font-semibold text-gray-900">#{entry.rank}</span>
         </div>
       ),
     },
@@ -115,8 +115,8 @@ export const GroupQuizDetails = () => {
       header: "Student",
       render: (_, entry) => (
         <div>
-          <p className="font-medium text-white">{entry.full_name || entry.user_id}</p>
-          <p className="text-sm text-gray-400">{entry.email || ""}</p>
+          <p className="font-medium text-gray-900">{entry.full_name || entry.user_id}</p>
+          <p className="text-sm text-gray-600">{entry.email || ""}</p>
         </div>
       ),
     },
@@ -133,7 +133,7 @@ export const GroupQuizDetails = () => {
       key: "best_time",
       header: "Time",
       render: (_, entry) => (
-        <span className="text-sm text-gray-300">
+        <span className="text-sm text-gray-700">
           {formatDuration(entry.best_time_seconds)}
         </span>
       ),
@@ -147,10 +147,10 @@ export const GroupQuizDetails = () => {
       header: "Student",
       render: (_, userAttempt) => (
         <div>
-          <p className="font-medium text-white">
+          <p className="font-medium text-gray-900">
             {userAttempt.full_name || userAttempt.user_id}
           </p>
-          <p className="text-sm text-gray-400">{userAttempt.email || ""}</p>
+          <p className="text-sm text-gray-600">{userAttempt.email || ""}</p>
         </div>
       ),
     },
@@ -158,14 +158,14 @@ export const GroupQuizDetails = () => {
       key: "total_attempts",
       header: "Attempts",
       render: (_, userAttempt) => (
-        <span className="text-sm text-gray-300">{userAttempt.total_attempts}</span>
+        <span className="text-sm text-gray-700">{userAttempt.total_attempts}</span>
       ),
     },
     {
       key: "completed",
       header: "Completed",
       render: (_, userAttempt) => (
-        <span className="text-sm text-gray-300">{userAttempt.completed_attempts}</span>
+        <span className="text-sm text-gray-700">{userAttempt.completed_attempts}</span>
       ),
     },
     {
@@ -184,7 +184,7 @@ export const GroupQuizDetails = () => {
       key: "avg_score",
       header: "Avg Score",
       render: (_, userAttempt) => (
-        <span className="text-sm text-gray-300">
+        <span className="text-sm text-gray-700">
           {userAttempt.average_score?.toFixed(1) || "N/A"}%
         </span>
       ),
@@ -213,14 +213,14 @@ export const GroupQuizDetails = () => {
       key: "attempt_number",
       header: "#",
       render: (_, attempt) => (
-        <span className="font-semibold text-white">#{attempt.attempt_number}</span>
+        <span className="font-semibold text-gray-900">#{attempt.attempt_number}</span>
       ),
     },
     {
       key: "started_at",
       header: "Started",
       render: (_, attempt) => (
-        <span className="text-sm text-gray-400">{formatDate(attempt.started_at)}</span>
+        <span className="text-sm text-gray-600">{formatDate(attempt.started_at)}</span>
       ),
     },
     {
@@ -251,7 +251,7 @@ export const GroupQuizDetails = () => {
       key: "correct",
       header: "Correct",
       render: (_, attempt) => (
-        <span className="text-sm text-gray-300">
+        <span className="text-sm text-gray-700">
           {attempt.correct_answers}/{attempt.total_questions}
         </span>
       ),
@@ -260,7 +260,7 @@ export const GroupQuizDetails = () => {
       key: "time",
       header: "Time",
       render: (_, attempt) => (
-        <span className="text-sm text-gray-300">
+        <span className="text-sm text-gray-700">
           {formatDuration(attempt.total_time_seconds)}
         </span>
       ),
@@ -349,34 +349,34 @@ export const GroupQuizDetails = () => {
         {/* Overview Tab */}
         <TabsContent value="overview" className="space-y-6">
           <Card className="p-6">
-            <h3 className="text-lg font-semibold text-white mb-4">Quiz Information</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Quiz Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <p className="text-sm text-gray-400">Time Limit</p>
-                <p className="text-white font-medium">
+                <p className="text-sm text-gray-600">Time Limit</p>
+                <p className="text-gray-900 font-medium">
                   {quiz?.time_limit_minutes ? `${quiz.time_limit_minutes} minutes` : "Unlimited"}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-gray-400">Passing Score</p>
-                <p className="text-white font-medium">{quiz?.passing_score || 70}%</p>
+                <p className="text-sm text-gray-600">Passing Score</p>
+                <p className="text-gray-900 font-medium">{quiz?.passing_score || 70}%</p>
               </div>
               <div>
-                <p className="text-sm text-gray-400">Total Questions</p>
-                <p className="text-white font-medium">{quiz?.total_questions || "N/A"}</p>
+                <p className="text-sm text-gray-600">Total Questions</p>
+                <p className="text-gray-900 font-medium">{quiz?.total_questions || "N/A"}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-400">Max Attempts</p>
-                <p className="text-white font-medium">
+                <p className="text-sm text-gray-600">Max Attempts</p>
+                <p className="text-gray-900 font-medium">
                   {quiz?.max_attempts || "Unlimited"}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-gray-400">Published At</p>
-                <p className="text-white font-medium">{formatDate(quiz?.published_at)}</p>
+                <p className="text-sm text-gray-600">Published At</p>
+                <p className="text-gray-900 font-medium">{formatDate(quiz?.published_at)}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-400">Status</p>
+                <p className="text-sm text-gray-600">Status</p>
                 <Badge variant={quiz?.status === "active" ? "success" : "default"}>
                   {quiz?.status || "unknown"}
                 </Badge>
@@ -387,7 +387,7 @@ export const GroupQuizDetails = () => {
           {/* Top 5 Leaderboard Preview */}
           <Card className="p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-white">Top Performers</h3>
+              <h3 className="text-lg font-semibold text-gray-900">Top Performers</h3>
               <Button
                 variant="ghost"
                 size="sm"
@@ -417,7 +417,7 @@ export const GroupQuizDetails = () => {
         {/* Leaderboard Tab */}
         <TabsContent value="leaderboard">
           <Card className="p-6">
-            <h3 className="text-lg font-semibold text-white mb-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
               Leaderboard - Top Scores
             </h3>
             {leaderboardLoading ? (
@@ -442,7 +442,7 @@ export const GroupQuizDetails = () => {
         {/* All Attempts Tab */}
         <TabsContent value="attempts">
           <Card className="p-6">
-            <h3 className="text-lg font-semibold text-white mb-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
               All Attempts by Student
             </h3>
             {attemptsLoading ? (
@@ -454,21 +454,21 @@ export const GroupQuizDetails = () => {
                     <div className="flex items-center justify-between p-4 bg-gray-800/50 rounded-lg">
                       <div className="flex-1 grid grid-cols-5 gap-4 items-center">
                         <div>
-                          <p className="font-medium text-white">
+                          <p className="font-medium text-gray-900">
                             {userAttempt.full_name || userAttempt.user_id}
                           </p>
-                          <p className="text-sm text-gray-400">{userAttempt.email || ""}</p>
+                          <p className="text-sm text-gray-600">{userAttempt.email || ""}</p>
                         </div>
                         <div className="text-center">
-                          <p className="text-sm text-gray-400">Attempts</p>
-                          <p className="text-white font-medium">{userAttempt.total_attempts}</p>
+                          <p className="text-sm text-gray-600">Attempts</p>
+                          <p className="text-gray-900 font-medium">{userAttempt.total_attempts}</p>
                         </div>
                         <div className="text-center">
-                          <p className="text-sm text-gray-400">Completed</p>
-                          <p className="text-white font-medium">{userAttempt.completed_attempts}</p>
+                          <p className="text-sm text-gray-600">Completed</p>
+                          <p className="text-gray-900 font-medium">{userAttempt.completed_attempts}</p>
                         </div>
                         <div className="text-center">
-                          <p className="text-sm text-gray-400">Best</p>
+                          <p className="text-sm text-gray-600">Best</p>
                           <Badge
                             variant={userAttempt.best_score >= 70 ? "success" : "error"}
                             size="sm"
@@ -477,8 +477,8 @@ export const GroupQuizDetails = () => {
                           </Badge>
                         </div>
                         <div className="text-center">
-                          <p className="text-sm text-gray-400">Avg</p>
-                          <p className="text-white font-medium">
+                          <p className="text-sm text-gray-600">Avg</p>
+                          <p className="text-gray-900 font-medium">
                             {userAttempt.average_score?.toFixed(1) || "N/A"}%
                           </p>
                         </div>
