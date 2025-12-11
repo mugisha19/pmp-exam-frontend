@@ -117,15 +117,18 @@ const QuestionReviewCard = ({ question, index }) => {
 
       {/* Options */}
       <div className="space-y-2 mb-4">
-        {question.options?.map((option, idx) => {
-          // Handle both string and object formats for options
-          const optionText = typeof option === 'string' ? option : option?.text || option;
+        {question.options && Object.entries(question.options).map(([key, option]) => {
+          // Extract text from option (handle both string and object formats)
+          const optionText = typeof option === 'object' && option !== null 
+            ? option.text 
+            : String(option);
+          
           const isUserAnswer = Array.isArray(userAnswer) 
-            ? userAnswer.includes(optionText) 
-            : userAnswer === optionText;
+            ? userAnswer.includes(key)
+            : userAnswer === key;
           const isCorrectAnswer = Array.isArray(correctAnswer)
-            ? correctAnswer.includes(optionText)
-            : correctAnswer === optionText;
+            ? correctAnswer.includes(key)
+            : correctAnswer === key;
           
           let bgClass = "bg-gray-100";
           let borderClass = "border-gray-300";
@@ -143,13 +146,13 @@ const QuestionReviewCard = ({ question, index }) => {
 
           return (
             <div
-              key={idx}
+              key={key}
               className={`p-3 rounded-lg border ${bgClass} ${borderClass}`}
             >
               <div className="flex items-center justify-between">
                 <p className={`${textClass} flex items-center gap-2`}>
                   <span className="font-semibold">
-                    {String.fromCharCode(65 + idx)}.
+                    {key}.
                   </span>
                   {optionText}
                 </p>
