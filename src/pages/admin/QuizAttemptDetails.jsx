@@ -79,16 +79,19 @@ const QuestionReviewCard = ({ question, index }) => {
   const correctAnswer = question.correct_answer;
   const questionType = question.question_type;
 
-  // Render user's answer
+  // Render user's answer (for incorrect/unanswered only)
   const renderUserAnswer = () => {
     if (!userAnswer) return null;
 
     if (questionType === 'matching') {
-      if (!Array.isArray(userAnswer)) return null;
+      // User answer for matching is in format: {"pairs": [{left_id, right_id}]}
+      const pairs = userAnswer?.pairs || userAnswer;
+      if (!Array.isArray(pairs)) return null;
+      
       return (
         <div className="space-y-2">
           <p className="text-sm font-semibold text-gray-700">Your Answer:</p>
-          {userAnswer.map((pair, idx) => {
+          {pairs.map((pair, idx) => {
             const leftItem = question.options?.left_items?.find(l => l.id === pair.left_id);
             const rightItem = question.options?.right_items?.find(r => r.id === pair.right_id);
             return (
@@ -103,9 +106,23 @@ const QuestionReviewCard = ({ question, index }) => {
       );
     }
 
-    // For choice-based questions
-    const userOptions = Array.isArray(userAnswer) ? userAnswer : [userAnswer];
-    const optionLabels = userOptions.map(optId => {
+    // For choice-based questions, extract selected options
+    let selectedOptions = [];
+    
+    if (questionType === 'multiple_response') {
+      // User answer format: {"selected_option_ids": ["A", "C"]}
+      selectedOptions = userAnswer?.selected_option_ids || userAnswer;
+    } else if (questionType === 'multiple_choice' || questionType === 'true_false') {
+      // User answer format: {"selected_option_id": "A"}
+      const selectedId = userAnswer?.selected_option_id || userAnswer;
+      selectedOptions = selectedId ? [selectedId] : [];
+    }
+
+    if (!Array.isArray(selectedOptions)) {
+      selectedOptions = [selectedOptions];
+    }
+
+    const optionLabels = selectedOptions.map(optId => {
       const opt = question.options?.find(o => o.id === optId);
       return opt ? `${opt.id}. ${opt.text}` : optId;
     }).join(', ');
@@ -118,7 +135,7 @@ const QuestionReviewCard = ({ question, index }) => {
     );
   };
 
-  // Render correct answer
+  // Render correct answer (for incorrect/unanswered only)
   const renderCorrectAnswer = () => {
     if (questionType === 'matching') {
       if (!Array.isArray(correctAnswer)) return null;
@@ -155,6 +172,22 @@ const QuestionReviewCard = ({ question, index }) => {
     );
   };
 
+  // Get user's selected option IDs for highlighting
+  const getUserSelectedIds = () => {
+    if (!userAnswer) return [];
+    
+    if (questionType === 'matching') {
+      return [];
+    } else if (questionType === 'multiple_response') {
+      return userAnswer?.selected_option_ids || userAnswer || [];
+    } else if (questionType === 'multiple_choice' || questionType === 'true_false') {
+      const selectedId = userAnswer?.selected_option_id || userAnswer;
+      return selectedId ? [selectedId] : [];
+    }
+    
+    return Array.isArray(userAnswer) ? userAnswer : [userAnswer];
+  };
+
   // Handle different option formats based on question type
   const renderOptions = () => {
     if (questionType === 'matching') {
@@ -185,15 +218,15 @@ const QuestionReviewCard = ({ question, index }) => {
 
     // For multiple choice, multiple response, and true/false
     if (Array.isArray(question.options)) {
+      const userSelectedIds = getUserSelectedIds();
+      
       return (
         <div className="space-y-2">
           {question.options.map((option) => {
             const optionId = option.id;
             const optionText = option.text;
             
-            const isUserAnswer = Array.isArray(userAnswer)
-              ? userAnswer.includes(optionId)
-              : userAnswer === optionId;
+            const isUserAnswer = userSelectedIds.includes(optionId);
             const isCorrectAnswer = option.is_correct || 
               (Array.isArray(correctAnswer) 
                 ? correctAnswer.includes(optionId) 
@@ -280,33 +313,30 @@ const QuestionReviewCard = ({ question, index }) => {
       {/* Options */}
       {renderOptions()}
 
-      {/* User Answer */}
-      {userAnswer !== null ? (
+      {/* Only show answer details and explanation if incorrect or unanswered */}
+      {!isCorrect && userAnswer !== null && (
         <div className="mt-4 space-y-3">
           {renderUserAnswer()}
+          {renderCorrectAnswer()}
           
-          {/* Show correct answer only if user was incorrect */}
-          {!isCorrect && renderCorrectAnswer()}
-          
-          {/* Show explanation only if user was incorrect */}
-          {!isCorrect && question.explanation && (
+          {question.explanation && (
             <div className="p-4 bg-orange-500/10 border border-orange-500/20 rounded-lg">
               <p className="text-sm font-semibold text-orange-700 mb-1">Explanation:</p>
               <p className="text-sm text-gray-700">{question.explanation}</p>
             </div>
           )}
         </div>
-      ) : (
-        /* User didn't answer */
+      )}
+
+      {/* User didn't answer */}
+      {userAnswer === null && (
         <div className="mt-4 space-y-3">
           <div className="p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
             <p className="text-sm text-yellow-700">No answer provided</p>
           </div>
           
-          {/* Show correct answer for unanswered questions */}
           {renderCorrectAnswer()}
           
-          {/* Show explanation for unanswered questions */}
           {question.explanation && (
             <div className="p-4 bg-orange-500/10 border border-orange-500/20 rounded-lg">
               <p className="text-sm font-semibold text-orange-700 mb-1">Explanation:</p>
