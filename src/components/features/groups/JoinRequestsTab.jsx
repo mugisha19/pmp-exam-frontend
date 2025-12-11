@@ -3,7 +3,7 @@
  * Displays and manages pending join requests for private groups
  */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Check, X, UserPlus, MessageSquare } from "lucide-react";
 import {
   useGroupJoinRequests,
@@ -38,13 +38,30 @@ export const JoinRequestsTab = ({ groupId }) => {
   const [message, setMessage] = useState("");
 
   // Fetch join requests
-  const { data: requestsData, isLoading } = useGroupJoinRequests(groupId);
+  const { data: requestsData, isLoading, refetch, isError, error } = useGroupJoinRequests(groupId);
 
   // Approve/reject mutation
   const approveRequestMutation = useApproveJoinRequestMutation();
 
-  // Extract requests array
-  const requests = requestsData?.items || requestsData || [];
+  // Refetch data when tab becomes active
+  useEffect(() => {
+    if (groupId) {
+      refetch();
+    }
+  }, [groupId, refetch]);
+
+  // Extract requests array - handle different response structures
+  const requests = Array.isArray(requestsData)
+    ? requestsData
+    : requestsData?.items || requestsData?.requests || [];
+
+  // Debug logging
+  useEffect(() => {
+    console.log('JoinRequestsTab - Raw data:', requestsData);
+    console.log('JoinRequestsTab - Extracted requests:', requests);
+    console.log('JoinRequestsTab - Loading:', isLoading);
+    console.log('JoinRequestsTab - Error:', error);
+  }, [requestsData, requests, isLoading, error]);
 
   // Handle approve/reject
   const handleApprove = (request) => {

@@ -277,19 +277,21 @@ export const PublishQuizModal = ({ isOpen, onClose, quizBank, preselectedGroupId
             </select>
           </div>
 
-          {/* Time Limit */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Time Limit (minutes) {quizMode === "exam" && <span className="text-red-500">*</span>}
-            </label>
-            <Input
-              type="number"
-              {...register("time_limit_minutes", { valueAsNumber: true })}
-              placeholder="e.g., 60"
-              error={errors.time_limit_minutes?.message}
-              leftIcon={<Clock className="w-4 h-4" />}
-            />
-          </div>
+          {/* Time Limit - Only show for exam mode */}
+          {quizMode === "exam" && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Time Limit (minutes) <span className="text-red-500">*</span>
+              </label>
+              <Input
+                type="number"
+                {...register("time_limit_minutes", { valueAsNumber: true })}
+                placeholder="e.g., 60"
+                error={errors.time_limit_minutes?.message}
+                leftIcon={<Clock className="w-4 h-4" />}
+              />
+            </div>
+          )}
 
           {/* Passing Score */}
           <div>

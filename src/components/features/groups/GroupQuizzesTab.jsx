@@ -3,7 +3,7 @@
  * Displays quizzes assigned to a group
  */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FileQuestion, Plus, Search } from "lucide-react";
 import { useGroupQuizzes } from "@/hooks/queries/useGroupQueries";
 import { useQuizBanks } from "@/hooks/queries/useQuizBankQueries";
@@ -56,7 +56,7 @@ export const GroupQuizzesTab = ({ groupId }) => {
   const [searchQuery, setSearchQuery] = useState("");
 
   // Fetch group quizzes
-  const { data: quizzesData, isLoading } = useGroupQuizzes(groupId);
+  const { data: quizzesData, isLoading, refetch, isError, error } = useGroupQuizzes(groupId);
 
   // Fetch quiz banks for selection
   const { data: quizBanksData, isLoading: quizBanksLoading } = useQuizBanks(
@@ -64,9 +64,26 @@ export const GroupQuizzesTab = ({ groupId }) => {
     { enabled: isSelectQuizBankOpen }
   );
 
-  // Extract quizzes array
-  const quizzes = quizzesData?.items || quizzesData || [];
+  // Refetch data when tab becomes active
+  useEffect(() => {
+    if (groupId) {
+      refetch();
+    }
+  }, [groupId, refetch]);
+
+  // Extract quizzes array - handle different response structures
+  const quizzes = Array.isArray(quizzesData)
+    ? quizzesData
+    : quizzesData?.items || quizzesData?.quizzes || [];
   const quizBanks = quizBanksData?.items || quizBanksData || [];
+
+  // Debug logging
+  useEffect(() => {
+    console.log('GroupQuizzesTab - Raw data:', quizzesData);
+    console.log('GroupQuizzesTab - Extracted quizzes:', quizzes);
+    console.log('GroupQuizzesTab - Loading:', isLoading);
+    console.log('GroupQuizzesTab - Error:', error);
+  }, [quizzesData, quizzes, isLoading, error]);
 
   // Handle quiz bank selection
   const handleSelectQuizBank = (quizBank) => {

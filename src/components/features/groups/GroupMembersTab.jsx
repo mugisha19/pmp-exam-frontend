@@ -3,7 +3,7 @@
  * Displays and manages group members
  */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { UserMinus, Users } from "lucide-react";
 import {
   useGroupMembers,
@@ -47,13 +47,30 @@ export const GroupMembersTab = ({ groupId }) => {
   const [selectedMember, setSelectedMember] = useState(null);
 
   // Fetch group members
-  const { data: membersData, isLoading } = useGroupMembers(groupId);
+  const { data: membersData, isLoading, refetch, isError, error } = useGroupMembers(groupId);
+
+  // Refetch data when tab becomes active
+  useEffect(() => {
+    if (groupId) {
+      refetch();
+    }
+  }, [groupId, refetch]);
 
   // Remove mutation
   const removeMemberMutation = useRemoveMemberMutation();
 
-  // Extract members array
-  const members = membersData?.items || membersData || [];
+  // Extract members array - handle different response structures
+  const members = Array.isArray(membersData) 
+    ? membersData 
+    : membersData?.items || membersData?.members || [];
+
+  // Debug logging
+  useEffect(() => {
+    console.log('GroupMembersTab - Raw data:', membersData);
+    console.log('GroupMembersTab - Extracted members:', members);
+    console.log('GroupMembersTab - Loading:', isLoading);
+    console.log('GroupMembersTab - Error:', error);
+  }, [membersData, members, isLoading, error]);
 
   // Handle remove
   const handleRemove = (member) => {
