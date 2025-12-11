@@ -364,57 +364,41 @@ export const GroupDetails = () => {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        {({ value, onValueChange }) => (
-          <>
-            <TabsList>
-              <TabsTrigger
-                value="members"
-                activeValue={value}
-                onValueChange={onValueChange}
-              >
-                <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4" />
-                  Members
-                </div>
-              </TabsTrigger>
-              <TabsTrigger
-                value="quizzes"
-                activeValue={value}
-                onValueChange={onValueChange}
-              >
-                <div className="flex items-center gap-2">
-                  <FileQuestion className="w-4 h-4" />
-                  Quizzes
-                </div>
-              </TabsTrigger>
-              {isPrivateGroup && (
-                <TabsTrigger
-                  value="requests"
-                  activeValue={value}
-                  onValueChange={onValueChange}
-                >
-                  <div className="flex items-center gap-2">
-                    <UserPlus className="w-4 h-4" />
-                    Join Requests
-                  </div>
-                </TabsTrigger>
-              )}
-            </TabsList>
+        <TabsList>
+          <TabsTrigger value="members">
+            <div className="flex items-center gap-2">
+              <Users className="w-4 h-4" />
+              Members
+            </div>
+          </TabsTrigger>
+          <TabsTrigger value="quizzes">
+            <div className="flex items-center gap-2">
+              <FileQuestion className="w-4 h-4" />
+              Quizzes
+            </div>
+          </TabsTrigger>
+          {isPrivateGroup && (
+            <TabsTrigger value="requests">
+              <div className="flex items-center gap-2">
+                <UserPlus className="w-4 h-4" />
+                Join Requests
+              </div>
+            </TabsTrigger>
+          )}
+        </TabsList>
 
-            <TabsContent value="members" activeValue={value}>
-              <GroupMembersTab groupId={groupId} />
-            </TabsContent>
+        <TabsContent value="members">
+          <GroupMembersTab groupId={groupId} />
+        </TabsContent>
 
-            <TabsContent value="quizzes" activeValue={value}>
-              <GroupQuizzesTab groupId={groupId} />
-            </TabsContent>
+        <TabsContent value="quizzes">
+          <GroupQuizzesTab groupId={groupId} />
+        </TabsContent>
 
-            {isPrivateGroup && (
-              <TabsContent value="requests" activeValue={value}>
-                <JoinRequestsTab groupId={groupId} />
-              </TabsContent>
-            )}
-          </>
+        {isPrivateGroup && (
+          <TabsContent value="requests">
+            <JoinRequestsTab groupId={groupId} />
+          </TabsContent>
         )}
       </Tabs>
     </div>
