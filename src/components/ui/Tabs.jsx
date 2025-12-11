@@ -3,8 +3,18 @@
  * Tab navigation with underline indicator
  */
 
-import { useState } from "react";
+import { createContext, useContext, useState } from "react";
 import { cn } from "@/utils/cn";
+
+const TabsContext = createContext(null);
+
+const useTabsContext = () => {
+  const context = useContext(TabsContext);
+  if (!context) {
+    throw new Error("Tabs components must be used within a Tabs component");
+  }
+  return context;
+};
 
 export const Tabs = ({
   defaultValue,
@@ -25,11 +35,9 @@ export const Tabs = ({
   };
 
   return (
-    <div className={cn("", className)}>
-      {typeof children === "function"
-        ? children({ value, onValueChange: handleChange })
-        : children}
-    </div>
+    <TabsContext.Provider value={{ value, onValueChange: handleChange }}>
+      <div className={cn("", className)}>{children}</div>
+    </TabsContext.Provider>
   );
 };
 
@@ -51,9 +59,8 @@ export const TabsTrigger = ({
   value,
   children,
   className,
-  activeValue,
-  onValueChange,
 }) => {
+  const { value: activeValue, onValueChange } = useTabsContext();
   const isActive = value === activeValue;
 
   return (
@@ -76,24 +83,15 @@ export const TabsTrigger = ({
   );
 };
 
-export const TabsContent = ({ value, children, className, activeValue }) => {
+export const TabsContent = ({ value, children, className }) => {
+  const { value: activeValue } = useTabsContext();
+  
   if (value !== activeValue) return null;
 
   return (
     <div className={cn("mt-4 focus:outline-none", className)} role="tabpanel">
       {children}
     </div>
-  );
-};
-
-// Convenience wrapper with context
-export const TabsRoot = ({ defaultValue, children, className }) => {
-  const [value, setValue] = useState(defaultValue);
-
-  return (
-    <Tabs value={value} onValueChange={setValue} className={className}>
-      {children({ value, onValueChange: setValue })}
-    </Tabs>
   );
 };
 
