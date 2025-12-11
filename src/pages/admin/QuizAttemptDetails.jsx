@@ -77,6 +77,92 @@ const QuestionReviewCard = ({ question, index }) => {
   const isCorrect = question.is_correct;
   const userAnswer = question.user_answer;
   const correctAnswer = question.correct_answer;
+  const questionType = question.question_type;
+
+  // Handle different option formats based on question type
+  const renderOptions = () => {
+    if (questionType === 'matching') {
+      // Matching questions have a special structure
+      return (
+        <div className="space-y-3">
+          <p className="text-sm font-semibold text-gray-700">Left Items → Right Items</p>
+          {question.options?.left_items?.map((leftItem, idx) => {
+            const correctMatch = question.options.correct_matches?.find(
+              m => m.left_id === leftItem.id
+            );
+            const rightItem = question.options.right_items?.find(
+              r => r.id === correctMatch?.right_id
+            );
+            
+            return (
+              <div key={leftItem.id} className="p-3 bg-gray-100 rounded-lg border border-gray-300">
+                <p className="text-gray-900">
+                  <span className="font-semibold">{leftItem.text}</span>
+                  {rightItem && <span className="text-gray-600"> → {rightItem.text}</span>}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
+
+    // For multiple choice, multiple response, and true/false
+    if (Array.isArray(question.options)) {
+      return (
+        <div className="space-y-2">
+          {question.options.map((option) => {
+            const optionId = option.id;
+            const optionText = option.text;
+            
+            const isUserAnswer = Array.isArray(userAnswer)
+              ? userAnswer.includes(optionId)
+              : userAnswer === optionId;
+            const isCorrectAnswer = option.is_correct || 
+              (Array.isArray(correctAnswer) 
+                ? correctAnswer.includes(optionId) 
+                : correctAnswer === optionId);
+            
+            let bgClass = "bg-gray-100";
+            let borderClass = "border-gray-300";
+            let textClass = "text-gray-900";
+
+            if (isCorrectAnswer) {
+              bgClass = "bg-green-500/10";
+              borderClass = "border-green-500";
+              textClass = "text-green-600";
+            } else if (isUserAnswer && !isCorrectAnswer) {
+              bgClass = "bg-red-500/10";
+              borderClass = "border-red-500";
+              textClass = "text-red-600";
+            }
+
+            return (
+              <div
+                key={optionId}
+                className={`p-3 rounded-lg border ${bgClass} ${borderClass}`}
+              >
+                <div className="flex items-center justify-between">
+                  <p className={`${textClass} flex items-center gap-2`}>
+                    <span className="font-semibold">{optionId}.</span>
+                    {optionText}
+                  </p>
+                  {isCorrectAnswer && (
+                    <CheckCircle className="w-4 h-4 text-green-500" />
+                  )}
+                  {isUserAnswer && !isCorrectAnswer && (
+                    <XCircle className="w-4 h-4 text-red-500" />
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
+
+    return null;
+  };
 
   return (
     <Card className="p-6">
@@ -96,9 +182,9 @@ const QuestionReviewCard = ({ question, index }) => {
             </Badge>
           </div>
         </div>
-        {question.topic && (
+        {question.question_type && (
           <Badge variant="default" size="sm">
-            {question.topic}
+            {question.question_type.replace('_', ' ')}
           </Badge>
         )}
       </div>
@@ -116,62 +202,19 @@ const QuestionReviewCard = ({ question, index }) => {
       </div>
 
       {/* Options */}
-      <div className="space-y-2 mb-4">
-        {question.options && Object.entries(question.options).map(([key, option]) => {
-          // Extract text from option (handle both string and object formats)
-          const optionText = typeof option === 'object' && option !== null 
-            ? option.text 
-            : String(option);
-          
-          const isUserAnswer = Array.isArray(userAnswer) 
-            ? userAnswer.includes(key)
-            : userAnswer === key;
-          const isCorrectAnswer = Array.isArray(correctAnswer)
-            ? correctAnswer.includes(key)
-            : correctAnswer === key;
-          
-          let bgClass = "bg-gray-100";
-          let borderClass = "border-gray-300";
-          let textClass = "text-gray-900";
+      {renderOptions()}
 
-          if (isCorrectAnswer) {
-            bgClass = "bg-green-500/10";
-            borderClass = "border-green-500";
-            textClass = "text-green-600";
-          } else if (isUserAnswer && !isCorrect) {
-            bgClass = "bg-red-500/10";
-            borderClass = "border-red-500";
-            textClass = "text-red-600";
-          }
-
-          return (
-            <div
-              key={key}
-              className={`p-3 rounded-lg border ${bgClass} ${borderClass}`}
-            >
-              <div className="flex items-center justify-between">
-                <p className={`${textClass} flex items-center gap-2`}>
-                  <span className="font-semibold">
-                    {key}.
-                  </span>
-                  {optionText}
-                </p>
-                {isCorrectAnswer && (
-                  <CheckCircle className="w-4 h-4 text-green-500" />
-                )}
-                {isUserAnswer && !isCorrect && (
-                  <XCircle className="w-4 h-4 text-red-500" />
-                )}
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      {/* User didn't answer */}
+      {userAnswer === null && (
+        <div className="mt-3 p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+          <p className="text-sm text-yellow-700">No answer provided</p>
+        </div>
+      )}
 
       {/* Explanation */}
       {question.explanation && (
         <div className="mt-4 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-          <p className="text-sm font-semibold text-blue-400 mb-1">Explanation</p>
+          <p className="text-sm font-semibold text-blue-600 mb-1">Explanation</p>
           <p className="text-sm text-gray-700">{question.explanation}</p>
         </div>
       )}
@@ -265,7 +308,7 @@ export const QuizAttemptDetails = () => {
           </div>
           <div>
             <p className="text-sm text-gray-600">Submitted At</p>
-            <p className="text-gray-900 font-medium">{formatDate(attemptData?.completed_at)}</p>
+            <p className="text-gray-900 font-medium">{formatDate(attemptData?.submitted_at)}</p>
           </div>
           <div>
             <p className="text-sm text-gray-600">Status</p>
