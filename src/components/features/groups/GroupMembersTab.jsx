@@ -95,7 +95,15 @@ export const GroupMembersTab = ({ groupId }) => {
       key: "user",
       header: "Member",
       render: (_, member) => (
-        <UserCell user={member.user || member} showEmail />
+        <UserCell 
+          user={{
+            first_name: member.first_name,
+            last_name: member.last_name,
+            email: member.email,
+            user_id: member.user_id,
+          }} 
+          showEmail 
+        />
       ),
     },
     {
@@ -187,8 +195,8 @@ export const GroupMembersTab = ({ groupId }) => {
         onConfirm={confirmRemove}
         title="Remove Member"
         message={`Are you sure you want to remove ${
-          selectedMember?.user?.first_name ||
           selectedMember?.first_name ||
+          selectedMember?.email?.split("@")[0] ||
           "this member"
         } from this group?`}
         confirmText="Remove"
