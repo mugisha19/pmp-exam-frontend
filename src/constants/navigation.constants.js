@@ -156,18 +156,6 @@ export const ADMIN_NAV_ITEMS = [
     icon: Users,
   },
   {
-    id: "instructors",
-    label: "Instructors",
-    path: "/admin/instructors",
-    icon: UserCircle,
-  },
-  {
-    id: "students",
-    label: "Students",
-    path: "/admin/students",
-    icon: UserCircle,
-  },
-  {
     id: "exams",
     label: "Exams",
     path: "/admin/exams",
