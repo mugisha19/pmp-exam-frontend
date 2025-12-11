@@ -427,7 +427,7 @@ export const QuizAttemptDetails = () => {
       {/* Attempt Info */}
       <Card className="p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Attempt Information</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <div>
             <p className="text-sm text-gray-600">Started At</p>
             <p className="text-gray-900 font-medium">{formatDate(attemptData?.started_at)}</p>
@@ -441,6 +441,44 @@ export const QuizAttemptDetails = () => {
             <Badge variant="success">
               Submitted
             </Badge>
+          </div>
+        </div>
+
+        {/* Pass/Fail Explanation */}
+        <div className={`mt-4 p-4 rounded-lg border ${
+          isPassed 
+            ? 'bg-green-500/10 border-green-500/30' 
+            : 'bg-red-500/10 border-red-500/30'
+        }`}>
+          <div className="flex items-start gap-3">
+            {isPassed ? (
+              <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+            ) : (
+              <XCircle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
+            )}
+            <div>
+              <p className={`font-semibold ${isPassed ? 'text-green-700' : 'text-red-700'}`}>
+                {isPassed ? 'Quiz Passed!' : 'Quiz Not Passed'}
+              </p>
+              <p className="text-sm text-gray-700 mt-1">
+                {isPassed ? (
+                  <>
+                    Score of <span className="font-semibold">{score.toFixed(1)}%</span> meets the required passing score of{' '}
+                    <span className="font-semibold">{attemptData?.passing_score || 70}%</span>.
+                  </>
+                ) : (
+                  <>
+                    Score of <span className="font-semibold">{score.toFixed(1)}%</span> is below the required passing score of{' '}
+                    <span className="font-semibold">{attemptData?.passing_score || 70}%</span>.{' '}
+                    {attemptData?.passing_score && (
+                      <span>
+                        You need at least <span className="font-semibold">{attemptData.passing_score}%</span> to pass.
+                      </span>
+                    )}
+                  </>
+                )}
+              </p>
+            </div>
           </div>
         </div>
       </Card>
