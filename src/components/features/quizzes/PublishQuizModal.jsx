@@ -63,7 +63,6 @@ const publishSchema = z.object({
 );
 
 export const PublishQuizModal = ({ isOpen, onClose, quizBank }) => {
-  const [publishType, setPublishType] = useState("group");
   const [selectedGroups, setSelectedGroups] = useState([]);
   
   const publishToGroupMutation = usePublishToGroupMutation();
@@ -93,6 +92,7 @@ export const PublishQuizModal = ({ isOpen, onClose, quizBank }) => {
     },
   });
 
+  const publishType = watch("publish_type");
   const quizMode = watch("quiz_mode");
   const useAllQuestions = watch("use_all_questions");
 
@@ -168,7 +168,6 @@ export const PublishQuizModal = ({ isOpen, onClose, quizBank }) => {
                 type="radio"
                 value="group"
                 {...register("publish_type")}
-                onChange={(e) => setPublishType(e.target.value)}
                 className="hidden"
               />
               <Users
@@ -192,7 +191,6 @@ export const PublishQuizModal = ({ isOpen, onClose, quizBank }) => {
                 type="radio"
                 value="public"
                 {...register("publish_type")}
-                onChange={(e) => setPublishType(e.target.value)}
                 className="hidden"
               />
               <Globe
