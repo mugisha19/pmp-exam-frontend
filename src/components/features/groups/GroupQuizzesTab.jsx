@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { FileQuestion, Plus, Search } from "lucide-react";
 import { useGroupQuizzes } from "@/hooks/queries/useGroupQueries";
 import { useQuizBanks } from "@/hooks/queries/useQuizBankQueries";
@@ -50,6 +51,7 @@ const getModeBadgeVariant = (mode) => {
 };
 
 export const GroupQuizzesTab = ({ groupId }) => {
+  const navigate = useNavigate();
   const [isSelectQuizBankOpen, setIsSelectQuizBankOpen] = useState(false);
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
   const [selectedQuizBank, setSelectedQuizBank] = useState(null);
@@ -90,6 +92,12 @@ export const GroupQuizzesTab = ({ groupId }) => {
     setSelectedQuizBank(quizBank);
     setIsSelectQuizBankOpen(false);
     setIsPublishModalOpen(true);
+  };
+
+  // Handle quiz row click
+  const handleQuizClick = (quiz) => {
+    const quizId = quiz.quiz_id || quiz.id;
+    navigate(`/admin/groups/${groupId}/quiz/${quizId}`);
   };
 
   // Table columns
@@ -280,6 +288,7 @@ export const GroupQuizzesTab = ({ groupId }) => {
         paginated={true}
         pageSize={10}
         sortable={true}
+        onRowClick={handleQuizClick}
       />
 
       {/* Quiz Bank Selection Modal */}

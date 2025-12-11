@@ -8,6 +8,8 @@ export { Dashboard as AdminDashboard } from "./Dashboard";
 export { UserManagement as UserManagementPage } from "./UserManagement";
 export { default as AdminGroupsPage } from "./GroupManagement";
 export { GroupDetails as AdminGroupDetailsPage } from "./GroupDetails";
+export { default as GroupQuizDetails } from "./GroupQuizDetails";
+export { default as QuizAttemptDetails } from "./QuizAttemptDetails";
 export { default as AdminTopicsPage } from "./TopicManagement";
 export { default as AdminQuestionsPage } from "./QuestionManagement";
 export { default as AdminQuestionDetailsPage } from "./QuestionDetails";

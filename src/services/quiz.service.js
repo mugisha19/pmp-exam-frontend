@@ -187,6 +187,80 @@ export const getPublishedQuizzes = async (params = {}) => {
  * @param {Error} error - Error object
  * @returns {Error} Formatted error
  */
+/**
+ * Get quiz statistics
+ * @param {string} quizId - Quiz ID
+ * @returns {Promise<Object>} Quiz statistics
+ */
+export const getQuizStats = async (quizId) => {
+  try {
+    const response = await api.get(QUIZ_ENDPOINTS.GET_QUIZ_STATS(quizId));
+    return response.data;
+  } catch (error) {
+    throw handleQuizError(error);
+  }
+};
+
+/**
+ * Get quiz leaderboard
+ * @param {string} quizId - Quiz ID
+ * @param {number} [limit=10] - Number of top entries to return
+ * @returns {Promise<Object>} Leaderboard data
+ */
+export const getQuizLeaderboard = async (quizId, limit = 10) => {
+  try {
+    const response = await api.get(QUIZ_ENDPOINTS.GET_QUIZ_LEADERBOARD(quizId), {
+      params: { limit }
+    });
+    return response.data;
+  } catch (error) {
+    throw handleQuizError(error);
+  }
+};
+
+/**
+ * Get all attempts for a quiz (instructor/admin only)
+ * @param {string} quizId - Quiz ID
+ * @returns {Promise<Object>} All attempts grouped by user
+ */
+export const getAllQuizAttempts = async (quizId) => {
+  try {
+    const response = await api.get(QUIZ_ENDPOINTS.GET_QUIZ_ALL_ATTEMPTS(quizId));
+    return response.data;
+  } catch (error) {
+    throw handleQuizError(error);
+  }
+};
+
+/**
+ * Get user's attempts for a quiz
+ * @param {string} quizId - Quiz ID
+ * @returns {Promise<Object>} User's attempts
+ */
+export const getQuizAttempts = async (quizId) => {
+  try {
+    const response = await api.get(QUIZ_ENDPOINTS.GET_QUIZ_ATTEMPTS(quizId));
+    return response.data;
+  } catch (error) {
+    throw handleQuizError(error);
+  }
+};
+
+/**
+ * Get attempt review/details
+ * @param {string} quizId - Quiz ID
+ * @param {string} attemptId - Attempt ID
+ * @returns {Promise<Object>} Attempt details with answers
+ */
+export const getAttemptReview = async (quizId, attemptId) => {
+  try {
+    const response = await api.get(QUIZ_ENDPOINTS.GET_ATTEMPT_REVIEW(quizId, attemptId));
+    return response.data;
+  } catch (error) {
+    throw handleQuizError(error);
+  }
+};
+
 const handleQuizError = (error) => {
   if (error.response) {
     const { status, data } = error.response;
@@ -228,4 +302,9 @@ export default {
   publishToGroup,
   publishPublic,
   getPublishedQuizzes,
+  getQuizStats,
+  getQuizLeaderboard,
+  getAllQuizAttempts,
+  getQuizAttempts,
+  getAttemptReview,
 };

@@ -103,6 +103,11 @@ export const QUIZ_ENDPOINTS = {
   DELETE_QUIZ: (quizId) => `/real-quizzes/${quizId}`,
   PUBLISH_QUIZ: (quizId) => `/real-quizzes/${quizId}/publish`,
   CANCEL_QUIZ: (quizId) => `/real-quizzes/${quizId}/cancel`,
+  GET_QUIZ_STATS: (quizId) => `/real-quizzes/${quizId}/stats`,
+  GET_QUIZ_LEADERBOARD: (quizId) => `/real-quizzes/${quizId}/leaderboard`,
+  GET_QUIZ_ALL_ATTEMPTS: (quizId) => `/real-quizzes/${quizId}/all-attempts`,
+  GET_QUIZ_ATTEMPTS: (quizId) => `/real-quizzes/${quizId}/attempts`,
+  GET_ATTEMPT_REVIEW: (quizId, attemptId) => `/real-quizzes/${quizId}/attempts/${attemptId}/review`,
   
   // Publish Quiz Bank
   PUBLISH_TO_GROUP: "/quizzes/publish-to-group",

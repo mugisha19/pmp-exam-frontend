@@ -270,6 +270,103 @@ export const usePublishPublicMutation = () => {
   });
 };
 
+/**
+ * Get quiz statistics hook
+ * @param {string} quizId - Quiz ID
+ * @param {Object} options - Query options
+ */
+export const useQuizStats = (quizId, options = {}) => {
+  return useQuery({
+    queryKey: ["quiz-stats", quizId],
+    queryFn: () => quizService.getQuizStats(quizId),
+    enabled: !!quizId,
+    staleTime: 30 * 1000, // 30 seconds
+    onError: (error) => {
+      const errorMessage = error.message || "Failed to fetch quiz statistics";
+      toast.error(errorMessage);
+    },
+    ...options,
+  });
+};
+
+/**
+ * Get quiz leaderboard hook
+ * @param {string} quizId - Quiz ID
+ * @param {number} limit - Number of top entries
+ * @param {Object} options - Query options
+ */
+export const useQuizLeaderboard = (quizId, limit = 10, options = {}) => {
+  return useQuery({
+    queryKey: ["quiz-leaderboard", quizId, limit],
+    queryFn: () => quizService.getQuizLeaderboard(quizId, limit),
+    enabled: !!quizId,
+    staleTime: 30 * 1000, // 30 seconds
+    onError: (error) => {
+      const errorMessage = error.message || "Failed to fetch leaderboard";
+      toast.error(errorMessage);
+    },
+    ...options,
+  });
+};
+
+/**
+ * Get all quiz attempts (instructor/admin) hook
+ * @param {string} quizId - Quiz ID
+ * @param {Object} options - Query options
+ */
+export const useAllQuizAttempts = (quizId, options = {}) => {
+  return useQuery({
+    queryKey: ["quiz-all-attempts", quizId],
+    queryFn: () => quizService.getAllQuizAttempts(quizId),
+    enabled: !!quizId,
+    staleTime: 30 * 1000, // 30 seconds
+    onError: (error) => {
+      const errorMessage = error.message || "Failed to fetch quiz attempts";
+      toast.error(errorMessage);
+    },
+    ...options,
+  });
+};
+
+/**
+ * Get user's quiz attempts hook
+ * @param {string} quizId - Quiz ID
+ * @param {Object} options - Query options
+ */
+export const useQuizAttempts = (quizId, options = {}) => {
+  return useQuery({
+    queryKey: ["quiz-attempts", quizId],
+    queryFn: () => quizService.getQuizAttempts(quizId),
+    enabled: !!quizId,
+    staleTime: 30 * 1000, // 30 seconds
+    onError: (error) => {
+      const errorMessage = error.message || "Failed to fetch your attempts";
+      toast.error(errorMessage);
+    },
+    ...options,
+  });
+};
+
+/**
+ * Get attempt review hook
+ * @param {string} quizId - Quiz ID
+ * @param {string} attemptId - Attempt ID
+ * @param {Object} options - Query options
+ */
+export const useAttemptReview = (quizId, attemptId, options = {}) => {
+  return useQuery({
+    queryKey: ["attempt-review", quizId, attemptId],
+    queryFn: () => quizService.getAttemptReview(quizId, attemptId),
+    enabled: !!quizId && !!attemptId,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    onError: (error) => {
+      const errorMessage = error.message || "Failed to fetch attempt details";
+      toast.error(errorMessage);
+    },
+    ...options,
+  });
+};
+
 export default {
   useQuizzes,
   useQuiz,
@@ -280,4 +377,9 @@ export default {
   useCancelQuizMutation,
   usePublishToGroupMutation,
   usePublishPublicMutation,
+  useQuizStats,
+  useQuizLeaderboard,
+  useAllQuizAttempts,
+  useQuizAttempts,
+  useAttemptReview,
 };
