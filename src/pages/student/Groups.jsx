@@ -30,7 +30,7 @@ export const Groups = () => {
   });
 
   // Fetch user's joined groups
-  const { data: myGroupsData, isLoading: loadingMy } = useQuery({
+  const { data: myGroups, isLoading: loadingMy } = useQuery({
     queryKey: ["my-groups"],
     queryFn: getMyGroups,
     staleTime: 2 * 60 * 1000,
@@ -58,13 +58,16 @@ export const Groups = () => {
   };
 
   // Filter out private groups from all groups and exclude already joined
-  const myGroupIds = new Set(myGroupsData?.items?.map((g) => g.id) || []);
-  const publicGroups = allGroupsData?.items?.filter(
-    (group) => group.group_type === "public" && !myGroupIds.has(group.id)
+  const myGroupIds = new Set(myGroups?.map((g) => g.group_id) || []);
+  
+  // Handle both array response and items response
+  const allGroupsList = Array.isArray(allGroupsData) ? allGroupsData : (allGroupsData?.items || []);
+  const publicGroups = allGroupsList.filter(
+    (group) => group.group_type === "public" && !myGroupIds.has(group.id || group.group_id)
   ) || [];
 
   const isLoading = activeTab === "all" ? loadingAll : loadingMy;
-  const displayGroups = activeTab === "all" ? publicGroups : myGroupsData?.items || [];
+  const displayGroups = activeTab === "all" ? publicGroups : (myGroups || []);
 
   return (
     <div className="space-y-6">
@@ -136,12 +139,13 @@ export const Groups = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {displayGroups.map((group) => {
-            const isJoined = myGroupIds.has(group.id);
+            const groupId = group.id || group.group_id;
+            const isJoined = myGroupIds.has(groupId);
             const isPublic = group.group_type === "public";
 
             return (
               <div
-                key={group.id}
+                key={groupId}
                 className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
               >
                 {/* Group Header */}
@@ -190,12 +194,11 @@ export const Groups = () => {
                       Created {new Date(group.created_at).toLocaleDateString()}
                     </span>
                   </div>
-
                   {/* Actions */}
                   <div className="flex items-center gap-2">
                     {isJoined ? (
                       <button
-                        onClick={() => handleViewGroup(group.id)}
+                        onClick={() => handleViewGroup(groupId)}
                         className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
                       >
                         View Group
@@ -205,9 +208,10 @@ export const Groups = () => {
                       <>
                         {isPublic && (
                           <button
-                            onClick={() => handleJoinGroup(group.id)}
+                            onClick={() => handleJoinGroup(groupId)}
                             disabled={joinGroupMutation.isPending}
                             className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                          > className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             {joinGroupMutation.isPending ? (
                               <Spinner size="sm" />
