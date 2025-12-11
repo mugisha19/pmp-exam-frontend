@@ -202,6 +202,74 @@ export const useCancelQuizMutation = () => {
   });
 };
 
+/**
+ * Publish quiz bank to groups mutation hook
+ */
+export const usePublishToGroupMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (publishData) => quizService.publishToGroup(publishData),
+    onSuccess: (data) => {
+      // Invalidate quizzes list
+      queryClient.invalidateQueries({ queryKey: queryKeys.quizzes.all });
+
+      // Invalidate group quizzes for all affected groups
+      queryClient.invalidateQueries({ queryKey: ["group-quizzes"] });
+
+      // Invalidate quiz banks
+      queryClient.invalidateQueries({ queryKey: queryKeys.quizBanks.all });
+
+      const groupCount = data.quizzes?.length || 1;
+      toast.success(`Quiz published to ${groupCount} group(s) successfully`);
+    },
+    onError: (error) => {
+      const errorMessage =
+        error.message || "Failed to publish quiz. Please try again.";
+      
+      if (error.errors) {
+        Object.values(error.errors).forEach((err) => {
+          toast.error(err);
+        });
+      } else {
+        toast.error(errorMessage);
+      }
+    },
+  });
+};
+
+/**
+ * Publish quiz bank publicly mutation hook
+ */
+export const usePublishPublicMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (publishData) => quizService.publishPublic(publishData),
+    onSuccess: (data) => {
+      // Invalidate quizzes list
+      queryClient.invalidateQueries({ queryKey: queryKeys.quizzes.all });
+
+      // Invalidate quiz banks
+      queryClient.invalidateQueries({ queryKey: queryKeys.quizBanks.all });
+
+      toast.success("Quiz published publicly successfully");
+    },
+    onError: (error) => {
+      const errorMessage =
+        error.message || "Failed to publish quiz. Please try again.";
+      
+      if (error.errors) {
+        Object.values(error.errors).forEach((err) => {
+          toast.error(err);
+        });
+      } else {
+        toast.error(errorMessage);
+      }
+    },
+  });
+};
+
 export default {
   useQuizzes,
   useQuiz,
@@ -210,4 +278,6 @@ export default {
   useDeleteQuizMutation,
   usePublishQuizMutation,
   useCancelQuizMutation,
+  usePublishToGroupMutation,
+  usePublishPublicMutation,
 };

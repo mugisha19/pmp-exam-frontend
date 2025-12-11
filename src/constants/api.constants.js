@@ -103,6 +103,11 @@ export const QUIZ_ENDPOINTS = {
   DELETE_QUIZ: (quizId) => `/real-quizzes/${quizId}`,
   PUBLISH_QUIZ: (quizId) => `/real-quizzes/${quizId}/publish`,
   CANCEL_QUIZ: (quizId) => `/real-quizzes/${quizId}/cancel`,
+  
+  // Publish Quiz Bank
+  PUBLISH_TO_GROUP: "/real-quizzes/publish-to-group",
+  PUBLISH_PUBLIC: "/real-quizzes/publish-public",
+  LIST_PUBLISHED: "/real-quizzes/published",
 
   // Quiz Sessions
   START_SESSION: "/sessions/start",

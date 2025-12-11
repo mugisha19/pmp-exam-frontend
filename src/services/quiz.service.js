@@ -122,6 +122,67 @@ export const cancelQuiz = async (quizId) => {
 };
 
 /**
+ * Publish quiz bank to groups
+ * @param {Object} data - Publish data
+ * @param {string} data.quiz_bank_id - Quiz bank ID to publish
+ * @param {string[]} data.group_ids - Array of group IDs
+ * @param {string} [data.title] - Override quiz title
+ * @param {string} [data.description] - Override description
+ * @param {string} [data.quiz_mode] - "practice" or "exam"
+ * @param {number} [data.time_limit_minutes] - Time limit in minutes
+ * @param {number} [data.passing_score] - Passing score percentage (default 70)
+ * @param {boolean} [data.shuffle_questions] - Shuffle questions (default true)
+ * @param {boolean} [data.shuffle_options] - Shuffle options (default true)
+ * @param {boolean} [data.show_results_immediately] - Show results immediately (default true)
+ * @param {number} [data.max_attempts] - Max attempts allowed
+ * @param {boolean} [data.use_all_questions] - Use all questions (default true)
+ * @param {number} [data.subset_count] - Number of questions if not all
+ * @param {string} [data.starts_at] - Start datetime (ISO string)
+ * @param {string} [data.ends_at] - End datetime (ISO string)
+ * @returns {Promise<Object>} Published quizzes result
+ */
+export const publishToGroup = async (data) => {
+  try {
+    const response = await api.post(QUIZ_ENDPOINTS.PUBLISH_TO_GROUP, data);
+    return response.data;
+  } catch (error) {
+    throw handleQuizError(error);
+  }
+};
+
+/**
+ * Publish quiz bank publicly
+ * @param {Object} data - Publish data (same as publishToGroup but no group_ids)
+ * @returns {Promise<Object>} Published quiz result
+ */
+export const publishPublic = async (data) => {
+  try {
+    const response = await api.post(QUIZ_ENDPOINTS.PUBLISH_PUBLIC, data);
+    return response.data;
+  } catch (error) {
+    throw handleQuizError(error);
+  }
+};
+
+/**
+ * Get list of published quizzes
+ * @param {Object} params - Query parameters
+ * @param {string} [params.group_id] - Filter by group ID
+ * @param {boolean} [params.is_public] - Filter by public status
+ * @param {number} [params.skip] - Number to skip
+ * @param {number} [params.limit] - Max results
+ * @returns {Promise<Object>} Published quizzes list
+ */
+export const getPublishedQuizzes = async (params = {}) => {
+  try {
+    const response = await api.get(QUIZ_ENDPOINTS.LIST_PUBLISHED, { params });
+    return response.data;
+  } catch (error) {
+    throw handleQuizError(error);
+  }
+};
+
+/**
  * Handle quiz service errors
  * @param {Error} error - Error object
  * @returns {Error} Formatted error
@@ -164,4 +225,7 @@ export default {
   deleteQuiz,
   publishQuiz,
   cancelQuiz,
+  publishToGroup,
+  publishPublic,
+  getPublishedQuizzes,
 };
