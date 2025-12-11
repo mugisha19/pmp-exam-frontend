@@ -82,7 +82,7 @@ export const JoinRequestsTab = ({ groupId }) => {
     if (selectedRequest) {
       await approveRequestMutation.mutateAsync({
         groupId,
-        requestId: selectedRequest.id,
+        requestId: selectedRequest.request_id || selectedRequest.id,
         approved: isApproving,
         message: message || undefined,
       });
