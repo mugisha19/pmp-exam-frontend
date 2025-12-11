@@ -52,24 +52,35 @@ const formatDuration = (seconds) => {
 /**
  * Stat Card Component
  */
-const StatCard = ({ icon: Icon, label, value, color = "blue" }) => (
-  <Card className="p-6">
-    <div className="flex items-center gap-4">
-      <div className={`p-3 bg-${color}-500/10 rounded-lg`}>
-        <Icon className={`w-6 h-6 text-${color}-500`} />
+const StatCard = ({ icon: Icon, label, value, color = "blue" }) => {
+  const colorClasses = {
+    blue: { bg: "bg-blue-500/10", text: "text-blue-500" },
+    green: { bg: "bg-green-500/10", text: "text-green-500" },
+    purple: { bg: "bg-purple-500/10", text: "text-purple-500" },
+    yellow: { bg: "bg-yellow-500/10", text: "text-yellow-500" },
+  };
+  const classes = colorClasses[color] || colorClasses.blue;
+
+  return (
+    <Card className="p-6">
+      <div className="flex items-center gap-4">
+        <div className={`p-3 ${classes.bg} rounded-lg`}>
+          <Icon className={`w-6 h-6 ${classes.text}`} />
+        </div>
+        <div>
+          <p className="text-sm text-gray-400">{label}</p>
+          <p className="text-2xl font-bold text-white">{value}</p>
+        </div>
       </div>
-      <div>
-        <p className="text-sm text-gray-400">{label}</p>
-        <p className="text-2xl font-bold text-white">{value}</p>
-      </div>
-    </div>
-  </Card>
-);
+    </Card>
+  );
+};
 
 export const GroupQuizDetails = () => {
   const { groupId, quizId } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("overview");
+  const [expandedUserId, setExpandedUserId] = useState(null);
 
   // Fetch data
   const { data: quiz, isLoading: quizLoading } = useQuiz(quizId);
@@ -437,12 +448,65 @@ export const GroupQuizDetails = () => {
             {attemptsLoading ? (
               <Spinner />
             ) : attemptsData?.user_attempts?.length > 0 ? (
-              <DataTable
-                columns={attemptsColumns}
-                data={attemptsData.user_attempts}
-                paginated={true}
-                pageSize={10}
-              />
+              <div className="space-y-4">
+                {attemptsData.user_attempts.map((userAttempt) => (
+                  <div key={userAttempt.user_id} className="space-y-2">
+                    <div className="flex items-center justify-between p-4 bg-gray-800/50 rounded-lg">
+                      <div className="flex-1 grid grid-cols-5 gap-4 items-center">
+                        <div>
+                          <p className="font-medium text-white">
+                            {userAttempt.full_name || userAttempt.user_id}
+                          </p>
+                          <p className="text-sm text-gray-400">{userAttempt.email || ""}</p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-sm text-gray-400">Attempts</p>
+                          <p className="text-white font-medium">{userAttempt.total_attempts}</p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-sm text-gray-400">Completed</p>
+                          <p className="text-white font-medium">{userAttempt.completed_attempts}</p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-sm text-gray-400">Best</p>
+                          <Badge
+                            variant={userAttempt.best_score >= 70 ? "success" : "error"}
+                            size="sm"
+                          >
+                            {userAttempt.best_score?.toFixed(1) || "N/A"}%
+                          </Badge>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-sm text-gray-400">Avg</p>
+                          <p className="text-white font-medium">
+                            {userAttempt.average_score?.toFixed(1) || "N/A"}%
+                          </p>
+                        </div>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() =>
+                          setExpandedUserId(
+                            expandedUserId === userAttempt.user_id ? null : userAttempt.user_id
+                          )
+                        }
+                      >
+                        {expandedUserId === userAttempt.user_id ? "Hide" : "View"} Details
+                      </Button>
+                    </div>
+                    {expandedUserId === userAttempt.user_id && userAttempt.attempts && (
+                      <div className="ml-4 pl-4 border-l-2 border-gray-700">
+                        <DataTable
+                          columns={individualAttemptsColumns}
+                          data={userAttempt.attempts}
+                          paginated={false}
+                        />
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
             ) : (
               <EmptyState
                 icon={Users}

@@ -69,7 +69,7 @@ export const TabsTrigger = ({
       className={cn(
         "relative px-4 py-3 text-sm font-medium transition-colors",
         "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
-        isActive ? "text-blue-600" : "text-gray-500 hover:text-gray-700",
+        isActive ? "text-blue-500" : "text-gray-400 hover:text-gray-300",
         className
       )}
       role="tab"
@@ -77,7 +77,7 @@ export const TabsTrigger = ({
     >
       {children}
       {isActive && (
-        <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600" />
+        <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500" />
       )}
     </button>
   );
