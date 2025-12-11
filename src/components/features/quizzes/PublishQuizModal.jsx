@@ -62,7 +62,7 @@ const publishSchema = z.object({
   }
 );
 
-export const PublishQuizModal = ({ isOpen, onClose, quizBank }) => {
+export const PublishQuizModal = ({ isOpen, onClose, quizBank, preselectedGroupId = null }) => {
   const [selectedGroups, setSelectedGroups] = useState([]);
   
   const publishToGroupMutation = usePublishToGroupMutation();
@@ -82,13 +82,14 @@ export const PublishQuizModal = ({ isOpen, onClose, quizBank }) => {
   } = useForm({
     resolver: zodResolver(publishSchema),
     defaultValues: {
-      publish_type: "group",
+      publish_type: preselectedGroupId ? "group" : "group",
       quiz_mode: "practice",
       passing_score: 70,
       shuffle_questions: true,
       shuffle_options: true,
       show_results_immediately: true,
       use_all_questions: true,
+      group_ids: preselectedGroupId ? [preselectedGroupId] : [],
     },
   });
 
@@ -151,63 +152,80 @@ export const PublishQuizModal = ({ isOpen, onClose, quizBank }) => {
           </p>
         </div>
 
-        {/* Publish Type */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">
-            Publish To <span className="text-red-500">*</span>
-          </label>
-          <div className="grid grid-cols-2 gap-3">
-            <label
-              className={`flex items-center gap-3 p-4 border rounded-xl cursor-pointer transition-all ${
-                publishType === "group"
-                  ? "border-blue-500 bg-blue-50"
-                  : "border-gray-200 hover:border-gray-300"
-              }`}
-            >
-              <input
-                type="radio"
-                value="group"
-                {...register("publish_type")}
-                className="hidden"
-              />
-              <Users
-                className={`w-5 h-5 ${
-                  publishType === "group" ? "text-blue-600" : "text-gray-400"
-                }`}
-              />
-              <div>
-                <p className="font-medium text-gray-900">Groups</p>
-                <p className="text-xs text-gray-500">Select specific groups</p>
-              </div>
+        {/* Publish Type - Only show if no preselected group */}
+        {!preselectedGroupId && (
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-700">
+              Publish To <span className="text-red-500">*</span>
             </label>
-            <label
-              className={`flex items-center gap-3 p-4 border rounded-xl cursor-pointer transition-all ${
-                publishType === "public"
-                  ? "border-blue-500 bg-blue-50"
-                  : "border-gray-200 hover:border-gray-300"
-              }`}
-            >
-              <input
-                type="radio"
-                value="public"
-                {...register("publish_type")}
-                className="hidden"
-              />
-              <Globe
-                className={`w-5 h-5 ${
-                  publishType === "public" ? "text-blue-600" : "text-gray-400"
+            <div className="grid grid-cols-2 gap-3">
+              <label
+                className={`flex items-center gap-3 p-4 border rounded-xl cursor-pointer transition-all ${
+                  publishType === "group"
+                    ? "border-blue-500 bg-blue-50"
+                    : "border-gray-200 hover:border-gray-300"
                 }`}
-              />
-              <div>
-                <p className="font-medium text-gray-900">Public</p>
-                <p className="text-xs text-gray-500">Available to all users</p>
-              </div>
-            </label>
+              >
+                <input
+                  type="radio"
+                  value="group"
+                  {...register("publish_type")}
+                  className="hidden"
+                />
+                <Users
+                  className={`w-5 h-5 ${
+                    publishType === "group" ? "text-blue-600" : "text-gray-400"
+                  }`}
+                />
+                <div>
+                  <p className="font-medium text-gray-900">Groups</p>
+                  <p className="text-xs text-gray-500">Select specific groups</p>
+                </div>
+              </label>
+              <label
+                className={`flex items-center gap-3 p-4 border rounded-xl cursor-pointer transition-all ${
+                  publishType === "public"
+                    ? "border-blue-500 bg-blue-50"
+                    : "border-gray-200 hover:border-gray-300"
+                }`}
+              >
+                <input
+                  type="radio"
+                  value="public"
+                  {...register("publish_type")}
+                  className="hidden"
+                />
+                <Globe
+                  className={`w-5 h-5 ${
+                    publishType === "public" ? "text-blue-600" : "text-gray-400"
+                  }`}
+                />
+                <div>
+                  <p className="font-medium text-gray-900">Public</p>
+                  <p className="text-xs text-gray-500">Available to all users</p>
+                </div>
+              </label>
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Group Selection (only show if publish_type is group) */}
-        {publishType === "group" && (
+        {/* Show selected group when preselected */}
+        {preselectedGroupId && (
+          <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+            <div className="flex items-center gap-2">
+              <Users className="w-5 h-5 text-blue-600" />
+              <div>
+                <p className="text-sm font-medium text-gray-900">Publishing to Group</p>
+                <p className="text-xs text-gray-600">
+                  {groups.find(g => g.group_id === preselectedGroupId)?.name || "Selected Group"}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Group Selection (only show if publish_type is group and no preselected group) */}
+        {publishType === "group" && !preselectedGroupId && (
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">
               Select Groups <span className="text-red-500">*</span>
