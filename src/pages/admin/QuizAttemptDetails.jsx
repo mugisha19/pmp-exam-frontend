@@ -46,19 +46,29 @@ const formatDuration = (seconds) => {
 /**
  * Stat Card Component
  */
-const StatCard = ({ icon: Icon, label, value, color = "blue" }) => (
-  <Card className="p-4">
-    <div className="flex items-center gap-3">
-      <div className={`p-2 bg-${color}-500/10 rounded-lg`}>
-        <Icon className={`w-5 h-5 text-${color}-500`} />
+const StatCard = ({ icon: Icon, label, value, color = "blue" }) => {
+  const colorClasses = {
+    blue: { bg: "bg-blue-500/10", text: "text-blue-500" },
+    green: { bg: "bg-green-500/10", text: "text-green-500" },
+    purple: { bg: "bg-purple-500/10", text: "text-purple-500" },
+    red: { bg: "bg-red-500/10", text: "text-red-500" },
+  };
+  const classes = colorClasses[color] || colorClasses.blue;
+
+  return (
+    <Card className="p-4">
+      <div className="flex items-center gap-3">
+        <div className={`p-2 ${classes.bg} rounded-lg`}>
+          <Icon className={`w-5 h-5 ${classes.text}`} />
+        </div>
+        <div>
+          <p className="text-xs text-gray-600">{label}</p>
+          <p className="text-lg font-bold text-gray-900">{value}</p>
+        </div>
       </div>
-      <div>
-        <p className="text-xs text-gray-400">{label}</p>
-        <p className="text-lg font-bold text-white">{value}</p>
-      </div>
-    </div>
-  </Card>
-);
+    </Card>
+  );
+};
 
 /**
  * Question Review Card Component
@@ -80,7 +90,7 @@ const QuestionReviewCard = ({ question, index }) => {
             )}
           </div>
           <div>
-            <p className="text-sm text-gray-400">Question {index + 1}</p>
+            <p className="text-sm text-gray-600">Question {index + 1}</p>
             <Badge variant={isCorrect ? "success" : "error"} size="sm">
               {isCorrect ? "Correct" : "Incorrect"}
             </Badge>
@@ -95,7 +105,7 @@ const QuestionReviewCard = ({ question, index }) => {
 
       {/* Question Text */}
       <div className="mb-4">
-        <p className="text-white font-medium mb-2">{question.question_text}</p>
+        <p className="text-gray-900 font-medium mb-2">{question.question_text}</p>
         {question.question_image && (
           <img
             src={question.question_image}
@@ -108,21 +118,27 @@ const QuestionReviewCard = ({ question, index }) => {
       {/* Options */}
       <div className="space-y-2 mb-4">
         {question.options?.map((option, idx) => {
-          const isUserAnswer = option === userAnswer;
-          const isCorrectAnswer = option === correctAnswer;
+          // Handle both string and object formats for options
+          const optionText = typeof option === 'string' ? option : option?.text || option;
+          const isUserAnswer = Array.isArray(userAnswer) 
+            ? userAnswer.includes(optionText) 
+            : userAnswer === optionText;
+          const isCorrectAnswer = Array.isArray(correctAnswer)
+            ? correctAnswer.includes(optionText)
+            : correctAnswer === optionText;
           
-          let bgClass = "bg-gray-800";
-          let borderClass = "border-gray-700";
-          let textClass = "text-gray-300";
+          let bgClass = "bg-gray-100";
+          let borderClass = "border-gray-300";
+          let textClass = "text-gray-900";
 
           if (isCorrectAnswer) {
             bgClass = "bg-green-500/10";
             borderClass = "border-green-500";
-            textClass = "text-green-400";
+            textClass = "text-green-600";
           } else if (isUserAnswer && !isCorrect) {
             bgClass = "bg-red-500/10";
             borderClass = "border-red-500";
-            textClass = "text-red-400";
+            textClass = "text-red-600";
           }
 
           return (
@@ -135,7 +151,7 @@ const QuestionReviewCard = ({ question, index }) => {
                   <span className="font-semibold">
                     {String.fromCharCode(65 + idx)}.
                   </span>
-                  {option}
+                  {optionText}
                 </p>
                 {isCorrectAnswer && (
                   <CheckCircle className="w-4 h-4 text-green-500" />
@@ -153,7 +169,7 @@ const QuestionReviewCard = ({ question, index }) => {
       {question.explanation && (
         <div className="mt-4 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
           <p className="text-sm font-semibold text-blue-400 mb-1">Explanation</p>
-          <p className="text-sm text-gray-300">{question.explanation}</p>
+          <p className="text-sm text-gray-700">{question.explanation}</p>
         </div>
       )}
     </Card>
@@ -165,7 +181,7 @@ export const QuizAttemptDetails = () => {
   const navigate = useNavigate();
 
   // Fetch attempt review
-  const { data: attemptData, isLoading } = useAttemptReview(quizId, attemptId);
+  const { data: attemptData, isLoading, error } = useAttemptReview(quizId, attemptId);
 
   if (isLoading) {
     return (
@@ -175,9 +191,20 @@ export const QuizAttemptDetails = () => {
     );
   }
 
-  const attempt = attemptData?.attempt || {};
-  const questions = attemptData?.questions || [];
-  const score = attempt.score || 0;
+  if (!attemptData) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Card className="p-6">
+          <p className="text-center text-gray-600">
+            {error?.message || "Attempt not found"}
+          </p>
+        </Card>
+      </div>
+    );
+  }
+
+  // Backend returns data at root level, not nested in 'attempt'
+  const score = attemptData?.score || 0;
   const isPassed = score >= (attemptData?.passing_score || 70);
 
   return (
@@ -185,7 +212,7 @@ export const QuizAttemptDetails = () => {
       {/* Header */}
       <PageHeader
         title="Attempt Review"
-        description={`Review for ${attemptData?.quiz_title || "Quiz"} - Attempt #${attempt.attempt_number || 1}`}
+        description={`Review for ${attemptData?.quiz_title || "Quiz"} - Attempt #${attemptData?.attempt_number || 1}`}
         actions={
           <Button
             variant="secondary"
@@ -208,13 +235,13 @@ export const QuizAttemptDetails = () => {
         <StatCard
           icon={CheckCircle}
           label="Correct Answers"
-          value={`${attempt.correct_answers || 0}/${attempt.total_questions || 0}`}
+          value={`${attemptData?.correct_answers || 0}/${attemptData?.total_questions || 0}`}
           color="blue"
         />
         <StatCard
           icon={Clock}
           label="Time Taken"
-          value={formatDuration(attempt.total_time_seconds)}
+          value={formatDuration(attemptData?.time_spent_seconds)}
           color="purple"
         />
         <StatCard
@@ -227,20 +254,20 @@ export const QuizAttemptDetails = () => {
 
       {/* Attempt Info */}
       <Card className="p-6">
-        <h3 className="text-lg font-semibold text-white mb-4">Attempt Information</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Attempt Information</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <p className="text-sm text-gray-400">Started At</p>
-            <p className="text-white font-medium">{formatDate(attempt.started_at)}</p>
+            <p className="text-sm text-gray-600">Started At</p>
+            <p className="text-gray-900 font-medium">{formatDate(attemptData?.started_at)}</p>
           </div>
           <div>
-            <p className="text-sm text-gray-400">Submitted At</p>
-            <p className="text-white font-medium">{formatDate(attempt.submitted_at)}</p>
+            <p className="text-sm text-gray-600">Submitted At</p>
+            <p className="text-gray-900 font-medium">{formatDate(attemptData?.completed_at)}</p>
           </div>
           <div>
-            <p className="text-sm text-gray-400">Status</p>
-            <Badge variant={attempt.status === "submitted" ? "success" : "warning"}>
-              {attempt.status || "unknown"}
+            <p className="text-sm text-gray-600">Status</p>
+            <Badge variant="success">
+              Submitted
             </Badge>
           </div>
         </div>
@@ -248,14 +275,14 @@ export const QuizAttemptDetails = () => {
 
       {/* Questions Review */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-white">Question Review</h3>
-        {questions.length > 0 ? (
-          questions.map((question, index) => (
+        <h3 className="text-lg font-semibold text-gray-900">Question Review</h3>
+        {attemptData?.questions?.length > 0 ? (
+          attemptData.questions.map((question, index) => (
             <QuestionReviewCard key={index} question={question} index={index} />
           ))
         ) : (
           <Card className="p-6">
-            <p className="text-center text-gray-400">No questions available for review</p>
+            <p className="text-center text-gray-600">No questions available for review</p>
           </Card>
         )}
       </div>
