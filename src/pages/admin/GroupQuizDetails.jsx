@@ -451,7 +451,7 @@ export const GroupQuizDetails = () => {
               <div className="space-y-4">
                 {attemptsData.user_attempts.map((userAttempt) => (
                   <div key={userAttempt.user_id} className="space-y-2">
-                    <div className="flex items-center justify-between p-4 bg-gray-800/50 rounded-lg">
+                    <div className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg">
                       <div className="flex-1 grid grid-cols-5 gap-4 items-center">
                         <div>
                           <p className="font-medium text-gray-900">
@@ -496,7 +496,7 @@ export const GroupQuizDetails = () => {
                       </Button>
                     </div>
                     {expandedUserId === userAttempt.user_id && userAttempt.attempts && (
-                      <div className="ml-4 pl-4 border-l-2 border-gray-700">
+                      <div className="ml-4 pl-4 border-l-2 border-gray-300">
                         <DataTable
                           columns={individualAttemptsColumns}
                           data={userAttempt.attempts}
