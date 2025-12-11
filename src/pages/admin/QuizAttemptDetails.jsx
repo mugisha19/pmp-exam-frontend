@@ -17,7 +17,7 @@ import { PageHeader } from "@/components/shared/PageHeader";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
-import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
+import { Spinner } from "@/components/ui/Spinner";
 
 /**
  * Format date for display
@@ -170,7 +170,7 @@ export const QuizAttemptDetails = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <LoadingSpinner size="lg" />
+        <Spinner size="lg" />
       </div>
     );
   }

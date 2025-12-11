@@ -96,7 +96,10 @@ export const GroupQuizzesTab = ({ groupId }) => {
 
   // Handle quiz row click
   const handleQuizClick = (quiz) => {
+    console.log('Quiz clicked:', quiz);
     const quizId = quiz.quiz_id || quiz.id;
+    console.log('Quiz ID:', quizId);
+    console.log('Navigating to:', `/admin/groups/${groupId}/quiz/${quizId}`);
     navigate(`/admin/groups/${groupId}/quiz/${quizId}`);
   };
 

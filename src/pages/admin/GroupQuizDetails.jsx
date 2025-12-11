@@ -22,7 +22,7 @@ import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
 import { DataTable } from "@/components/shared/DataTable";
-import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
+import { Spinner } from "@/components/ui/Spinner";
 import { EmptyState } from "@/components/shared/EmptyState";
 
 /**
@@ -277,7 +277,7 @@ export const GroupQuizDetails = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <LoadingSpinner size="lg" />
+        <Spinner size="lg" />
       </div>
     );
   }
@@ -386,7 +386,7 @@ export const GroupQuizDetails = () => {
               </Button>
             </div>
             {leaderboardLoading ? (
-              <LoadingSpinner />
+              <Spinner />
             ) : leaderboardData?.leaderboard?.length > 0 ? (
               <DataTable
                 columns={leaderboardColumns}
@@ -410,7 +410,7 @@ export const GroupQuizDetails = () => {
               Leaderboard - Top Scores
             </h3>
             {leaderboardLoading ? (
-              <LoadingSpinner />
+              <Spinner />
             ) : leaderboardData?.leaderboard?.length > 0 ? (
               <DataTable
                 columns={leaderboardColumns}
@@ -435,7 +435,7 @@ export const GroupQuizDetails = () => {
               All Attempts by Student
             </h3>
             {attemptsLoading ? (
-              <LoadingSpinner />
+              <Spinner />
             ) : attemptsData?.user_attempts?.length > 0 ? (
               <DataTable
                 columns={attemptsColumns}
