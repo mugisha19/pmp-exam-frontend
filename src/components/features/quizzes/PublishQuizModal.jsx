@@ -99,6 +99,9 @@ export const PublishQuizModal = ({ isOpen, onClose, quizBank, preselectedGroupId
 
   const onSubmit = async (data) => {
     try {
+      // Determine if scheduling is enabled based on dates provided
+      const hasScheduling = !!(data.starts_at || data.ends_at);
+      
       const publishData = {
         quiz_bank_id: quizBank.quiz_bank_id,
         title: data.title || quizBank.title,
@@ -112,6 +115,7 @@ export const PublishQuizModal = ({ isOpen, onClose, quizBank, preselectedGroupId
         max_attempts: data.max_attempts || null,
         use_all_questions: data.use_all_questions,
         subset_count: data.use_all_questions ? null : data.subset_count,
+        scheduling_enabled: hasScheduling,
         starts_at: data.starts_at || null,
         ends_at: data.ends_at || null,
       };
