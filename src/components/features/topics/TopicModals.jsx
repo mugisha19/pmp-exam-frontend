@@ -35,11 +35,7 @@ export const CreateTopicModal = ({ isOpen, onClose, onSuccess }) => {
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm({
-    defaultValues: {
-      is_active: "true",
-    },
-  });
+  } = useForm();
 
   const createMutation = useCreateTopicMutation();
 
@@ -47,7 +43,7 @@ export const CreateTopicModal = ({ isOpen, onClose, onSuccess }) => {
     try {
       const payload = {
         ...data,
-        is_active: data.is_active === "true",
+        is_active: true, // Always active by default when creating
       };
       await createMutation.mutateAsync(payload);
       toast.success("Topic created successfully");
@@ -113,22 +109,6 @@ export const CreateTopicModal = ({ isOpen, onClose, onSuccess }) => {
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
             rows={3}
           />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Status
-          </label>
-          <select
-            {...register("is_active")}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            {STATUS_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
         </div>
 
         <div className="flex justify-end gap-3 pt-4">
