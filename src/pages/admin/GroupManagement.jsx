@@ -96,6 +96,9 @@ export default function GroupManagement() {
     return groupsData?.groups || groupsData?.items || groupsData || [];
   }, [groupsData]);
 
+  // Extract total count for pagination
+  const totalCount = groupsData?.total || 0;
+
   // Generate invite link mutation
   const generateInviteMutation = useMutation({
     mutationFn: (groupId) => groupService.generateInviteLink(groupId),
@@ -527,6 +530,9 @@ export default function GroupManagement() {
         rowKey="group_id"
         paginated={true}
         pageSize={pageSize}
+        currentPage={page}
+        totalPages={Math.ceil(totalCount / pageSize)}
+        onPageChange={setPage}
         emptyMessage="No groups found"
         onRowClick={(group) =>
           handleSelectGroup(
