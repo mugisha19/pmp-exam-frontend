@@ -145,10 +145,26 @@ export const GroupQuizzesTab = ({ groupId }) => {
       key: "attempts",
       header: "Attempts",
       render: (_, quiz) => (
-        <span className="text-sm text-gray-300">
-          {quiz.attempt_count || quiz.attempts || 0}
+        <span className="text-sm text-gray-900 font-medium">
+          {quiz.total_attempts || quiz.attempt_count || quiz.attempts || 0}
         </span>
       ),
+    },
+    {
+      key: "avg_score",
+      header: "Avg Score",
+      render: (_, quiz) => {
+        const avgScore = quiz.avg_score;
+        if (avgScore === null || avgScore === undefined || quiz.total_attempts === 0) {
+          return <span className="text-sm text-gray-400">N/A</span>;
+        }
+        const scoreColor = avgScore >= 70 ? "text-green-600" : avgScore >= 50 ? "text-yellow-600" : "text-red-600";
+        return (
+          <span className={`text-sm font-semibold ${scoreColor}`}>
+            {avgScore.toFixed(1)}%
+          </span>
+        );
+      },
     },
     {
       key: "dates",
