@@ -113,7 +113,7 @@ const QuestionReviewCard = ({ question, index }) => {
       // User answer format: {"selected_option_ids": ["A", "C"]}
       selectedOptions = userAnswer?.selected_option_ids || userAnswer;
     } else if (questionType === 'multiple_choice' || questionType === 'true_false') {
-      // User answer format: {"selected_option_id": "A"}
+      // User answer format: {"selected_option_id": "A"} or {"selected_option_id": "true"}
       const selectedId = userAnswer?.selected_option_id || userAnswer;
       selectedOptions = selectedId ? [selectedId] : [];
     }
@@ -124,7 +124,7 @@ const QuestionReviewCard = ({ question, index }) => {
 
     const optionLabels = selectedOptions.map(optId => {
       const opt = question.options?.find(o => o.id === optId);
-      return opt ? `${opt.id}. ${opt.text}` : optId;
+      return opt ? opt.text : optId;
     }).join(', ');
 
     return (
@@ -161,7 +161,7 @@ const QuestionReviewCard = ({ question, index }) => {
     const correctOptions = Array.isArray(correctAnswer) ? correctAnswer : [correctAnswer];
     const optionLabels = correctOptions.map(optId => {
       const opt = question.options?.find(o => o.id === optId);
-      return opt ? `${opt.id}. ${opt.text}` : optId;
+      return opt ? opt.text : optId;
     }).join(', ');
 
     return (
@@ -313,10 +313,9 @@ const QuestionReviewCard = ({ question, index }) => {
       {/* Options */}
       {renderOptions()}
 
-      {/* Only show answer details and explanation if incorrect or unanswered */}
+      {/* Only show answer details and explanation if incorrect */}
       {!isCorrect && userAnswer !== null && (
         <div className="mt-4 space-y-3">
-          {renderUserAnswer()}
           {renderCorrectAnswer()}
           
           {question.explanation && (
