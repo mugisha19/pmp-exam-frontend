@@ -6,7 +6,7 @@
 import { Route } from "react-router-dom";
 import { RoleRoute } from "@/components/routes";
 import StudentLayout from "@/components/layouts/StudentLayout";
-import { Dashboard, Groups, GroupDetail, MyExams } from "@/pages/student";
+import { Dashboard, Groups, GroupDetail, MyExams, QuizDetail } from "@/pages/student";
 
 export const studentRoutes = (
   <Route
@@ -20,5 +20,6 @@ export const studentRoutes = (
     <Route path="/groups" element={<Groups />} />
     <Route path="/groups/:groupId" element={<GroupDetail />} />
     <Route path="/exams" element={<MyExams />} />
+    <Route path="/exams/:quizId" element={<QuizDetail />} />
   </Route>
 );

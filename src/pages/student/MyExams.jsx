@@ -289,67 +289,41 @@ export const MyExams = () => {
           {filteredQuizzes.map((quiz) => (
             <div
               key={quiz.quiz_id}
-              className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md transition-shadow"
+              onClick={() => navigate(`/exams/${quiz.quiz_id}`)}
+              className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-lg hover:border-blue-300 transition-all cursor-pointer group"
             >
-              <div className="flex items-start justify-between mb-4">
+              <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
                     {getQuizTypeIcon(quiz)}
-                    <h3 className="text-lg font-bold text-gray-900">{quiz.title}</h3>
+                    <h3 className="text-lg font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
+                      {quiz.title}
+                    </h3>
                     {getQuizStatusBadge(quiz)}
                     {getQuizTypeBadge(quiz)}
                   </div>
-                  {quiz.description && (
-                    <p className="text-sm text-gray-600 mb-3">{quiz.description}</p>
-                  )}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <BookOpen className="w-4 h-4" />
-                  <span>{quiz.total_questions} questions</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <Clock className="w-4 h-4" />
-                  <span>{quiz.time_limit_minutes || 0} minutes</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <Trophy className="w-4 h-4" />
-                  <span>{quiz.passing_score}% to pass</span>
-                </div>
-                {quiz.scheduling_enabled && quiz.starts_at && (
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <Calendar className="w-4 h-4" />
-                    <span>{new Date(quiz.starts_at).toLocaleDateString()}</span>
+                  
+                  <div className="flex items-center gap-4 text-sm text-gray-600 mt-3">
+                    <div className="flex items-center gap-1.5">
+                      <BookOpen className="w-4 h-4" />
+                      <span>{quiz.total_questions} questions</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Clock className="w-4 h-4" />
+                      <span>{quiz.time_limit_minutes || 0} min</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Trophy className="w-4 h-4" />
+                      <span>{quiz.passing_score}%</span>
+                    </div>
                   </div>
-                )}
-              </div>
-
-              <div className="flex items-center gap-3">
-                {canStartQuiz(quiz) ? (
-                  <button
-                    onClick={() => handleStartQuiz(quiz.quiz_id)}
-                    className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
-                  >
-                    <Play className="w-4 h-4" />
-                    Start Quiz
-                  </button>
-                ) : (
-                  <button
-                    disabled
-                    className="flex items-center gap-2 px-4 py-2 bg-gray-300 text-gray-600 rounded-lg cursor-not-allowed font-medium"
-                  >
-                    <Play className="w-4 h-4" />
-                    {new Date() < new Date(quiz.start_date) ? "Not Started Yet" : "Ended"}
-                  </button>
-                )}
-                <button
-                  onClick={() => handleViewAttempts(quiz.quiz_id)}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors font-medium"
-                >
-                  View Attempts
-                </button>
+                </div>
+                
+                <div className="ml-4">
+                  <div className="p-2 bg-gray-50 rounded-lg group-hover:bg-blue-50 transition-colors">
+                    <ArrowLeft className="w-5 h-5 text-gray-400 rotate-180 group-hover:text-blue-600 transition-colors" />
+                  </div>
+                </div>
               </div>
             </div>
           ))}
