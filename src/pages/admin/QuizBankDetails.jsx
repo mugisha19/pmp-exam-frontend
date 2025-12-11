@@ -14,6 +14,7 @@ import {
   Edit2,
   Trash2,
   Eye,
+  Send,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import {
@@ -31,6 +32,7 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { DataTable } from "@/components/shared/DataTable";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { EditQuizBankModal } from "@/components/features/quiz-banks";
+import { PublishQuizModal } from "@/components/features/quizzes/PublishQuizModal";
 
 /**
  * Format date for display
@@ -67,6 +69,7 @@ export const QuizBankDetails = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedQuestion, setSelectedQuestion] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
 
   // Fetch quiz bank details
   const {
@@ -257,6 +260,15 @@ export const QuizBankDetails = () => {
         actions={
           <div className="flex items-center gap-2">
             <Button
+              variant="primary"
+              size="sm"
+              leftIcon={<Send className="w-4 h-4" />}
+              onClick={() => setIsPublishModalOpen(true)}
+              disabled={!questions || questions.length === 0}
+            >
+              Publish Quiz
+            </Button>
+            <Button
               variant="outline"
               size="sm"
               leftIcon={<Edit2 className="w-4 h-4" />}
@@ -371,6 +383,13 @@ export const QuizBankDetails = () => {
           setIsEditModalOpen(false);
           refetchQuizBank();
         }}
+      />
+
+      {/* Publish Quiz Modal */}
+      <PublishQuizModal
+        isOpen={isPublishModalOpen}
+        onClose={() => setIsPublishModalOpen(false)}
+        quizBank={quizBank}
       />
     </div>
   );

@@ -15,6 +15,7 @@ import {
   Calendar,
   X,
   BookOpen,
+  Send,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 
@@ -32,6 +33,7 @@ import {
   CreateQuizBankModal,
   EditQuizBankModal,
 } from "@/components/features/quiz-banks";
+import { PublishQuizModal } from "@/components/features/quizzes/PublishQuizModal";
 
 /**
  * Format date for display
@@ -60,6 +62,7 @@ export default function QuizBankManagement() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
   const [selectedQuizBank, setSelectedQuizBank] = useState(null);
 
   // Build query params
@@ -110,6 +113,11 @@ export default function QuizBankManagement() {
   const handleEditQuizBank = useCallback((quizBank) => {
     setSelectedQuizBank(quizBank);
     setIsEditModalOpen(true);
+  }, []);
+
+  const handlePublishQuizBank = useCallback((quizBank) => {
+    setSelectedQuizBank(quizBank);
+    setIsPublishModalOpen(true);
   }, []);
 
   const handleDeleteQuizBank = useCallback((quizBank) => {
@@ -313,6 +321,15 @@ export default function QuizBankManagement() {
               Edit
             </Button>
             <Button
+              variant="primary"
+              size="sm"
+              onClick={() => handlePublishQuizBank(getSelectedQuizBank())}
+              disabled={!getSelectedQuizBank()?.question_count || getSelectedQuizBank()?.question_count === 0}
+            >
+              <Send className="w-4 h-4 mr-1" />
+              Publish
+            </Button>
+            <Button
               variant="danger"
               size="sm"
               onClick={() => handleDeleteQuizBank(getSelectedQuizBank())}
@@ -386,6 +403,16 @@ export default function QuizBankManagement() {
         onClose={handleEditModalClose}
         quizBank={selectedQuizBank}
         onSuccess={handleEditSuccess}
+      />
+
+      {/* Publish Quiz Modal */}
+      <PublishQuizModal
+        isOpen={isPublishModalOpen}
+        onClose={() => {
+          setIsPublishModalOpen(false);
+          setSelectedQuizBank(null);
+        }}
+        quizBank={selectedQuizBank}
       />
 
       {/* Delete Confirmation Dialog */}
