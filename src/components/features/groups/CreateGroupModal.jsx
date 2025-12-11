@@ -15,34 +15,21 @@ import { Select } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
 
 // Validation schema
-const createGroupSchema = z
-  .object({
-    name: z
-      .string()
-      .min(3, "Group name must be at least 3 characters")
-      .max(100, "Group name must be less than 100 characters"),
-    description: z
-      .string()
-      .max(500, "Description must be less than 500 characters")
-      .optional(),
-    group_type: z.enum(["public", "private"], {
-      required_error: "Please select a group type",
-    }),
-    join_method: z.enum(["direct", "link"]).optional(),
-    from_date: z.string().min(1, "Start date is required"),
-    to_date: z.string().min(1, "End date is required"),
-  })
-  .refine(
-    (data) => {
-      const from = new Date(data.from_date);
-      const to = new Date(data.to_date);
-      return to > from;
-    },
-    {
-      message: "End date must be after start date",
-      path: ["to_date"],
-    }
-  );
+const createGroupSchema = z.object({
+  name: z
+    .string()
+    .min(3, "Group name must be at least 3 characters")
+    .max(100, "Group name must be less than 100 characters"),
+  description: z
+    .string()
+    .max(500, "Description must be less than 500 characters")
+    .optional(),
+  group_type: z.enum(["public", "private"], {
+    required_error: "Please select a group type",
+  }),
+  join_method: z.enum(["direct", "link"]).optional(),
+  from_date: z.string().min(1, "Start date is required"),
+});
 
 const GROUP_TYPE_OPTIONS = [
   { value: "public", label: "Public - Anyone can join" },
@@ -71,9 +58,6 @@ export const CreateGroupModal = ({ isOpen, onClose }) => {
       group_type: "public",
       join_method: "direct",
       from_date: new Date().toISOString().split("T")[0],
-      to_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-        .toISOString()
-        .split("T")[0],
     },
   });
 
@@ -85,7 +69,6 @@ export const CreateGroupModal = ({ isOpen, onClose }) => {
       const groupData = {
         ...data,
         from_date: new Date(data.from_date).toISOString(),
-        to_date: new Date(data.to_date).toISOString(),
       };
 
       // Remove join_method for public groups
@@ -201,23 +184,14 @@ export const CreateGroupModal = ({ isOpen, onClose }) => {
           />
         )}
 
-        {/* Date Range */}
-        <div className="grid grid-cols-2 gap-4">
-          <Input
-            type="date"
-            label="Start Date"
-            leftIcon={<Calendar className="w-4 h-4" />}
-            error={errors.from_date?.message}
-            {...register("from_date")}
-          />
-          <Input
-            type="date"
-            label="End Date"
-            leftIcon={<Calendar className="w-4 h-4" />}
-            error={errors.to_date?.message}
-            {...register("to_date")}
-          />
-        </div>
+        {/* Start Date */}
+        <Input
+          type="date"
+          label="Start Date"
+          leftIcon={<Calendar className="w-4 h-4" />}
+          error={errors.from_date?.message}
+          {...register("from_date")}
+        />
 
         {/* Footer */}
         <ModalFooter>

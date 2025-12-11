@@ -358,7 +358,7 @@ export default function GroupManagement() {
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <Calendar className="text-gray-400" />
             <span>
-              {formatDate(group?.from_date)} - {formatDate(group?.to_date)}
+              {formatDate(group?.from_date)} - {group?.to_date ? formatDate(group.to_date) : 'Ongoing'}
             </span>
           </div>
         ),
