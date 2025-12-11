@@ -38,7 +38,6 @@ export const CreateTopicModal = ({ isOpen, onClose, onSuccess }) => {
   } = useForm({
     defaultValues: {
       is_active: "true",
-      order: 0,
     },
   });
 
@@ -49,7 +48,6 @@ export const CreateTopicModal = ({ isOpen, onClose, onSuccess }) => {
       const payload = {
         ...data,
         is_active: data.is_active === "true",
-        order: parseInt(data.order, 10) || 0,
       };
       await createMutation.mutateAsync(payload);
       toast.success("Topic created successfully");
@@ -117,34 +115,20 @@ export const CreateTopicModal = ({ isOpen, onClose, onSuccess }) => {
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Display Order
-            </label>
-            <Input
-              type="number"
-              {...register("order")}
-              placeholder="0"
-              min="0"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Status
-            </label>
-            <select
-              {...register("is_active")}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              {STATUS_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-          </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Status
+          </label>
+          <select
+            {...register("is_active")}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            {STATUS_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div className="flex justify-end gap-3 pt-4">
@@ -183,7 +167,6 @@ export const EditTopicModal = ({ isOpen, onClose, topic, onSuccess }) => {
         name: topic.name || "",
         description: topic.description || "",
         domain: topic.domain || "",
-        order: topic.order || 0,
         is_active:
           topic.is_active !== undefined ? String(topic.is_active) : "true",
       });
@@ -197,7 +180,6 @@ export const EditTopicModal = ({ isOpen, onClose, topic, onSuccess }) => {
       const payload = {
         ...data,
         is_active: data.is_active === "true",
-        order: parseInt(data.order, 10) || 0,
       };
       await updateMutation.mutateAsync({
         topicId: topic.topic_id,
@@ -268,34 +250,20 @@ export const EditTopicModal = ({ isOpen, onClose, topic, onSuccess }) => {
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Display Order
-            </label>
-            <Input
-              type="number"
-              {...register("order")}
-              placeholder="0"
-              min="0"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Status
-            </label>
-            <select
-              {...register("is_active")}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              {STATUS_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-          </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Status
+          </label>
+          <select
+            {...register("is_active")}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            {STATUS_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div className="flex justify-end gap-3 pt-4">
@@ -371,59 +339,29 @@ export const ViewTopicModal = ({ isOpen, onClose, topic }) => {
           </div>
         )}
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-blue-900">Questions</p>
-                <p className="text-2xl font-bold text-blue-700 mt-1">
-                  {topic.question_count || 0}
-                </p>
-              </div>
-              <div className="bg-blue-100 p-3 rounded-lg">
-                <svg
-                  className="w-6 h-6 text-blue-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
+        {/* Stats */}
+        <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-blue-900">Questions</p>
+              <p className="text-2xl font-bold text-blue-700 mt-1">
+                {topic.question_count || 0}
+              </p>
             </div>
-          </div>
-
-          <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-purple-900">
-                  Display Order
-                </p>
-                <p className="text-2xl font-bold text-purple-700 mt-1">
-                  {topic.order || 0}
-                </p>
-              </div>
-              <div className="bg-purple-100 p-3 rounded-lg">
-                <svg
-                  className="w-6 h-6 text-purple-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
-                  />
-                </svg>
-              </div>
+            <div className="bg-blue-100 p-3 rounded-lg">
+              <svg
+                className="w-6 h-6 text-blue-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
             </div>
           </div>
         </div>

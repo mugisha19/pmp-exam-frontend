@@ -248,14 +248,6 @@ export default function TopicManagement() {
         ),
       },
       {
-        key: "order",
-        header: "Order",
-        sortable: true,
-        render: (_, topic) => (
-          <span className="text-sm text-gray-600">{topic?.order || 0}</span>
-        ),
-      },
-      {
         key: "is_active",
         header: "Status",
         sortable: true,
