@@ -25,15 +25,15 @@ import {
 export const STUDENT_NAV_ITEMS = [
   {
     id: "dashboard",
-    label: "Dashboard",
+    label: "Home",
     path: "/dashboard",
     icon: LayoutDashboard,
   },
   {
-    id: "exams",
-    label: "Available Exams",
-    path: "/exams",
-    icon: BookOpen,
+    id: "groups",
+    label: "Groups",
+    path: "/groups",
+    icon: Users,
   },
   {
     id: "my-exams",
@@ -42,34 +42,10 @@ export const STUDENT_NAV_ITEMS = [
     icon: ClipboardList,
   },
   {
-    id: "results",
-    label: "Results",
-    path: "/results",
-    icon: BarChart3,
-  },
-  {
     id: "leaderboard",
     label: "Leaderboard",
     path: "/leaderboard",
     icon: Trophy,
-  },
-  {
-    id: "study-materials",
-    label: "Study Materials",
-    path: "/study-materials",
-    icon: BookMarked,
-  },
-  {
-    id: "profile",
-    label: "Profile",
-    path: "/profile",
-    icon: UserCircle,
-  },
-  {
-    id: "settings",
-    label: "Settings",
-    path: "/settings",
-    icon: Settings,
   },
 ];
 
