@@ -61,9 +61,17 @@ export const GroupQuizzesTab = ({ groupId }) => {
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
   const [selectedQuizBank, setSelectedQuizBank] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
-  // Fetch group quizzes
-  const { data: quizzesData, isLoading, refetch, isError, error } = useGroupQuizzes(groupId);
+  // Fetch group quizzes with pagination
+  const { data: quizzesData, isLoading, refetch, isError, error } = useGroupQuizzes(
+    groupId,
+    {
+      skip: (page - 1) * pageSize,
+      limit: pageSize,
+    }
+  );
 
   // Fetch quiz banks for selection
   const { data: quizBanksData, isLoading: quizBanksLoading } = useQuizBanks(
@@ -78,10 +86,12 @@ export const GroupQuizzesTab = ({ groupId }) => {
     }
   }, [groupId, refetch]);
 
-  // Extract quizzes array - handle different response structures
+  // Extract quizzes array and pagination data - handle different response structures
   const quizzes = Array.isArray(quizzesData)
     ? quizzesData
     : quizzesData?.items || quizzesData?.quizzes || [];
+  const total = quizzesData?.total || quizzes.length;
+  const totalPages = Math.ceil(total / pageSize);
   const quizBanks = quizBanksData?.items || quizBanksData || [];
 
   // Debug logging
@@ -316,11 +326,71 @@ export const GroupQuizzesTab = ({ groupId }) => {
         emptyMessage="No quizzes"
         emptyDescription="No quizzes have been assigned to this group."
         emptyIcon={FileQuestion}
-        paginated={true}
-        pageSize={10}
+        paginated={false}
         sortable={true}
         onRowClick={handleQuizClick}
       />
+
+      {/* Server-side Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="mt-4 flex items-center justify-between px-4 py-3 bg-white border border-gray-200 rounded-lg">
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <span>
+              Showing {(page - 1) * pageSize + 1} to{" "}
+              {Math.min(page * pageSize, total)} of {total} quizzes
+            </span>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1}
+            >
+              Previous
+            </Button>
+            
+            <div className="flex items-center gap-1">
+              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                let pageNum;
+                if (totalPages <= 5) {
+                  pageNum = i + 1;
+                } else if (page <= 3) {
+                  pageNum = i + 1;
+                } else if (page >= totalPages - 2) {
+                  pageNum = totalPages - 4 + i;
+                } else {
+                  pageNum = page - 2 + i;
+                }
+                
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => setPage(pageNum)}
+                    className={`px-3 py-1 rounded ${
+                      page === pageNum
+                        ? "bg-blue-600 text-white"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+            </div>
+            
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+            >
+              Next
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Quiz Bank Selection Modal */}
       <Modal
