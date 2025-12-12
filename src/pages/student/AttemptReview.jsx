@@ -83,6 +83,7 @@ export const AttemptReview = () => {
   }
 
   const formatTime = (seconds) => {
+    if (!seconds || isNaN(seconds)) return '0m 0s';
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
@@ -91,6 +92,20 @@ export const AttemptReview = () => {
       return `${hours}h ${minutes}m ${secs}s`;
     }
     return `${minutes}m ${secs}s`;
+  };
+  
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return 'N/A';
+    return date.toLocaleDateString();
+  };
+  
+  const formatDateTime = (dateString) => {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return 'N/A';
+    return date.toLocaleTimeString();
   };
 
   return (
@@ -182,10 +197,10 @@ export const AttemptReview = () => {
               <span className="text-sm font-medium">Completed</span>
             </div>
             <p className="text-sm font-medium text-gray-900">
-              {new Date(attempt.completed_at).toLocaleDateString()}
+              {formatDate(attempt.completed_at)}
             </p>
             <p className="text-xs text-gray-600">
-              {new Date(attempt.completed_at).toLocaleTimeString()}
+              {formatDateTime(attempt.completed_at)}
             </p>
           </div>
         </div>
@@ -271,8 +286,16 @@ export const AttemptReview = () => {
                     }
                   }
                   
+                  // Debug logging
+                  console.log('Question:', question.question_number, {
+                    userAnswer,
+                    correctAnswer,
+                    is_correct: question.is_correct,
+                    options
+                  });
+                  
                   return options.map((option, optIndex) => {
-                    // Handle both array and object user_answer formats
+                    // Handle both array and object user_answer formats (matching admin implementation)
                     let userAnswers = [];
                     if (userAnswer) {
                       if (Array.isArray(userAnswer)) {
@@ -280,6 +303,9 @@ export const AttemptReview = () => {
                       } else if (typeof userAnswer === 'object') {
                         userAnswers = userAnswer.selected_option_ids || 
                                      (userAnswer.selected_option_id ? [userAnswer.selected_option_id] : []);
+                      } else if (typeof userAnswer === 'string') {
+                        // Single option ID as string
+                        userAnswers = [userAnswer];
                       }
                     }
                     
@@ -291,24 +317,54 @@ export const AttemptReview = () => {
                       } else if (typeof correctAnswer === 'object') {
                         correctAnswers = correctAnswer.correct_option_ids || 
                                         (correctAnswer.correct_option_id ? [correctAnswer.correct_option_id] : []);
+                      } else if (typeof correctAnswer === 'string') {
+                        // Single option ID as string
+                        correctAnswers = [correctAnswer];
                       }
                     }
                     
-                    const isUserAnswer = userAnswers.includes(option.option_id);
-                    const isCorrect = correctAnswers.includes(option.option_id) || option.is_correct;
+                    // Use option.id instead of option.option_id to match backend response
+                    const isUserAnswer = userAnswers.includes(option.id) || 
+                                        userAnswers.includes(String(option.id));
+                    const isCorrect = correctAnswers.includes(option.id) || 
+                                     correctAnswers.includes(String(option.id)) ||
+                                     option.is_correct;
+                  
+                    // Skip options that are neither selected by user nor correct
+                    // This hides unselected wrong options but shows all selected and all correct
+                    if (!isUserAnswer && !isCorrect) {
+                      return null;
+                    }
                   
                     let bgColor = "bg-gray-50";
                     let borderColor = "border-gray-200";
                     let textColor = "text-gray-900";
+                    let icon = null;
+                    let label = null;
                     
-                    if (isCorrect) {
+                    // User selected correct answer
+                    if (isUserAnswer && isCorrect) {
                       bgColor = "bg-green-50";
                       borderColor = "border-green-500";
                       textColor = "text-green-900";
-                    } else if (isUserAnswer && !isCorrect) {
+                      icon = <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />;
+                      label = <span className="ml-auto text-xs bg-green-200 text-green-800 px-2 py-1 rounded font-semibold">✓ Your Answer (Correct)</span>;
+                    } 
+                    // User selected wrong answer
+                    else if (isUserAnswer && !isCorrect) {
                       bgColor = "bg-red-50";
                       borderColor = "border-red-500";
                       textColor = "text-red-900";
+                      icon = <XCircle className="w-5 h-5 text-red-600 flex-shrink-0" />;
+                      label = <span className="ml-auto text-xs bg-red-200 text-red-800 px-2 py-1 rounded font-semibold">✗ Your Answer (Wrong)</span>;
+                    }
+                    // Correct answer user didn't select
+                    else if (!isUserAnswer && isCorrect) {
+                      bgColor = "bg-green-50";
+                      borderColor = "border-green-300";
+                      textColor = "text-green-900";
+                      icon = <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />;
+                      label = <span className="ml-auto text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Correct Answer</span>;
                     }
 
                     return (
@@ -317,15 +373,11 @@ export const AttemptReview = () => {
                         className={`p-3 rounded-lg border-2 ${bgColor} ${borderColor}`}
                       >
                         <div className="flex items-center gap-2">
-                          {isCorrect && (
-                            <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                          )}
-                          {isUserAnswer && !isCorrect && (
-                            <XCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
-                          )}
-                          <span className={`${textColor} ${isUserAnswer ? "font-semibold" : ""}`}>
+                          {icon}
+                          <span className={`flex-1 ${textColor} ${isUserAnswer || isCorrect ? "font-semibold" : ""}`}>
                             {option.option_text || option.text || 'Option'}
                           </span>
+                          {label}
                         </div>
                       </div>
                     );
@@ -333,10 +385,12 @@ export const AttemptReview = () => {
                 })()}
               </div>
 
-              {/* Explanation */}
-              {question.explanation && (
+              {/* Explanation - Only show for incorrect answers */}
+              {!question.is_correct && question.explanation && (
                 <div className="ml-11 mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                  <p className="text-sm font-semibold text-blue-900 mb-1">Explanation:</p>
+                  <p className="text-sm font-semibold text-blue-900 mb-1">
+                    💡 Explanation:
+                  </p>
                   <div
                     className="text-sm text-blue-800 prose prose-sm max-w-none"
                     dangerouslySetInnerHTML={{ __html: question.explanation }}
