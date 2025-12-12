@@ -244,29 +244,15 @@ export const Dashboard = () => {
         </div>
       )}
 
-      {/* Study Tips & Resources */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-blue-50 border border-blue-200 p-5">
-          <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-            <span>💡</span> Study Tip of the Day
-          </h3>
-          <p className="text-sm text-gray-700 leading-relaxed">
-            Consistent practice is key to passing the PMP exam. 
-            Try to complete at least one quiz per day and review your mistakes thoroughly.
-          </p>
-        </div>
-
-        <div className="bg-green-50 border border-green-200 p-5">
-          <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-            <span>📚</span> PMP Exam Info
-          </h3>
-          <ul className="text-sm text-gray-700 space-y-1">
-            <li>• 180 questions in total</li>
-            <li>• 230 minutes (3 hours 50 min)</li>
-            <li>• Passing score: Above Target</li>
-            <li>• Three domains: People, Process, Business</li>
-          </ul>
-        </div>
+      {/* Study Tip */}
+      <div className="bg-blue-50 border border-blue-200 p-5">
+        <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
+          <span>💡</span> Study Tip of the Day
+        </h3>
+        <p className="text-sm text-gray-700 leading-relaxed">
+          Consistent practice is key to passing the PMP exam. 
+          Try to complete at least one quiz per day and review your mistakes thoroughly.
+        </p>
       </div>
     </div>
   );
