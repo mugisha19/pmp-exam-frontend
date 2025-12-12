@@ -1,7 +1,7 @@
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { getQuizzes } from "@/services/quiz.service";
+import { getQuizzes, getQuizAttempts } from "@/services/quiz.service";
 import { startQuizSession, checkNetworkStatus, abandonQuiz } from "@/services/session.service";
 import toast from "react-hot-toast";
 import { Spinner } from "@/components/ui";
@@ -43,14 +43,7 @@ export const QuizDetail = () => {
   // Fetch user's attempts for this quiz
   const { data: attemptsData, isLoading: loadingAttempts } = useQuery({
     queryKey: ["quiz-attempts", quizId],
-    queryFn: async () => {
-      // TODO: Implement actual attempts API call
-      // For now, return mock data
-      return {
-        attempts: [],
-        total: 0,
-      };
-    },
+    queryFn: () => getQuizAttempts(quizId),
     enabled: !!quizId,
   });
 
@@ -246,9 +239,9 @@ export const QuizDetail = () => {
                 {quiz.time_limit_minutes ? `${quiz.time_limit_minutes} minutes` : "No time limit"}
               </span>
               <span>|</span>
-              {canStartQuiz() && (
+              {canStartQuiz() && quiz.passing_score && (
                 <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-xs font-medium">
-                  70% correct required to pass
+                  {quiz.passing_score}% correct required to pass
                 </span>
               )}
             </div>
@@ -427,7 +420,11 @@ export const QuizDetail = () => {
 
         {activeTab === "attempts" && (
           <div className="max-w-4xl">
-            {attempts.length === 0 ? (
+            {loadingAttempts ? (
+              <div className="flex justify-center py-12">
+                <Spinner size="lg" />
+              </div>
+            ) : attempts.length === 0 ? (
               <div className="text-center py-12 text-gray-500">
                 <FileText className="w-12 h-12 mx-auto mb-3 text-gray-400" />
                 <p>No attempts yet</p>
@@ -435,7 +432,28 @@ export const QuizDetail = () => {
               </div>
             ) : (
               <div className="space-y-3">
-                {attempts.map((attempt, index) => (
+                <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                  <div className="grid grid-cols-3 gap-4 text-center">
+                    <div>
+                      <p className="text-sm text-blue-600 font-medium">Total Attempts</p>
+                      <p className="text-2xl font-bold text-blue-900">{attemptsData?.attempts_used || 0}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-blue-600 font-medium">Max Allowed</p>
+                      <p className="text-2xl font-bold text-blue-900">
+                        {attemptsData?.max_attempts || "Unlimited"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-blue-600 font-medium">Best Score</p>
+                      <p className="text-2xl font-bold text-blue-900">
+                        {bestScore !== null ? `${bestScore}%` : "N/A"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                
+                {attempts.map((attempt) => (
                   <div
                     key={attempt.attempt_id}
                     className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
@@ -443,33 +461,50 @@ export const QuizDetail = () => {
                   >
                     <div className="flex items-center gap-4">
                       <div className="p-3 bg-white rounded-lg border border-gray-200">
-                        <span className="text-lg font-bold text-gray-900">#{index + 1}</span>
+                        <span className="text-lg font-bold text-gray-900">#{attempt.attempt_number}</span>
                       </div>
                       <div>
-                        <p className="font-medium text-gray-900">
-                          Score: {attempt.score}%
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium text-gray-900">
+                            Score: {attempt.score !== null ? `${attempt.score}%` : "N/A"}
+                          </p>
                           {attempt.passed && (
-                            <span className="ml-2 text-sm text-green-600 font-semibold">
+                            <span className="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-semibold">
                               ✓ Passed
                             </span>
                           )}
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          {new Date(attempt.submitted_at).toLocaleDateString()} at{" "}
-                          {new Date(attempt.submitted_at).toLocaleTimeString()}
+                          {attempt.passed === false && (
+                            <span className="px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-semibold">
+                              ✗ Failed
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-600 mt-1">
+                          {attempt.status === "completed" ? (
+                            <>
+                              Completed on {new Date(attempt.completed_at).toLocaleDateString()} at{" "}
+                              {new Date(attempt.completed_at).toLocaleTimeString()}
+                            </>
+                          ) : (
+                            <>
+                              Started on {new Date(attempt.started_at).toLocaleDateString()} - {attempt.status}
+                            </>
+                          )}
                         </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      {attempt.time_spent_seconds && (
+                      {attempt.time_spent_seconds > 0 && (
                         <div className="flex items-center gap-1 text-sm text-gray-600">
                           <Timer className="w-4 h-4" />
                           <span>{Math.floor(attempt.time_spent_seconds / 60)} min</span>
                         </div>
                       )}
-                      <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
-                        View Details
-                      </button>
+                      {attempt.status === "completed" && (
+                        <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
+                          View Details
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}

@@ -8,6 +8,7 @@ import { RoleRoute } from "@/components/routes";
 import StudentLayout from "@/components/layouts/StudentLayout";
 import { Dashboard, Groups, GroupDetail, MyExams, QuizDetail } from "@/pages/student";
 import QuizTake from "@/pages/student/QuizTake";
+import AttemptReview from "@/pages/student/AttemptReview";
 
 export const studentRoutes = (
   <Route
@@ -23,5 +24,6 @@ export const studentRoutes = (
     <Route path="/exams" element={<MyExams />} />
     <Route path="/exams/:quizId" element={<QuizDetail />} />
     <Route path="/exams/:quizId/take" element={<QuizTake />} />
+    <Route path="/exams/:quizId/attempts/:attemptId" element={<AttemptReview />} />
   </Route>
 );
