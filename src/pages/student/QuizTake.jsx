@@ -128,13 +128,17 @@ export const QuizTake = () => {
         is_flagged: currentQuestion.is_flagged
       });
       
-      // Update session data
-      const updatedQuestions = sessionData.questions.map(q => 
-        q.quiz_question_id === currentQuestion.quiz_question_id 
-          ? { ...q, user_answer: answer, is_answered: true }
-          : q
+      // Fetch fresh session state from backend to update progress counts
+      const sessionState = await getSessionState(sessionToken);
+      setSessionData(sessionState);
+      
+      // Update current question with new data
+      const updatedQuestion = sessionState.questions.find(
+        q => q.quiz_question_id === currentQuestion.quiz_question_id
       );
-      setSessionData({ ...sessionData, questions: updatedQuestions });
+      if (updatedQuestion) {
+        setCurrentQuestion(updatedQuestion);
+      }
     } catch (error) {
       toast.error("Failed to save answer");
     }
@@ -144,42 +148,55 @@ export const QuizTake = () => {
     const newFlagStatus = !currentQuestion.is_flagged;
     
     try {
+      // Save flag to backend database
       await flagQuestion(sessionToken, currentQuestion.quiz_question_id, newFlagStatus);
       
-      // Update questions array with new flag status
-      const updatedQuestions = sessionData.questions.map(q => 
-        q.quiz_question_id === currentQuestion.quiz_question_id 
-          ? { ...q, is_flagged: newFlagStatus }
-          : q
+      // Fetch fresh session state from backend to update progress counts
+      const sessionState = await getSessionState(sessionToken);
+      setSessionData(sessionState);
+      
+      // Update current question with new data
+      const updatedQuestion = sessionState.questions.find(
+        q => q.quiz_question_id === currentQuestion.quiz_question_id
       );
-      
-      // Recalculate flagged count
-      const newFlaggedCount = updatedQuestions.filter(q => q.is_flagged).length;
-      
-      // Update session data with new questions and flagged count
-      setSessionData({ 
-        ...sessionData, 
-        questions: updatedQuestions,
-        progress: {
-          ...sessionData.progress,
-          flagged_count: newFlaggedCount
-        }
-      });
-      setCurrentQuestion({ ...currentQuestion, is_flagged: newFlagStatus });
+      if (updatedQuestion) {
+        setCurrentQuestion(updatedQuestion);
+      }
     } catch (error) {
       toast.error("Failed to flag question");
     }
   };
 
-  const handleNavigate = (questionNumber) => {
-    const question = sessionData.questions[questionNumber - 1];
-    setCurrentQuestion(question);
-    setSelectedAnswer(question.user_answer);
+  const handleNavigate = async (questionNumber) => {
+    try {
+      // Fetch fresh session state to get latest progress
+      const sessionState = await getSessionState(sessionToken);
+      setSessionData(sessionState);
+      
+      // Set the question user wants to navigate to
+      const question = sessionState.questions[questionNumber - 1];
+      setCurrentQuestion(question);
+      setSelectedAnswer(question.user_answer);
+    } catch (error) {
+      // Fallback to local navigation if backend fails
+      const question = sessionData.questions[questionNumber - 1];
+      setCurrentQuestion(question);
+      setSelectedAnswer(question.user_answer);
+    }
   };
 
   const handlePause = async () => {
+    // Check if pause is allowed
     if (!sessionData.pause_info.can_pause_now) {
-      toast.error("Pause not available yet");
+      if (sessionData.quiz_mode === "exam") {
+        const questionsUntilPause = sessionData.pause_info.questions_until_next_pause || 0;
+        toast.error(
+          `Pause is only available after every ${sessionData.pause_info.pause_after_questions} questions. ` +
+          `Answer ${questionsUntilPause} more question${questionsUntilPause !== 1 ? 's' : ''} to pause.`
+        );
+      } else {
+        toast.error("Pause not available at this time");
+      }
       return;
     }
     
@@ -187,10 +204,15 @@ export const QuizTake = () => {
     try {
       await pauseQuiz(sessionToken);
       toast.success("Quiz paused");
-      // Reload session data
+      // Reload session data to get updated pause state
       window.location.reload();
     } catch (error) {
-      toast.error(error.response?.data?.detail?.message || "Failed to pause");
+      const errorDetail = error.response?.data?.detail;
+      if (errorDetail?.error === "pause_not_allowed") {
+        toast.error(errorDetail.message || "Pause not allowed at this time");
+      } else {
+        toast.error(error.response?.data?.detail || "Failed to pause");
+      }
     } finally {
       setIsPausing(false);
     }
@@ -319,16 +341,29 @@ export const QuizTake = () => {
         const matchedRightIds = new Set(matchedPairs.map(p => p.right_id));
         
         return (
-          <div className="space-y-4">
-            <p className="text-sm text-gray-600 mb-4">
-              Drag items from the right column to match with items in the left column
-            </p>
+          <div className="space-y-6">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="flex items-center gap-2 text-blue-800">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                <p className="text-sm font-medium">
+                  Drag items from the right and drop them next to their matching pair on the left
+                </p>
+              </div>
+            </div>
             
-            <div className="grid grid-cols-2 gap-6">
-              {/* Left Column - Fixed Items */}
-              <div className="space-y-3">
-                <h4 className="font-semibold text-gray-700 mb-3">Items</h4>
-                {currentQuestion.options.left_items.map((leftItem) => {
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Left Column - Fixed Items with Drop Zones */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="font-semibold text-gray-900 text-lg">Items to Match</h4>
+                  <span className="text-sm text-gray-500">
+                    {matchedPairs.length} / {currentQuestion.options.left_items.length} matched
+                  </span>
+                </div>
+                
+                {currentQuestion.options.left_items.map((leftItem, index) => {
                   const match = matchedPairs.find(p => p.left_id === leftItem.id);
                   const rightItem = match 
                     ? currentQuestion.options.right_items.find(r => r.id === match.right_id)
@@ -337,46 +372,71 @@ export const QuizTake = () => {
                   return (
                     <div
                       key={leftItem.id}
-                      className="border-2 border-gray-300 rounded-lg p-4 bg-white"
+                      className="bg-white border-2 border-gray-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow"
                     >
-                      <div className="font-medium text-gray-900 mb-2">{leftItem.text}</div>
+                      <div className="flex items-start gap-3 mb-3">
+                        <span className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-semibold text-sm">
+                          {index + 1}
+                        </span>
+                        <p className="font-medium text-gray-900 pt-1">{leftItem.text}</p>
+                      </div>
                       
                       {/* Drop Zone */}
                       <div
-                        onDragOver={(e) => e.preventDefault()}
+                        onDragOver={(e) => {
+                          e.preventDefault();
+                          e.currentTarget.classList.add('border-blue-400', 'bg-blue-100', 'scale-[1.02]');
+                        }}
+                        onDragLeave={(e) => {
+                          e.currentTarget.classList.remove('border-blue-400', 'bg-blue-100', 'scale-[1.02]');
+                        }}
                         onDrop={(e) => {
                           e.preventDefault();
+                          e.currentTarget.classList.remove('border-blue-400', 'bg-blue-100', 'scale-[1.02]');
+                          
                           const rightId = e.dataTransfer.getData("rightId");
                           
-                          // Remove any existing match for this left item
+                          // Remove any existing match for this left item and the dragged right item
                           const newPairs = matchedPairs.filter(p => p.left_id !== leftItem.id && p.right_id !== rightId);
                           // Add new match
                           newPairs.push({ left_id: leftItem.id, right_id: rightId });
                           
                           handleAnswerChange({ pairs: newPairs });
                         }}
-                        className={`min-h-[60px] border-2 border-dashed rounded p-3 transition-colors ${
+                        className={`min-h-[80px] border-2 border-dashed rounded-lg p-4 transition-all duration-200 ${
                           rightItem
-                            ? "border-blue-500 bg-blue-50"
-                            : "border-gray-300 bg-gray-50 hover:border-blue-400 hover:bg-blue-50"
+                            ? "border-green-400 bg-green-50"
+                            : "border-gray-300 bg-gray-50 hover:border-blue-300"
                         }`}
                       >
                         {rightItem ? (
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm text-gray-700">{rightItem.text}</span>
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex items-start gap-2 flex-1">
+                              <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                              </svg>
+                              <span className="text-sm text-gray-700 leading-relaxed">{rightItem.text}</span>
+                            </div>
                             <button
                               onClick={() => {
                                 const newPairs = matchedPairs.filter(p => p.left_id !== leftItem.id);
                                 handleAnswerChange({ pairs: newPairs });
                               }}
-                              className="text-red-500 hover:text-red-700"
+                              className="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition-colors"
                               title="Remove match"
                             >
-                              ✕
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
                             </button>
                           </div>
                         ) : (
-                          <span className="text-xs text-gray-400">Drop here to match</span>
+                          <div className="flex flex-col items-center justify-center text-gray-400 py-2">
+                            <svg className="w-8 h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13l-3 3m0 0l-3-3m3 3V8m0 13a9 9 0 110-18 9 9 0 010 18z" />
+                            </svg>
+                            <span className="text-xs font-medium">Drop answer here</span>
+                          </div>
                         )}
                       </div>
                     </div>
@@ -385,38 +445,52 @@ export const QuizTake = () => {
               </div>
               
               {/* Right Column - Draggable Items */}
-              <div className="space-y-3">
-                <h4 className="font-semibold text-gray-700 mb-3">Match With</h4>
-                {currentQuestion.options.right_items.map((rightItem) => {
-                  const isMatched = matchedRightIds.has(rightItem.id);
-                  
-                  return (
-                    <div
-                      key={rightItem.id}
-                      draggable={!isMatched}
-                      onDragStart={(e) => {
-                        e.dataTransfer.setData("rightId", rightItem.id);
-                      }}
-                      className={`border-2 rounded-lg p-4 transition-all ${
-                        isMatched
-                          ? "border-gray-200 bg-gray-100 opacity-50 cursor-not-allowed"
-                          : "border-blue-300 bg-blue-50 cursor-move hover:border-blue-500 hover:shadow-md"
-                      }`}
-                    >
-                      <div className="text-sm text-gray-700">{rightItem.text}</div>
-                      {isMatched && (
-                        <div className="text-xs text-gray-500 mt-1">✓ Matched</div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-            
-            {/* Progress Indicator */}
-            <div className="mt-4 p-3 bg-gray-100 rounded-lg">
-              <div className="text-sm text-gray-600">
-                Matched: {matchedPairs.length} / {currentQuestion.options.left_items.length}
+              <div className="space-y-4">
+                <h4 className="font-semibold text-gray-900 text-lg mb-4">Drag to Match</h4>
+                
+                <div className="space-y-3">
+                  {currentQuestion.options.right_items.map((rightItem) => {
+                    const isMatched = matchedRightIds.has(rightItem.id);
+                    
+                    return (
+                      <div
+                        key={rightItem.id}
+                        draggable={!isMatched}
+                        onDragStart={(e) => {
+                          e.dataTransfer.setData("rightId", rightItem.id);
+                          e.currentTarget.style.opacity = '0.5';
+                        }}
+                        onDragEnd={(e) => {
+                          e.currentTarget.style.opacity = '1';
+                        }}
+                        className={`relative border-2 rounded-xl p-4 transition-all ${
+                          isMatched
+                            ? "border-green-300 bg-green-50 opacity-60"
+                            : "border-purple-300 bg-gradient-to-br from-purple-50 to-blue-50 cursor-grab active:cursor-grabbing hover:border-purple-400 hover:shadow-lg transform hover:-translate-y-1"
+                        }`}
+                      >
+                        {!isMatched && (
+                          <div className="absolute top-2 right-2">
+                            <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                            </svg>
+                          </div>
+                        )}
+                        
+                        <p className="text-sm text-gray-700 pr-8 leading-relaxed">{rightItem.text}</p>
+                        
+                        {isMatched && (
+                          <div className="flex items-center gap-1 mt-2 text-green-700">
+                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                            <span className="text-xs font-medium">Matched</span>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </div>
           </div>
@@ -500,9 +574,35 @@ export const QuizTake = () => {
               <button
                 onClick={handlePause}
                 disabled={isPausing}
-                className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 disabled:bg-gray-400"
+                className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 disabled:bg-gray-400 flex items-center gap-2"
               >
-                <Pause className="w-5 h-5" />
+                {isPausing ? <Spinner size="sm" /> : <Pause className="w-5 h-5" />}
+                Pause
+              </button>
+            )}
+            
+            {sessionData.quiz_mode === "exam" && (
+              <button
+                onClick={handlePause}
+                disabled={isPausing || !sessionData.pause_info.can_pause_now}
+                className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
+                  sessionData.pause_info.can_pause_now
+                    ? "bg-yellow-600 text-white hover:bg-yellow-700"
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                } disabled:bg-gray-400`}
+                title={
+                  !sessionData.pause_info.can_pause_now && sessionData.pause_info.questions_until_next_pause
+                    ? `Answer ${sessionData.pause_info.questions_until_next_pause} more questions to pause`
+                    : "Pause quiz"
+                }
+              >
+                {isPausing ? <Spinner size="sm" /> : <Pause className="w-5 h-5" />}
+                Pause
+                {!sessionData.pause_info.can_pause_now && sessionData.pause_info.questions_until_next_pause > 0 && (
+                  <span className="text-xs">
+                    ({sessionData.pause_info.questions_until_next_pause} more)
+                  </span>
+                )}
               </button>
             )}
             
