@@ -247,6 +247,8 @@ export const AttemptReview = () => {
               </div>
 
               {/* Options */}
+
+              {/* Matching type: show user matches and correct matches */}
               <div className="ml-11 space-y-2">
                 {(() => {
                   // Parse options if it's a JSON string
@@ -256,16 +258,9 @@ export const AttemptReview = () => {
                       options = JSON.parse(options);
                     } catch (e) {
                       console.error('Failed to parse options:', e);
-                      options = [];
+                      options = {};
                     }
                   }
-                  
-                  // Ensure options is an array
-                  if (!Array.isArray(options)) {
-                    console.log('Options is not array:', options);
-                    options = [];
-                  }
-                  
                   // Parse user_answer if it's a string
                   let userAnswer = question.user_answer;
                   if (typeof userAnswer === 'string') {
@@ -275,7 +270,6 @@ export const AttemptReview = () => {
                       console.error('Failed to parse user_answer:', e);
                     }
                   }
-                  
                   // Parse correct_answer if it's a string
                   let correctAnswer = question.correct_answer;
                   if (typeof correctAnswer === 'string') {
@@ -285,17 +279,67 @@ export const AttemptReview = () => {
                       console.error('Failed to parse correct_answer:', e);
                     }
                   }
-                  
-                  // Debug logging
-                  console.log('Question:', question.question_number, {
-                    userAnswer,
-                    correctAnswer,
-                    is_correct: question.is_correct,
-                    options
-                  });
-                  
+
+                  if (question.question_type === 'matching') {
+                    // options: { left_items: [...], right_items: [...] }
+                    const leftItems = options.left_items || [];
+                    const rightItems = options.right_items || [];
+                    // userAnswer: [{ left_id, right_id }]
+                    // correctAnswer: [{ left_id, right_id }]
+                    const userPairs = Array.isArray(userAnswer) ? userAnswer : [];
+                    const correctPairs = Array.isArray(correctAnswer) ? correctAnswer : [];
+
+                    return (
+                      <div className="space-y-2">
+                        <p className="text-sm font-semibold text-gray-700">Your Matches:</p>
+                        {userPairs.length === 0 && <p className="text-gray-500 text-sm">No answer given.</p>}
+                        {userPairs.map((pair, idx) => {
+                          const left = leftItems.find(l => l.id === pair.left_id);
+                          const right = rightItems.find(r => r.id === pair.right_id);
+                          // Check if this pair is correct
+                          const isCorrect = correctPairs.some(
+                            cp => cp.left_id === pair.left_id && cp.right_id === pair.right_id
+                          );
+                          return (
+                            <div key={idx} className={`p-2 rounded border flex items-center gap-2 ${isCorrect ? 'bg-green-50 border-green-300' : 'bg-red-50 border-red-300'}`}>
+                              {isCorrect ? <CheckCircle className="w-4 h-4 text-green-600" /> : <XCircle className="w-4 h-4 text-red-600" />}
+                              <span className="text-gray-900 font-medium">{left?.text || '—'}</span>
+                              <span className="mx-2 text-gray-500">→</span>
+                              <span className="text-gray-900 font-medium">{right?.text || '—'}</span>
+                              <span className={`ml-auto text-xs px-2 py-1 rounded font-semibold ${isCorrect ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'}`}>{isCorrect ? 'Correct' : 'Wrong'}</span>
+                            </div>
+                          );
+                        })}
+                        {/* Show correct matches if any were wrong */}
+                        {userPairs.length > 0 && userPairs.some(pair => !correctPairs.some(cp => cp.left_id === pair.left_id && cp.right_id === pair.right_id)) && (
+                          <div className="mt-2">
+                            <p className="text-sm font-semibold text-green-700">Correct Matches:</p>
+                            {correctPairs.map((pair, idx) => {
+                              const left = leftItems.find(l => l.id === pair.left_id);
+                              const right = rightItems.find(r => r.id === pair.right_id);
+                              return (
+                                <div key={idx} className="p-2 rounded border border-green-200 bg-green-50 flex items-center gap-2">
+                                  <CheckCircle className="w-4 h-4 text-green-600" />
+                                  <span className="text-gray-900 font-medium">{left?.text || '—'}</span>
+                                  <span className="mx-2 text-gray-500">→</span>
+                                  <span className="text-gray-900 font-medium">{right?.text || '—'}</span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  }
+
+                  // ...existing code for other question types...
+                  // Ensure options is an array for other types
+                  if (!Array.isArray(options)) {
+                    options = [];
+                  }
+                  // ...existing code for rendering options (as before)...
                   return options.map((option, optIndex) => {
-                    // Handle both array and object user_answer formats (matching admin implementation)
+                    // ...existing code...
                     let userAnswers = [];
                     if (userAnswer) {
                       if (Array.isArray(userAnswer)) {
@@ -304,12 +348,9 @@ export const AttemptReview = () => {
                         userAnswers = userAnswer.selected_option_ids || 
                                      (userAnswer.selected_option_id ? [userAnswer.selected_option_id] : []);
                       } else if (typeof userAnswer === 'string') {
-                        // Single option ID as string
                         userAnswers = [userAnswer];
                       }
                     }
-                    
-                    // Handle correct answer
                     let correctAnswers = [];
                     if (correctAnswer) {
                       if (Array.isArray(correctAnswer)) {
@@ -318,58 +359,44 @@ export const AttemptReview = () => {
                         correctAnswers = correctAnswer.correct_option_ids || 
                                         (correctAnswer.correct_option_id ? [correctAnswer.correct_option_id] : []);
                       } else if (typeof correctAnswer === 'string') {
-                        // Single option ID as string
                         correctAnswers = [correctAnswer];
                       }
                     }
-                    
-                    // Use option.id instead of option.option_id to match backend response
                     const isUserAnswer = userAnswers.includes(option.id) || 
                                         userAnswers.includes(String(option.id));
                     const isCorrect = correctAnswers.includes(option.id) || 
                                      correctAnswers.includes(String(option.id)) ||
                                      option.is_correct;
-                  
-                    // Skip options that are neither selected by user nor correct
-                    // This hides unselected wrong options but shows all selected and all correct
                     if (!isUserAnswer && !isCorrect) {
                       return null;
                     }
-                  
                     let bgColor = "bg-gray-50";
                     let borderColor = "border-gray-200";
                     let textColor = "text-gray-900";
                     let icon = null;
                     let label = null;
-                    
-                    // User selected correct answer
                     if (isUserAnswer && isCorrect) {
                       bgColor = "bg-green-50";
                       borderColor = "border-green-500";
                       textColor = "text-green-900";
                       icon = <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />;
                       label = <span className="ml-auto text-xs bg-green-200 text-green-800 px-2 py-1 rounded font-semibold">✓ Your Answer (Correct)</span>;
-                    } 
-                    // User selected wrong answer
-                    else if (isUserAnswer && !isCorrect) {
+                    } else if (isUserAnswer && !isCorrect) {
                       bgColor = "bg-red-50";
                       borderColor = "border-red-500";
                       textColor = "text-red-900";
                       icon = <XCircle className="w-5 h-5 text-red-600 flex-shrink-0" />;
                       label = <span className="ml-auto text-xs bg-red-200 text-red-800 px-2 py-1 rounded font-semibold">✗ Your Answer (Wrong)</span>;
-                    }
-                    // Correct answer user didn't select
-                    else if (!isUserAnswer && isCorrect) {
+                    } else if (!isUserAnswer && isCorrect) {
                       bgColor = "bg-green-50";
                       borderColor = "border-green-300";
                       textColor = "text-green-900";
                       icon = <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />;
                       label = <span className="ml-auto text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Correct Answer</span>;
                     }
-
                     return (
                       <div
-                        key={option.option_id || `option-${optIndex}`}
+                        key={option.id || `option-${optIndex}`}
                         className={`p-3 rounded-lg border-2 ${bgColor} ${borderColor}`}
                       >
                         <div className="flex items-center gap-2">
