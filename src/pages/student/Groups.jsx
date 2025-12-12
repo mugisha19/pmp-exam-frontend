@@ -143,7 +143,7 @@ export const Groups = () => {
               {displayGroups.length} {displayGroups.length === 1 ? 'Group' : 'Groups'}
             </h2>
           </div>
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {displayGroups.map((group) => {
             const groupId = group.id || group.group_id;
             const isJoined = myGroupIds.has(groupId);
