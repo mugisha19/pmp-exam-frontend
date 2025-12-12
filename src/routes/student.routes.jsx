@@ -6,7 +6,7 @@
 import { Route } from "react-router-dom";
 import { RoleRoute } from "@/components/routes";
 import StudentLayout from "@/components/layouts/StudentLayout";
-import { Dashboard, Groups, GroupDetail, MyExams, QuizDetail } from "@/pages/student";
+import { Dashboard, Groups, GroupDetail, MyExams, QuizDetail, Profile } from "@/pages/student";
 import QuizTake from "@/pages/student/QuizTake";
 import AttemptReview from "@/pages/student/AttemptReview";
 
@@ -25,5 +25,6 @@ export const studentRoutes = (
     <Route path="/exams/:quizId" element={<QuizDetail />} />
     <Route path="/exams/:quizId/take" element={<QuizTake />} />
     <Route path="/exams/:quizId/attempts/:attemptId" element={<AttemptReview />} />
+    <Route path="/profile" element={<Profile />} />
   </Route>
 );

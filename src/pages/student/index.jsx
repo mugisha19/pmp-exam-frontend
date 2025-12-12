@@ -4,3 +4,4 @@ export { GroupDetail } from "./GroupDetail";
 export { MyExams } from "./MyExams";
 export { QuizDetail } from "./QuizDetail";
 export { default as AttemptReview } from "./AttemptReview";
+export { default as Profile } from "./Profile";

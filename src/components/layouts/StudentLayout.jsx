@@ -5,6 +5,7 @@
 
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useAuthStore } from "@/stores/auth.store";
+import { useLogoutMutation } from "@/hooks/queries/useAuthQueries";
 import { STUDENT_NAV_ITEMS } from "@/constants/navigation.constants";
 import { 
   Menu, 
@@ -16,7 +17,8 @@ import {
   ChevronDown,
   BookOpen,
   GraduationCap,
-  Settings
+  Settings,
+  Loader2
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/utils/cn";
@@ -24,13 +26,17 @@ import { cn } from "@/utils/cn";
 export const StudentLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, logout } = useAuthStore();
+  const { user } = useAuthStore();
+  const logoutMutation = useLogoutMutation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
 
   const handleLogout = () => {
-    logout();
-    navigate("/login");
+    logoutMutation.mutate(undefined, {
+      onSuccess: () => {
+        navigate("/login");
+      },
+    });
   };
 
   const isActive = (path) => location.pathname === path;
@@ -38,7 +44,7 @@ export const StudentLayout = () => {
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Left Sidebar Navigation */}
-      <aside className="hidden lg:flex flex-col fixed left-4 top-1/2 -translate-y-1/2 w-64 h-[90vh] bg-white/95 backdrop-blur-xl shadow-2xl rounded-3xl border border-gray-200 z-50">
+      <aside className="hidden lg:flex flex-col fixed left-4 top-1/2 -translate-y-1/2 w-64 h-[95vh] bg-white/95 backdrop-blur-xl shadow-2xl rounded-3xl border border-gray-200 z-50">
         <div className="flex flex-col h-full p-6">
           {/* Logo & Brand */}
           <div className="flex items-center gap-3 mb-8">
@@ -131,10 +137,15 @@ export const StudentLayout = () => {
                   <div className="border-t border-gray-200 mt-1 pt-1">
                     <button
                       onClick={handleLogout}
-                      className="w-full px-4 py-2.5 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-3 transition-colors"
+                      disabled={logoutMutation.isPending}
+                      className="w-full px-4 py-2.5 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-3 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <LogOut className="w-4 h-4" />
-                      Logout
+                      {logoutMutation.isPending ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <LogOut className="w-4 h-4" />
+                      )}
+                      {logoutMutation.isPending ? "Signing out..." : "Logout"}
                     </button>
                   </div>
                 </div>
@@ -195,10 +206,15 @@ export const StudentLayout = () => {
               })}
               <button
                 onClick={handleLogout}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
+                disabled={logoutMutation.isPending}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <LogOut className="w-5 h-5" />
-                <span className="font-medium">Logout</span>
+                {logoutMutation.isPending ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <LogOut className="w-5 h-5" />
+                )}
+                <span className="font-medium">{logoutMutation.isPending ? "Signing out..." : "Logout"}</span>
               </button>
             </div>
           </div>
