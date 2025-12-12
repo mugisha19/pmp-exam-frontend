@@ -13,6 +13,7 @@ export const QuizTake = () => {
   const [currentQuestion, setCurrentQuestion] = React.useState(null);
   const [selectedAnswer, setSelectedAnswer] = React.useState(null);
   const [timeRemaining, setTimeRemaining] = React.useState(0);
+  const [pauseTimeRemaining, setPauseTimeRemaining] = React.useState(0);
   const [isPausing, setIsPausing] = React.useState(false);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const sessionToken = sessionStorage.getItem("quiz_session_token");
@@ -59,6 +60,11 @@ export const QuizTake = () => {
           setTimeRemaining(sessionData.timing.time_remaining_seconds);
         }
         
+        // Set pause time remaining if quiz is paused
+        if (sessionData.pause_info.is_paused && sessionData.pause_info.pause_remaining_seconds) {
+          setPauseTimeRemaining(sessionData.pause_info.pause_remaining_seconds);
+        }
+        
         // Load saved answer if exists (from backend)
         if (sessionData.questions[0].user_answer) {
           setSelectedAnswer(sessionData.questions[0].user_answer);
@@ -92,6 +98,29 @@ export const QuizTake = () => {
     return () => clearInterval(timer);
   }, [sessionData]);
 
+  // Pause countdown timer - synced with backend
+  React.useEffect(() => {
+    if (!sessionData || !sessionData.pause_info.is_paused) return;
+    
+    // If no pause time limit (unlimited pause), don't run countdown
+    if (!sessionData.pause_info.pause_remaining_seconds) return;
+
+    const pauseTimer = setInterval(() => {
+      setPauseTimeRemaining(prev => {
+        if (prev <= 0) {
+          // Time expired, backend will auto-resume
+          // Fetch fresh state instead of auto-resuming from frontend
+          clearInterval(pauseTimer);
+          window.location.reload();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(pauseTimer);
+  }, [sessionData?.pause_info?.is_paused]);
+
   // Heartbeat every 30 seconds
   React.useEffect(() => {
     if (!sessionToken) return;
@@ -99,9 +128,13 @@ export const QuizTake = () => {
     const heartbeat = setInterval(async () => {
       try {
         const response = await sendHeartbeat(sessionToken);
-        // Sync time remaining from server to prevent drift
-        if (response?.time_remaining_seconds !== undefined && response.time_remaining_seconds !== null) {
+        // Update time remaining from heartbeat response
+        if (response.time_remaining_seconds !== undefined) {
           setTimeRemaining(response.time_remaining_seconds);
+        }
+        // Update pause time remaining if quiz is paused
+        if (response.pause_info?.is_paused && response.pause_info?.pause_remaining_seconds !== undefined) {
+          setPauseTimeRemaining(response.pause_info.pause_remaining_seconds);
         }
       } catch (error) {
         console.error("Heartbeat failed:", error);
@@ -220,9 +253,10 @@ export const QuizTake = () => {
 
   const handleResume = async () => {
     try {
-      const result = await resumeQuiz(sessionToken);
-      setSessionData(result.session);
+      await resumeQuiz(sessionToken);
       toast.success("Quiz resumed");
+      // Reload page to get fresh session state from backend
+      window.location.reload();
     } catch (error) {
       toast.error("Failed to resume");
     }
@@ -533,15 +567,28 @@ export const QuizTake = () => {
         <div className="bg-white rounded-lg shadow-lg p-8 max-w-md text-center">
           <Pause className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
           <h2 className="text-2xl font-bold mb-2">Quiz Paused</h2>
-          <p className="text-gray-600 mb-4">
-            {sessionData.pause_info.pause_remaining_seconds
-              ? `Resume in ${formatTime(sessionData.pause_info.pause_remaining_seconds)}`
-              : "Resume whenever you're ready"}
-          </p>
+          
+          {pauseTimeRemaining > 0 ? (
+            <div className="mb-6">
+              <p className="text-gray-600 mb-3">Auto-resume in:</p>
+              <div className={`inline-flex items-center gap-2 px-6 py-3 rounded-lg text-2xl font-mono font-bold ${
+                pauseTimeRemaining < 60 ? "bg-red-100 text-red-700" : "bg-yellow-100 text-yellow-700"
+              }`}>
+                <Clock className="w-6 h-6" />
+                {formatTime(pauseTimeRemaining)}
+              </div>
+            </div>
+          ) : (
+            <p className="text-gray-600 mb-6">
+              Resume whenever you're ready
+            </p>
+          )}
+          
           <button
             onClick={handleResume}
-            className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium"
+            className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium flex items-center gap-2 mx-auto"
           >
+            <Play className="w-5 h-5" />
             Resume Quiz
           </button>
         </div>

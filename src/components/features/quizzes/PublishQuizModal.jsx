@@ -38,6 +38,8 @@ const publishSchema = z.object({
   subset_count: z.union([z.number().min(1), z.nan(), z.undefined()]).optional().nullable().transform(val => (isNaN(val) || val === undefined) ? null : val),
   starts_at: z.string().optional().nullable(),
   ends_at: z.string().optional().nullable(),
+  pause_after_questions: z.union([z.number().min(1), z.nan(), z.undefined()]).optional().nullable().transform(val => (isNaN(val) || val === undefined) ? null : val),
+  pause_duration_minutes: z.union([z.number().min(1).max(60), z.nan(), z.undefined()]).optional().nullable().transform(val => (isNaN(val) || val === undefined) ? null : val),
 }).refine(
   (data) => {
     if (data.publish_type === "group") {
@@ -118,6 +120,8 @@ export const PublishQuizModal = ({ isOpen, onClose, quizBank, preselectedGroupId
         scheduling_enabled: hasScheduling,
         starts_at: data.starts_at || null,
         ends_at: data.ends_at || null,
+        pause_after_questions: data.quiz_mode === 'exam' ? (data.pause_after_questions || null) : null,
+        pause_duration_minutes: data.quiz_mode === 'exam' ? (data.pause_duration_minutes || null) : null,
       };
 
       if (data.publish_type === "group") {
@@ -327,6 +331,48 @@ export const PublishQuizModal = ({ isOpen, onClose, quizBank, preselectedGroupId
             </p>
           </div>
         </div>
+
+        {/* Pause Settings - Only show for exam mode */}
+        {quizMode === "exam" && (
+          <div className="space-y-3 bg-orange-50 p-4 rounded-lg border border-orange-200">
+            <h4 className="font-medium text-gray-900 flex items-center gap-2">
+              <Clock className="w-4 h-4 text-orange-600" />
+              Pause Settings (Exam Mode)
+            </h4>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Pause After Questions
+                </label>
+                <Input
+                  type="number"
+                  {...register("pause_after_questions", { valueAsNumber: true })}
+                  placeholder="e.g., 10"
+                  error={errors.pause_after_questions?.message}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Student can pause after answering this many questions
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Pause Duration (minutes)
+                </label>
+                <Input
+                  type="number"
+                  {...register("pause_duration_minutes", { valueAsNumber: true })}
+                  placeholder="e.g., 5"
+                  error={errors.pause_duration_minutes?.message}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Maximum time allowed for each pause break
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Question Selection */}
         <div className="space-y-3">
