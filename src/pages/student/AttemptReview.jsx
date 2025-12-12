@@ -74,6 +74,13 @@ export const AttemptReview = () => {
   // Backend returns flat structure, not nested
   const attempt = reviewData;
   const questions = reviewData.questions || [];
+  
+  // Debug log to see data structure
+  console.log('Review Data:', reviewData);
+  console.log('Questions:', questions);
+  if (questions.length > 0) {
+    console.log('First Question:', questions[0]);
+  }
 
   const formatTime = (seconds) => {
     const hours = Math.floor(seconds / 3600);
@@ -226,49 +233,104 @@ export const AttemptReview = () => {
 
               {/* Options */}
               <div className="ml-11 space-y-2">
-                {question.options?.map((option) => {
-                  // Handle both array and object user_answer formats
-                  const userAnswers = question.user_answer 
-                    ? (Array.isArray(question.user_answer) 
-                        ? question.user_answer 
-                        : (question.user_answer.selected_option_ids || [question.user_answer.selected_option_id]))
-                    : [];
-                  const isUserAnswer = userAnswers.includes(option.option_id);
-                  const isCorrect = option.is_correct;
-                  
-                  let bgColor = "bg-gray-50";
-                  let borderColor = "border-gray-200";
-                  let textColor = "text-gray-900";
-                  
-                  if (isCorrect) {
-                    bgColor = "bg-green-50";
-                    borderColor = "border-green-500";
-                    textColor = "text-green-900";
-                  } else if (isUserAnswer && !isCorrect) {
-                    bgColor = "bg-red-50";
-                    borderColor = "border-red-500";
-                    textColor = "text-red-900";
+                {(() => {
+                  // Parse options if it's a JSON string
+                  let options = question.options;
+                  if (typeof options === 'string') {
+                    try {
+                      options = JSON.parse(options);
+                    } catch (e) {
+                      console.error('Failed to parse options:', e);
+                      options = [];
+                    }
                   }
+                  
+                  // Ensure options is an array
+                  if (!Array.isArray(options)) {
+                    console.log('Options is not array:', options);
+                    options = [];
+                  }
+                  
+                  // Parse user_answer if it's a string
+                  let userAnswer = question.user_answer;
+                  if (typeof userAnswer === 'string') {
+                    try {
+                      userAnswer = JSON.parse(userAnswer);
+                    } catch (e) {
+                      console.error('Failed to parse user_answer:', e);
+                    }
+                  }
+                  
+                  // Parse correct_answer if it's a string
+                  let correctAnswer = question.correct_answer;
+                  if (typeof correctAnswer === 'string') {
+                    try {
+                      correctAnswer = JSON.parse(correctAnswer);
+                    } catch (e) {
+                      console.error('Failed to parse correct_answer:', e);
+                    }
+                  }
+                  
+                  return options.map((option, optIndex) => {
+                    // Handle both array and object user_answer formats
+                    let userAnswers = [];
+                    if (userAnswer) {
+                      if (Array.isArray(userAnswer)) {
+                        userAnswers = userAnswer;
+                      } else if (typeof userAnswer === 'object') {
+                        userAnswers = userAnswer.selected_option_ids || 
+                                     (userAnswer.selected_option_id ? [userAnswer.selected_option_id] : []);
+                      }
+                    }
+                    
+                    // Handle correct answer
+                    let correctAnswers = [];
+                    if (correctAnswer) {
+                      if (Array.isArray(correctAnswer)) {
+                        correctAnswers = correctAnswer;
+                      } else if (typeof correctAnswer === 'object') {
+                        correctAnswers = correctAnswer.correct_option_ids || 
+                                        (correctAnswer.correct_option_id ? [correctAnswer.correct_option_id] : []);
+                      }
+                    }
+                    
+                    const isUserAnswer = userAnswers.includes(option.option_id);
+                    const isCorrect = correctAnswers.includes(option.option_id) || option.is_correct;
+                  
+                    let bgColor = "bg-gray-50";
+                    let borderColor = "border-gray-200";
+                    let textColor = "text-gray-900";
+                    
+                    if (isCorrect) {
+                      bgColor = "bg-green-50";
+                      borderColor = "border-green-500";
+                      textColor = "text-green-900";
+                    } else if (isUserAnswer && !isCorrect) {
+                      bgColor = "bg-red-50";
+                      borderColor = "border-red-500";
+                      textColor = "text-red-900";
+                    }
 
-                  return (
-                    <div
-                      key={option.option_id}
-                      className={`p-3 rounded-lg border-2 ${bgColor} ${borderColor}`}
-                    >
-                      <div className="flex items-center gap-2">
-                        {isCorrect && (
-                          <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                        )}
-                        {isUserAnswer && !isCorrect && (
-                          <XCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
-                        )}
-                        <span className={`${textColor} ${isUserAnswer ? "font-semibold" : ""}`}>
-                          {option.option_text}
-                        </span>
+                    return (
+                      <div
+                        key={option.option_id || `option-${optIndex}`}
+                        className={`p-3 rounded-lg border-2 ${bgColor} ${borderColor}`}
+                      >
+                        <div className="flex items-center gap-2">
+                          {isCorrect && (
+                            <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+                          )}
+                          {isUserAnswer && !isCorrect && (
+                            <XCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+                          )}
+                          <span className={`${textColor} ${isUserAnswer ? "font-semibold" : ""}`}>
+                            {option.option_text || option.text || 'Option'}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  });
+                })()}
               </div>
 
               {/* Explanation */}
