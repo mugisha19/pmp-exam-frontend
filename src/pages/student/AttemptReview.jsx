@@ -53,7 +53,7 @@ export const AttemptReview = () => {
     );
   }
 
-  if (!reviewData || !reviewData.attempt) {
+  if (!reviewData || !reviewData.attempt_id) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -71,7 +71,9 @@ export const AttemptReview = () => {
     );
   }
 
-  const { attempt, questions } = reviewData;
+  // Backend returns flat structure, not nested
+  const attempt = reviewData;
+  const questions = reviewData.questions || [];
 
   const formatTime = (seconds) => {
     const hours = Math.floor(seconds / 3600);
@@ -143,7 +145,7 @@ export const AttemptReview = () => {
               <span className="text-sm font-medium">Correct Answers</span>
             </div>
             <p className="text-2xl font-bold text-gray-900">
-              {attempt.correct_count} / {attempt.total_questions}
+              {attempt.correct_answers || 0} / {attempt.total_questions}
             </p>
           </div>
 
@@ -225,7 +227,13 @@ export const AttemptReview = () => {
               {/* Options */}
               <div className="ml-11 space-y-2">
                 {question.options?.map((option) => {
-                  const isUserAnswer = question.user_answer_ids?.includes(option.option_id);
+                  // Handle both array and object user_answer formats
+                  const userAnswers = question.user_answer 
+                    ? (Array.isArray(question.user_answer) 
+                        ? question.user_answer 
+                        : (question.user_answer.selected_option_ids || [question.user_answer.selected_option_id]))
+                    : [];
+                  const isUserAnswer = userAnswers.includes(option.option_id);
                   const isCorrect = option.is_correct;
                   
                   let bgColor = "bg-gray-50";
