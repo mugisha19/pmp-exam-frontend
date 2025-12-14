@@ -606,7 +606,7 @@ export const QuizTake = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       <div className="max-w-7xl mx-auto p-6">
         <div className="bg-white rounded-lg shadow-md border border-gray-200">
           {/* Top: Header */}
