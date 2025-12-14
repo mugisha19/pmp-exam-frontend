@@ -48,6 +48,7 @@ export const adminRoutes = (
     <Route path="students" element={<AdminStudentsPage />} />
     <Route path="exams" element={<AdminExamsPage />} />
     <Route path="exams/:examId" element={<AdminExamDetails />} />
+    <Route path="exams/:examId/attempt/:attemptId" element={<QuizAttemptDetails />} />
     <Route path="groups" element={<AdminGroupsPage />} />
     <Route path="groups/:groupId" element={<AdminGroupDetailsPage />} />
     <Route path="groups/:groupId/quiz/:quizId" element={<GroupQuizDetails />} />
