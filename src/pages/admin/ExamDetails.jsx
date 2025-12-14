@@ -22,6 +22,7 @@ import {
   PlayCircle,
   XCircle,
   CheckSquare,
+  Trash2,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { Spinner } from "@/components/ui";
@@ -31,12 +32,14 @@ import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { DataTable } from "@/components/shared/DataTable";
 import { EmptyState } from "@/components/shared/EmptyState";
+import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import {
   getQuizById,
   getQuizStats,
   getQuizLeaderboard,
   getAllQuizAttempts,
   updateQuizStatus,
+  deleteQuiz,
 } from "@/services/quiz.service";
 
 const formatDate = (dateStr) => {
@@ -87,6 +90,8 @@ export default function ExamDetails() {
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState("overview");
   const [expandedUserId, setExpandedUserId] = useState(null);
+  const [statusDialog, setStatusDialog] = useState({ isOpen: false, status: null });
+  const [deleteDialog, setDeleteDialog] = useState(false);
 
   const { data: exam, isLoading: loadingExam } = useQuery({
     queryKey: ["exam", examId],
@@ -117,14 +122,40 @@ export default function ExamDetails() {
     onSuccess: () => {
       queryClient.invalidateQueries(["exam", examId]);
       toast.success("Exam status updated successfully");
+      setStatusDialog({ isOpen: false, status: null });
     },
     onError: (error) => {
       toast.error(error?.message || "Failed to update status");
+      setStatusDialog({ isOpen: false, status: null });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: () => deleteQuiz(examId),
+    onSuccess: () => {
+      toast.success("Exam deleted successfully");
+      navigate("/admin/exams");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to delete exam");
+      setDeleteDialog(false);
     },
   });
 
   const handleStatusChange = (status) => {
-    statusMutation.mutate({ status });
+    setStatusDialog({ isOpen: true, status });
+  };
+
+  const confirmStatusChange = () => {
+    statusMutation.mutate({ status: statusDialog.status });
+  };
+
+  const handleDelete = () => {
+    setDeleteDialog(true);
+  };
+
+  const confirmDelete = () => {
+    deleteMutation.mutate();
   };
 
   const leaderboardColumns = [
@@ -306,6 +337,15 @@ export default function ExamDetails() {
               <Edit2 className="w-4 h-4 mr-2" />
               Edit
             </Button>
+            {(attemptsData?.total_attempts || 0) === 0 && (
+              <Button
+                variant="danger"
+                onClick={handleDelete}
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Delete
+              </Button>
+            )}
           </div>
         }
       />
@@ -494,52 +534,32 @@ export default function ExamDetails() {
               <Spinner size="lg" />
             </div>
           ) : stats ? (
-            <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <Card className="p-6">
-                  <p className="text-sm text-gray-600">Total Attempts</p>
-                  <p className="text-3xl font-bold">{stats.total_attempts || 0}</p>
-                </Card>
-                <Card className="p-6">
-                  <p className="text-sm text-gray-600">Pass Rate</p>
-                  <p className="text-3xl font-bold">
-                    {stats.pass_rate ? `${stats.pass_rate.toFixed(1)}%` : "0%"}
-                  </p>
-                </Card>
-                <Card className="p-6">
-                  <p className="text-sm text-gray-600">Average Score</p>
-                  <p className="text-3xl font-bold">
-                    {stats.average_score ? `${stats.average_score.toFixed(1)}%` : "0%"}
-                  </p>
-                </Card>
-                <Card className="p-6">
-                  <p className="text-sm text-gray-600">Avg Time</p>
-                  <p className="text-3xl font-bold">
-                    {stats.average_time_minutes
-                      ? `${stats.average_time_minutes.toFixed(0)}m`
-                      : "N/A"}
-                  </p>
-                </Card>
-              </div>
-
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <Card className="p-6">
-                <h3 className="text-lg font-semibold mb-4">Additional Statistics</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-gray-600">Total Participants</p>
-                    <p className="font-medium">{stats.total_participants || 0}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Completion Rate</p>
-                    <p className="font-medium">
-                      {stats.completion_rate
-                        ? `${stats.completion_rate.toFixed(1)}%`
-                        : "0%"}
-                    </p>
-                  </div>
-                </div>
+                <p className="text-sm text-gray-600">Total Attempts</p>
+                <p className="text-3xl font-bold">{stats.total_attempts || 0}</p>
               </Card>
-            </>
+              <Card className="p-6">
+                <p className="text-sm text-gray-600">Pass Rate</p>
+                <p className="text-3xl font-bold">
+                  {stats.pass_rate ? `${stats.pass_rate.toFixed(1)}%` : "0%"}
+                </p>
+              </Card>
+              <Card className="p-6">
+                <p className="text-sm text-gray-600">Average Score</p>
+                <p className="text-3xl font-bold">
+                  {stats.average_score ? `${stats.average_score.toFixed(1)}%` : "0%"}
+                </p>
+              </Card>
+              <Card className="p-6">
+                <p className="text-sm text-gray-600">Avg Time</p>
+                <p className="text-3xl font-bold">
+                  {stats.average_time_minutes
+                    ? `${stats.average_time_minutes.toFixed(0)}m`
+                    : "N/A"}
+                </p>
+              </Card>
+            </div>
           ) : (
             <Card className="p-6">
               <p className="text-center text-gray-500">No statistics available</p>
@@ -648,6 +668,30 @@ export default function ExamDetails() {
           )}
         </Card>
       )}
+
+      {/* Status Change Confirmation */}
+      <ConfirmDialog
+        isOpen={statusDialog.isOpen}
+        onClose={() => setStatusDialog({ isOpen: false, status: null })}
+        onConfirm={confirmStatusChange}
+        title="Change Exam Status"
+        message={`Are you sure you want to change the exam status to "${statusDialog.status}"?`}
+        confirmText="Change Status"
+        confirmVariant="primary"
+        isLoading={statusMutation.isPending}
+      />
+
+      {/* Delete Confirmation */}
+      <ConfirmDialog
+        isOpen={deleteDialog}
+        onClose={() => setDeleteDialog(false)}
+        onConfirm={confirmDelete}
+        title="Delete Exam"
+        message={`Are you sure you want to delete "${exam?.title}"? This action cannot be undone.`}
+        confirmText="Delete"
+        confirmVariant="danger"
+        isLoading={deleteMutation.isPending}
+      />
     </div>
   );
 }
