@@ -73,6 +73,19 @@ export function NotificationDropdown() {
               )}
             </div>
             <div className="flex items-center gap-2">
+              {unreadCount > 0 && (
+                <button
+                  onClick={handleMarkAllRead}
+                  disabled={markAllReadMutation.isPending}
+                  className="text-xs text-blue-600 hover:text-blue-700 font-medium disabled:opacity-50"
+                >
+                  {markAllReadMutation.isPending ? (
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                  ) : (
+                    "Mark all read"
+                  )}
+                </button>
+              )}
               <button
                 onClick={() => setIsOpen(false)}
                 className="text-gray-400 hover:text-gray-600"
