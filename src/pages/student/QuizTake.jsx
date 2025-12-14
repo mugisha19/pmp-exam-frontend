@@ -607,173 +607,189 @@ export const QuizTake = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-gray-900">{sessionData.quiz_title}</h1>
-            <p className="text-sm text-gray-600">{sessionData.quiz_mode === "exam" ? "Exam Mode" : "Practice Mode"}</p>
-          </div>
-          
-          <div className="flex items-center gap-4">
-            {/* Only show countdown timer for exam mode with time limit */}
-            {sessionData.quiz_mode === "exam" && sessionData.timing.has_time_limit && (
-              <div className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
-                timeRemaining < 300 ? "bg-red-100 text-red-700" : "bg-blue-100 text-blue-700"
-              }`}>
-                <Clock className="w-5 h-5" />
-                <span className="font-mono font-bold">{formatTime(timeRemaining)}</span>
+      <div className="max-w-7xl mx-auto p-6">
+        <div className="bg-white rounded-lg shadow-md border border-gray-200">
+          {/* Top: Header */}
+          <div className="border-b border-gray-200 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-xl font-bold text-gray-900">{sessionData.quiz_title}</h1>
+                <p className="text-sm text-gray-500 mt-0.5">
+                  {sessionData.quiz_mode === "exam" ? "Exam Mode" : "Practice Mode"}
+                </p>
               </div>
-            )}
-            
-            {sessionData.quiz_mode === "practice" && (
-              <button
-                onClick={handlePause}
-                disabled={isPausing}
-                className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 disabled:bg-gray-400 flex items-center gap-2"
-              >
-                {isPausing ? <Spinner size="sm" /> : <Pause className="w-5 h-5" />}
-                Pause
-              </button>
-            )}
-            
-            {sessionData.quiz_mode === "exam" && (
-              <button
-                onClick={handlePause}
-                disabled={isPausing || !sessionData.pause_info.can_pause_now}
-                className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
-                  sessionData.pause_info.can_pause_now
-                    ? "bg-yellow-600 text-white hover:bg-yellow-700"
-                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                } disabled:bg-gray-400`}
-                title={
-                  !sessionData.pause_info.can_pause_now && sessionData.pause_info.questions_until_next_pause
-                    ? `Answer ${sessionData.pause_info.questions_until_next_pause} more questions to pause`
-                    : "Pause quiz"
-                }
-              >
-                {isPausing ? <Spinner size="sm" /> : <Pause className="w-5 h-5" />}
-                Pause
-                {!sessionData.pause_info.can_pause_now && sessionData.pause_info.questions_until_next_pause > 0 && (
-                  <span className="text-xs">
-                    ({sessionData.pause_info.questions_until_next_pause} more)
-                  </span>
+              
+              <div className="flex items-center gap-3">
+                {/* Only show countdown timer for exam mode with time limit */}
+                {sessionData.quiz_mode === "exam" && sessionData.timing.has_time_limit && (
+                  <div className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium ${
+                    timeRemaining < 300 
+                      ? "bg-red-100 text-red-700" 
+                      : "bg-blue-100 text-blue-700"
+                  }`}>
+                    <Clock className="w-5 h-5" />
+                    <span className="font-mono font-bold">{formatTime(timeRemaining)}</span>
+                  </div>
                 )}
-              </button>
-            )}
-            
-            <button
-              onClick={handleSubmit}
-              disabled={isSubmitting}
-              className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium disabled:bg-gray-400 flex items-center gap-2"
-            >
-              {isSubmitting ? <Spinner size="sm" /> : <Send className="w-5 h-5" />}
-              Submit
-            </button>
+                
+                {sessionData.quiz_mode === "practice" && (
+                  <button
+                    onClick={handlePause}
+                    disabled={isPausing}
+                    className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-medium transition-colors"
+                  >
+                    {isPausing ? <Spinner size="sm" /> : <Pause className="w-5 h-5" />}
+                    Pause
+                  </button>
+                )}
+                
+                {sessionData.quiz_mode === "exam" && (
+                  <button
+                    onClick={handlePause}
+                    disabled={isPausing || !sessionData.pause_info.can_pause_now}
+                    className={`px-4 py-2 rounded-lg flex items-center gap-2 font-medium transition-colors ${
+                      sessionData.pause_info.can_pause_now
+                        ? "bg-yellow-500 text-white hover:bg-yellow-600"
+                        : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                    }`}
+                    title={
+                      !sessionData.pause_info.can_pause_now && sessionData.pause_info.questions_until_next_pause
+                        ? `Answer ${sessionData.pause_info.questions_until_next_pause} more questions to pause`
+                        : "Pause quiz"
+                    }
+                  >
+                    {isPausing ? <Spinner size="sm" /> : <Pause className="w-5 h-5" />}
+                    Pause
+                    {!sessionData.pause_info.can_pause_now && sessionData.pause_info.questions_until_next_pause > 0 && (
+                      <span className="text-xs">
+                        ({sessionData.pause_info.questions_until_next_pause} more)
+                      </span>
+                    )}
+                  </button>
+                )}
+                
+                <button
+                  onClick={handleSubmit}
+                  disabled={isSubmitting}
+                  className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+                >
+                  {isSubmitting ? <Spinner size="sm" /> : <Send className="w-5 h-5" />}
+                  Submit
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
 
-      <div className="max-w-7xl mx-auto p-6 flex gap-6">
-        {/* Question Panel */}
-        <div className="flex-1">
-          <div className="bg-white rounded-lg shadow p-6">
-            {/* Question Header */}
-            <div className="flex items-start justify-between mb-6">
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
-                  <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
-                    Question {currentQuestion?.question_number} of {sessionData.progress.total_questions}
-                  </span>
-                  {/* Hide question metadata (type, difficulty, topic, domain) for students during quiz */}
+          {/* Bottom: Left (Question) and Right (Navigator) */}
+          <div className="flex gap-6 p-6">
+            {/* Left: Question */}
+            <div className="flex-1">
+              {/* Question Header */}
+              <div className="mb-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-semibold text-gray-500">Question</span>
+                    <span className="text-2xl font-bold text-gray-900">{currentQuestion?.question_number}</span>
+                    <span className="text-sm text-gray-400">of {sessionData.progress.total_questions}</span>
+                  </div>
+                  <button
+                    onClick={handleFlagToggle}
+                    className={`p-2 rounded-lg transition-colors ${
+                      currentQuestion?.is_flagged
+                        ? "bg-red-100 text-red-600 hover:bg-red-200"
+                        : "bg-gray-100 text-gray-400 hover:bg-gray-200 hover:text-gray-600"
+                    }`}
+                    title={currentQuestion?.is_flagged ? "Unflag question" : "Flag for review"}
+                  >
+                    <Flag className="w-5 h-5" fill={currentQuestion?.is_flagged ? "currentColor" : "none"} />
+                  </button>
                 </div>
               </div>
-              
-              <button
-                onClick={handleFlagToggle}
-                className={`p-2 rounded-lg transition-colors ${
-                  currentQuestion?.is_flagged
-                    ? "bg-red-100 text-red-600"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                }`}
-              >
-                <Flag className="w-5 h-5" fill={currentQuestion?.is_flagged ? "currentColor" : "none"} />
-              </button>
-            </div>
 
-            {/* Question Text */}
-            <div className="mb-6">
-              <p className="text-lg text-gray-900 leading-relaxed">{currentQuestion?.question_text}</p>
-              {currentQuestion?.image_url && (
-                <img src={currentQuestion.image_url} alt="Question" className="mt-4 rounded-lg max-w-full" />
-              )}
-            </div>
+              {/* Question Content */}
+              <div className="mb-8">
+                <p className="text-lg text-gray-800 leading-relaxed">{currentQuestion?.question_text}</p>
+                {currentQuestion?.image_url && (
+                  <img src={currentQuestion.image_url} alt="Question" className="mt-4 rounded-lg border border-gray-200 max-w-full" />
+                )}
+              </div>
 
-            {/* Options */}
-            <div className="mb-6">
-              {renderQuestionOptions()}
-            </div>
+              {/* Options */}
+              <div className="mb-8">
+                {renderQuestionOptions()}
+              </div>
 
-            {/* Navigation */}
-            <div className="flex items-center justify-between pt-6 border-t">
-              <button
-                onClick={() => handleNavigate(currentQuestion.question_number - 1)}
-                disabled={currentQuestion?.question_number === 1}
-                className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <ChevronLeft className="w-5 h-5" />
-                Previous
-              </button>
-              
-              <button
-                onClick={() => handleNavigate(currentQuestion.question_number + 1)}
-                disabled={currentQuestion?.question_number === sessionData.progress.total_questions}
-                className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Next
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Question Navigator Sidebar */}
-        <div className="w-64">
-          <div className="bg-white rounded-lg shadow p-4 sticky top-24">
-            <h3 className="font-semibold mb-4">Questions</h3>
-            
-            <div className="grid grid-cols-5 gap-2 mb-4">
-              {sessionData.questions.map((q, idx) => (
+              {/* Navigation Buttons */}
+              <div className="flex items-center justify-between pt-6 border-t border-gray-200">
                 <button
-                  key={q.quiz_question_id}
-                  onClick={() => handleNavigate(idx + 1)}
-                  className={`w-10 h-10 rounded-lg font-medium text-sm transition-colors ${
-                    q.quiz_question_id === currentQuestion?.quiz_question_id
-                      ? "bg-blue-600 text-white"
-                      : q.is_answered
-                      ? "bg-green-100 text-green-700"
-                      : q.is_flagged
-                      ? "bg-red-100 text-red-700"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
+                  onClick={() => handleNavigate(currentQuestion.question_number - 1)}
+                  disabled={currentQuestion?.question_number === 1}
+                  className="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-gray-700 transition-colors"
                 >
-                  {idx + 1}
+                  <ChevronLeft className="w-5 h-5" />
+                  Previous
                 </button>
-              ))}
+                
+                <button
+                  onClick={() => handleNavigate(currentQuestion.question_number + 1)}
+                  disabled={currentQuestion?.question_number === sessionData.progress.total_questions}
+                  className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
+                >
+                  Next
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
             </div>
 
-            <div className="space-y-2 text-sm">
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 bg-green-100 rounded"></div>
-                <span className="text-gray-600">Answered: {sessionData.progress.answered_count}</span>
+            {/* Right: Question Navigator */}
+            <div className="w-80 border-l border-gray-200 pl-6">
+              <div className="mb-4">
+                <h3 className="font-semibold text-gray-900 mb-1">Question Palette</h3>
+                <p className="text-xs text-gray-500">Click to navigate</p>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 bg-gray-100 rounded"></div>
-                <span className="text-gray-600">Unanswered: {sessionData.progress.unanswered_count}</span>
+              
+              <div className="grid grid-cols-5 gap-2 mb-6">
+                {sessionData.questions.map((q, idx) => (
+                  <button
+                    key={q.quiz_question_id}
+                    onClick={() => handleNavigate(idx + 1)}
+                    className={`w-12 h-12 rounded-lg font-semibold text-sm transition-all ${
+                      q.quiz_question_id === currentQuestion?.quiz_question_id
+                        ? "bg-blue-600 text-white shadow-md"
+                        : q.is_answered
+                        ? "bg-green-100 text-green-700 hover:bg-green-200"
+                        : q.is_flagged
+                        ? "bg-red-100 text-red-700 hover:bg-red-200"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
+                  >
+                    {idx + 1}
+                  </button>
+                ))}
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 bg-red-100 rounded"></div>
-                <span className="text-gray-600">Flagged: {sessionData.progress.flagged_count}</span>
+
+              <div className="space-y-2 text-sm border-t border-gray-200 pt-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-green-500 rounded"></div>
+                    <span className="text-gray-700">Answered</span>
+                  </div>
+                  <span className="font-bold text-gray-900">{sessionData.progress.answered_count}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-gray-400 rounded"></div>
+                    <span className="text-gray-700">Unanswered</span>
+                  </div>
+                  <span className="font-bold text-gray-900">{sessionData.progress.unanswered_count}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-red-500 rounded"></div>
+                    <span className="text-gray-700">Flagged</span>
+                  </div>
+                  <span className="font-bold text-gray-900">{sessionData.progress.flagged_count}</span>
+                </div>
               </div>
             </div>
           </div>
