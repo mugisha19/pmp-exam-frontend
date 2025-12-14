@@ -5,7 +5,7 @@
 
 import { Menu } from "lucide-react";
 import { useUIStore } from "@/stores/ui.store";
-import NotificationBell from "./NotificationBell";
+import { NotificationDropdown } from "./NotificationDropdown";
 import UserDropdown from "./UserDropdown";
 
 export const DashboardHeader = ({ title, subtitle }) => {
@@ -41,7 +41,7 @@ export const DashboardHeader = ({ title, subtitle }) => {
         {/* Right Section */}
         <div className="flex items-center gap-3">
           {/* Notifications */}
-          <NotificationBell />
+          <NotificationDropdown />
 
           {/* User Dropdown */}
           <UserDropdown />

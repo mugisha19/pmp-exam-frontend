@@ -168,12 +168,6 @@ export const ADMIN_NAV_ITEMS = [
     icon: BarChart3,
   },
   {
-    id: "reports",
-    label: "Reports",
-    path: "/admin/reports",
-    icon: FileText,
-  },
-  {
     id: "notifications",
     label: "Notifications",
     path: "/admin/notifications",

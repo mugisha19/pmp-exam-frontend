@@ -53,6 +53,7 @@ export function NotificationItem({
   onRead,
   onDelete,
   showDeleteButton = true,
+  compact = false,
 }) {
   const {
     id,
@@ -88,6 +89,32 @@ export function NotificationItem({
       onDelete(id);
     }
   };
+
+  if (compact) {
+    return (
+      <div
+        onClick={handleClick}
+        className={`
+          relative flex items-start gap-2 transition-colors cursor-pointer
+          ${isRead ? "" : "bg-blue-50/50"}
+        `}
+      >
+        {!isRead && (
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-1 rounded-full bg-blue-500" />
+        )}
+        <div className={`p-1.5 rounded ${iconConfig.bg} flex-shrink-0`}>
+          <Icon className={`w-3.5 h-3.5 ${iconConfig.color}`} />
+        </div>
+        <div className="flex-1 min-w-0">
+          <h4 className={`text-xs truncate ${isRead ? "text-gray-600" : "text-gray-900 font-medium"}`}>
+            {title}
+          </h4>
+          <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{message}</p>
+          <span className="text-xs text-gray-400 mt-0.5 block">{timeAgo}</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div

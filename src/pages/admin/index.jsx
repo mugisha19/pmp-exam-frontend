@@ -38,12 +38,3 @@ export const AdminStudentsPage = () => (
     <p className="text-gray-500">Manage student accounts - Coming Soon</p>
   </div>
 );
-
-
-
-export const ReportsPage = () => (
-  <div className="p-6">
-    <h1 className="text-2xl font-bold text-gray-900 mb-2">Reports</h1>
-    <p className="text-gray-500">Generate and view reports - Coming Soon</p>
-  </div>
-);

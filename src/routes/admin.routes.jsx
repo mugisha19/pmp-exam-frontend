@@ -73,7 +73,6 @@ export const adminRoutes = (
       element={<AdminQuizBankAddQuestionsPage />}
     />
     <Route path="analytics" element={<AnalyticsPage />} />
-    <Route path="reports" element={<ReportsPage />} />
     <Route path="notifications" element={<NotificationsPage />} />
     <Route path="settings" element={<SystemSettingsPage />} />
     <Route path="profile" element={<AdminProfilePage />} />
