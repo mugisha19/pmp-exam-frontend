@@ -26,7 +26,6 @@ import {
   AdminQuizBankDetailsPage,
   AdminQuizBankAddQuestionsPage,
   AnalyticsPage,
-  ReportsPage,
   NotificationsPage,
   SystemSettingsPage,
   AdminProfilePage,
