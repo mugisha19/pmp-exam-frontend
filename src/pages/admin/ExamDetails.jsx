@@ -110,18 +110,18 @@ export default function ExamDetails() {
     {
       key: "rank",
       header: "Rank",
-      render: (_, entry, index) => (
+      render: (_, entry) => (
         <div className="flex items-center gap-2">
-          {index < 3 && (
+          {entry.rank <= 3 && (
             <Trophy
               className={`w-5 h-5 ${
-                index === 0 ? "text-yellow-500" :
-                index === 1 ? "text-gray-400" :
+                entry.rank === 1 ? "text-yellow-500" :
+                entry.rank === 2 ? "text-gray-400" :
                 "text-orange-600"
               }`}
             />
           )}
-          <span className="font-semibold text-gray-900">#{index + 1}</span>
+          <span className="font-semibold text-gray-900">#{entry.rank}</span>
         </div>
       ),
     },
@@ -139,8 +139,8 @@ export default function ExamDetails() {
       key: "score",
       header: "Score",
       render: (_, entry) => (
-        <Badge variant={entry.score >= 70 ? "success" : "error"} size="md">
-          {entry.score}%
+        <Badge variant={entry.best_score >= 70 ? "success" : "error"} size="md">
+          {entry.best_score?.toFixed(1)}%
         </Badge>
       ),
     },
@@ -148,7 +148,7 @@ export default function ExamDetails() {
       key: "time",
       header: "Time",
       render: (_, entry) => (
-        <span className="text-sm text-gray-700">{entry.time_minutes}m</span>
+        <span className="text-sm text-gray-700">{formatDuration(entry.best_time_seconds)}</span>
       ),
     },
   ];
@@ -208,6 +208,24 @@ export default function ExamDetails() {
         <span className="text-sm text-gray-700">
           {formatDuration(attempt.total_time_seconds)}
         </span>
+      ),
+    },
+    {
+      key: "actions",
+      header: "",
+      render: (_, attempt) => (
+        attempt.status === "submitted" && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/admin/exams/${examId}/attempt/${attempt.attempt_id}`);
+            }}
+          >
+            Review
+          </Button>
+        )
       ),
     },
   ];
@@ -392,19 +410,19 @@ export default function ExamDetails() {
                 <Spinner />
               ) : leaderboard?.leaderboard?.length > 0 ? (
                 <div className="space-y-2">
-                  {leaderboard.leaderboard.slice(0, 3).map((entry, index) => (
+                  {leaderboard.leaderboard.slice(0, 3).map((entry) => (
                     <div key={entry.user_id} className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <Trophy
                           className={`w-4 h-4 ${
-                            index === 0 ? "text-yellow-500" :
-                            index === 1 ? "text-gray-400" :
+                            entry.rank === 1 ? "text-yellow-500" :
+                            entry.rank === 2 ? "text-gray-400" :
                             "text-orange-600"
                           }`}
                         />
                         <span className="text-sm">{entry.full_name || entry.first_name}</span>
                       </div>
-                      <span className="font-bold">{entry.score}%</span>
+                      <span className="font-bold">{entry.best_score?.toFixed(1)}%</span>
                     </div>
                   ))}
                 </div>
