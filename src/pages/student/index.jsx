@@ -5,3 +5,4 @@ export { MyExams } from "./MyExams";
 export { QuizDetail } from "./QuizDetail";
 export { default as AttemptReview } from "./AttemptReview";
 export { default as Profile } from "./Profile";
+export { Notifications } from "./Notifications";

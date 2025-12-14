@@ -108,14 +108,21 @@ export function NotificationDropdown() {
             ) : (
               <div className="divide-y divide-gray-100">
                 {notifications.slice(0, 5).map((notification) => (
-                  <div key={notification.id} className="p-3 hover:bg-gray-50">
-                    <NotificationItem
-                      notification={notification}
-                      compact
-                      onRead={() => {}}
-                      onDelete={() => {}}
-                    />
-                  </div>
+                  <Link
+                    key={notification.id}
+                    to={notification.link || (user?.role === "admin" ? "/admin/notifications" : "/notifications")}
+                    onClick={() => setIsOpen(false)}
+                    className="block"
+                  >
+                    <div className="p-3 hover:bg-gray-50">
+                      <NotificationItem
+                        notification={notification}
+                        compact
+                        onRead={() => {}}
+                        onDelete={() => {}}
+                      />
+                    </div>
+                  </Link>
                 ))}
               </div>
             )}

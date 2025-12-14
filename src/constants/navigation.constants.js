@@ -41,12 +41,6 @@ export const STUDENT_NAV_ITEMS = [
     path: "/exams",
     icon: ClipboardList,
   },
-  {
-    id: "leaderboard",
-    label: "Leaderboard",
-    path: "/leaderboard",
-    icon: Trophy,
-  },
 ];
 
 export const INSTRUCTOR_NAV_ITEMS = [
