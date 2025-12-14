@@ -151,8 +151,16 @@ export const QuizTake = () => {
   }, [sessionToken]);
 
   const handleAutoSubmit = async () => {
-    toast.error("Time's up! Submitting quiz...");
-    await handleSubmit();
+    try {
+      await submitQuiz(sessionToken);
+      sessionStorage.removeItem("quiz_session_token");
+      sessionStorage.removeItem("quiz_session_data");
+      toast.error("Time's up! Quiz auto-submitted.");
+      navigate(`/exams/${quizId}`);
+    } catch (error) {
+      toast.error("Failed to auto-submit quiz");
+      navigate(`/exams/${quizId}`);
+    }
   };
 
   const handleAnswerChange = async (answer) => {
@@ -276,7 +284,7 @@ export const QuizTake = () => {
     
     setIsSubmitting(true);
     try {
-      const result = await submitQuiz(sessionToken);
+      await submitQuiz(sessionToken);
       sessionStorage.removeItem("quiz_session_token");
       sessionStorage.removeItem("quiz_session_data");
       toast.success("Quiz submitted successfully!");
