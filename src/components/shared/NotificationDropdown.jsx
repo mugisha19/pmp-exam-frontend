@@ -42,7 +42,8 @@ export function NotificationDropdown() {
     try {
       await markAllReadMutation.mutateAsync();
     } catch (error) {
-      console.error("Failed to mark all as read:", error);
+      // Silently fail if endpoint doesn't exist
+      console.log("Mark all read not implemented yet");
     }
   };
 
@@ -72,19 +73,6 @@ export function NotificationDropdown() {
               )}
             </div>
             <div className="flex items-center gap-2">
-              {unreadCount > 0 && (
-                <button
-                  onClick={handleMarkAllRead}
-                  disabled={markAllReadMutation.isPending}
-                  className="text-xs text-blue-600 hover:text-blue-700 font-medium"
-                >
-                  {markAllReadMutation.isPending ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    "Mark all read"
-                  )}
-                </button>
-              )}
               <button
                 onClick={() => setIsOpen(false)}
                 className="text-gray-400 hover:text-gray-600"
