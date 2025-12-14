@@ -17,7 +17,6 @@ import {
   AdminExamEditPage,
   AdminGroupsPage,
   AdminGroupDetailsPage,
-  GroupQuizDetails,
   QuizAttemptDetails,
   AdminTopicsPage,
   AdminQuestionsPage,
@@ -53,7 +52,6 @@ export const adminRoutes = (
     <Route path="exams/:examId/attempt/:attemptId" element={<QuizAttemptDetails />} />
     <Route path="groups" element={<AdminGroupsPage />} />
     <Route path="groups/:groupId" element={<AdminGroupDetailsPage />} />
-    <Route path="groups/:groupId/quiz/:quizId" element={<GroupQuizDetails />} />
     <Route path="groups/:groupId/quiz/:quizId/attempt/:attemptId" element={<QuizAttemptDetails />} />
     <Route path="topics" element={<AdminTopicsPage />} />
     <Route path="questions" element={<AdminQuestionsPage />} />
