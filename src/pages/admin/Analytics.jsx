@@ -136,7 +136,7 @@ export function Analytics() {
       key: "best_score",
       label: "Best Score",
       render: (value) => (
-        <span className="text-blue-400 font-medium">{value}%</span>
+        <span className="text-blue-400 font-medium">{value?.toFixed(1)}%</span>
       ),
     },
   ];
