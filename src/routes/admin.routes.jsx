@@ -12,8 +12,9 @@ import {
   UserManagementPage,
   AdminInstructorsPage,
   AdminStudentsPage,
-  AdminExamsPage,
-  AdminExamDetails,
+  AdminExamManagementPage,
+  AdminExamDetailsPage,
+  AdminExamEditPage,
   AdminGroupsPage,
   AdminGroupDetailsPage,
   GroupQuizDetails,
@@ -46,8 +47,9 @@ export const adminRoutes = (
     <Route path="users" element={<UserManagementPage />} />
     <Route path="instructors" element={<AdminInstructorsPage />} />
     <Route path="students" element={<AdminStudentsPage />} />
-    <Route path="exams" element={<AdminExamsPage />} />
-    <Route path="exams/:examId" element={<AdminExamDetails />} />
+    <Route path="exams" element={<AdminExamManagementPage />} />
+    <Route path="exams/:examId" element={<AdminExamDetailsPage />} />
+    <Route path="exams/:examId/edit" element={<AdminExamEditPage />} />
     <Route path="exams/:examId/attempt/:attemptId" element={<QuizAttemptDetails />} />
     <Route path="groups" element={<AdminGroupsPage />} />
     <Route path="groups/:groupId" element={<AdminGroupDetailsPage />} />

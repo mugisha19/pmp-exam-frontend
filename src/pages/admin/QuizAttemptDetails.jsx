@@ -349,11 +349,14 @@ const QuestionReviewCard = ({ question, index }) => {
 };
 
 export const QuizAttemptDetails = () => {
-  const { groupId, quizId, attemptId } = useParams();
+  const { groupId, quizId, examId, attemptId } = useParams();
   const navigate = useNavigate();
 
+  // Use examId if available, otherwise use quizId
+  const actualQuizId = examId || quizId;
+
   // Fetch attempt review
-  const { data: attemptData, isLoading, error } = useAttemptReview(quizId, attemptId);
+  const { data: attemptData, isLoading, error } = useAttemptReview(actualQuizId, attemptId);
 
   if (isLoading) {
     return (
@@ -389,9 +392,17 @@ export const QuizAttemptDetails = () => {
           <Button
             variant="secondary"
             leftIcon={<ArrowLeft className="w-4 h-4" />}
-            onClick={() => navigate(`/admin/groups/${groupId}/quiz/${quizId}`)}
+            onClick={() => {
+              if (examId) {
+                navigate(`/admin/exams/${examId}`);
+              } else if (groupId && quizId) {
+                navigate(`/admin/groups/${groupId}/quiz/${quizId}`);
+              } else {
+                navigate(-1);
+              }
+            }}
           >
-            Back to Quiz
+            Back
           </Button>
         }
       />

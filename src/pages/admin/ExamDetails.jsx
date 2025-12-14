@@ -273,7 +273,7 @@ export default function ExamDetails() {
             </Button>
             <Button
               variant="outline"
-              onClick={() => navigate(`/admin/quiz-banks/${exam.quiz_bank_id}`)}
+              onClick={() => navigate(`/admin/exams/${examId}/edit`)}
             >
               <Edit2 className="w-4 h-4 mr-2" />
               Edit Exam

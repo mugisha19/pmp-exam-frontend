@@ -53,9 +53,6 @@ export default function ExamManagement() {
   const [page, setPage] = useState(1);
   const pageSize = 10;
 
-  // Selection state
-  const [selectedExams, setSelectedExams] = useState([]);
-
   // Modal states
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedExam, setSelectedExam] = useState(null);
@@ -115,22 +112,6 @@ export default function ExamManagement() {
 
   const totalCount = exams.length;
 
-  // Selection handlers
-  const handleSelectExam = useCallback((examId, isSelected) => {
-    setSelectedExams((prev) =>
-      isSelected ? [...prev, examId] : prev.filter((id) => id !== examId)
-    );
-  }, []);
-
-  const clearSelection = useCallback(() => {
-    setSelectedExams([]);
-  }, []);
-
-  const getSelectedExam = useCallback(() => {
-    if (selectedExams.length !== 1) return null;
-    return exams.find((exam) => exam.quiz_id === selectedExams[0]);
-  }, [selectedExams, exams]);
-
   // CRUD handlers
   const handleViewExam = useCallback(
     (exam) => {
@@ -158,12 +139,11 @@ export default function ExamManagement() {
       await deleteExamMutation.mutateAsync(selectedExam.quiz_id);
       setIsDeleteDialogOpen(false);
       setSelectedExam(null);
-      clearSelection();
       refetch();
     } catch (error) {
       // Error handled by mutation
     }
-  }, [selectedExam, deleteExamMutation, clearSelection, refetch]);
+  }, [selectedExam, deleteExamMutation, refetch]);
 
   // Table columns
   const columns = useMemo(
@@ -314,55 +294,7 @@ export default function ExamManagement() {
     </div>
   );
 
-  // Selection actions bar
-  const selectionBar = selectedExams.length > 0 && (
-    <div className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-lg p-3 mb-4">
-      <div className="flex items-center gap-2">
-        <span className="text-xs font-medium text-gray-600">
-          {selectedExams.length} exam{selectedExams.length !== 1 ? "s" : ""}{" "}
-          selected
-        </span>
-        <button
-          onClick={clearSelection}
-          className="text-gray-500 hover:text-gray-700"
-        >
-          <X className="w-3 h-3" />
-        </button>
-      </div>
 
-      <div className="flex items-center gap-2">
-        {/* Single selection actions */}
-        {selectedExams.length === 1 && (
-          <>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleViewExam(getSelectedExam())}
-            >
-              <Eye className="w-4 h-4 mr-1" />
-              View
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleViewStats(getSelectedExam())}
-            >
-              <BarChart3 className="w-4 h-4 mr-1" />
-              Stats
-            </Button>
-            <Button
-              variant="danger"
-              size="sm"
-              onClick={() => handleDeleteExam(getSelectedExam())}
-            >
-              <Trash2 className="w-4 h-4 mr-1" />
-              Delete
-            </Button>
-          </>
-        )}
-      </div>
-    </div>
-  );
 
   return (
     <div className="p-6">
@@ -373,15 +305,10 @@ export default function ExamManagement() {
 
       {filtersUI}
 
-      {selectionBar}
-
       <DataTable
         data={exams}
         columns={columns}
         loading={isLoading}
-        selectable
-        selectedRows={selectedExams}
-        onSelectionChange={setSelectedExams}
         rowKey="quiz_id"
         paginated={true}
         pageSize={pageSize}
@@ -389,12 +316,7 @@ export default function ExamManagement() {
         totalPages={Math.ceil(totalCount / pageSize)}
         onPageChange={setPage}
         emptyMessage="No exams found"
-        onRowClick={(exam) =>
-          handleSelectExam(
-            exam.quiz_id,
-            !selectedExams.includes(exam.quiz_id)
-          )
-        }
+        onRowClick={(exam) => handleViewExam(exam)}
       />
 
       {/* Delete Confirmation Dialog */}

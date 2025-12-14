@@ -19,6 +19,7 @@ export { default as AdminQuizBankAddQuestionsPage } from "./QuizBankAddQuestions
 export { default as AdminQuizBankDetailsPage } from "./QuizBankDetails";
 export { default as AdminExamManagementPage } from "./ExamManagement";
 export { default as AdminExamDetailsPage } from "./ExamDetails";
+export { default as AdminExamEditPage } from "./ExamEdit";
 export { Analytics as AnalyticsPage } from "./Analytics";
 export { Settings as SystemSettingsPage } from "./Settings";
 export { Notifications as NotificationsPage } from "./Notifications";
@@ -39,8 +40,7 @@ export const AdminStudentsPage = () => (
   </div>
 );
 
-export { default as AdminExamsPage } from "./ExamManagement";
-export { default as AdminExamDetails } from "./ExamDetails";
+
 
 export const ReportsPage = () => (
   <div className="p-6">
