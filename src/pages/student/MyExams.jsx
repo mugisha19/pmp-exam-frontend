@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getQuizzes } from "@/services/quiz.service";
-import { getMyGroups } from "@/services/group.service";
 import { Spinner } from "@/components/ui";
 import {
   BookOpen,
@@ -12,10 +11,10 @@ import {
   Play,
   CheckCircle,
   XCircle,
-  Filter,
   Search,
   Globe,
   Users,
+  ArrowRight,
 } from "lucide-react";
 
 export const MyExams = () => {
@@ -24,35 +23,15 @@ export const MyExams = () => {
   const [statusFilter, setStatusFilter] = useState("all"); // all, active, upcoming, completed
   const [typeFilter, setTypeFilter] = useState("all"); // all, public, group
 
-  // Fetch all quizzes (public + group quizzes)
-  const { data: allQuizzesData, isLoading: loadingQuizzes } = useQuery({
-    queryKey: ["all-quizzes"],
-    queryFn: () => getQuizzes({ limit: 200 }),
+  // Fetch available quizzes - backend will filter based on user role
+  const { data: quizzesData, isLoading: loadingQuizzes } = useQuery({
+    queryKey: ["student-quizzes"],
+    queryFn: () => getQuizzes(),
     staleTime: 2 * 60 * 1000,
+    retry: 1,
   });
 
-  // Fetch user's groups to identify group quizzes
-  const { data: myGroups } = useQuery({
-    queryKey: ["my-groups"],
-    queryFn: getMyGroups,
-    staleTime: 2 * 60 * 1000,
-  });
-
-  // Handle different response structures from the backend
-  let allQuizzes = [];
-  if (allQuizzesData) {
-    if (Array.isArray(allQuizzesData)) {
-      allQuizzes = allQuizzesData;
-    } else if (allQuizzesData.items && Array.isArray(allQuizzesData.items)) {
-      allQuizzes = allQuizzesData.items;
-    } else if (allQuizzesData.quizzes && Array.isArray(allQuizzesData.quizzes)) {
-      allQuizzes = allQuizzesData.quizzes;
-    }
-  }
-
-  const myGroupIds = new Set(
-    (Array.isArray(myGroups) ? myGroups : []).map((g) => g.group_id).filter(Boolean)
-  );
+  const allQuizzes = quizzesData?.quizzes || [];
 
   // Filter quizzes
   const filteredQuizzes = allQuizzes.filter((quiz) => {
@@ -63,8 +42,8 @@ export const MyExams = () => {
 
     // Type filter (public vs group)
     if (typeFilter !== "all") {
-      const isGroupQuiz = quiz.group_id && myGroupIds.has(quiz.group_id);
-      const isPublicQuiz = !quiz.group_id;
+      const isPublicQuiz = quiz.is_public && !quiz.group_id;
+      const isGroupQuiz = quiz.group_id;
       
       if (typeFilter === "public" && !isPublicQuiz) return false;
       if (typeFilter === "group" && !isGroupQuiz) return false;
@@ -72,19 +51,9 @@ export const MyExams = () => {
 
     // Status filter
     if (statusFilter !== "all") {
-      const now = new Date();
-      const startDate = new Date(quiz.start_date);
-      const endDate = new Date(quiz.end_date);
-
-      if (statusFilter === "active" && !(now >= startDate && now <= endDate && quiz.status === "active")) {
-        return false;
-      }
-      if (statusFilter === "upcoming" && !(now < startDate)) {
-        return false;
-      }
-      if (statusFilter === "completed" && !(quiz.status === "completed" || now > endDate)) {
-        return false;
-      }
+      if (statusFilter === "active" && !quiz.is_available) return false;
+      if (statusFilter === "upcoming" && quiz.is_available) return false;
+      if (statusFilter === "completed" && quiz.status !== "completed") return false;
     }
 
     return true;
@@ -199,7 +168,7 @@ export const MyExams = () => {
   };
 
   const getQuizTypeBadge = (quiz) => {
-    if (!quiz.group_id) {
+    if (quiz.is_public && !quiz.group_id) {
       return (
         <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 rounded text-xs font-medium">
           <Globe className="w-3 h-3" />
@@ -208,11 +177,10 @@ export const MyExams = () => {
       );
     }
     
-    const group = myGroups?.find((g) => g.group_id === quiz.group_id);
     return (
       <span className="inline-flex items-center gap-1 px-2 py-1 bg-purple-50 text-purple-700 rounded text-xs font-medium">
         <Users className="w-3 h-3" />
-        {group?.name || "Group"}
+        Group
       </span>
     );
   };
@@ -321,7 +289,7 @@ export const MyExams = () => {
                 
                 <div className="ml-4">
                   <div className="p-2 bg-gray-50 rounded-lg group-hover:bg-blue-50 transition-colors">
-                    <ArrowLeft className="w-5 h-5 text-gray-400 rotate-180 group-hover:text-blue-600 transition-colors" />
+                    <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-blue-600 transition-colors" />
                   </div>
                 </div>
               </div>
