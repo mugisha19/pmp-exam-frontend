@@ -53,7 +53,13 @@ export const QuizTake = () => {
         }
         
         setSessionData(sessionData);
-        setCurrentQuestion(sessionData.questions[0]);
+        
+        // Use backend's current_question_number to restore user's position
+        const currentQuestionNumber = sessionData.progress?.current_question_number || 1;
+        const questionIndex = currentQuestionNumber - 1;
+        const restoredQuestion = sessionData.questions[questionIndex];
+        
+        setCurrentQuestion(restoredQuestion);
         
         // Set time remaining from backend (accurate even after refresh)
         if (sessionData.timing.has_time_limit && sessionData.timing.time_remaining_seconds !== null) {
@@ -66,8 +72,8 @@ export const QuizTake = () => {
         }
         
         // Load saved answer if exists (from backend)
-        if (sessionData.questions[0].user_answer) {
-          setSelectedAnswer(sessionData.questions[0].user_answer);
+        if (restoredQuestion.user_answer) {
+          setSelectedAnswer(restoredQuestion.user_answer);
         }
       } catch (error) {
         console.error("Failed to load session data:", error);
@@ -202,6 +208,9 @@ export const QuizTake = () => {
 
   const handleNavigate = async (questionNumber) => {
     try {
+      // Navigate to question via backend API (updates current_question_number in DB)
+      await navigateToQuestion(sessionToken, questionNumber);
+      
       // Fetch fresh session state to get latest progress
       const sessionState = await getSessionState(sessionToken);
       setSessionData(sessionState);
