@@ -154,7 +154,9 @@ export default function ExamManagement() {
         sortable: true,
         render: (_, exam) => (
           <div className="flex flex-col">
-            <span className="font-medium text-gray-900">{exam?.title}</span>
+            <span className="font-medium text-gray-900">
+              {exam?.group_name ? `${exam.group_name} - ${exam.title}` : exam?.title}
+            </span>
             {exam?.description && (
               <span className="text-sm text-gray-500 truncate max-w-md">
                 {exam.description}
@@ -182,6 +184,17 @@ export default function ExamManagement() {
           </div>
         ),
       },
+      {
+        key: "quiz_mode",
+        header: "Mode",
+        sortable: true,
+        render: (_, exam) => (
+          <Badge variant={exam?.quiz_mode === "exam" ? "primary" : "secondary"}>
+            {exam?.quiz_mode || "practice"}
+          </Badge>
+        ),
+      },
+
       {
         key: "questions",
         header: "Questions",
