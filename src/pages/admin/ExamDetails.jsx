@@ -102,7 +102,7 @@ export default function ExamDetails() {
   const { data: stats, isLoading: loadingStats } = useQuery({
     queryKey: ["exam-stats", examId],
     queryFn: () => getQuizStats(examId),
-    enabled: !!examId && activeTab === "statistics",
+    enabled: !!examId,
   });
 
   const { data: leaderboard, isLoading: loadingLeaderboard } = useQuery({
@@ -305,7 +305,6 @@ export default function ExamDetails() {
 
   const tabs = [
     { id: "overview", label: "Overview", icon: BookOpen },
-    { id: "statistics", label: "Statistics", icon: BarChart3 },
     { id: "leaderboard", label: "Leaderboard", icon: Award },
     { id: "attempts", label: "All Attempts", icon: Users },
   ];
@@ -375,32 +374,38 @@ export default function ExamDetails() {
         </div>
       </Card>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          icon={Users}
-          label="Total Participants"
-          value={attemptsData?.total_users || stats?.total_participants || 0}
-          color="blue"
-        />
-        <StatCard
-          icon={TrendingUp}
-          label="Total Attempts"
-          value={attemptsData?.total_attempts || stats?.total_attempts || 0}
-          color="green"
-        />
-        <StatCard
-          icon={Target}
-          label="Average Score"
-          value={`${stats?.average_score?.toFixed(1) || 0}%`}
-          color="purple"
-        />
-        <StatCard
-          icon={CheckCircle}
-          label="Pass Rate"
-          value={`${stats?.pass_rate?.toFixed(1) || 0}%`}
-          color="yellow"
-        />
-      </div>
+      {loadingStats ? (
+        <div className="flex justify-center py-12">
+          <Spinner size="lg" />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatCard
+            icon={Users}
+            label="Total Participants"
+            value={stats?.total_participants || 0}
+            color="blue"
+          />
+          <StatCard
+            icon={TrendingUp}
+            label="Total Attempts"
+            value={stats?.total_attempts || 0}
+            color="green"
+          />
+          <StatCard
+            icon={Target}
+            label="Average Score"
+            value={`${stats?.avg_score?.toFixed(1) || 0}%`}
+            color="purple"
+          />
+          <StatCard
+            icon={CheckCircle}
+            label="Pass Rate"
+            value={`${stats?.pass_rate?.toFixed(1) || 0}%`}
+            color="yellow"
+          />
+        </div>
+      )}
 
       <div className="border-b border-gray-200">
         <div className="flex gap-4">
@@ -524,47 +529,6 @@ export default function ExamDetails() {
               )}
             </Card>
           </div>
-        </div>
-      )}
-
-      {activeTab === "statistics" && (
-        <div className="space-y-6">
-          {loadingStats ? (
-            <div className="flex justify-center py-12">
-              <Spinner size="lg" />
-            </div>
-          ) : stats ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Card className="p-6">
-                <p className="text-sm text-gray-600">Total Attempts</p>
-                <p className="text-3xl font-bold">{stats.total_attempts || 0}</p>
-              </Card>
-              <Card className="p-6">
-                <p className="text-sm text-gray-600">Pass Rate</p>
-                <p className="text-3xl font-bold">
-                  {stats.pass_rate ? `${stats.pass_rate.toFixed(1)}%` : "0%"}
-                </p>
-              </Card>
-              <Card className="p-6">
-                <p className="text-sm text-gray-600">Average Score</p>
-                <p className="text-3xl font-bold">
-                  {stats.average_score ? `${stats.average_score.toFixed(1)}%` : "0%"}
-                </p>
-              </Card>
-              <Card className="p-6">
-                <p className="text-sm text-gray-600">Avg Time</p>
-                <p className="text-3xl font-bold">
-                  {stats.average_time_minutes
-                    ? `${stats.average_time_minutes.toFixed(0)}m`
-                    : "N/A"}
-                </p>
-              </Card>
-            </div>
-          ) : (
-            <Card className="p-6">
-              <p className="text-center text-gray-500">No statistics available</p>
-            </Card>
-          )}
         </div>
       )}
 
