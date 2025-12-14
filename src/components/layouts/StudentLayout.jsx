@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/utils/cn";
+import { useNotifications } from "@/hooks/queries/useNotificationQueries";
 
 export const StudentLayout = () => {
   const navigate = useNavigate();
@@ -30,6 +31,14 @@ export const StudentLayout = () => {
   const logoutMutation = useLogoutMutation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+
+  const { data: notificationsData } = useNotifications({
+    page: 1,
+    page_size: 100,
+    unread_only: true,
+  });
+
+  const unreadCount = notificationsData?.items?.length || notificationsData?.length || 0;
 
   const handleLogout = () => {
     logoutMutation.mutate(undefined, {
@@ -91,6 +100,11 @@ export const StudentLayout = () => {
             >
               <Bell className="w-5 h-5 text-gray-600" />
               <span className="text-sm font-medium text-gray-600">Notifications</span>
+              {unreadCount > 0 && (
+                <span className="ml-auto w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                  {unreadCount}
+                </span>
+              )}
             </button>
 
             {/* Profile Menu */}
