@@ -73,7 +73,22 @@ export const createQuiz = async (data) => {
  */
 export const updateQuiz = async (quizId, data) => {
   try {
-    const response = await api.put(QUIZ_ENDPOINTS.UPDATE_QUIZ(quizId), data);
+    const response = await api.patch(QUIZ_ENDPOINTS.UPDATE_QUIZ(quizId), data);
+    return response.data;
+  } catch (error) {
+    throw handleQuizError(error);
+  }
+};
+
+/**
+ * Update quiz status
+ * @param {string} quizId - Quiz ID
+ * @param {string} status - New status (draft, active, completed, cancelled)
+ * @returns {Promise<Object>} Updated quiz
+ */
+export const updateQuizStatus = async (quizId, status) => {
+  try {
+    const response = await api.patch(`${QUIZ_ENDPOINTS.UPDATE_QUIZ(quizId)}/status?new_status=${status}`);
     return response.data;
   } catch (error) {
     throw handleQuizError(error);
@@ -296,6 +311,7 @@ export default {
   getQuizById,
   createQuiz,
   updateQuiz,
+  updateQuizStatus,
   deleteQuiz,
   publishQuiz,
   cancelQuiz,

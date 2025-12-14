@@ -1,11 +1,11 @@
 /**
  * Admin Exam Details Page
- * View, update, stats, and leaderboard for a specific exam
+ * View exam details, statistics, leaderboard, and attempts
  */
 
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   ArrowLeft,
   BookOpen,
@@ -19,7 +19,11 @@ import {
   Edit2,
   Target,
   CheckCircle,
+  PlayCircle,
+  XCircle,
+  CheckSquare,
 } from "lucide-react";
+import { toast } from "react-hot-toast";
 import { Spinner } from "@/components/ui";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { Button } from "@/components/ui/Button";
@@ -32,6 +36,7 @@ import {
   getQuizStats,
   getQuizLeaderboard,
   getAllQuizAttempts,
+  updateQuizStatus,
 } from "@/services/quiz.service";
 
 const formatDate = (dateStr) => {
@@ -79,6 +84,7 @@ const StatCard = ({ icon: Icon, label, value, color = "blue" }) => {
 export default function ExamDetails() {
   const { examId } = useParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState("overview");
   const [expandedUserId, setExpandedUserId] = useState(null);
 
@@ -91,20 +97,35 @@ export default function ExamDetails() {
   const { data: stats, isLoading: loadingStats } = useQuery({
     queryKey: ["exam-stats", examId],
     queryFn: () => getQuizStats(examId),
-    enabled: !!examId,
+    enabled: !!examId && activeTab === "statistics",
   });
 
   const { data: leaderboard, isLoading: loadingLeaderboard } = useQuery({
     queryKey: ["exam-leaderboard", examId],
     queryFn: () => getQuizLeaderboard(examId, 20),
-    enabled: !!examId,
+    enabled: !!examId && activeTab === "leaderboard",
   });
 
   const { data: attemptsData, isLoading: loadingAttempts } = useQuery({
     queryKey: ["exam-attempts", examId],
     queryFn: () => getAllQuizAttempts(examId),
-    enabled: !!examId,
+    enabled: !!examId && activeTab === "attempts",
   });
+
+  const statusMutation = useMutation({
+    mutationFn: ({ status }) => updateQuizStatus(examId, status),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["exam", examId]);
+      toast.success("Exam status updated successfully");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to update status");
+    },
+  });
+
+  const handleStatusChange = (status) => {
+    statusMutation.mutate({ status });
+  };
 
   const leaderboardColumns = [
     {
@@ -253,8 +274,15 @@ export default function ExamDetails() {
 
   const tabs = [
     { id: "overview", label: "Overview", icon: BookOpen },
+    { id: "statistics", label: "Statistics", icon: BarChart3 },
     { id: "leaderboard", label: "Leaderboard", icon: Award },
     { id: "attempts", label: "All Attempts", icon: Users },
+  ];
+
+  const statusButtons = [
+    { status: "active", label: "Activate", icon: PlayCircle, variant: "success" },
+    { status: "completed", label: "Complete", icon: CheckSquare, variant: "default" },
+    { status: "cancelled", label: "Cancel", icon: XCircle, variant: "danger" },
   ];
 
   return (
@@ -276,11 +304,36 @@ export default function ExamDetails() {
               onClick={() => navigate(`/admin/exams/${examId}/edit`)}
             >
               <Edit2 className="w-4 h-4 mr-2" />
-              Edit Exam
+              Edit
             </Button>
           </div>
         }
       />
+
+      <Card className="p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-medium text-gray-700">Status:</span>
+            <Badge variant={exam.status === "active" ? "success" : "default"} size="lg">
+              {exam.status}
+            </Badge>
+          </div>
+          <div className="flex gap-2">
+            {statusButtons.map((btn) => (
+              <Button
+                key={btn.status}
+                variant={btn.variant}
+                size="sm"
+                onClick={() => handleStatusChange(btn.status)}
+                disabled={exam.status === btn.status || statusMutation.isPending}
+              >
+                <btn.icon className="w-4 h-4 mr-1" />
+                {btn.label}
+              </Button>
+            ))}
+          </div>
+        </div>
+      </Card>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
@@ -431,6 +484,67 @@ export default function ExamDetails() {
               )}
             </Card>
           </div>
+        </div>
+      )}
+
+      {activeTab === "statistics" && (
+        <div className="space-y-6">
+          {loadingStats ? (
+            <div className="flex justify-center py-12">
+              <Spinner size="lg" />
+            </div>
+          ) : stats ? (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <Card className="p-6">
+                  <p className="text-sm text-gray-600">Total Attempts</p>
+                  <p className="text-3xl font-bold">{stats.total_attempts || 0}</p>
+                </Card>
+                <Card className="p-6">
+                  <p className="text-sm text-gray-600">Pass Rate</p>
+                  <p className="text-3xl font-bold">
+                    {stats.pass_rate ? `${stats.pass_rate.toFixed(1)}%` : "0%"}
+                  </p>
+                </Card>
+                <Card className="p-6">
+                  <p className="text-sm text-gray-600">Average Score</p>
+                  <p className="text-3xl font-bold">
+                    {stats.average_score ? `${stats.average_score.toFixed(1)}%` : "0%"}
+                  </p>
+                </Card>
+                <Card className="p-6">
+                  <p className="text-sm text-gray-600">Avg Time</p>
+                  <p className="text-3xl font-bold">
+                    {stats.average_time_minutes
+                      ? `${stats.average_time_minutes.toFixed(0)}m`
+                      : "N/A"}
+                  </p>
+                </Card>
+              </div>
+
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-4">Additional Statistics</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-gray-600">Total Participants</p>
+                    <p className="font-medium">{stats.total_participants || 0}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Completion Rate</p>
+                    <p className="font-medium">
+                      {stats.completion_rate
+                        ? `${stats.completion_rate.toFixed(1)}%`
+                        : "0%"}
+                    </p>
+                  </div>
+                </div>
+              </Card>
+            </>
+          ) : (
+            <Card className="p-6">
+              <p className="text-center text-gray-500">No statistics available</p>
+            </Card>
+          )}
         </div>
       )}
 
