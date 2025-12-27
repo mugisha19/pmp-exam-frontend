@@ -183,14 +183,26 @@ export const publishPublic = async (data) => {
  * Get list of published quizzes
  * @param {Object} params - Query parameters
  * @param {string} [params.group_id] - Filter by group ID
- * @param {boolean} [params.is_public] - Filter by public status
+ * @param {boolean} [params.is_public] - Filter by public status (defaults to true for published quizzes)
+ * @param {string} [params.status] - Filter by status
  * @param {number} [params.skip] - Number to skip
  * @param {number} [params.limit] - Max results
  * @returns {Promise<Object>} Published quizzes list
  */
 export const getPublishedQuizzes = async (params = {}) => {
   try {
-    const response = await api.get(QUIZ_ENDPOINTS.LIST_PUBLISHED, { params });
+    // Use /quizzes endpoint with is_public=true by default
+    const queryParams = {
+      is_public: true,
+      ...params,
+    };
+    
+    // Filter out empty string values, null, and undefined
+    const cleanParams = Object.fromEntries(
+      Object.entries(queryParams).filter(([_, value]) => value !== "" && value !== null && value !== undefined)
+    );
+    
+    const response = await api.get(QUIZ_ENDPOINTS.LIST_QUIZZES, { params: cleanParams });
     return response.data;
   } catch (error) {
     throw handleQuizError(error);

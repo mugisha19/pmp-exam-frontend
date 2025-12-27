@@ -23,6 +23,9 @@ import {
 import { useState, useEffect } from "react";
 import { cn } from "@/utils/cn";
 import { useNotifications } from "@/hooks/queries/useNotificationQueries";
+import { ProfileCard } from "@/components/shared/ProfileCard";
+import { ProgressChart } from "@/components/shared/ProgressChart";
+import { MentorList } from "@/components/shared/MentorList";
 
 export const StudentLayout = () => {
   const navigate = useNavigate();
@@ -51,7 +54,7 @@ export const StudentLayout = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className="flex min-h-screen bg-bg-primary">
       {/* Left Sidebar Navigation */}
       <aside className="hidden lg:flex flex-col fixed left-4 top-1/2 -translate-y-1/2 w-64 h-[95vh] bg-white/95 backdrop-blur-xl shadow-2xl rounded-3xl border border-gray-200 z-50">
         <div className="flex flex-col h-full p-6">
@@ -238,11 +241,16 @@ export const StudentLayout = () => {
       </nav>
 
       {/* Main Content Area */}
-      <main className="flex-1 lg:ml-72 px-4 sm:px-6 lg:px-8 py-6">
+      <main className="flex-1 lg:ml-72 xl:mr-80 px-4 sm:px-6 lg:px-8 py-6 transition-all duration-300">
         <Outlet />
       </main>
 
-
+      {/* Right Sidebar - Hidden on mobile/tablet, visible on xl screens */}
+      <aside className="hidden xl:flex flex-col fixed right-4 top-1/2 -translate-y-1/2 w-72 h-[95vh] space-y-4 overflow-y-auto z-40 scrollbar-hide">
+        <ProfileCard />
+        <ProgressChart data={[]} />
+        <MentorList mentors={[]} />
+      </aside>
     </div>
   );
 };

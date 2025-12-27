@@ -23,7 +23,7 @@ export const useStudentDashboardStats = (options = {}) => {
       ]);
 
       const myGroups = groupsData?.items || groupsData || [];
-      const availableQuizzes = quizzesData?.items || quizzesData || [];
+      const availableQuizzes = quizzesData?.quizzes || quizzesData?.items || quizzesData || [];
 
       // Calculate stats
       const totalGroups = myGroups.length;
@@ -75,7 +75,7 @@ export const useAvailableQuizzes = (limit = 5, options = {}) => {
     queryKey: ["student", "quizzes", "available", { limit }],
     queryFn: () => quizService.getPublishedQuizzes({ limit }),
     staleTime: 2 * 60 * 1000, // 2 minutes
-    select: (data) => data?.items || data || [],
+    select: (data) => data?.quizzes || data?.items || data || [],
     onError: (error) => {
       console.error("Failed to fetch available quizzes:", error);
     },
@@ -110,7 +110,7 @@ export const useStudentActivity = (options = {}) => {
       });
 
       // Add quiz activities
-      const quizItems = quizzes?.items || quizzes || [];
+      const quizItems = quizzes?.quizzes || quizzes?.items || quizzes || [];
       quizItems.forEach((quiz) => {
         activity.push({
           type: "quiz_available",

@@ -36,3 +36,18 @@ export { default as ConfirmDialog } from "./ConfirmDialog";
 
 // Notification components
 export { NotificationItem, NotificationItemCompact } from "./NotificationItem";
+
+// Dashboard components
+export { default as SearchBar } from "./SearchBar";
+export { default as ProgressCard } from "./ProgressCard";
+export { default as QuizCard } from "./QuizCard";
+export { default as QuizCardEnhanced } from "./QuizCardEnhanced";
+export { default as ProfileCard } from "./ProfileCard";
+export { default as ProgressChart } from "./ProgressChart";
+export { default as MentorList } from "./MentorList";
+export { default as GroupCard } from "./GroupCard";
+export { DashboardStatsCard, StatsGrid } from "./StatsCards";
+export { default as SortDropdown } from "./SortDropdown";
+export { default as ViewToggle } from "./ViewToggle";
+export { default as CountdownTimer } from "./CountdownTimer";
+export { default as AttemptBadge } from "./AttemptBadge";

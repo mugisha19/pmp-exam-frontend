@@ -1,19 +1,20 @@
-import { useState } from "react";
+/**
+ * Groups Page
+ * Modern groups page with statistics, filtering, and enhanced cards
+ */
+
+import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { getAvailableGroups, getMyGroups, createJoinRequest } from "@/services/group.service";
+import { getGroups, getMyGroups, createJoinRequest } from "@/services/group.service";
 import { Spinner } from "@/components/ui";
-import {
-  Users,
-  Search,
-  UserPlus,
-  Lock,
-  Globe,
-  CheckCircle,
-  ArrowRight,
-  Calendar,
-  BookOpen,
-} from "lucide-react";
+import { SearchBar } from "@/components/shared/SearchBar";
+import { GroupCard } from "@/components/shared/GroupCard";
+import { DashboardStatsCard, StatsGrid } from "@/components/shared/StatsCards";
+import { SortDropdown } from "@/components/shared/SortDropdown";
+import { ViewToggle } from "@/components/shared/ViewToggle";
+import { FilterBar, FilterGroup } from "@/components/shared/FilterBar";
+import { Users, BookOpen, TrendingUp } from "lucide-react";
 import { toast } from "react-hot-toast";
 
 export const Groups = () => {
@@ -21,13 +22,10 @@ export const Groups = () => {
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState("all"); // "all" or "my-groups"
   const [searchQuery, setSearchQuery] = useState("");
-
-  // Fetch available public groups (not joined)
-  const { data: availableGroups, isLoading: loadingAvailable } = useQuery({
-    queryKey: ["available-groups", searchQuery],
-    queryFn: () => getAvailableGroups({ search: searchQuery, limit: 50 }),
-    staleTime: 2 * 60 * 1000,
-  });
+  const [typeFilter, setTypeFilter] = useState("all"); // all, class, study_group, cohort
+  const [statusFilter, setStatusFilter] = useState("all"); // all, active, inactive
+  const [sortBy, setSortBy] = useState("name"); // name, members, quizzes, date
+  const [viewMode, setViewMode] = useState("grid"); // grid or list
 
   // Fetch user's joined groups
   const { data: myGroups, isLoading: loadingMy } = useQuery({
@@ -35,6 +33,26 @@ export const Groups = () => {
     queryFn: getMyGroups,
     staleTime: 2 * 60 * 1000,
   });
+
+  // Fetch available public groups (not joined)
+  const { data: publicGroupsData, isLoading: loadingAvailable } = useQuery({
+    queryKey: ["public-groups", searchQuery],
+    queryFn: () => {
+      const params = { group_type: "public", limit: 100 };
+      if (searchQuery && searchQuery.trim()) {
+        params.search = searchQuery.trim();
+      }
+      return getGroups(params);
+    },
+    staleTime: 2 * 60 * 1000,
+  });
+
+  // Filter out groups user is already a member of
+  const availableGroups = useMemo(() => {
+    if (!publicGroupsData?.groups || !myGroups) return publicGroupsData?.groups || [];
+    const myGroupIds = new Set(myGroups.map((g) => g.group_id));
+    return publicGroupsData.groups.filter((g) => !myGroupIds.has(g.group_id));
+  }, [publicGroupsData, myGroups]);
 
   // Join group mutation
   const joinGroupMutation = useMutation({
@@ -45,7 +63,7 @@ export const Groups = () => {
       queryClient.invalidateQueries(["available-groups"]);
     },
     onError: (error) => {
-      toast.error(error.message || "Failed to join group");
+      toast.error(error?.message || "Failed to join group");
     },
   });
 
@@ -57,27 +75,123 @@ export const Groups = () => {
     navigate(`/groups/${groupId}`);
   };
 
+  // Calculate statistics
+  const stats = useMemo(() => {
+    const groups = myGroups || [];
+    const activeGroups = groups.filter((g) => g.status === "active").length;
+    const totalQuizzes = groups.reduce((sum, g) => sum + (g.quiz_count || 0), 0);
+    return {
+      totalGroups: groups.length,
+      activeGroups,
+      totalQuizzes,
+    };
+  }, [myGroups]);
+
+  // Filter and sort groups
+  const filteredAndSortedGroups = useMemo(() => {
+    const groups = activeTab === "all" ? (availableGroups || []) : (myGroups || []);
+    const myGroupIds = new Set((myGroups || []).map((g) => g.group_id || g.id));
+
+    let filtered = groups.filter((group) => {
+      // Type filter
+      if (typeFilter !== "all" && group.group_type !== typeFilter) {
+        return false;
+      }
+
+      // Status filter
+      if (statusFilter !== "all" && group.status !== statusFilter) {
+        return false;
+      }
+
+      // Search filter
+      if (searchQuery && !group.name?.toLowerCase().includes(searchQuery.toLowerCase())) {
+        return false;
+      }
+
+      return true;
+    });
+
+    // Sort
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case "members":
+          return (b.member_count || 0) - (a.member_count || 0);
+        case "quizzes":
+          return (b.quiz_count || 0) - (a.quiz_count || 0);
+        case "date":
+          const dateA = new Date(a.created_at || a.joined_at || 0);
+          const dateB = new Date(b.created_at || b.joined_at || 0);
+          return dateB - dateA;
+        case "name":
+        default:
+          return (a.name || "").localeCompare(b.name || "");
+      }
+    });
+
+    return filtered.map((group) => ({
+      ...group,
+      isJoined: myGroupIds.has(group.group_id || group.id),
+    }));
+  }, [activeTab, availableGroups, myGroups, typeFilter, statusFilter, searchQuery, sortBy]);
+
   const isLoading = activeTab === "all" ? loadingAvailable : loadingMy;
-  const displayGroups = activeTab === "all" ? (availableGroups || []) : (myGroups || []);
-  const myGroupIds = new Set(myGroups?.map((g) => g.group_id) || []);
+  const activeFiltersCount = [
+    typeFilter !== "all",
+    statusFilter !== "all",
+    searchQuery !== "",
+  ].filter(Boolean).length;
+
+  const sortOptions = [
+    { value: "name", label: "Name" },
+    { value: "members", label: "Members" },
+    { value: "quizzes", label: "Quizzes" },
+    { value: "date", label: "Date" },
+  ];
+
+  const handleClearFilters = () => {
+    setTypeFilter("all");
+    setStatusFilter("all");
+    setSearchQuery("");
+  };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white border-2 border-gray-300 p-6">
+      <div>
         <h1 className="text-2xl font-bold text-gray-900 mb-2">Study Groups</h1>
         <p className="text-gray-600">
           Join groups to access quizzes and study materials
         </p>
       </div>
 
+      {/* Statistics - Only show for My Groups */}
+      {activeTab === "my-groups" && (
+        <StatsGrid>
+          <DashboardStatsCard
+            title="Total Groups"
+            value={stats.totalGroups}
+            icon={Users}
+          />
+          <DashboardStatsCard
+            title="Active Groups"
+            value={stats.activeGroups}
+            icon={TrendingUp}
+          />
+          <DashboardStatsCard
+            title="Total Quizzes"
+            value={stats.totalQuizzes}
+            icon={BookOpen}
+          />
+        </StatsGrid>
+      )}
+
       {/* Tabs */}
-      <div className="flex items-center gap-2 border-b-2 border-gray-300">
+      <div className="flex items-center gap-2 border-b border-gray-200 overflow-x-auto scrollbar-hide">
         <button
           onClick={() => setActiveTab("all")}
-          className={`px-6 py-3 font-bold text-sm border-b-2 -mb-0.5 ${
+          className={`px-4 md:px-6 py-3 font-semibold text-sm border-b-2 -mb-0.5 transition-colors whitespace-nowrap ${
             activeTab === "all"
-              ? "border-blue-600 text-blue-600"
+              ? "border-accent-primary text-accent-primary"
               : "border-transparent text-gray-600 hover:text-gray-900"
           }`}
         >
@@ -85,9 +199,9 @@ export const Groups = () => {
         </button>
         <button
           onClick={() => setActiveTab("my-groups")}
-          className={`px-6 py-3 font-bold text-sm border-b-2 -mb-0.5 ${
+          className={`px-4 md:px-6 py-3 font-semibold text-sm border-b-2 -mb-0.5 transition-colors whitespace-nowrap ${
             activeTab === "my-groups"
-              ? "border-blue-600 text-blue-600"
+              ? "border-accent-primary text-accent-primary"
               : "border-transparent text-gray-600 hover:text-gray-900"
           }`}
         >
@@ -95,42 +209,81 @@ export const Groups = () => {
         </button>
       </div>
 
-      {/* Search Bar - Only show on "Browse Groups" tab */}
-      {activeTab === "all" && (
-        <div className="bg-white border border-gray-300 p-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search groups by name..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 focus:outline-none focus:border-blue-500"
+      {/* Search and Filters */}
+      <div className="space-y-4">
+        <SearchBar
+          placeholder="Search groups by name..."
+          onSearch={setSearchQuery}
+          className="w-full"
+        />
+
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <FilterBar
+              activeFiltersCount={activeFiltersCount}
+              onClearAll={handleClearFilters}
+              className="flex-1 min-w-0"
+            >
+            <FilterGroup label="Type">
+              <select
+                value={typeFilter}
+                onChange={(e) => setTypeFilter(e.target.value)}
+                className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-primary/20 focus:border-accent-primary"
+              >
+                <option value="all">All Types</option>
+                <option value="class">Class</option>
+                <option value="study_group">Study Group</option>
+                <option value="cohort">Cohort</option>
+              </select>
+            </FilterGroup>
+
+            {activeTab === "my-groups" && (
+              <FilterGroup label="Status">
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-primary/20 focus:border-accent-primary"
+                >
+                  <option value="all">All Status</option>
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+              </FilterGroup>
+            )}
+          </FilterBar>
+
+          <div className="flex items-center gap-3 flex-shrink-0">
+            <SortDropdown
+              options={sortOptions}
+              value={sortBy}
+              onChange={setSortBy}
             />
+            <ViewToggle view={viewMode} onChange={setViewMode} />
           </div>
         </div>
-      )}
+      </div>
 
       {/* Groups List */}
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
           <Spinner size="lg" />
         </div>
-      ) : displayGroups.length === 0 ? (
-        <div className="text-center py-12 bg-white border border-gray-300">
+      ) : filteredAndSortedGroups.length === 0 ? (
+        <div className="text-center py-12 bg-white rounded-xl border border-gray-200">
           <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-bold text-gray-900 mb-2">
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">
             {activeTab === "all" ? "No groups found" : "No groups yet"}
           </h3>
           <p className="text-sm text-gray-600 mb-4">
             {activeTab === "all"
-              ? "Try adjusting your search criteria"
+              ? activeFiltersCount > 0
+                ? "Try adjusting your filters"
+                : "No public groups available at the moment"
               : "Browse and join groups to get started"}
           </p>
           {activeTab === "my-groups" && (
             <button
               onClick={() => setActiveTab("all")}
-              className="px-6 py-2 bg-blue-600 text-white font-semibold hover:bg-blue-700"
+              className="px-6 py-2 bg-accent-primary text-white font-semibold rounded-lg hover:bg-accent-secondary transition-colors"
             >
               Browse Groups
             </button>
@@ -138,85 +291,39 @@ export const Groups = () => {
         </div>
       ) : (
         <div>
-          <div className="border-b-2 border-gray-300 pb-2 mb-4">
-            <h2 className="text-lg font-bold text-gray-900">
-              {displayGroups.length} {displayGroups.length === 1 ? 'Group' : 'Groups'}
-            </h2>
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-sm text-gray-600">
+              Showing {filteredAndSortedGroups.length} group{filteredAndSortedGroups.length !== 1 ? "s" : ""}
+            </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {displayGroups.map((group) => {
-            const groupId = group.id || group.group_id;
-            const isJoined = myGroupIds.has(groupId);
-            const isPublic = group.group_type === "public";
-
-            return (
-              <div
-                key={groupId}
-                className="bg-white border border-gray-300 p-4 hover:bg-gray-50 cursor-pointer"
-              >
-                <div className="flex items-start gap-3 mb-3">
-                  <div className="w-10 h-10 bg-gray-100 flex items-center justify-center flex-shrink-0">
-                    <Users className="w-5 h-5 text-gray-600" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-semibold text-gray-900">
-                        {group.name}
-                      </h3>
-                      {isJoined && (
-                        <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
-                      )}
-                      {isPublic ? (
-                        <Globe className="w-3 h-3 text-green-600" />
-                      ) : (
-                        <Lock className="w-3 h-3 text-gray-600" />
-                      )}
-                    </div>
-                    <p className="text-xs text-gray-600 line-clamp-2 mb-2">
-                      {group.description || "No description available"}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between pt-3 border-t border-gray-200">
-                  <div className="flex items-center gap-3 text-xs text-gray-500">
-                    <span className="flex items-center gap-1">
-                      <Users className="w-3 h-3" />
-                      {group.member_count || 0}
-                    </span>
-                    <span>•</span>
-                    <span className="flex items-center gap-1">
-                      <BookOpen className="w-3 h-3" />
-                      {group.quiz_count || 0}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {isJoined ? (
-                      <button
-                        onClick={() => handleViewGroup(groupId)}
-                        className="px-4 py-1.5 bg-blue-600 text-white hover:bg-blue-700 text-xs font-semibold"
-                      >
-                        View
-                      </button>
-                    ) : (
-                      <>
-                        {isPublic && (
-                          <button
-                            onClick={() => handleJoinGroup(groupId)}
-                            disabled={joinGroupMutation.isPending}
-                            className="px-4 py-1.5 bg-green-600 text-white hover:bg-green-700 text-xs font-semibold disabled:opacity-50"
-                          >
-                            {joinGroupMutation.isPending ? "Joining..." : "Join"}
-                          </button>
-                        )}
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-          </div>
+          {viewMode === "grid" ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filteredAndSortedGroups.map((group) => (
+                <GroupCard
+                  key={group.group_id || group.id}
+                  group={group}
+                  isJoined={group.isJoined}
+                  onJoin={handleJoinGroup}
+                  onView={handleViewGroup}
+                  isLoading={joinGroupMutation.isPending}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {filteredAndSortedGroups.map((group) => (
+                <GroupCard
+                  key={group.group_id || group.id}
+                  group={group}
+                  isJoined={group.isJoined}
+                  onJoin={handleJoinGroup}
+                  onView={handleViewGroup}
+                  isLoading={joinGroupMutation.isPending}
+                  className="max-w-full"
+                />
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>

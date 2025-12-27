@@ -232,7 +232,11 @@ export const getMyGroups = async () => {
  */
 export const getAvailableGroups = async (params = {}) => {
   try {
-    const response = await api.get(GROUP_ENDPOINTS.AVAILABLE_GROUPS, { params });
+    // Filter out empty string values
+    const cleanParams = Object.fromEntries(
+      Object.entries(params).filter(([_, value]) => value !== "" && value !== null && value !== undefined)
+    );
+    const response = await api.get(GROUP_ENDPOINTS.AVAILABLE_GROUPS, { params: cleanParams });
     return response.data;
   } catch (error) {
     throw handleGroupError(error);
