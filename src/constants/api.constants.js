@@ -144,6 +144,7 @@ export const QUIZ_ENDPOINTS = {
   WEAK_AREAS: "/performance/weak-areas",
   STUDY_HISTORY: "/performance/study-history",
   LEARNING_GOALS: "/performance/learning-goals",
+  PERFORMANCE_TRENDS: "/performance/trends",
 };
 
 // Notification endpoints

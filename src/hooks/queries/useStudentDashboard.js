@@ -43,8 +43,7 @@ export const useStudentDashboardStats = (options = {}) => {
       };
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
-    onError: (error) => {
-      console.error("Failed to fetch dashboard stats:", error);
+    onError: () => {
       toast.error("Failed to load dashboard statistics");
     },
     ...options,
@@ -60,8 +59,8 @@ export const useRecentGroups = (limit = 5, options = {}) => {
     queryFn: () => groupService.getMyGroups({ limit }),
     staleTime: 2 * 60 * 1000, // 2 minutes
     select: (data) => data?.items || data || [],
-    onError: (error) => {
-      console.error("Failed to fetch recent groups:", error);
+    onError: () => {
+      // Error handled silently
     },
     ...options,
   });
@@ -76,8 +75,8 @@ export const useAvailableQuizzes = (limit = 5, options = {}) => {
     queryFn: () => quizService.getPublishedQuizzes({ limit }),
     staleTime: 2 * 60 * 1000, // 2 minutes
     select: (data) => data?.quizzes || data?.items || data || [],
-    onError: (error) => {
-      console.error("Failed to fetch available quizzes:", error);
+    onError: () => {
+      // Error handled silently
     },
     ...options,
   });

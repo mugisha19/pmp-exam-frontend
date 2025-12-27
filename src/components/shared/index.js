@@ -51,3 +51,4 @@ export { default as SortDropdown } from "./SortDropdown";
 export { default as ViewToggle } from "./ViewToggle";
 export { default as CountdownTimer } from "./CountdownTimer";
 export { default as AttemptBadge } from "./AttemptBadge";
+export { default as ActivityStats } from "./ActivityStats";

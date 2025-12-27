@@ -67,7 +67,6 @@ export const QuizDetail = () => {
       // Navigate to quiz taking page
       navigate(`/exams/${quizId}/take`);
     } catch (error) {
-      console.error("Failed to start quiz:", error);
       
       // Handle specific errors
       if (error.response?.status === 409) {

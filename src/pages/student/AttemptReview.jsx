@@ -74,13 +74,6 @@ export const AttemptReview = () => {
   // Backend returns flat structure, not nested
   const attempt = reviewData;
   const questions = reviewData.questions || [];
-  
-  // Debug log to see data structure
-  console.log('Review Data:', reviewData);
-  console.log('Questions:', questions);
-  if (questions.length > 0) {
-    console.log('First Question:', questions[0]);
-  }
 
   const formatTime = (seconds) => {
     if (!seconds || isNaN(seconds)) return '0m 0s';
@@ -257,7 +250,6 @@ export const AttemptReview = () => {
                     try {
                       options = JSON.parse(options);
                     } catch (e) {
-                      console.error('Failed to parse options:', e);
                       options = {};
                     }
                   }
@@ -267,7 +259,6 @@ export const AttemptReview = () => {
                     try {
                       userAnswer = JSON.parse(userAnswer);
                     } catch (e) {
-                      console.error('Failed to parse user_answer:', e);
                     }
                   }
                   // Parse correct_answer if it's a string
@@ -276,7 +267,6 @@ export const AttemptReview = () => {
                     try {
                       correctAnswer = JSON.parse(correctAnswer);
                     } catch (e) {
-                      console.error('Failed to parse correct_answer:', e);
                     }
                   }
 

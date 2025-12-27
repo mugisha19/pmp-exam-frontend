@@ -146,7 +146,6 @@ export function Profile() {
       setAvatarPreview(null);
       setSelectedFile(null);
     } catch (error) {
-      console.error("Profile update error:", error);
 
       if (error.response?.status === 401) {
         toast.error("Session expired. Please log in again.");

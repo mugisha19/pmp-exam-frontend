@@ -22,13 +22,37 @@ export const getUserAnalytics = async (userId) => {
 
 /**
  * Get performance dashboard data for current user
- * @returns {Promise<Object>} Dashboard data with summary statistics
+ * @returns {Promise<Object|null>} Dashboard data with summary statistics, or null if not found
  */
 export const getPerformanceDashboard = async () => {
   try {
     const response = await api.get(QUIZ_ENDPOINTS.DASHBOARD);
     return response.data;
   } catch (error) {
+    // Handle 404 gracefully - user might not have performance data yet
+    if (error?.response?.status === 404 || error?.status === 404) {
+      return null;
+    }
+    throw handleAnalyticsError(error);
+  }
+};
+
+/**
+ * Get performance trends for a specific period
+ * @param {number} days - Number of days to look back (default: 30)
+ * @returns {Promise<Object|null>} Performance trends data, or null if not found
+ */
+export const getPerformanceTrends = async (days = 30) => {
+  try {
+    const response = await api.get(QUIZ_ENDPOINTS.PERFORMANCE_TRENDS, {
+      params: { days },
+    });
+    return response.data;
+  } catch (error) {
+    // Handle 404 gracefully - user might not have performance data yet
+    if (error?.response?.status === 404 || error?.status === 404) {
+      return { trends: [] };
+    }
     throw handleAnalyticsError(error);
   }
 };
@@ -335,6 +359,7 @@ const handleAnalyticsError = (error) => {
 export default {
   getUserAnalytics,
   getPerformanceDashboard,
+  getPerformanceTrends,
   getDomainAnalysis,
   getTopicMastery,
   getWeakAreas,

@@ -19,6 +19,7 @@ import { useRecentGroups, useAvailableQuizzes } from "@/hooks/queries/useStudent
 import { SearchBar } from "@/components/shared/SearchBar";
 import { ProgressCard } from "@/components/shared/ProgressCard";
 import { QuizCard } from "@/components/shared/QuizCard";
+import { ActivityStats } from "@/components/shared/ActivityStats";
 import { Spinner } from "@/components/ui";
 import { cn } from "@/utils/cn";
 
@@ -72,6 +73,9 @@ export const Dashboard = () => {
           onFilterClick={() => navigate("/exams")}
         />
       </div>
+
+      {/* Activity Statistics */}
+      <ActivityStats />
 
       {/* Promotional Banner */}
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-accent-primary to-accent-secondary p-8 text-white shadow-lg">

@@ -76,7 +76,6 @@ export const QuizTake = () => {
           setSelectedAnswer(restoredQuestion.user_answer);
         }
       } catch (error) {
-        console.error("Failed to load session data:", error);
         toast.error("Failed to load quiz session");
         navigate(`/exams/${quizId}`);
       } finally {
@@ -143,7 +142,6 @@ export const QuizTake = () => {
           setPauseTimeRemaining(response.pause_info.pause_remaining_seconds);
         }
       } catch (error) {
-        console.error("Heartbeat failed:", error);
       }
     }, 30000);
 

@@ -16,9 +16,6 @@ import { AUTH_ENDPOINTS, API_BASE_URL } from "@/constants/api.constants";
 // Direct auth service URL for token refresh (bypass proxy)
 const AUTH_SERVICE_URL = "http://localhost:8000/api/v1";
 
-// Debug: Log what we're using
-console.log("Creating axios with baseURL:", API_BASE_URL);
-
 // Create axios instance
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -27,9 +24,6 @@ const api = axios.create({
     "Content-Type": "application/json",
   },
 });
-
-// Debug: Verify the instance configuration
-console.log("Axios instance baseURL:", api.defaults.baseURL);
 
 // Flag to prevent multiple refresh attempts
 let isRefreshing = false;
@@ -56,13 +50,11 @@ const processQueue = (error, token = null) => {
  */
 api.interceptors.request.use(
   (config) => {
-    // Debug: Log request details
-    console.log("API Request:", {
-      baseURL: config.baseURL,
-      url: config.url,
-      params: config.params,
-      fullURL: `${config.baseURL}${config.url}`,
-    });
+    // Mark performance endpoints to suppress 404 logging
+    if (config.url?.includes('/performance/dashboard') || 
+        config.url?.includes('/performance/trends')) {
+      config._suppress404Log = true;
+    }
 
     const token = getStorageItem(TOKEN_KEYS.ACCESS_TOKEN);
 
@@ -87,6 +79,23 @@ api.interceptors.response.use(
   },
   async (error) => {
     const originalRequest = error.config;
+    
+    // Suppress 404 errors for performance endpoints (expected when user has no data)
+    if (error.response?.status === 404) {
+      const url = originalRequest?.url || '';
+      const isPerformanceEndpoint = url.includes('/performance/dashboard') || 
+                                    url.includes('/performance/trends');
+      if (isPerformanceEndpoint) {
+        // Return a custom error that won't be logged by axios
+        const customError = new Error('Performance data not found');
+        customError.response = error.response;
+        customError.config = originalRequest;
+        customError.isAxiosError = true;
+        customError.status = 404;
+        customError.suppressLog = true; // Flag to suppress logging
+        return Promise.reject(customError);
+      }
+    }
 
     // Handle network errors
     if (!error.response) {
@@ -128,7 +137,6 @@ api.interceptors.response.use(
 
       try {
         // Attempt to refresh token using direct auth service URL
-        console.log("Attempting token refresh...");
         const response = await axios.post(
           `${AUTH_SERVICE_URL}${AUTH_ENDPOINTS.REFRESH_TOKEN}`,
           { refresh_token: refreshToken },
@@ -140,7 +148,6 @@ api.interceptors.response.use(
         );
 
         const { access_token, refresh_token: newRefreshToken } = response.data;
-        console.log("Token refresh successful");
 
         // Store new tokens
         setStorageItem(TOKEN_KEYS.ACCESS_TOKEN, access_token);
@@ -179,7 +186,12 @@ api.interceptors.response.use(
 
     // Handle 404 Not Found
     if (status === 404) {
-      console.warn("Resource not found:", originalRequest.url);
+      // Suppress console warnings for expected 404s (e.g., performance data not yet created)
+      const isExpected404 = originalRequest.url?.includes("/performance/dashboard") ||
+                           originalRequest.url?.includes("/performance/trends");
+      if (!isExpected404) {
+        console.warn("Resource not found:", originalRequest.url);
+      }
     }
 
     // Handle 422 Validation Error
