@@ -3,7 +3,7 @@
  * Modals for creating and editing topics
  */
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -13,13 +13,9 @@ import {
   useCreateTopicMutation,
   useUpdateTopicMutation,
 } from "@/hooks/queries/useTopicQueries";
+import { useCourses } from "@/hooks/queries/useCourseQueries";
+import { useDomains, useDomain } from "@/hooks/queries/useDomainQueries";
 import toast from "react-hot-toast";
-
-const DOMAIN_OPTIONS = [
-  { value: "People", label: "People" },
-  { value: "Process", label: "Process" },
-  { value: "Business Environment", label: "Business Environment" },
-];
 
 const STATUS_OPTIONS = [
   { value: "true", label: "Active" },
@@ -30,24 +26,56 @@ const STATUS_OPTIONS = [
  * Create Topic Modal
  */
 export const CreateTopicModal = ({ isOpen, onClose, onSuccess }) => {
+  const [parentType, setParentType] = useState("domain"); // "course" or "domain"
+
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
+    setValue,
   } = useForm();
 
   const createMutation = useCreateTopicMutation();
 
+  // Fetch courses and domains
+  const { data: coursesData, isLoading: coursesLoading } = useCourses({
+    is_active: true,
+  });
+  const { data: domainsData, isLoading: domainsLoading } = useDomains({
+    is_active: true,
+  });
+
+  const courses = coursesData?.items || [];
+  const domains = domainsData?.items || [];
+
   const onSubmit = async (data) => {
     try {
       const payload = {
-        ...data,
-        is_active: true, // Always active by default when creating
+        name: data.name,
+        description: data.description || null,
       };
+
+      if (parentType === "course") {
+        if (!data.course_id || data.course_id === "") {
+          toast.error("Please select a course");
+          return;
+        }
+        payload.course_id = data.course_id;
+        // Explicitly don't include domain_id
+      } else {
+        if (!data.domain_id || data.domain_id === "") {
+          toast.error("Please select a domain");
+          return;
+        }
+        payload.domain_id = data.domain_id;
+        // Explicitly don't include course_id
+      }
+
       await createMutation.mutateAsync(payload);
       toast.success("Topic created successfully");
       reset();
+      setParentType("domain");
       onSuccess?.();
     } catch (error) {
       toast.error(error.message || "Failed to create topic");
@@ -56,6 +84,7 @@ export const CreateTopicModal = ({ isOpen, onClose, onSuccess }) => {
 
   const handleClose = () => {
     reset();
+    setParentType("domain");
     onClose();
   };
 
@@ -79,23 +108,86 @@ export const CreateTopicModal = ({ isOpen, onClose, onSuccess }) => {
           />
         </div>
 
+        {/* Parent Type Selection */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            PMP Domain <span className="text-red-500">*</span>
+            Belongs To <span className="text-red-500">*</span>
           </label>
-          <select
-            {...register("domain", { required: "Domain is required" })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">Select a domain</option>
-            {DOMAIN_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-          {errors.domain && (
-            <p className="mt-1 text-sm text-red-600">{errors.domain.message}</p>
+          <div className="flex gap-4 mb-3">
+            <label className="flex items-center">
+              <input
+                type="radio"
+                value="course"
+                checked={parentType === "course"}
+                onChange={(e) => {
+                  setParentType(e.target.value);
+                  setValue("domain_id", ""); // Reset domain when switching to course
+                }}
+                className="mr-2"
+              />
+              <span>Course</span>
+            </label>
+            <label className="flex items-center">
+              <input
+                type="radio"
+                value="domain"
+                checked={parentType === "domain"}
+                onChange={(e) => {
+                  setParentType(e.target.value);
+                  setValue("course_id", ""); // Reset course when switching to domain
+                }}
+                className="mr-2"
+              />
+              <span>Domain</span>
+            </label>
+          </div>
+
+          {parentType === "course" ? (
+            <div>
+              <select
+                {...register("course_id", {
+                  required: parentType === "course" ? "Course is required" : false,
+                })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                disabled={coursesLoading}
+              >
+                <option value="">Select a course</option>
+                {courses.map((course) => (
+                  <option key={course.course_id} value={course.course_id}>
+                    {course.name}
+                  </option>
+                ))}
+              </select>
+              {errors.course_id && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.course_id.message}
+                </p>
+              )}
+            </div>
+          ) : (
+            <div>
+              <select
+                {...register("domain_id", {
+                  required: parentType === "domain" ? "Domain is required" : false,
+                })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                disabled={domainsLoading}
+              >
+                <option value="">
+                  {domainsLoading ? "Loading domains..." : "Select a domain"}
+                </option>
+                {domains.map((domain) => (
+                  <option key={domain.domain_id} value={domain.domain_id}>
+                    {domain.name}
+                  </option>
+                ))}
+              </select>
+              {errors.domain_id && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.domain_id.message}
+                </p>
+              )}
+            </div>
           )}
         </div>
 
@@ -133,34 +225,109 @@ export const CreateTopicModal = ({ isOpen, onClose, onSuccess }) => {
  * Edit Topic Modal
  */
 export const EditTopicModal = ({ isOpen, onClose, topic, onSuccess }) => {
+  const [parentType, setParentType] = useState("course");
+  const [selectedCourseId, setSelectedCourseId] = useState("");
+
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
+    watch,
+    setValue,
   } = useForm();
+
+  // Fetch courses and domains
+  const { data: coursesData, isLoading: coursesLoading } = useCourses({
+    is_active: true,
+  });
+  const { data: domainsData, isLoading: domainsLoading } = useDomains({
+    course_id: selectedCourseId || undefined,
+    is_active: true,
+  });
+
+  // Fetch domain if topic has domain_id to get its course_id
+  const { data: topicDomain } = useDomain(topic?.domain_id, {
+    enabled: !!topic?.domain_id && isOpen,
+  });
+
+  const courses = coursesData?.items || [];
+  const domains = domainsData?.items || [];
+
+  // Watch course_id and domain_id
+  const courseId = watch("course_id");
+  const domainId = watch("domain_id");
 
   // Reset form when topic or modal state changes
   React.useEffect(() => {
     if (topic && isOpen) {
+      const initialParentType = topic.domain_id ? "domain" : "course";
+      setParentType(initialParentType);
+      
+      // If topic has domain_id, get course_id from the domain
+      if (topic.domain_id && topicDomain) {
+        setSelectedCourseId(topicDomain.course_id || "");
+      } else if (topic.course_id) {
+        setSelectedCourseId(topic.course_id);
+      } else {
+        setSelectedCourseId("");
+      }
+
       reset({
         name: topic.name || "",
         description: topic.description || "",
-        domain: topic.domain || "",
+        course_id: topicDomain?.course_id || topic.course_id || "",
+        domain_id: topic.domain_id || "",
         is_active:
           topic.is_active !== undefined ? String(topic.is_active) : "true",
       });
     }
-  }, [topic, isOpen, reset]);
+  }, [topic, topicDomain, isOpen, reset]);
+
+  // Update selectedCourseId when course_id changes
+  useEffect(() => {
+    if (courseId) {
+      setSelectedCourseId(courseId);
+    } else {
+      setSelectedCourseId("");
+    }
+  }, [courseId]);
+
+  // Reset domain when course changes or parent type changes
+  useEffect(() => {
+    if (parentType === "course") {
+      setValue("domain_id", "");
+    } else {
+      setValue("course_id", "");
+    }
+  }, [parentType, setValue]);
 
   const updateMutation = useUpdateTopicMutation();
 
   const onSubmit = async (data) => {
     try {
       const payload = {
-        ...data,
+        name: data.name,
+        description: data.description || null,
         is_active: data.is_active === "true",
       };
+
+      if (parentType === "course") {
+        if (!data.course_id) {
+          toast.error("Please select a course");
+          return;
+        }
+        payload.course_id = data.course_id;
+        payload.domain_id = null;
+      } else {
+        if (!data.domain_id) {
+          toast.error("Please select a domain");
+          return;
+        }
+        payload.domain_id = data.domain_id;
+        payload.course_id = null;
+      }
+
       await updateMutation.mutateAsync({
         topicId: topic.topic_id,
         data: payload,
@@ -175,6 +342,8 @@ export const EditTopicModal = ({ isOpen, onClose, topic, onSuccess }) => {
 
   const handleClose = () => {
     reset();
+    setParentType("course");
+    setSelectedCourseId("");
     onClose();
   };
 
@@ -198,23 +367,107 @@ export const EditTopicModal = ({ isOpen, onClose, topic, onSuccess }) => {
           />
         </div>
 
+        {/* Parent Type Selection */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            PMP Domain <span className="text-red-500">*</span>
+            Belongs To <span className="text-red-500">*</span>
           </label>
-          <select
-            {...register("domain", { required: "Domain is required" })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">Select a domain</option>
-            {DOMAIN_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-          {errors.domain && (
-            <p className="mt-1 text-sm text-red-600">{errors.domain.message}</p>
+          <div className="flex gap-4 mb-2">
+            <label className="flex items-center">
+              <input
+                type="radio"
+                value="course"
+                checked={parentType === "course"}
+                onChange={(e) => setParentType(e.target.value)}
+                className="mr-2"
+              />
+              <span>Course</span>
+            </label>
+            <label className="flex items-center">
+              <input
+                type="radio"
+                value="domain"
+                checked={parentType === "domain"}
+                onChange={(e) => setParentType(e.target.value)}
+                className="mr-2"
+              />
+              <span>Domain</span>
+            </label>
+          </div>
+
+          {parentType === "course" ? (
+            <div>
+              <select
+                {...register("course_id", {
+                  required: "Course is required",
+                })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                disabled={coursesLoading}
+              >
+                <option value="">Select a course</option>
+                {courses.map((course) => (
+                  <option key={course.course_id} value={course.course_id}>
+                    {course.name}
+                  </option>
+                ))}
+              </select>
+              {errors.course_id && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.course_id.message}
+                </p>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {/* Course selector for domain-based topics */}
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">
+                  Course (to filter domains)
+                </label>
+                <select
+                  {...register("course_id")}
+                  onChange={(e) => {
+                    setValue("course_id", e.target.value);
+                    setSelectedCourseId(e.target.value);
+                    setValue("domain_id", ""); // Reset domain when course changes
+                  }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  disabled={coursesLoading}
+                >
+                  <option value="">All courses</option>
+                  {courses.map((course) => (
+                    <option key={course.course_id} value={course.course_id}>
+                      {course.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              {/* Domain selector */}
+              <div>
+                <select
+                  {...register("domain_id", {
+                    required: "Domain is required",
+                  })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  disabled={domainsLoading}
+                >
+                  <option value="">
+                    {domainsLoading ? "Loading domains..." : "Select a domain"}
+                  </option>
+                  {domains.map((domain) => (
+                    <option key={domain.domain_id} value={domain.domain_id}>
+                      {domain.name}
+                    </option>
+                  ))}
+                </select>
+                {errors.domain_id && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {errors.domain_id.message}
+                  </p>
+                )}
+              </div>
+            </div>
           )}
         </div>
 

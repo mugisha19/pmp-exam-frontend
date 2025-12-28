@@ -29,10 +29,7 @@ import {
   useQuizBanks,
   useDeleteQuizBankMutation,
 } from "@/hooks/queries/useQuizBankQueries";
-import {
-  CreateQuizBankModal,
-  EditQuizBankModal,
-} from "@/components/features/quiz-banks";
+import { CreateQuizBankModal } from "@/components/features/quiz-banks";
 import { PublishQuizModal } from "@/components/features/quizzes/PublishQuizModal";
 
 /**
@@ -60,7 +57,6 @@ export default function QuizBankManagement() {
 
   // Modal states
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
   const [selectedQuizBank, setSelectedQuizBank] = useState(null);
@@ -111,9 +107,8 @@ export default function QuizBankManagement() {
   }, []);
 
   const handleEditQuizBank = useCallback((quizBank) => {
-    setSelectedQuizBank(quizBank);
-    setIsEditModalOpen(true);
-  }, []);
+    navigate(`/admin/quiz-banks/${quizBank.quiz_bank_id}`);
+  }, [navigate]);
 
   const handlePublishQuizBank = useCallback((quizBank) => {
     setSelectedQuizBank(quizBank);
@@ -189,13 +184,6 @@ export default function QuizBankManagement() {
     setIsCreateModalOpen(false);
     refetch();
   }, [refetch]);
-
-  const handleEditSuccess = useCallback(() => {
-    setIsEditModalOpen(false);
-    setSelectedQuizBank(null);
-    clearSelection();
-    refetch();
-  }, [refetch, clearSelection]);
 
   // Table columns
   const columns = useMemo(
@@ -382,12 +370,9 @@ export default function QuizBankManagement() {
         totalPages={Math.ceil(totalCount / pageSize)}
         onPageChange={setPage}
         emptyMessage="No quiz banks found"
-        onRowClick={(quizBank) =>
-          handleSelectQuizBank(
-            quizBank.quiz_bank_id,
-            !selectedQuizBanks.includes(quizBank.quiz_bank_id)
-          )
-        }
+        onRowClick={(quizBank) => {
+          navigate(`/admin/quiz-banks/${quizBank.quiz_bank_id}`);
+        }}
       />
 
       {/* Create Quiz Bank Modal */}
@@ -395,14 +380,6 @@ export default function QuizBankManagement() {
         isOpen={isCreateModalOpen}
         onClose={handleCreateModalClose}
         onSuccess={handleCreateSuccess}
-      />
-
-      {/* Edit Quiz Bank Modal */}
-      <EditQuizBankModal
-        isOpen={isEditModalOpen}
-        onClose={handleEditModalClose}
-        quizBank={selectedQuizBank}
-        onSuccess={handleEditSuccess}
       />
 
       {/* Publish Quiz Modal */}

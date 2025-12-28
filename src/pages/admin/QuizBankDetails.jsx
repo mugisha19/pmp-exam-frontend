@@ -12,15 +12,11 @@ import {
   Calendar,
   BookOpen,
   Edit2,
-  Trash2,
-  Eye,
   Send,
 } from "lucide-react";
-import toast from "react-hot-toast";
 import {
   useQuizBank,
   useQuizBankQuestions,
-  useRemoveQuestionFromBankMutation,
 } from "@/hooks/queries/useQuizBankQueries";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { StatusBadge } from "@/components/shared/StatusBadge";
@@ -30,7 +26,6 @@ import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { DataTable } from "@/components/shared/DataTable";
-import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { EditQuizBankModal } from "@/components/features/quiz-banks";
 import { PublishQuizModal } from "@/components/features/quizzes/PublishQuizModal";
 
@@ -66,8 +61,6 @@ const InfoItem = ({ icon: IconComponent, label, value }) => (
 export const QuizBankDetails = () => {
   const { quizBankId } = useParams();
   const navigate = useNavigate();
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [selectedQuestion, setSelectedQuestion] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
 
@@ -87,33 +80,7 @@ export const QuizBankDetails = () => {
     refetch: refetchQuestions,
   } = useQuizBankQuestions(quizBankId);
 
-  // Remove question mutation
-  const removeQuestionMutation = useRemoveQuestionFromBankMutation();
-
   const questions = questionsData?.items || questionsData || [];
-
-  // Handle remove question
-  const handleRemoveQuestion = (question) => {
-    setSelectedQuestion(question);
-    setIsDeleteDialogOpen(true);
-  };
-
-  const handleConfirmRemove = async () => {
-    if (!selectedQuestion) return;
-
-    try {
-      await removeQuestionMutation.mutateAsync({
-        quizBankId,
-        questionId: selectedQuestion.question_id,
-      });
-      toast.success("Question removed from quiz bank");
-      setIsDeleteDialogOpen(false);
-      setSelectedQuestion(null);
-      refetchQuestions();
-    } catch (error) {
-      toast.error(error.message || "Failed to remove question");
-    }
-  };
 
   // Loading state
   if (isLoading) {
@@ -210,39 +177,6 @@ export const QuizBankDetails = () => {
           </Badge>
         );
       },
-    },
-    {
-      key: "topic_name",
-      header: "Topic",
-      render: (_, question) => (
-        <span className="text-sm text-gray-600">
-          {question.topic_name || "N/A"}
-        </span>
-      ),
-    },
-    {
-      key: "actions",
-      header: "Actions",
-      render: (_, question) => (
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate(`/admin/questions/${question.question_id}`)}
-            title="View Question"
-          >
-            <Eye className="w-4 h-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => handleRemoveQuestion(question)}
-            title="Remove from Quiz Bank"
-          >
-            <Trash2 className="w-4 h-4 text-red-500" />
-          </Button>
-        </div>
-      ),
     },
   ];
 
@@ -354,25 +288,13 @@ export const QuizBankDetails = () => {
               columns={questionColumns}
               rowKey="question_id"
               emptyMessage="No questions found"
+              onRowClick={(question) => {
+                navigate(`/admin/questions/${question.question_id}`);
+              }}
             />
           )}
         </CardContent>
       </Card>
-
-      {/* Remove Question Confirmation Dialog */}
-      <ConfirmDialog
-        isOpen={isDeleteDialogOpen}
-        onClose={() => {
-          setIsDeleteDialogOpen(false);
-          setSelectedQuestion(null);
-        }}
-        onConfirm={handleConfirmRemove}
-        title="Remove Question"
-        message="Are you sure you want to remove this question from the quiz bank? The question itself will not be deleted from the question bank."
-        confirmText="Remove"
-        confirmVariant="danger"
-        isLoading={removeQuestionMutation.isPending}
-      />
 
       {/* Edit Quiz Bank Modal */}
       <EditQuizBankModal

@@ -10,6 +10,7 @@ export { default as AdminGroupsPage } from "./GroupManagement";
 export { GroupDetails as AdminGroupDetailsPage } from "./GroupDetails";
 export { default as QuizAttemptDetails } from "./QuizAttemptDetails";
 export { default as AdminTopicsPage } from "./TopicManagement";
+export { TopicDetails as AdminTopicDetailsPage } from "./TopicDetails";
 export { default as AdminQuestionsPage } from "./QuestionManagement";
 export { default as AdminQuestionDetailsPage } from "./QuestionDetails";
 export { default as AdminQuestionEditPage } from "./QuestionEdit";

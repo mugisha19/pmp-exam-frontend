@@ -37,9 +37,9 @@ export const getTopicById = async (topicId) => {
  * Create a new topic
  * @param {Object} data - Topic data
  * @param {string} data.name - Topic name
- * @param {string} data.description - Topic description
- * @param {string} data.domain - Domain category (e.g., "People", "Process", "Business Environment")
- * @param {number} data.order_index - Display order index
+ * @param {string} [data.description] - Topic description
+ * @param {string} [data.course_id] - Course ID (required if domain_id not provided)
+ * @param {string} [data.domain_id] - Domain ID (required if course_id not provided)
  * @returns {Promise<Object>} Created topic
  */
 export const createTopic = async (data) => {
@@ -57,8 +57,9 @@ export const createTopic = async (data) => {
  * @param {Object} data - Topic data to update
  * @param {string} [data.name] - Topic name
  * @param {string} [data.description] - Topic description
- * @param {string} [data.domain] - Domain category
- * @param {number} [data.order_index] - Display order index
+ * @param {string} [data.course_id] - Course ID
+ * @param {string} [data.domain_id] - Domain ID
+ * @param {boolean} [data.is_active] - Active status
  * @returns {Promise<Object>} Updated topic
  */
 export const updateTopic = async (topicId, data) => {

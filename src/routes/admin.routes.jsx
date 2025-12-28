@@ -19,6 +19,7 @@ import {
   AdminGroupDetailsPage,
   QuizAttemptDetails,
   AdminTopicsPage,
+  AdminTopicDetailsPage,
   AdminQuestionsPage,
   AdminQuestionDetailsPage,
   AdminQuestionEditPage,
@@ -53,6 +54,7 @@ export const adminRoutes = (
     <Route path="groups/:groupId" element={<AdminGroupDetailsPage />} />
     <Route path="groups/:groupId/quiz/:quizId/attempt/:attemptId" element={<QuizAttemptDetails />} />
     <Route path="topics" element={<AdminTopicsPage />} />
+    <Route path="topics/:topicId" element={<AdminTopicDetailsPage />} />
     <Route path="questions" element={<AdminQuestionsPage />} />
     <Route
       path="questions/:questionId"

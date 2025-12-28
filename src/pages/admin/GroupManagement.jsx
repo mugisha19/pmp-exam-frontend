@@ -28,7 +28,6 @@ import {
   CreateGroupModal,
   EditGroupModal,
   AddMemberModal,
-  ViewMembersModal,
 } from "@/components/features/groups";
 import {
   useGroups,
@@ -66,7 +65,6 @@ export default function GroupManagement() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
-  const [isViewMembersModalOpen, setIsViewMembersModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState(null);
 
@@ -184,9 +182,8 @@ export default function GroupManagement() {
   }, []);
 
   const handleViewMembers = useCallback((group) => {
-    setSelectedGroup(group);
-    setIsViewMembersModalOpen(true);
-  }, []);
+    navigate(`/admin/groups/${group.group_id}`);
+  }, [navigate]);
 
   const handleDeleteGroup = useCallback((group) => {
     setSelectedGroup(group);
@@ -266,10 +263,6 @@ export default function GroupManagement() {
     setSelectedGroup(null);
   }, []);
 
-  const handleViewMembersModalClose = useCallback(() => {
-    setIsViewMembersModalOpen(false);
-    setSelectedGroup(null);
-  }, []);
 
   // Success handlers for modals
   const handleCreateSuccess = useCallback(() => {
@@ -442,7 +435,10 @@ export default function GroupManagement() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => handleViewGroup(getSelectedGroup())}
+              onClick={() => {
+                const group = getSelectedGroup();
+                if (group) navigate(`/admin/groups/${group.group_id}`);
+              }}
             >
               <Eye className="w-4 h-4 mr-1" />
               View
@@ -450,7 +446,10 @@ export default function GroupManagement() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => handleEditGroup(getSelectedGroup())}
+              onClick={() => {
+                const group = getSelectedGroup();
+                if (group) navigate(`/admin/groups/${group.group_id}`);
+              }}
             >
               <Edit2 className="w-4 h-4 mr-1" />
               Edit
@@ -458,15 +457,10 @@ export default function GroupManagement() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => handleAddMember(getSelectedGroup())}
-            >
-              <UserPlus className="w-4 h-4 mr-1" />
-              Add Member
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleViewMembers(getSelectedGroup())}
+              onClick={() => {
+                const group = getSelectedGroup();
+                if (group) navigate(`/admin/groups/${group.group_id}`);
+              }}
             >
               <Users className="w-4 h-4 mr-1" />
               View Members
@@ -534,12 +528,9 @@ export default function GroupManagement() {
         totalPages={Math.ceil(totalCount / pageSize)}
         onPageChange={setPage}
         emptyMessage="No groups found"
-        onRowClick={(group) =>
-          handleSelectGroup(
-            group.group_id,
-            !selectedGroups.includes(group.group_id)
-          )
-        }
+        onRowClick={(group) => {
+          navigate(`/admin/groups/${group.group_id}`);
+        }}
       />
 
       {/* Create Group Modal */}
@@ -563,13 +554,6 @@ export default function GroupManagement() {
         onClose={handleAddMemberModalClose}
         group={selectedGroup}
         onSuccess={handleAddMemberSuccess}
-      />
-
-      {/* View Members Modal */}
-      <ViewMembersModal
-        isOpen={isViewMembersModalOpen}
-        onClose={handleViewMembersModalClose}
-        group={selectedGroup}
       />
 
       {/* Delete Confirmation Dialog */}

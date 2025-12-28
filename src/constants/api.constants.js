@@ -68,6 +68,20 @@ export const GROUP_ENDPOINTS = {
 
 // Quiz endpoints
 export const QUIZ_ENDPOINTS = {
+  // Courses
+  LIST_COURSES: "/courses",
+  CREATE_COURSE: "/courses",
+  GET_COURSE: (courseId) => `/courses/${courseId}`,
+  UPDATE_COURSE: (courseId) => `/courses/${courseId}`,
+  DELETE_COURSE: (courseId) => `/courses/${courseId}`,
+
+  // Domains
+  LIST_DOMAINS: "/domains",
+  CREATE_DOMAIN: "/domains",
+  GET_DOMAIN: (domainId) => `/domains/${domainId}`,
+  UPDATE_DOMAIN: (domainId) => `/domains/${domainId}`,
+  DELETE_DOMAIN: (domainId) => `/domains/${domainId}`,
+
   // Topics
   LIST_TOPICS: "/topics",
   CREATE_TOPIC: "/topics",

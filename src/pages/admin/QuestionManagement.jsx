@@ -148,7 +148,7 @@ export default function QuestionManagement() {
 
   const handleEditQuestion = useCallback(
     (question) => {
-      navigate(`/admin/questions/${question.question_id}/edit`);
+      navigate(`/admin/questions/${question.question_id}`);
     },
     [navigate]
   );
@@ -658,12 +658,9 @@ export default function QuestionManagement() {
         totalPages={Math.ceil(totalCount / pageSize)}
         onPageChange={setPage}
         emptyMessage="No questions found. Create your first question to get started."
-        onRowClick={(question) =>
-          handleSelectQuestion(
-            question.question_id,
-            !selectedQuestions.includes(question.question_id)
-          )
-        }
+        onRowClick={(question) => {
+          navigate(`/admin/questions/${question.question_id}`);
+        }}
       />
 
       {/* Create Question Modal */}

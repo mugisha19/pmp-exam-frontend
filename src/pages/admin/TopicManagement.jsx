@@ -4,6 +4,7 @@
  */
 
 import { useState, useMemo, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Plus,
   Search,
@@ -27,11 +28,7 @@ import {
   useTopics,
   useDeleteTopicMutation,
 } from "@/hooks/queries/useTopicQueries";
-import {
-  CreateTopicModal,
-  EditTopicModal,
-  ViewTopicModal,
-} from "@/components/features/topics";
+import { CreateTopicModal } from "@/components/features/topics";
 
 const DOMAIN_OPTIONS = [
   { value: "", label: "All Domains" },
@@ -47,6 +44,8 @@ const STATUS_OPTIONS = [
 ];
 
 export default function TopicManagement() {
+  const navigate = useNavigate();
+
   // Filter states
   const [searchQuery, setSearchQuery] = useState("");
   const [domain, setDomain] = useState("");
@@ -59,8 +58,6 @@ export default function TopicManagement() {
 
   // Modal states
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedTopic, setSelectedTopic] = useState(null);
 
@@ -116,14 +113,12 @@ export default function TopicManagement() {
   }, []);
 
   const handleViewTopic = useCallback((topic) => {
-    setSelectedTopic(topic);
-    setIsViewModalOpen(true);
-  }, []);
+    navigate(`/admin/topics/${topic.topic_id}`);
+  }, [navigate]);
 
   const handleEditTopic = useCallback((topic) => {
-    setSelectedTopic(topic);
-    setIsEditModalOpen(true);
-  }, []);
+    navigate(`/admin/topics/${topic.topic_id}`);
+  }, [navigate]);
 
   const handleDeleteTopic = useCallback((topic) => {
     setSelectedTopic(topic);
@@ -175,27 +170,10 @@ export default function TopicManagement() {
     setIsCreateModalOpen(false);
   }, []);
 
-  const handleViewModalClose = useCallback(() => {
-    setIsViewModalOpen(false);
-    setSelectedTopic(null);
-  }, []);
-
-  const handleEditModalClose = useCallback(() => {
-    setIsEditModalOpen(false);
-    setSelectedTopic(null);
-  }, []);
-
   const handleCreateSuccess = useCallback(() => {
     setIsCreateModalOpen(false);
     refetch();
   }, [refetch]);
-
-  const handleEditSuccess = useCallback(() => {
-    setIsEditModalOpen(false);
-    setSelectedTopic(null);
-    clearSelection();
-    refetch();
-  }, [refetch, clearSelection]);
 
   // Table columns
   const columns = useMemo(
@@ -267,7 +245,7 @@ export default function TopicManagement() {
               size="sm"
               onClick={(e) => {
                 e.stopPropagation();
-                handleViewTopic(topic);
+                navigate(`/admin/topics/${topic.topic_id}`);
               }}
               title="View details"
             >
@@ -278,7 +256,7 @@ export default function TopicManagement() {
               size="sm"
               onClick={(e) => {
                 e.stopPropagation();
-                handleEditTopic(topic);
+                navigate(`/admin/topics/${topic.topic_id}`);
               }}
               title="Edit topic"
             >
@@ -300,7 +278,7 @@ export default function TopicManagement() {
         ),
       },
     ],
-    [handleViewTopic, handleEditTopic, handleDeleteTopic]
+    [navigate, handleDeleteTopic]
   );
 
   // Calculate active filters
@@ -433,7 +411,10 @@ export default function TopicManagement() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => handleViewTopic(getSelectedTopic())}
+              onClick={() => {
+                const topic = getSelectedTopic();
+                if (topic) navigate(`/admin/topics/${topic.topic_id}`);
+              }}
             >
               <Eye className="w-4 h-4 mr-1" />
               View
@@ -441,7 +422,10 @@ export default function TopicManagement() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => handleEditTopic(getSelectedTopic())}
+              onClick={() => {
+                const topic = getSelectedTopic();
+                if (topic) navigate(`/admin/topics/${topic.topic_id}`);
+              }}
             >
               <Edit2 className="w-4 h-4 mr-1" />
               Edit
@@ -467,100 +451,6 @@ export default function TopicManagement() {
     </div>
   );
 
-  // Calculate stats
-  const stats = useMemo(() => {
-    const allTopics = topicsData?.items || topicsData || [];
-    const activeCount = allTopics.filter((t) => t.is_active).length;
-    const inactiveCount = allTopics.filter((t) => !t.is_active).length;
-    const totalQuestions = allTopics.reduce(
-      (sum, t) => sum + (t.question_count || 0),
-      0
-    );
-
-    return {
-      total: allTopics.length,
-      active: activeCount,
-      inactive: inactiveCount,
-      totalQuestions,
-    };
-  }, [topicsData]);
-
-  const statsCards = (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-      <div className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-gray-600">Total Topics</p>
-            <p className="text-2xl font-bold text-gray-900 mt-1">
-              {stats.total}
-            </p>
-          </div>
-          <div className="bg-blue-100 p-3 rounded-lg">
-            <BookOpen className="w-6 h-6 text-blue-600" />
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-gray-600">Active Topics</p>
-            <p className="text-2xl font-bold text-green-600 mt-1">
-              {stats.active}
-            </p>
-          </div>
-          <div className="bg-green-100 p-3 rounded-lg">
-            <div className="w-6 h-6 flex items-center justify-center">
-              <div className="w-3 h-3 bg-green-600 rounded-full"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-gray-600">Inactive Topics</p>
-            <p className="text-2xl font-bold text-gray-600 mt-1">
-              {stats.inactive}
-            </p>
-          </div>
-          <div className="bg-gray-100 p-3 rounded-lg">
-            <div className="w-6 h-6 flex items-center justify-center">
-              <div className="w-3 h-3 bg-gray-600 rounded-full"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-gray-600">Total Questions</p>
-            <p className="text-2xl font-bold text-purple-600 mt-1">
-              {stats.totalQuestions}
-            </p>
-          </div>
-          <div className="bg-purple-100 p-3 rounded-lg">
-            <svg
-              className="w-6 h-6 text-purple-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <PageHeader
@@ -573,8 +463,6 @@ export default function TopicManagement() {
           </Button>
         }
       />
-
-      {statsCards}
 
       {filtersUI}
 
@@ -590,12 +478,9 @@ export default function TopicManagement() {
         rowKey="topic_id"
         paginated={false}
         emptyMessage="No topics found"
-        onRowClick={(topic) =>
-          handleSelectTopic(
-            topic.topic_id,
-            !selectedTopics.includes(topic.topic_id)
-          )
-        }
+        onRowClick={(topic) => {
+          navigate(`/admin/topics/${topic.topic_id}`);
+        }}
       />
 
       {/* Create Topic Modal */}
@@ -603,21 +488,6 @@ export default function TopicManagement() {
         isOpen={isCreateModalOpen}
         onClose={handleCreateModalClose}
         onSuccess={handleCreateSuccess}
-      />
-
-      {/* View Topic Modal */}
-      <ViewTopicModal
-        isOpen={isViewModalOpen}
-        onClose={handleViewModalClose}
-        topic={selectedTopic}
-      />
-
-      {/* Edit Topic Modal */}
-      <EditTopicModal
-        isOpen={isEditModalOpen}
-        onClose={handleEditModalClose}
-        topic={selectedTopic}
-        onSuccess={handleEditSuccess}
       />
 
       {/* Delete Confirmation Dialog */}
