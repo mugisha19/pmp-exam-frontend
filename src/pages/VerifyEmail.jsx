@@ -3,25 +3,37 @@
  * Email verification with link from email
  */
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { AuthLayout, AuthFormWrapper } from "../components/layouts";
 import { VerifyIllustration } from "../components/illustrations";
-import { Button } from "../components/ui";
+import { Button, Input } from "../components/ui";
 import {
   useVerifyEmailMutation,
   useResendVerificationMutation,
 } from "@/hooks/queries";
 import { toast } from "react-hot-toast";
-import { Mail, Loader2, CheckCircle } from "lucide-react";
+import { Mail, Loader2, CheckCircle, ArrowLeft } from "lucide-react";
 
 export const VerifyEmail = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
+  const [email, setEmail] = useState("");
+  const [showEmailInput, setShowEmailInput] = useState(false);
 
   const verifyMutation = useVerifyEmailMutation();
   const resendMutation = useResendVerificationMutation();
+
+  // Get email from storage on mount
+  useEffect(() => {
+    const storedEmail =
+      localStorage.getItem("verification_email") ||
+      sessionStorage.getItem("verification_email");
+    if (storedEmail) {
+      setEmail(storedEmail);
+    }
+  }, []);
 
   // Auto-verify if token is present in URL
   useEffect(() => {
@@ -47,19 +59,33 @@ export const VerifyEmail = () => {
   };
 
   const handleResend = async () => {
-    const email =
-      localStorage.getItem("verification_email") ||
-      sessionStorage.getItem("verification_email");
+    let emailToUse = email;
 
-    if (!email) {
-      toast.error("No email found. Please register again.");
-      navigate("/signup");
+    // If no email in state, try to get from storage
+    if (!emailToUse) {
+      emailToUse =
+        localStorage.getItem("verification_email") ||
+        sessionStorage.getItem("verification_email");
+    }
+
+    // If still no email, show input field
+    if (!emailToUse) {
+      setShowEmailInput(true);
+      toast.error("Please enter your email address");
+      return;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(emailToUse)) {
+      toast.error("Please enter a valid email address");
       return;
     }
 
     try {
-      await resendMutation.mutateAsync({ email });
+      await resendMutation.mutateAsync({ email: emailToUse });
       toast.success("Verification link sent to your email!");
+      setShowEmailInput(false);
     } catch {
       // Error handled by mutation
     }
@@ -103,20 +129,7 @@ export const VerifyEmail = () => {
   return (
     <AuthLayout illustration={VerifyIllustration}>
       <AuthFormWrapper
-        title="Check your email"
-        subtitle="We've sent a verification link to your email address"
-        footer={
-          <p>
-            Didn't receive the email?{" "}
-            <button
-              onClick={handleResend}
-              disabled={resendMutation.isPending}
-              className="text-accent hover:text-accent/80 font-medium disabled:opacity-50"
-            >
-              {resendMutation.isPending ? "Sending..." : "Resend link"}
-            </button>
-          </p>
-        }
+       
       >
         <div className="space-y-6">
           <div className="flex flex-col items-center justify-center py-8 space-y-4">
@@ -133,10 +146,49 @@ export const VerifyEmail = () => {
             </div>
           </div>
 
-          <div className="border-t border-gray-200 pt-4">
+          {/* Email input for resend (shown when email not found) */}
+          {showEmailInput && (
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Email Address
+              </label>
+              <Input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email address"
+                disabled={resendMutation.isPending}
+              />
+            </div>
+          )}
+
+          {/* Resend link section */}
+          <div className="border-t border-gray-200 pt-4 space-y-4">
+            <p className="text-sm text-gray-600 text-center">
+              Didn't receive the email?{" "}
+              <button
+                onClick={handleResend}
+                disabled={resendMutation.isPending}
+                className="text-blue-600 hover:text-blue-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {resendMutation.isPending ? "Sending..." : "Resend link"}
+              </button>
+            </p>
             <p className="text-xs text-gray-500 text-center">
               If you don't see the email, check your spam folder
             </p>
+          </div>
+
+          {/* Back to Login button */}
+          <div className="pt-4">
+            <Button
+              variant="outline"
+              className="w-full"
+              leftIcon={<ArrowLeft className="w-4 h-4" />}
+              onClick={() => navigate("/login")}
+            >
+              Back to Login
+            </Button>
           </div>
         </div>
       </AuthFormWrapper>

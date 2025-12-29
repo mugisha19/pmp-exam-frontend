@@ -10,7 +10,7 @@ export const AuthFormWrapper = ({ title, subtitle, children, footer }) => {
     <div className="w-full animate-fade-in">
       {/* Icon */}
       <div className="mb-6 flex justify-center">
-        <Logo size="md" />
+        {/* <Logo size="md" /> */}
       </div>
 
       {/* Title and Subtitle */}

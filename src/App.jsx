@@ -9,7 +9,7 @@ import { studentRoutes } from "@/routes/student.routes";
 import { instructorRoutes } from "@/routes/instructor.routes";
 import { adminRoutes } from "@/routes/admin.routes";
 import Unauthorized from "@/pages/Unauthorized";
-import JoinGroup from "@/pages/JoinGroup";
+import { JoinGroup } from "@/pages/student";
 import { RoleBasedRedirect } from "@/components/routes/RoleBasedRedirect";
 
 function App() {

@@ -3,9 +3,9 @@
  * Modern groups page with statistics, filtering, and enhanced cards
  */
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { getGroups, getMyGroups, createJoinRequest } from "@/services/group.service";
 import { Spinner } from "@/components/ui";
 import { SearchBar } from "@/components/shared/SearchBar";
@@ -20,12 +20,41 @@ import { toast } from "react-hot-toast";
 export const Groups = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState("all"); // "all" or "my-groups"
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  // Get initial tab from URL parameter, default to "all"
+  const tabParam = searchParams.get("tab");
+  const initialTab = tabParam === "mygroups" ? "my-groups" : "all";
+  
+  const [activeTab, setActiveTab] = useState(initialTab); // "all" or "my-groups"
   const [searchQuery, setSearchQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState("all"); // all, class, study_group, cohort
   const [statusFilter, setStatusFilter] = useState("all"); // all, active, inactive
   const [sortBy, setSortBy] = useState("name"); // name, members, quizzes, date
   const [viewMode, setViewMode] = useState("grid"); // grid or list
+
+  // Update URL when tab changes via user interaction
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    const newParams = new URLSearchParams(searchParams);
+    if (tab === "my-groups") {
+      newParams.set("tab", "mygroups");
+    } else {
+      newParams.delete("tab");
+    }
+    setSearchParams(newParams, { replace: true });
+  };
+
+  // Sync tab state with URL parameter when URL changes externally (browser back/forward)
+  useEffect(() => {
+    const tabParam = searchParams.get("tab");
+    const expectedTab = tabParam === "mygroups" ? "my-groups" : "all";
+    // Only update if different to avoid unnecessary re-renders
+    if (activeTab !== expectedTab) {
+      setActiveTab(expectedTab);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   // Fetch user's joined groups
   const { data: myGroups, isLoading: loadingMy } = useQuery({
@@ -188,7 +217,7 @@ export const Groups = () => {
       {/* Tabs */}
       <div className="flex items-center gap-2 border-b border-gray-200 overflow-x-auto scrollbar-hide">
         <button
-          onClick={() => setActiveTab("all")}
+          onClick={() => handleTabChange("all")}
           className={`px-4 md:px-6 py-3 font-semibold text-sm border-b-2 -mb-0.5 transition-colors whitespace-nowrap ${
             activeTab === "all"
               ? "border-accent-primary text-accent-primary"
@@ -198,7 +227,7 @@ export const Groups = () => {
           Browse All Groups
         </button>
         <button
-          onClick={() => setActiveTab("my-groups")}
+          onClick={() => handleTabChange("my-groups")}
           className={`px-4 md:px-6 py-3 font-semibold text-sm border-b-2 -mb-0.5 transition-colors whitespace-nowrap ${
             activeTab === "my-groups"
               ? "border-accent-primary text-accent-primary"
@@ -282,7 +311,7 @@ export const Groups = () => {
           </p>
           {activeTab === "my-groups" && (
             <button
-              onClick={() => setActiveTab("all")}
+              onClick={() => handleTabChange("all")}
               className="px-6 py-2 bg-accent-primary text-white font-semibold rounded-lg hover:bg-accent-secondary transition-colors"
             >
               Browse Groups

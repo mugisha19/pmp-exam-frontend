@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect } from "react";
-import { Check, X, UserPlus, MessageSquare } from "lucide-react";
+import { Check, X, UserPlus, MessageSquare, User, Info } from "lucide-react";
 import {
   useGroupJoinRequests,
   useApproveJoinRequestMutation,
@@ -142,7 +142,7 @@ export const JoinRequestsTab = ({ groupId }) => {
               e.stopPropagation();
               handleApprove(request);
             }}
-            className="text-green-400 hover:text-green-300 hover:bg-green-500/10"
+            className="text-blue-500 hover:text-blue-600 hover:bg-blue-500/10"
           >
             Approve
           </Button>
@@ -200,53 +200,72 @@ export const JoinRequestsTab = ({ groupId }) => {
         title={isApproving ? "Approve Join Request" : "Reject Join Request"}
         size="md"
       >
-        <div className="space-y-4">
-          {/* User Info */}
+        <div className="space-y-5">
+          {/* User Info Card */}
           {selectedRequest && (
-            <div className="p-4 bg-gray-800/50 rounded-xl">
-              <UserCell
-                user={selectedRequest.user || selectedRequest}
-                showEmail
-              />
+            <div className="p-5 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl shadow-sm">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <User className="w-6 h-6 text-blue-600" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <UserCell
+                    user={selectedRequest.user || selectedRequest}
+                    showEmail
+                  />
+                </div>
+              </div>
             </div>
           )}
 
           {/* Info Message */}
           <div
-            className={`p-4 rounded-xl border ${
+            className={`p-4 rounded-xl border-2 ${
               isApproving
-                ? "bg-green-500/10 border-green-500/30"
-                : "bg-red-500/10 border-red-500/30"
+                ? "bg-blue-50 border-blue-300"
+                : "bg-red-50 border-red-300"
             }`}
           >
-            <p
-              className={`text-sm ${
-                isApproving ? "text-green-300" : "text-red-300"
-              }`}
-            >
-              {isApproving
-                ? "The user will be added to the group and notified of the approval."
-                : "The user will be notified that their request was rejected."}
-            </p>
+            <div className="flex items-start gap-3">
+              <div
+                className={`flex-shrink-0 mt-0.5 ${
+                  isApproving ? "text-blue-600" : "text-red-600"
+                }`}
+              >
+                <Info className="w-5 h-5" />
+              </div>
+              <div className="flex-1">
+                <p
+                  className={`text-sm font-medium ${
+                    isApproving ? "text-blue-900" : "text-red-900"
+                  }`}
+                >
+                  {isApproving
+                    ? "The user will be added to the group and notified of the approval."
+                    : "The user will be notified that their request was rejected."}
+                </p>
+              </div>
+            </div>
           </div>
 
           {/* Optional Message */}
-          <Textarea
-            label={
-              <div className="flex items-center gap-2">
-                <MessageSquare className="w-4 h-4" />
-                <span>Message (Optional)</span>
-              </div>
-            }
-            placeholder={
-              isApproving
-                ? "Welcome to the group! We're excited to have you..."
-                : "Thank you for your interest, but we're unable to approve your request at this time..."
-            }
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            rows={3}
-          />
+          <div className="space-y-2">
+            <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+              <MessageSquare className="w-4 h-4 text-gray-500" />
+              <span>Message (Optional)</span>
+            </label>
+            <Textarea
+              placeholder={
+                isApproving
+                  ? "Welcome to the group! We're excited to have you..."
+                  : "Thank you for your interest, but we're unable to approve your request at this time..."
+              }
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              rows={3}
+              className="resize-none"
+            />
+          </div>
         </div>
 
         <ModalFooter>
@@ -262,11 +281,12 @@ export const JoinRequestsTab = ({ groupId }) => {
             Cancel
           </Button>
           <Button
-            variant={isApproving ? "success" : "danger"}
+            variant={isApproving ? "primary" : "danger"}
             onClick={confirmResponse}
             loading={approveRequestMutation.isPending}
+            leftIcon={isApproving ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />}
           >
-            {isApproving ? "Approve" : "Reject"}
+            {isApproving ? "Approve Request" : "Reject Request"}
           </Button>
         </ModalFooter>
       </Modal>
