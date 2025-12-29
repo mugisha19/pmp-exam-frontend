@@ -220,13 +220,22 @@ export const QuizTaking = () => {
     }
   };
 
-  const handleAnswerChange = async (answer) => {
+  const handleAnswerChange = (answer) => {
+    // Only update local state, don't save to backend yet
+    setSelectedAnswer(answer);
+  };
+
+  const handleSaveAnswer = async () => {
     if (!sessionData || sessionData.pause_info?.is_paused) {
-      toast.error("Cannot answer questions while quiz is paused");
+      toast.error("Cannot save answers while quiz is paused");
       return;
     }
 
-    setSelectedAnswer(answer);
+    if (!selectedAnswer) {
+      // Allow navigating without an answer (skipping)
+      return;
+    }
+
     setIsSaving(true);
 
     try {
@@ -234,7 +243,7 @@ export const QuizTaking = () => {
       const response = await saveAnswer(sessionToken, {
         quiz_question_id: currentQ.quiz_question_id,
         question_type: currentQ.question_type,
-        answer: answer,
+        answer: selectedAnswer,
         time_spent_seconds: currentQ.time_spent_seconds || 0,
         is_flagged: currentQ.is_flagged || false,
       });
@@ -279,6 +288,11 @@ export const QuizTaking = () => {
       return;
     }
 
+    // Save current answer before navigating (if there's an answer)
+    if (selectedAnswer) {
+      await handleSaveAnswer();
+    }
+
     let newIndex;
     if (direction === "prev") {
       newIndex = Math.max(0, currentQuestionIndex - 1);
@@ -286,21 +300,27 @@ export const QuizTaking = () => {
       newIndex = Math.min(sessionData.questions.length - 1, currentQuestionIndex + 1);
     } else if (typeof direction === "number") {
       newIndex = direction - 1; // Convert 1-indexed to 0-indexed
+      // Don't navigate if clicking on current question
+      if (newIndex === currentQuestionIndex) {
+        return;
+      }
     } else {
       return;
     }
 
     try {
       await navigateToQuestion(sessionToken, newIndex + 1);
+      // Reload session state to get latest data
+      await loadSessionState();
       setCurrentQuestionIndex(newIndex);
       const newQ = sessionData.questions[newIndex];
-      setSelectedAnswer(newQ.user_answer || null);
+      setSelectedAnswer(newQ?.user_answer || null);
     } catch (error) {
       console.error("Failed to navigate:", error);
       // Fallback to local navigation
       setCurrentQuestionIndex(newIndex);
       const newQ = sessionData.questions[newIndex];
-      setSelectedAnswer(newQ.user_answer || null);
+      setSelectedAnswer(newQ?.user_answer || null);
     }
   };
 
@@ -387,7 +407,7 @@ export const QuizTaking = () => {
             {currentQ.options.map((option) => (
               <label
                 key={option.id}
-                className={cn(
+                  className={cn(
                   "flex items-center p-4 border-2 rounded-xl cursor-pointer transition-all",
                   selectedAnswer?.selected_option_id === option.id
                     ? "border-blue-500 bg-blue-50 shadow-sm"
@@ -400,7 +420,7 @@ export const QuizTaking = () => {
                   checked={selectedAnswer?.selected_option_id === option.id}
                   onChange={() => handleAnswerChange({ selected_option_id: option.id })}
                   className="w-4 h-4 text-blue-600"
-                  disabled={sessionData.pause_info?.is_paused}
+                  disabled={sessionData.pause_info?.is_paused || isSaving}
                 />
                 <span className="ml-3 text-gray-900 font-medium">{option.text}</span>
               </label>
@@ -415,7 +435,7 @@ export const QuizTaking = () => {
             {currentQ.options.map((option) => (
               <label
                 key={option.id}
-                className={cn(
+                  className={cn(
                   "flex items-center p-4 border-2 rounded-xl cursor-pointer transition-all",
                   selectedIds.includes(option.id)
                     ? "border-blue-500 bg-blue-50 shadow-sm"
@@ -432,7 +452,7 @@ export const QuizTaking = () => {
                     handleAnswerChange({ selected_option_ids: newIds });
                   }}
                   className="w-4 h-4 text-blue-600 rounded"
-                  disabled={sessionData.pause_info?.is_paused}
+                  disabled={sessionData.pause_info?.is_paused || isSaving}
                 />
                 <span className="ml-3 text-gray-900 font-medium">{option.text}</span>
               </label>
@@ -446,7 +466,7 @@ export const QuizTaking = () => {
             {["true", "false"].map((value) => (
               <label
                 key={value}
-                className={cn(
+                  className={cn(
                   "flex items-center p-4 border-2 rounded-xl cursor-pointer transition-all",
                   selectedAnswer?.selected_option_id === value
                     ? "border-blue-500 bg-blue-50 shadow-sm"
@@ -459,7 +479,7 @@ export const QuizTaking = () => {
                   checked={selectedAnswer?.selected_option_id === value}
                   onChange={() => handleAnswerChange({ selected_option_id: value })}
                   className="w-4 h-4 text-blue-600"
-                  disabled={sessionData.pause_info?.is_paused}
+                  disabled={sessionData.pause_info?.is_paused || isSaving}
                 />
                 <span className="ml-3 text-gray-900 font-medium capitalize">{value}</span>
               </label>
@@ -508,6 +528,7 @@ export const QuizTaking = () => {
 
                       <div
                         onDragOver={(e) => {
+                          if (sessionData.pause_info?.is_paused || isSaving) return;
                           e.preventDefault();
                           e.currentTarget.classList.add("border-blue-400", "bg-blue-100");
                         }}
@@ -515,6 +536,7 @@ export const QuizTaking = () => {
                           e.currentTarget.classList.remove("border-blue-400", "bg-blue-100");
                         }}
                         onDrop={(e) => {
+                          if (sessionData.pause_info?.is_paused || isSaving) return;
                           e.preventDefault();
                           e.currentTarget.classList.remove("border-blue-400", "bg-blue-100");
                           const rightId = e.dataTransfer.getData("rightId");
@@ -568,7 +590,7 @@ export const QuizTaking = () => {
                     return (
                       <div
                         key={rightItem.id}
-                        draggable={!isMatched && !sessionData.pause_info?.is_paused}
+                        draggable={!isMatched && !sessionData.pause_info?.is_paused && !isSaving}
                         onDragStart={(e) => {
                           e.dataTransfer.setData("rightId", rightItem.id);
                           e.currentTarget.style.opacity = "0.5";
@@ -780,21 +802,54 @@ export const QuizTaking = () => {
               <div className="flex items-center justify-between pt-6 border-t border-gray-200">
                 <button
                   onClick={() => handleNavigate("prev")}
-                  disabled={currentQuestionIndex === 0}
+                  disabled={currentQuestionIndex === 0 || isSaving}
                   className="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-gray-700 transition-colors"
                 >
                   <ChevronLeft className="w-5 h-5" />
                   Previous
                 </button>
 
-                <button
-                  onClick={() => handleNavigate("next")}
-                  disabled={currentQuestionIndex === sessionData.questions.length - 1}
-                  className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
-                >
-                  Next
-                  <ChevronRight className="w-5 h-5" />
-                </button>
+                {currentQuestionIndex === sessionData.questions.length - 1 ? (
+                  <button
+                    onClick={async () => {
+                      if (selectedAnswer) {
+                        await handleSaveAnswer();
+                      }
+                    }}
+                    disabled={isSaving}
+                    className="flex items-center gap-2 px-5 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
+                  >
+                    {isSaving ? (
+                      <>
+                        <Spinner size="sm" />
+                        Saving...
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle className="w-5 h-5" />
+                        Save
+                      </>
+                    )}
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => handleNavigate("next")}
+                    disabled={isSaving}
+                    className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
+                  >
+                    {isSaving ? (
+                      <>
+                        <Spinner size="sm" />
+                        Saving...
+                      </>
+                    ) : (
+                      <>
+                        Next
+                        <ChevronRight className="w-5 h-5" />
+                      </>
+                    )}
+                  </button>
+                )}
               </div>
             </div>
 
@@ -806,24 +861,31 @@ export const QuizTaking = () => {
               </div>
 
               <div className="grid grid-cols-5 gap-2 mb-6">
-                {sessionData.questions.map((q, idx) => (
-                  <button
-                    key={q.quiz_question_id}
-                    onClick={() => handleNavigate(idx + 1)}
-                    className={cn(
-                      "w-12 h-12 rounded-lg font-semibold text-sm transition-all",
-                      q.quiz_question_id === currentQ?.quiz_question_id
-                        ? "bg-blue-600 text-white shadow-md scale-105"
-                        : q.is_answered
-                        ? "bg-green-100 text-green-700 hover:bg-green-200"
-                        : q.is_flagged
-                        ? "bg-red-100 text-red-700 hover:bg-red-200"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                    )}
-                  >
-                    {idx + 1}
-                  </button>
-                ))}
+                {sessionData.questions.map((q, idx) => {
+                  // Priority: flagged > current > answered > unanswered
+                  const isCurrent = q.quiz_question_id === currentQ?.quiz_question_id;
+                  const isFlagged = q.is_flagged;
+                  const isAnswered = q.is_answered;
+                  
+                  return (
+                    <button
+                      key={q.quiz_question_id}
+                      onClick={() => handleNavigate(idx + 1)}
+                      className={cn(
+                        "w-12 h-12 rounded-lg font-semibold text-sm transition-all",
+                        isCurrent
+                          ? "bg-blue-600 text-white shadow-md scale-105"
+                          : isFlagged
+                          ? "bg-red-100 text-red-700 hover:bg-red-200 border-2 border-red-300"
+                          : isAnswered
+                          ? "bg-green-100 text-green-700 hover:bg-green-200"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      )}
+                    >
+                      {idx + 1}
+                    </button>
+                  );
+                })}
               </div>
 
               {/* Progress Stats */}
