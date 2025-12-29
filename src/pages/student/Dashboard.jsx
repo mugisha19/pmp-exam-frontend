@@ -16,10 +16,13 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { useRecentGroups, useAvailableQuizzes } from "@/hooks/queries/useStudentDashboard";
+import { useMyGroups, useGroupMembers } from "@/hooks/queries/useGroupQueries";
 import { SearchBar } from "@/components/shared/SearchBar";
 import { ProgressCard } from "@/components/shared/ProgressCard";
 import { QuizCard } from "@/components/shared/QuizCard";
 import { ActivityStats } from "@/components/shared/ActivityStats";
+import { UserCell } from "@/components/shared/UserCell";
+import { Badge } from "@/components/ui/Badge";
 import { Spinner } from "@/components/ui";
 import { cn } from "@/utils/cn";
 
@@ -28,14 +31,26 @@ export const Dashboard = () => {
   const { user } = useAuthStore();
   const { data: recentGroups, isLoading: groupsLoading } = useRecentGroups(4);
   const { data: availableQuizzes, isLoading: quizzesLoading } = useAvailableQuizzes(10);
+  const { data: myGroups } = useMyGroups();
   const [searchQuery, setSearchQuery] = useState("");
   const scrollRef = useRef(null);
 
   // Progress data - to be fetched from API
   const progressData = [];
 
-  // Mentor/instructor data - to be fetched from API
-  const mentors = [];
+  // Get the first group the user is a member of
+  const firstGroup = myGroups && myGroups.length > 0 ? myGroups[0] : null;
+  const groupId = firstGroup?.group_id || firstGroup?.id;
+
+  // Fetch members of the first group
+  const { data: membersData, isLoading: membersLoading } = useGroupMembers(groupId, {
+    enabled: !!groupId,
+  });
+
+  // Extract members array - handle different response structures
+  const members = Array.isArray(membersData)
+    ? membersData
+    : membersData?.items || membersData?.members || [];
 
   const handleSearch = (query) => {
     setSearchQuery(query);
@@ -154,72 +169,123 @@ export const Dashboard = () => {
         </div>
       )}
 
-      {/* Your Mentor Table */}
+      {/* Group Members Table */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         <div className="p-5 border-b border-gray-200 flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-gray-900">Your Mentor</h3>
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900">
+              {firstGroup ? `Members in ${firstGroup.name}` : "Group Members"}
+            </h3>
+            {firstGroup && (
+              <p className="text-sm text-gray-500 mt-1">
+                {members.length} {members.length === 1 ? "member" : "members"}
+              </p>
+            )}
+          </div>
           <button
             onClick={() => navigate("/groups")}
             className="text-sm text-accent-primary hover:text-accent-secondary font-medium"
           >
-            See All
+            See All Groups
           </button>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th className="px-5 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Instructor Name & Date
-                </th>
-                <th className="px-5 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Course Type
-                </th>
-                <th className="px-5 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Course Title
-                </th>
-                <th className="px-5 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {mentors.length === 0 ? (
+          {membersLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <Spinner size="lg" />
+            </div>
+          ) : !groupId ? (
+            <div className="px-5 py-8 text-center text-sm text-gray-500">
+              <Users className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+              <p>You are not a member of any group yet.</p>
+              <button
+                onClick={() => navigate("/groups")}
+                className="mt-4 px-4 py-2 bg-accent-primary text-white text-sm font-medium rounded-lg hover:bg-accent-secondary transition-colors"
+              >
+                Browse Groups
+              </button>
+            </div>
+          ) : members.length === 0 ? (
+            <div className="px-5 py-8 text-center text-sm text-gray-500">
+              <Users className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+              <p>No members found in this group.</p>
+            </div>
+          ) : (
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <td colSpan={4} className="px-5 py-8 text-center text-sm text-gray-500">
-                    No mentors available
-                  </td>
+                  <th className="px-5 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Member
+                  </th>
+                  <th className="px-5 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Role
+                  </th>
+                  <th className="px-5 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Joined Date
+                  </th>
+                  <th className="px-5 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Actions
+                  </th>
                 </tr>
-              ) : (
-                mentors.map((mentor) => (
-                  <tr key={mentor.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-5 py-4">
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">{mentor.name}</p>
-                        <p className="text-xs text-gray-500">{mentor.date}</p>
-                      </div>
-                    </td>
-                    <td className="px-5 py-4">
-                      <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-accent-primary/10 text-accent-primary">
-                        {mentor.courseType}
-                      </span>
-                    </td>
-                    <td className="px-5 py-4">
-                      <p className="text-sm text-gray-900">{mentor.courseTitle}</p>
-                    </td>
-                    <td className="px-5 py-4">
-                      <button
-                        onClick={() => navigate("/exams")}
-                        className="px-4 py-2 bg-accent-primary text-white text-xs font-medium rounded-lg hover:bg-accent-secondary transition-colors"
-                      >
-                        Show Details
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {members.map((member) => {
+                  const memberId = member.user_id || member.id;
+                  const joinedDate = member.joined_at || member.created_at;
+                  const role = member.group_role || member.role || "member";
+                  
+                  return (
+                    <tr key={memberId} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-5 py-4">
+                        <UserCell
+                          user={{
+                            first_name: member.first_name,
+                            last_name: member.last_name,
+                            email: member.email,
+                            user_id: memberId,
+                          }}
+                          showEmail
+                        />
+                      </td>
+                      <td className="px-5 py-4">
+                        <Badge
+                          variant={
+                            role === "admin" || role === "owner"
+                              ? "primary"
+                              : role === "instructor"
+                              ? "info"
+                              : "default"
+                          }
+                          size="sm"
+                        >
+                          {role.charAt(0).toUpperCase() + role.slice(1)}
+                        </Badge>
+                      </td>
+                      <td className="px-5 py-4">
+                        <span className="text-sm text-gray-600">
+                          {joinedDate
+                            ? new Date(joinedDate).toLocaleDateString("en-US", {
+                                month: "short",
+                                day: "numeric",
+                                year: "numeric",
+                              })
+                            : "Unknown"}
+                        </span>
+                      </td>
+                      <td className="px-5 py-4">
+                        <button
+                          onClick={() => navigate(`/groups/${groupId}`)}
+                          className="px-4 py-2 bg-accent-primary text-white text-xs font-medium rounded-lg hover:bg-accent-secondary transition-colors"
+                        >
+                          View Group
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
 

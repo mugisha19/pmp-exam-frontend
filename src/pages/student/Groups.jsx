@@ -8,13 +8,15 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { getGroups, getMyGroups, createJoinRequest } from "@/services/group.service";
 import { Spinner } from "@/components/ui";
+import { Modal, ModalBody, ModalFooter } from "@/components/ui/Modal";
+import { Button } from "@/components/ui/Button";
 import { SearchBar } from "@/components/shared/SearchBar";
 import { GroupCard } from "@/components/shared/GroupCard";
 import { DashboardStatsCard, StatsGrid } from "@/components/shared/StatsCards";
 import { SortDropdown } from "@/components/shared/SortDropdown";
 import { ViewToggle } from "@/components/shared/ViewToggle";
 import { FilterBar, FilterGroup } from "@/components/shared/FilterBar";
-import { Users, BookOpen, TrendingUp } from "lucide-react";
+import { Users, BookOpen, TrendingUp, CheckCircle, Bell } from "lucide-react";
 import { toast } from "react-hot-toast";
 
 export const Groups = () => {
@@ -32,6 +34,7 @@ export const Groups = () => {
   const [statusFilter, setStatusFilter] = useState("all"); // all, active, inactive
   const [sortBy, setSortBy] = useState("name"); // name, members, quizzes, date
   const [viewMode, setViewMode] = useState("grid"); // grid or list
+  const [showJoinRequestModal, setShowJoinRequestModal] = useState(false);
 
   // Update URL when tab changes via user interaction
   const handleTabChange = (tab) => {
@@ -55,6 +58,23 @@ export const Groups = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
+
+  // Check for joinRequest success parameter and show modal
+  useEffect(() => {
+    const joinRequestParam = searchParams.get("joinRequest");
+    if (joinRequestParam === "success") {
+      setShowJoinRequestModal(true);
+      // Remove the parameter from URL after showing modal
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete("joinRequest");
+      setSearchParams(newParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
+
+  // Handle closing the join request modal
+  const handleCloseJoinRequestModal = () => {
+    setShowJoinRequestModal(false);
+  };
 
   // Fetch user's joined groups
   const { data: myGroups, isLoading: loadingMy } = useQuery({
@@ -87,9 +107,10 @@ export const Groups = () => {
   const joinGroupMutation = useMutation({
     mutationFn: (groupId) => createJoinRequest({ group_id: groupId }),
     onSuccess: () => {
-      toast.success("Successfully joined the group!");
       queryClient.invalidateQueries(["my-groups"]);
       queryClient.invalidateQueries(["available-groups"]);
+      // Show success modal
+      setShowJoinRequestModal(true);
     },
     onError: (error) => {
       toast.error(error?.message || "Failed to join group");
@@ -355,6 +376,45 @@ export const Groups = () => {
           )}
         </div>
       )}
+
+      {/* Join Request Success Modal */}
+      <Modal
+        isOpen={showJoinRequestModal}
+        onClose={handleCloseJoinRequestModal}
+        title="Join Request Submitted"
+        size="md"
+        closeOnOverlay={true}
+      >
+        <ModalBody>
+          <div className="flex flex-col items-center text-center space-y-4 py-4">
+            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+              <CheckCircle className="w-10 h-10 text-blue-600" />
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-lg font-semibold text-gray-900">
+                Join Request Sent Successfully
+              </h3>
+              <p className="text-sm text-gray-600">
+                You have successfully sent a join request. Please wait for approval from the group administrator.
+              </p>
+              <div className="flex items-start gap-2 mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <Bell className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-blue-900 text-left">
+                  You will be notified once your request is approved or rejected.
+                </p>
+              </div>
+            </div>
+          </div>
+        </ModalBody>
+        <ModalFooter>
+          <Button
+            onClick={handleCloseJoinRequestModal}
+            className="w-full"
+          >
+            Got it
+          </Button>
+        </ModalFooter>
+      </Modal>
     </div>
   );
 };

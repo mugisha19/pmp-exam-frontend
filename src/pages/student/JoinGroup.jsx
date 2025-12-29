@@ -65,8 +65,7 @@ export const JoinGroup = () => {
         message: "Joining via invite link",
       }),
     onSuccess: (data) => {
-      toast.success("Successfully joined the group!");
-      navigate(`/groups?tab=mygroups`);
+      navigate(`/groups?tab=mygroups&joinRequest=success`);
     },
     onError: (error) => {
       const errorMessage =
