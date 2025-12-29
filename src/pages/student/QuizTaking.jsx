@@ -76,9 +76,9 @@ export const QuizTaking = () => {
         sessionStorage.removeItem("quiz_session_token");
         sessionStorage.removeItem("quiz_session_data");
         if (state.status === "auto_submitted") {
-          toast.error("Time's up! Quiz was auto-submitted.");
+          toast("Time's up! Quiz was auto-submitted.");
         } else {
-          toast.info("This quiz has already been submitted");
+          toast("This quiz has already been submitted");
         }
         navigate(`/exams/${quizId}`);
         return;
@@ -88,7 +88,7 @@ export const QuizTaking = () => {
       if (state.status === "auto_submitted" && state.result) {
         sessionStorage.removeItem("quiz_session_token");
         sessionStorage.removeItem("quiz_session_data");
-        toast.error("Time's up! Quiz was auto-submitted.");
+        toast("Time's up! Quiz was auto-submitted.");
         navigate(`/exams/${quizId}`);
         return;
       }
@@ -115,69 +115,28 @@ export const QuizTaking = () => {
         if (nextUnansweredIndex !== -1) {
           // Found unanswered question, navigate to it
           qIndex = nextUnansweredIndex;
-          try {
-            await navigateToQuestion(sessionToken, qIndex + 1);
-            // Reload state after navigation to get updated current question
-            const updatedState = await getSessionState(sessionToken);
-            setSessionData(updatedState);
-            // Update question index and answer from updated state
-            const updatedQ = updatedState.questions?.[qIndex];
-            setCurrentQuestionIndex(qIndex);
-            setSelectedAnswer(updatedQ?.user_answer || null);
-            
-            // Update timing from updated state
-            if (updatedState.timing) {
-              setTimeRemaining(updatedState.timing.time_remaining_seconds);
-              setExamTimeElapsed(updatedState.timing.time_elapsed_seconds || 0);
-              setPauseTimeElapsed(updatedState.timing.pause_time_seconds || 0);
-            }
-            
-            // Update pause info
-            if (updatedState.pause_info?.is_paused) {
-              setPauseTimeRemaining(updatedState.pause_info.pause_remaining_seconds);
-            } else {
-              setPauseTimeRemaining(null);
-            }
-            return; // Early return after navigation
-          } catch (error) {
-            console.error("Failed to navigate to next unanswered:", error);
-            // Fall through to set original state
-          }
         } else {
           // All remaining questions are answered, go to next question in sequence
           const nextIndex = qIndex + 1;
           if (nextIndex < state.questions.length) {
             qIndex = nextIndex;
-            try {
-              await navigateToQuestion(sessionToken, qIndex + 1);
-              // Reload state after navigation to get updated current question
-              const updatedState = await getSessionState(sessionToken);
-              setSessionData(updatedState);
-              // Update question index and answer from updated state
-              const updatedQ = updatedState.questions?.[qIndex];
-              setCurrentQuestionIndex(qIndex);
-              setSelectedAnswer(updatedQ?.user_answer || null);
-              
-              // Update timing from updated state
-              if (updatedState.timing) {
-                setTimeRemaining(updatedState.timing.time_remaining_seconds);
-                setExamTimeElapsed(updatedState.timing.time_elapsed_seconds || 0);
-                setPauseTimeElapsed(updatedState.timing.pause_time_seconds || 0);
-              }
-              
-              // Update pause info
-              if (updatedState.pause_info?.is_paused) {
-                setPauseTimeRemaining(updatedState.pause_info.pause_remaining_seconds);
-              } else {
-                setPauseTimeRemaining(null);
-              }
-              return; // Early return after navigation
-            } catch (error) {
-              console.error("Failed to navigate to next question:", error);
-              // Fall through to set original state
-            }
           }
         }
+        
+        // Only call backend navigation if session is active and not paused
+        if (!state.pause_info?.is_paused && state.status !== "expired") {
+          try {
+            await navigateToQuestion(sessionToken, qIndex + 1);
+          } catch (error) {
+            console.error("Failed to navigate to next unanswered:", error);
+            // Continue with local navigation even if backend call fails
+          }
+        }
+        
+        // Always update local state
+        setCurrentQuestionIndex(qIndex);
+        const updatedQ = state.questions?.[qIndex];
+        setSelectedAnswer(updatedQ?.user_answer || null);
       }
       
       // Set session data and current question
@@ -392,14 +351,23 @@ export const QuizTaking = () => {
   }, [isWaitingForAutoSubmit, sessionToken, quizId, navigate]);
 
   const handleAnswerChange = (answer) => {
+    // Don't allow answer changes if waiting for auto-submit or paused
+    if (isWaitingForAutoSubmit || sessionData?.pause_info?.is_paused) {
+      return;
+    }
     // Only update local state, don't save to backend yet
     setSelectedAnswer(answer);
   };
 
   const handleSaveAnswer = async () => {
-    if (!sessionData || sessionData.pause_info?.is_paused) {
-      toast.error("Cannot save answers while quiz is paused");
+    // Don't save if waiting for auto-submit
+    if (isWaitingForAutoSubmit) {
       return;
+    }
+
+    // Don't save if paused
+    if (!sessionData || sessionData.pause_info?.is_paused) {
+      return; // Silently return, don't show error (might be auto-paused)
     }
 
     if (!selectedAnswer) {
@@ -419,16 +387,31 @@ export const QuizTaking = () => {
         is_flagged: currentQ.is_flagged || false,
       });
 
-      // Reload session state to get updated progress
-      await loadSessionState();
-
-      // Handle auto-pause response (exam mode)
+      // Handle auto-pause response (exam mode) - reload state first
       if (response.auto_paused) {
-        toast.info(response.pause_message || "Auto-pause triggered");
+        // Reload session state immediately to get paused state
         await loadSessionState();
+        toast.success(response.pause_message || "Auto-pause triggered");
+        return; // Exit early, don't reload again
       }
+
+      // Reload session state to get updated progress (only if not auto-paused)
+      await loadSessionState();
     } catch (error) {
       console.error("Failed to save answer:", error);
+      // Check if error is due to pause or expired session
+      if (error.response?.status === 400 && error.response?.data?.detail?.includes("paused")) {
+        // Session was paused, reload state
+        await loadSessionState();
+        return;
+      }
+      if (error.response?.status === 410) {
+        // Session expired/submitted, redirect
+        sessionStorage.removeItem("quiz_session_token");
+        sessionStorage.removeItem("quiz_session_data");
+        navigate(`/exams/${quizId}`);
+        return;
+      }
       toast.error("Failed to save answer");
     } finally {
       setIsSaving(false);
@@ -436,6 +419,11 @@ export const QuizTaking = () => {
   };
 
   const handleFlagToggle = async () => {
+    // Don't flag if waiting for auto-submit
+    if (isWaitingForAutoSubmit) {
+      return;
+    }
+
     if (!sessionData || sessionData.pause_info?.is_paused) {
       toast.error("Cannot flag questions while quiz is paused");
       return;
@@ -449,11 +437,24 @@ export const QuizTaking = () => {
       await loadSessionState();
     } catch (error) {
       console.error("Failed to flag question:", error);
+      // Check if session expired
+      if (error.response?.status === 410) {
+        sessionStorage.removeItem("quiz_session_token");
+        sessionStorage.removeItem("quiz_session_data");
+        navigate(`/exams/${quizId}`);
+        return;
+      }
       toast.error("Failed to flag question");
     }
   };
 
   const handleNavigate = async (direction) => {
+    // Don't navigate if waiting for auto-submit
+    if (isWaitingForAutoSubmit) {
+      return;
+    }
+
+    // Don't navigate if paused
     if (!sessionData || sessionData.pause_info?.is_paused) {
       toast.error("Cannot navigate while quiz is paused");
       return;
@@ -462,6 +463,10 @@ export const QuizTaking = () => {
     // Save current answer before navigating (if there's an answer)
     if (selectedAnswer) {
       await handleSaveAnswer();
+      // Check if auto-pause happened during save
+      if (sessionData.pause_info?.is_paused) {
+        return; // Don't navigate if paused
+      }
     }
 
     let newIndex;
@@ -480,14 +485,25 @@ export const QuizTaking = () => {
     }
 
     try {
-      await navigateToQuestion(sessionToken, newIndex + 1);
-      // Reload session state to get latest data
-      await loadSessionState();
+      // Only call backend navigation if session is active and not paused
+      if (!sessionData.pause_info?.is_paused && !isWaitingForAutoSubmit) {
+        await navigateToQuestion(sessionToken, newIndex + 1);
+        // Reload session state to get latest data
+        await loadSessionState();
+      }
+      // Always update local state (even if backend call fails or skipped)
       setCurrentQuestionIndex(newIndex);
       const newQ = sessionData.questions[newIndex];
       setSelectedAnswer(newQ?.user_answer || null);
     } catch (error) {
       console.error("Failed to navigate:", error);
+      // Check if session expired or invalid
+      if (error.response?.status === 410 || error.response?.status === 404) {
+        sessionStorage.removeItem("quiz_session_token");
+        sessionStorage.removeItem("quiz_session_data");
+        navigate(`/exams/${quizId}`);
+        return;
+      }
       // Fallback to local navigation
       setCurrentQuestionIndex(newIndex);
       const newQ = sessionData.questions[newIndex];
@@ -537,12 +553,28 @@ export const QuizTaking = () => {
   };
 
   const handleSubmit = async () => {
+    // Don't submit if waiting for auto-submit
+    if (isWaitingForAutoSubmit) {
+      toast("Quiz is being auto-submitted. Please wait...");
+      return;
+    }
+
     if (!confirm("Are you sure you want to submit the quiz? You cannot change your answers after submission.")) {
       return;
     }
 
     setIsSubmitting(true);
     try {
+      // Save current answer before submitting (if there's an answer)
+      if (selectedAnswer && sessionData && !sessionData.pause_info?.is_paused) {
+        try {
+          await handleSaveAnswer();
+        } catch (error) {
+          console.error("Failed to save answer before submit:", error);
+          // Continue with submit even if save fails
+        }
+      }
+
       await submitQuiz(sessionToken);
       sessionStorage.removeItem("quiz_session_token");
       sessionStorage.removeItem("quiz_session_data");
@@ -550,6 +582,14 @@ export const QuizTaking = () => {
       navigate(`/exams/${quizId}`);
     } catch (error) {
       console.error("Failed to submit:", error);
+      // Check if already submitted
+      if (error.response?.status === 200 || error.response?.status === 410) {
+        sessionStorage.removeItem("quiz_session_token");
+        sessionStorage.removeItem("quiz_session_data");
+        toast("Quiz has already been submitted");
+        navigate(`/exams/${quizId}`);
+        return;
+      }
       toast.error("Failed to submit quiz");
     } finally {
       setIsSubmitting(false);
@@ -579,7 +619,10 @@ export const QuizTaking = () => {
               <label
                 key={option.id}
                   className={cn(
-                  "flex items-center p-4 border-2 rounded-xl cursor-pointer transition-all",
+                  "flex items-center p-4 border-2 rounded-xl transition-all",
+                  (sessionData.pause_info?.is_paused || isWaitingForAutoSubmit)
+                    ? "cursor-not-allowed opacity-50"
+                    : "cursor-pointer",
                   selectedAnswer?.selected_option_id === option.id
                     ? "border-blue-500 bg-blue-50 shadow-sm"
                     : "border-gray-200 hover:border-gray-300 bg-white"
@@ -591,7 +634,7 @@ export const QuizTaking = () => {
                   checked={selectedAnswer?.selected_option_id === option.id}
                   onChange={() => handleAnswerChange({ selected_option_id: option.id })}
                   className="w-4 h-4 text-blue-600"
-                  disabled={sessionData.pause_info?.is_paused || isSaving}
+                  disabled={sessionData.pause_info?.is_paused || isSaving || isWaitingForAutoSubmit}
                 />
                 <span className="ml-3 text-gray-900 font-medium">{option.text}</span>
               </label>
@@ -607,7 +650,10 @@ export const QuizTaking = () => {
               <label
                 key={option.id}
                   className={cn(
-                  "flex items-center p-4 border-2 rounded-xl cursor-pointer transition-all",
+                  "flex items-center p-4 border-2 rounded-xl transition-all",
+                  (sessionData.pause_info?.is_paused || isWaitingForAutoSubmit)
+                    ? "cursor-not-allowed opacity-50"
+                    : "cursor-pointer",
                   selectedIds.includes(option.id)
                     ? "border-blue-500 bg-blue-50 shadow-sm"
                     : "border-gray-200 hover:border-gray-300 bg-white"
@@ -623,7 +669,7 @@ export const QuizTaking = () => {
                     handleAnswerChange({ selected_option_ids: newIds });
                   }}
                   className="w-4 h-4 text-blue-600 rounded"
-                  disabled={sessionData.pause_info?.is_paused || isSaving}
+                  disabled={sessionData.pause_info?.is_paused || isSaving || isWaitingForAutoSubmit}
                 />
                 <span className="ml-3 text-gray-900 font-medium">{option.text}</span>
               </label>
@@ -638,7 +684,10 @@ export const QuizTaking = () => {
               <label
                 key={value}
                   className={cn(
-                  "flex items-center p-4 border-2 rounded-xl cursor-pointer transition-all",
+                  "flex items-center p-4 border-2 rounded-xl transition-all",
+                  (sessionData.pause_info?.is_paused || isWaitingForAutoSubmit)
+                    ? "cursor-not-allowed opacity-50"
+                    : "cursor-pointer",
                   selectedAnswer?.selected_option_id === value
                     ? "border-blue-500 bg-blue-50 shadow-sm"
                     : "border-gray-200 hover:border-gray-300 bg-white"
@@ -650,7 +699,7 @@ export const QuizTaking = () => {
                   checked={selectedAnswer?.selected_option_id === value}
                   onChange={() => handleAnswerChange({ selected_option_id: value })}
                   className="w-4 h-4 text-blue-600"
-                  disabled={sessionData.pause_info?.is_paused || isSaving}
+                  disabled={sessionData.pause_info?.is_paused || isSaving || isWaitingForAutoSubmit}
                 />
                 <span className="ml-3 text-gray-900 font-medium capitalize">{value}</span>
               </label>
@@ -699,7 +748,7 @@ export const QuizTaking = () => {
 
                       <div
                         onDragOver={(e) => {
-                          if (sessionData.pause_info?.is_paused || isSaving) return;
+                          if (sessionData.pause_info?.is_paused || isSaving || isWaitingForAutoSubmit) return;
                           e.preventDefault();
                           e.currentTarget.classList.add("border-blue-400", "bg-blue-100");
                         }}
@@ -707,7 +756,7 @@ export const QuizTaking = () => {
                           e.currentTarget.classList.remove("border-blue-400", "bg-blue-100");
                         }}
                         onDrop={(e) => {
-                          if (sessionData.pause_info?.is_paused || isSaving) return;
+                          if (sessionData.pause_info?.is_paused || isSaving || isWaitingForAutoSubmit) return;
                           e.preventDefault();
                           e.currentTarget.classList.remove("border-blue-400", "bg-blue-100");
                           const rightId = e.dataTransfer.getData("rightId");
@@ -761,7 +810,7 @@ export const QuizTaking = () => {
                     return (
                       <div
                         key={rightItem.id}
-                        draggable={!isMatched && !sessionData.pause_info?.is_paused && !isSaving}
+                        draggable={!isMatched && !sessionData.pause_info?.is_paused && !isSaving && !isWaitingForAutoSubmit}
                         onDragStart={(e) => {
                           e.dataTransfer.setData("rightId", rightItem.id);
                           e.currentTarget.style.opacity = "0.5";
@@ -1024,11 +1073,11 @@ export const QuizTaking = () => {
                 {currentQuestionIndex === sessionData.questions.length - 1 ? (
                   <button
                     onClick={async () => {
-                      if (selectedAnswer) {
+                      if (selectedAnswer && !isWaitingForAutoSubmit && !sessionData.pause_info?.is_paused) {
                         await handleSaveAnswer();
                       }
                     }}
-                    disabled={isSaving}
+                    disabled={isSaving || isWaitingForAutoSubmit || sessionData.pause_info?.is_paused}
                     className="flex items-center gap-2 px-5 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
                   >
                     {isSaving ? (
@@ -1046,7 +1095,7 @@ export const QuizTaking = () => {
                 ) : (
                   <button
                     onClick={() => handleNavigate("next")}
-                    disabled={isSaving}
+                    disabled={isSaving || isWaitingForAutoSubmit || sessionData.pause_info?.is_paused}
                     className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
                   >
                     {isSaving ? (
