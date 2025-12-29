@@ -60,6 +60,7 @@ export const QuizTaking = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isWaitingForAutoSubmit, setIsWaitingForAutoSubmit] = useState(false);
+  const [lastQuestionAnswerSaved, setLastQuestionAnswerSaved] = useState(false);
 
   // Load session state from backend
   const loadSessionState = useCallback(async () => {
@@ -147,6 +148,21 @@ export const QuizTaking = () => {
       const finalQ = state.questions?.[qIndex];
       if (finalQ) {
         setSelectedAnswer(finalQ.user_answer || null);
+      }
+      
+      // Reset last question save state when navigating away from last question
+      const isLastQuestion = qIndex === state.questions.length - 1;
+      if (!isLastQuestion) {
+        setLastQuestionAnswerSaved(false);
+      } else {
+        // If on last question, check if current answer is already saved
+        const lastQ = state.questions?.[qIndex];
+        if (lastQ?.user_answer) {
+          // Answer exists, consider it saved initially
+          setLastQuestionAnswerSaved(true);
+        } else {
+          setLastQuestionAnswerSaved(false);
+        }
       }
 
       // Update timing from backend (authoritative source)
@@ -287,7 +303,7 @@ export const QuizTaking = () => {
         if (response.status === "auto_submitted" || response.status === "expired") {
           sessionStorage.removeItem("quiz_session_token");
           sessionStorage.removeItem("quiz_session_data");
-          toast.error("Time's up! Quiz was auto-submitted.");
+          toast("Time's up! Quiz was auto-submitted.");
           navigate(`/exams/${quizId}`);
           return;
         }
@@ -318,7 +334,7 @@ export const QuizTaking = () => {
           // Backend has auto-submitted, redirect to exam detail
           sessionStorage.removeItem("quiz_session_token");
           sessionStorage.removeItem("quiz_session_data");
-          toast.error("Time's up! Quiz was auto-submitted.");
+          toast("Time's up! Quiz was auto-submitted.");
           navigate(`/exams/${quizId}`);
           return;
         }
@@ -339,7 +355,7 @@ export const QuizTaking = () => {
         if (error.response?.status === 404 || error.response?.status === 410) {
           sessionStorage.removeItem("quiz_session_token");
           sessionStorage.removeItem("quiz_session_data");
-          toast.error("Time's up! Quiz was auto-submitted.");
+          toast("Time's up! Quiz was auto-submitted.");
           navigate(`/exams/${quizId}`);
         } else {
           console.error("Failed to poll session status:", error);
@@ -357,6 +373,11 @@ export const QuizTaking = () => {
     }
     // Only update local state, don't save to backend yet
     setSelectedAnswer(answer);
+    
+    // If on last question and answer changed, enable Save button
+    if (sessionData && currentQuestionIndex === sessionData.questions.length - 1) {
+      setLastQuestionAnswerSaved(false);
+    }
   };
 
   const handleSaveAnswer = async () => {
@@ -402,6 +423,11 @@ export const QuizTaking = () => {
       const updatedState = await getSessionState(sessionToken);
       if (updatedState.pause_info?.is_paused) {
         return { autoPaused: true };
+      }
+      
+      // If this is the last question, mark answer as saved
+      if (sessionData && currentQuestionIndex === sessionData.questions.length - 1) {
+        setLastQuestionAnswerSaved(true);
       }
       
       return { autoPaused: false };
@@ -544,6 +570,19 @@ export const QuizTaking = () => {
       setCurrentQuestionIndex(newIndex);
       const newQ = sessionData.questions[newIndex];
       setSelectedAnswer(newQ?.user_answer || null);
+      
+      // Reset last question save state when navigating away from last question
+      const isLastQuestion = newIndex === sessionData.questions.length - 1;
+      if (!isLastQuestion) {
+        setLastQuestionAnswerSaved(false);
+      } else {
+        // If on last question, check if current answer is already saved
+        if (newQ?.user_answer) {
+          setLastQuestionAnswerSaved(true);
+        } else {
+          setLastQuestionAnswerSaved(false);
+        }
+      }
     } catch (error) {
       console.error("Failed to navigate:", error);
       // Check if session expired or invalid
@@ -1140,7 +1179,13 @@ export const QuizTaking = () => {
                         await handleSaveAnswer();
                       }
                     }}
-                    disabled={isSaving || isWaitingForAutoSubmit || sessionData.pause_info?.is_paused}
+                    disabled={
+                      isSaving || 
+                      isWaitingForAutoSubmit || 
+                      sessionData.pause_info?.is_paused || 
+                      !selectedAnswer ||
+                      lastQuestionAnswerSaved
+                    }
                     className="flex items-center gap-2 px-5 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
                   >
                     {isSaving ? (
