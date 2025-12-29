@@ -5,6 +5,7 @@ import { getQuizzes, getQuizAttempts } from "@/services/quiz.service";
 import { startQuizSession, checkNetworkStatus, abandonQuiz } from "@/services/session.service";
 import toast from "react-hot-toast";
 import { Spinner } from "@/components/ui";
+import { QuizModeModal } from "@/components/features/quizzes/QuizModeModal";
 import {
   Clock,
   Play,
@@ -20,6 +21,7 @@ export const QuizDetail = () => {
   const [activeTab, setActiveTab] = React.useState("overview");
   const [isStarting, setIsStarting] = React.useState(false);
   const [activeQuizError, setActiveQuizError] = React.useState(null);
+  const [showModeModal, setShowModeModal] = React.useState(false);
 
   // Fetch quiz details
   const { data: quizData, isLoading } = useQuery({
@@ -47,18 +49,18 @@ export const QuizDetail = () => {
     enabled: !!quizId,
   });
 
-  const handleStartQuiz = async () => {
-    // TODO: Check network connectivity
-    // const isOnline = await checkNetworkStatus();
-    // if (!isOnline) {
-    //   toast.error("No internet connection. Please check your network and try again.");
-    //   return;
-    // }
+  const handleStartQuiz = () => {
+    // Show mode selection modal
+    setShowModeModal(true);
+  };
 
+  const handleModeSelected = async (mode) => {
+    setShowModeModal(false);
     setIsStarting(true);
+    
     try {
-      // Start quiz session
-      const sessionData = await startQuizSession(quizId);
+      // Start quiz session with selected mode
+      const sessionData = await startQuizSession(quizId, mode);
       
       // Store session token
       sessionStorage.setItem("quiz_session_token", sessionData.session_token);
@@ -67,7 +69,6 @@ export const QuizDetail = () => {
       // Navigate to quiz taking page
       navigate(`/exams/${quizId}/take`);
     } catch (error) {
-      
       // Handle specific errors
       if (error.response?.status === 409) {
         const detail = error.response.data?.detail;
@@ -361,7 +362,7 @@ export const QuizDetail = () => {
             <div className="flex items-center gap-4">
               <button
                 onClick={() => navigate(-1)}
-                className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 font-medium"
+                className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors"
               >
                 Skip test
               </button>
@@ -369,7 +370,7 @@ export const QuizDetail = () => {
                 <button
                   onClick={handleStartQuiz}
                   disabled={isStarting}
-                  className="px-6 py-2.5 bg-gray-900 text-white rounded hover:bg-gray-800 font-medium disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2"
+                  className="px-6 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 font-medium disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
                 >
                   {isStarting ? (
                     <>
@@ -383,12 +384,20 @@ export const QuizDetail = () => {
               ) : (
                 <button
                   disabled
-                  className="px-6 py-2.5 bg-gray-300 text-gray-500 rounded cursor-not-allowed font-medium"
+                  className="px-6 py-2.5 bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed font-medium"
                 >
                   Quiz Not Available
                 </button>
               )}
             </div>
+
+            {/* Mode Selection Modal */}
+            <QuizModeModal
+              isOpen={showModeModal}
+              onClose={() => setShowModeModal(false)}
+              onSelectMode={handleModeSelected}
+              quiz={quiz}
+            />
 
             {/* Progress Stats */}
             {totalAttempts > 0 && (
