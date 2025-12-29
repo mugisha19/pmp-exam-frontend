@@ -84,17 +84,94 @@ export const QuizTaking = () => {
         return;
       }
 
-      setSessionData(state);
-      
       // Set current question from backend's current_question_number
       const currentQNum = state.progress?.current_question_number || 1;
-      const qIndex = currentQNum - 1;
+      let qIndex = currentQNum - 1;
+      const currentQ = state.questions?.[qIndex];
+      
+      // If current question is answered, navigate to next unanswered question
+      if (currentQ?.is_answered) {
+        // Find next unanswered question
+        const nextUnansweredIndex = state.questions.findIndex(
+          (q, idx) => idx > qIndex && !q.is_answered
+        );
+        
+        if (nextUnansweredIndex !== -1) {
+          // Found unanswered question, navigate to it
+          qIndex = nextUnansweredIndex;
+          try {
+            await navigateToQuestion(sessionToken, qIndex + 1);
+            // Reload state after navigation to get updated current question
+            const updatedState = await getSessionState(sessionToken);
+            setSessionData(updatedState);
+            // Update question index and answer from updated state
+            const updatedQ = updatedState.questions?.[qIndex];
+            setCurrentQuestionIndex(qIndex);
+            setSelectedAnswer(updatedQ?.user_answer || null);
+            
+            // Update timing from updated state
+            if (updatedState.timing) {
+              setTimeRemaining(updatedState.timing.time_remaining_seconds);
+              setExamTimeElapsed(updatedState.timing.time_elapsed_seconds || 0);
+              setPauseTimeElapsed(updatedState.timing.pause_time_seconds || 0);
+            }
+            
+            // Update pause info
+            if (updatedState.pause_info?.is_paused) {
+              setPauseTimeRemaining(updatedState.pause_info.pause_remaining_seconds);
+            } else {
+              setPauseTimeRemaining(null);
+            }
+            return; // Early return after navigation
+          } catch (error) {
+            console.error("Failed to navigate to next unanswered:", error);
+            // Fall through to set original state
+          }
+        } else {
+          // All remaining questions are answered, go to next question in sequence
+          const nextIndex = qIndex + 1;
+          if (nextIndex < state.questions.length) {
+            qIndex = nextIndex;
+            try {
+              await navigateToQuestion(sessionToken, qIndex + 1);
+              // Reload state after navigation to get updated current question
+              const updatedState = await getSessionState(sessionToken);
+              setSessionData(updatedState);
+              // Update question index and answer from updated state
+              const updatedQ = updatedState.questions?.[qIndex];
+              setCurrentQuestionIndex(qIndex);
+              setSelectedAnswer(updatedQ?.user_answer || null);
+              
+              // Update timing from updated state
+              if (updatedState.timing) {
+                setTimeRemaining(updatedState.timing.time_remaining_seconds);
+                setExamTimeElapsed(updatedState.timing.time_elapsed_seconds || 0);
+                setPauseTimeElapsed(updatedState.timing.pause_time_seconds || 0);
+              }
+              
+              // Update pause info
+              if (updatedState.pause_info?.is_paused) {
+                setPauseTimeRemaining(updatedState.pause_info.pause_remaining_seconds);
+              } else {
+                setPauseTimeRemaining(null);
+              }
+              return; // Early return after navigation
+            } catch (error) {
+              console.error("Failed to navigate to next question:", error);
+              // Fall through to set original state
+            }
+          }
+        }
+      }
+      
+      // Set session data and current question
+      setSessionData(state);
       setCurrentQuestionIndex(qIndex);
       
       // Load current question's answer
-      const currentQ = state.questions?.[qIndex];
-      if (currentQ) {
-        setSelectedAnswer(currentQ.user_answer || null);
+      const finalQ = state.questions?.[qIndex];
+      if (finalQ) {
+        setSelectedAnswer(finalQ.user_answer || null);
       }
 
       // Update timing from backend (authoritative source)
