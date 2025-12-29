@@ -20,6 +20,7 @@ import {
   Play,
   Send,
   AlertCircle,
+  AlertTriangle,
   CheckCircle,
   XCircle,
 } from "lucide-react";
@@ -36,6 +37,7 @@ import {
 import toast from "react-hot-toast";
 import { Spinner } from "@/components/ui";
 import { cn } from "@/utils/cn";
+import { Modal, ModalBody, ModalFooter } from "@/components/ui/Modal";
 
 export const QuizTaking = () => {
   const { quizId } = useParams();
@@ -61,6 +63,7 @@ export const QuizTaking = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [isWaitingForAutoSubmit, setIsWaitingForAutoSubmit] = useState(false);
   const [lastQuestionAnswerSaved, setLastQuestionAnswerSaved] = useState(false);
+  const [showSubmitModal, setShowSubmitModal] = useState(false);
 
   // Load session state from backend
   const loadSessionState = useCallback(async () => {
@@ -654,18 +657,27 @@ export const QuizTaking = () => {
     }
   };
 
-  const handleSubmit = async () => {
+  // Count unanswered questions
+  const getUnansweredCount = () => {
+    if (!sessionData?.questions) return 0;
+    return sessionData.questions.filter((q) => !q.user_answer).length;
+  };
+
+  const handleSubmitClick = () => {
     // Don't submit if waiting for auto-submit
     if (isWaitingForAutoSubmit) {
       toast("Quiz is being auto-submitted. Please wait...");
       return;
     }
 
-    if (!confirm("Are you sure you want to submit the quiz? You cannot change your answers after submission.")) {
-      return;
-    }
+    // Show modal for confirmation
+    setShowSubmitModal(true);
+  };
 
+  const handleSubmitConfirm = async () => {
+    setShowSubmitModal(false);
     setIsSubmitting(true);
+    
     try {
       // Save current answer before submitting (if there's an answer)
       if (selectedAnswer && sessionData && !sessionData.pause_info?.is_paused) {
@@ -1105,8 +1117,8 @@ export const QuizTaking = () => {
                 </button>
               )}
               <button
-                onClick={handleSubmit}
-                disabled={isSubmitting}
+                onClick={handleSubmitClick}
+                disabled={isSubmitting || isWaitingForAutoSubmit}
                 className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-semibold transition-colors"
               >
                 {isSubmitting ? <Spinner size="sm" /> : <Send className="w-4 h-4" />}
@@ -1291,6 +1303,70 @@ export const QuizTaking = () => {
           </div>
         </div>
       </div>
+
+      {/* Submit Confirmation Modal */}
+      <Modal
+        isOpen={showSubmitModal}
+        onClose={() => !isSubmitting && setShowSubmitModal(false)}
+        title="Submit Quiz"
+        size="md"
+        closeOnOverlay={!isSubmitting}
+      >
+        <ModalBody>
+          <div className="flex items-start gap-4">
+            <div className="p-3 rounded-xl flex-shrink-0 bg-yellow-600/20">
+              <AlertTriangle className="w-6 h-6 text-yellow-600" />
+            </div>
+            <div className="flex-1">
+              <p className="text-gray-800 text-base font-medium leading-relaxed mb-3">
+                Are you sure you want to submit the quiz? You cannot change your answers after submission.
+              </p>
+              {getUnansweredCount() > 0 && (
+                <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <div className="flex items-start gap-2">
+                    <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-semibold text-red-800">
+                        Warning: {getUnansweredCount()} question{getUnansweredCount() !== 1 ? "s" : ""} {getUnansweredCount() !== 1 ? "are" : "is"} unanswered
+                      </p>
+                      <p className="text-sm text-red-700 mt-1">
+                        You still have time to answer these questions before submitting.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </ModalBody>
+
+        <ModalFooter>
+          <button
+            onClick={() => setShowSubmitModal(false)}
+            disabled={isSubmitting}
+            className="px-5 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-gray-700 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSubmitConfirm}
+            disabled={isSubmitting}
+            className="px-5 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors flex items-center gap-2"
+          >
+            {isSubmitting ? (
+              <>
+                <Spinner size="sm" />
+                Submitting...
+              </>
+            ) : (
+              <>
+                <Send className="w-4 h-4" />
+                Submit Quiz
+              </>
+            )}
+          </button>
+        </ModalFooter>
+      </Modal>
     </div>
   );
 };
