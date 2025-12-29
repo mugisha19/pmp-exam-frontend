@@ -3,7 +3,7 @@
  * View exam details, statistics, leaderboard, and attempts
  */
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -23,6 +23,7 @@ import {
   XCircle,
   CheckSquare,
   Trash2,
+  ChevronDown,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { Spinner } from "@/components/ui";
@@ -92,6 +93,8 @@ export default function ExamDetails() {
   const [expandedUserId, setExpandedUserId] = useState(null);
   const [statusDialog, setStatusDialog] = useState({ isOpen: false, status: null });
   const [deleteDialog, setDeleteDialog] = useState(false);
+  const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
+  const statusDropdownRef = useRef(null);
 
   const { data: exam, isLoading: loadingExam } = useQuery({
     queryKey: ["exam", examId],
@@ -141,6 +144,34 @@ export default function ExamDetails() {
       setDeleteDialog(false);
     },
   });
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    if (!isStatusDropdownOpen) return;
+
+    const handleClickOutside = (event) => {
+      if (
+        statusDropdownRef.current &&
+        !statusDropdownRef.current.contains(event.target)
+      ) {
+        setIsStatusDropdownOpen(false);
+      }
+    };
+
+    const handleEscape = (event) => {
+      if (event.key === "Escape") {
+        setIsStatusDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [isStatusDropdownOpen]);
 
   const handleStatusChange = (status) => {
     setStatusDialog({ isOpen: true, status });
@@ -309,17 +340,39 @@ export default function ExamDetails() {
     { id: "attempts", label: "All Attempts", icon: Users },
   ];
 
-  const statusButtons = [
-    { status: "active", label: "Activate", icon: PlayCircle, variant: "success" },
-    { status: "completed", label: "Complete", icon: CheckSquare, variant: "default" },
-    { status: "cancelled", label: "Cancel", icon: XCircle, variant: "danger" },
+  const handleStatusSelect = (newStatus) => {
+    setIsStatusDropdownOpen(false);
+    if (newStatus !== exam?.status) {
+      setStatusDialog({ isOpen: true, status: newStatus });
+    }
+  };
+
+  const statusOptions = [
+    {
+      value: "active",
+      label: "Active",
+      icon: PlayCircle,
+      description: "Exam is active and available for students to take.",
+    },
+    {
+      value: "completed",
+      label: "Completed",
+      icon: CheckSquare,
+      description: "Exam is completed. No new attempts allowed.",
+    },
+    {
+      value: "cancelled",
+      label: "Cancelled",
+      icon: XCircle,
+      description: "Exam is cancelled. No new attempts allowed.",
+    },
   ];
 
   return (
     <div className="p-6 space-y-6">
       <PageHeader
         title={exam.title}
-        description={exam.description || "Exam details and statistics"}
+        subtitle={exam.description || "Exam details and statistics"}
         actions={
           <div className="flex gap-2">
             <Button
@@ -336,6 +389,53 @@ export default function ExamDetails() {
               <Edit2 className="w-4 h-4 mr-2" />
               Edit
             </Button>
+            <div className="relative inline-block" ref={statusDropdownRef}>
+              <Button
+                variant="outline"
+                disabled={statusMutation.isPending}
+                onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
+              >
+                Mark as
+                <ChevronDown
+                  className={`w-4 h-4 ml-2 transition-transform ${
+                    isStatusDropdownOpen ? "rotate-180" : ""
+                  }`}
+                />
+              </Button>
+              {isStatusDropdownOpen && (
+                <div className="absolute right-0 z-50 mt-1.5 min-w-[300px] bg-white rounded-lg shadow-lg border border-gray-200/80 py-1 animate-in fade-in slide-in-from-top-1 duration-150">
+                  {statusOptions.map((option) => {
+                    const Icon = option.icon;
+                    return (
+                      <button
+                        key={option.value}
+                        onClick={() => handleStatusSelect(option.value)}
+                        disabled={
+                          exam.status === option.value ||
+                          statusMutation.isPending
+                        }
+                        className={`w-full flex items-start gap-3 px-4 py-3 text-left text-sm transition-colors ${
+                          exam.status === option.value ||
+                          statusMutation.isPending
+                            ? "text-gray-400 cursor-not-allowed opacity-50"
+                            : "text-gray-700 hover:bg-gray-100"
+                        }`}
+                      >
+                        {Icon && (
+                          <Icon className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                        )}
+                        <div className="flex flex-col flex-1">
+                          <span className="font-medium">{option.label}</span>
+                          <span className="text-xs text-gray-500 mt-0.5">
+                            {option.description}
+                          </span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
             {(attemptsData?.total_attempts || 0) === 0 && (
               <Button
                 variant="danger"
@@ -349,30 +449,6 @@ export default function ExamDetails() {
         }
       />
 
-      <Card className="p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="text-sm font-medium text-gray-700">Status:</span>
-            <Badge variant={exam.status === "active" ? "success" : "default"} size="lg">
-              {exam.status}
-            </Badge>
-          </div>
-          <div className="flex gap-2">
-            {statusButtons.map((btn) => (
-              <Button
-                key={btn.status}
-                variant={btn.variant}
-                size="sm"
-                onClick={() => handleStatusChange(btn.status)}
-                disabled={exam.status === btn.status || statusMutation.isPending}
-              >
-                <btn.icon className="w-4 h-4 mr-1" />
-                {btn.label}
-              </Button>
-            ))}
-          </div>
-        </div>
-      </Card>
 
       {loadingStats ? (
         <div className="flex justify-center py-12">
@@ -436,10 +512,6 @@ export default function ExamDetails() {
               <h3 className="text-lg font-semibold mb-4">Exam Information</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-gray-600">Quiz Mode</p>
-                  <p className="font-medium capitalize">{exam.quiz_mode}</p>
-                </div>
-                <div>
                   <p className="text-sm text-gray-600">Status</p>
                   <Badge variant={exam.status === "active" ? "success" : "default"}>
                     {exam.status}
@@ -464,14 +536,16 @@ export default function ExamDetails() {
                   <p className="font-medium">{exam.max_attempts || "Unlimited"}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Type</p>
-                  <p className="font-medium">
-                    {exam.is_public && !exam.group_id ? "Public" : "Group"}
-                  </p>
+                  <p className="text-sm text-gray-600">Max Questions (Practice)</p>
+                  <p className="font-medium">{exam.max_questions_practice || "Unlimited"}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Shuffle Questions</p>
-                  <p className="font-medium">{exam.shuffle_questions ? "Yes" : "No"}</p>
+                  <p className="text-sm text-gray-600">Max Questions (Exam)</p>
+                  <p className="font-medium">{exam.max_questions_exam || "Unlimited"}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Group Name</p>
+                  <p className="font-medium">{exam.group_name || "N/A"}</p>
                 </div>
               </div>
             </Card>
@@ -636,10 +710,26 @@ export default function ExamDetails() {
       {/* Status Change Confirmation */}
       <ConfirmDialog
         isOpen={statusDialog.isOpen}
-        onClose={() => setStatusDialog({ isOpen: false, status: null })}
+        onClose={() => {
+          setStatusDialog({ isOpen: false, status: null });
+        }}
         onConfirm={confirmStatusChange}
         title="Change Exam Status"
-        message={`Are you sure you want to change the exam status to "${statusDialog.status}"?`}
+        message={
+          <>
+            Are you sure you want to change the exam status to{" "}
+            <strong>"{statusDialog.status}"</strong>?
+            {statusDialog.status && (
+              <>
+                <br />
+                <span className="text-sm text-gray-600 mt-2 block">
+                  {statusOptions.find((opt) => opt.value === statusDialog.status)
+                    ?.description || ""}
+                </span>
+              </>
+            )}
+          </>
+        }
         confirmText="Change Status"
         confirmVariant="primary"
         isLoading={statusMutation.isPending}
