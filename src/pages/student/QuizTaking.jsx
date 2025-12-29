@@ -59,6 +59,7 @@ export const QuizTaking = () => {
   const [isResuming, setIsResuming] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isWaitingForAutoSubmit, setIsWaitingForAutoSubmit] = useState(false);
 
   // Load session state from backend
   const loadSessionState = useCallback(async () => {
@@ -72,16 +73,31 @@ export const QuizTaking = () => {
       
       // Handle submitted/auto-submitted sessions
       if (state.status === "submitted" || state.status === "auto_submitted") {
-        toast.info("This quiz has already been submitted");
+        sessionStorage.removeItem("quiz_session_token");
+        sessionStorage.removeItem("quiz_session_data");
+        if (state.status === "auto_submitted") {
+          toast.error("Time's up! Quiz was auto-submitted.");
+        } else {
+          toast.info("This quiz has already been submitted");
+        }
         navigate(`/exams/${quizId}`);
         return;
       }
 
-      // Handle auto-submitted from backend
+      // Handle auto-submitted from backend (with result)
       if (state.status === "auto_submitted" && state.result) {
+        sessionStorage.removeItem("quiz_session_token");
+        sessionStorage.removeItem("quiz_session_data");
         toast.error("Time's up! Quiz was auto-submitted.");
         navigate(`/exams/${quizId}`);
         return;
+      }
+      
+      // Check if time has expired (exam mode)
+      if (state.quiz_mode === "exam" && state.timing?.time_remaining_seconds !== null && state.timing.time_remaining_seconds <= 0) {
+        // Time expired, wait for backend auto-submit
+        setIsWaitingForAutoSubmit(true);
+        setTimeRemaining(0);
       }
 
       // Set current question from backend's current_question_number
@@ -205,12 +221,19 @@ export const QuizTaking = () => {
   useEffect(() => {
     if (!sessionData || !sessionData.timing?.has_time_limit) return;
     if (sessionData.pause_info?.is_paused) return; // Don't countdown when paused
-    if (timeRemaining === null || timeRemaining <= 0) return;
+    if (timeRemaining === null || timeRemaining <= 0) {
+      // Countdown reached 0, wait for backend to auto-submit
+      if (timeRemaining === 0 && !isWaitingForAutoSubmit) {
+        setIsWaitingForAutoSubmit(true);
+      }
+      return;
+    }
 
     const timer = setInterval(() => {
       setTimeRemaining((prev) => {
         if (prev === null || prev <= 1) {
-          handleAutoSubmit();
+          // Countdown reached 0, set waiting state
+          setIsWaitingForAutoSubmit(true);
           return 0;
         }
         return prev - 1;
@@ -218,7 +241,7 @@ export const QuizTaking = () => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [sessionData, timeRemaining]);
+  }, [sessionData, timeRemaining, isWaitingForAutoSubmit]);
 
   // Pause countdown timer and auto-resume polling (exam mode only)
   useEffect(() => {
@@ -301,10 +324,19 @@ export const QuizTaking = () => {
           await loadSessionState();
         }
         
-        // Check for auto-submit
-        if (response.status === "auto_submitted") {
+        // Check for auto-submit or expired session
+        if (response.status === "auto_submitted" || response.status === "expired") {
+          sessionStorage.removeItem("quiz_session_token");
+          sessionStorage.removeItem("quiz_session_data");
           toast.error("Time's up! Quiz was auto-submitted.");
           navigate(`/exams/${quizId}`);
+          return;
+        }
+        
+        // Check if time remaining is 0 (waiting for backend auto-submit)
+        if (response.time_remaining_seconds !== undefined && response.time_remaining_seconds <= 0) {
+          setIsWaitingForAutoSubmit(true);
+          setTimeRemaining(0);
         }
       } catch (error) {
         console.error("Heartbeat failed:", error);
@@ -314,18 +346,50 @@ export const QuizTaking = () => {
     return () => clearInterval(heartbeat);
   }, [sessionToken, sessionData, quizId, navigate, loadSessionState]);
 
-  const handleAutoSubmit = async () => {
-    try {
-      await submitQuiz(sessionToken);
-      sessionStorage.removeItem("quiz_session_token");
-      sessionStorage.removeItem("quiz_session_data");
-      toast.error("Time's up! Quiz auto-submitted.");
-      navigate(`/exams/${quizId}`);
-    } catch (error) {
-      console.error("Auto-submit failed:", error);
-      navigate(`/exams/${quizId}`);
-    }
-  };
+  // Poll backend to check if session was auto-submitted
+  useEffect(() => {
+    if (!isWaitingForAutoSubmit || !sessionToken) return;
+
+    const pollInterval = setInterval(async () => {
+      try {
+        const state = await getSessionState(sessionToken);
+        
+        // Check if backend has auto-submitted
+        if (state.status === "auto_submitted" || state.status === "submitted") {
+          // Backend has auto-submitted, redirect to exam detail
+          sessionStorage.removeItem("quiz_session_token");
+          sessionStorage.removeItem("quiz_session_data");
+          toast.error("Time's up! Quiz was auto-submitted.");
+          navigate(`/exams/${quizId}`);
+          return;
+        }
+        
+        // Check if session is expired/invalid
+        if (state.status === "expired" || !state.session_id) {
+          // Session expired, redirect
+          sessionStorage.removeItem("quiz_session_token");
+          sessionStorage.removeItem("quiz_session_data");
+          toast.error("Session expired. Quiz was auto-submitted.");
+          navigate(`/exams/${quizId}`);
+          return;
+        }
+        
+        // Session still valid, continue polling
+      } catch (error) {
+        // If session not found or expired, redirect
+        if (error.response?.status === 404 || error.response?.status === 410) {
+          sessionStorage.removeItem("quiz_session_token");
+          sessionStorage.removeItem("quiz_session_data");
+          toast.error("Time's up! Quiz was auto-submitted.");
+          navigate(`/exams/${quizId}`);
+        } else {
+          console.error("Failed to poll session status:", error);
+        }
+      }
+    }, 2000); // Poll every 2 seconds when waiting for auto-submit
+
+    return () => clearInterval(pollInterval);
+  }, [isWaitingForAutoSubmit, sessionToken, quizId, navigate]);
 
   const handleAnswerChange = (answer) => {
     // Only update local state, don't save to backend yet
@@ -814,6 +878,30 @@ export const QuizTaking = () => {
               Resume Quiz
             </button>
           )}
+        </div>
+      </div>
+    );
+  }
+
+  // Show waiting screen when countdown reached 0 (waiting for backend auto-submit)
+  if (isWaitingForAutoSubmit) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md text-center border border-gray-200">
+          <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Clock className="w-10 h-10 text-red-600" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Time's Up!</h2>
+          <p className="text-gray-600 mb-6">
+            Your quiz is being automatically submitted. Please wait...
+          </p>
+          <div className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-100 text-blue-700">
+            <Spinner size="sm" />
+            <span className="font-medium">Submitting quiz...</span>
+          </div>
+          <p className="text-sm text-gray-500 mt-4">
+            You will be redirected to the results page shortly.
+          </p>
         </div>
       </div>
     );
