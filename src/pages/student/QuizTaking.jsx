@@ -220,36 +220,66 @@ export const QuizTaking = () => {
     return () => clearInterval(timer);
   }, [sessionData, timeRemaining]);
 
-  // Pause countdown timer (exam mode only)
+  // Pause countdown timer and auto-resume polling (exam mode only)
   useEffect(() => {
     if (!sessionData?.pause_info?.is_paused) {
       setPauseTimeRemaining(null);
       return;
     }
 
-    // Practice mode: no countdown
+    // Practice mode: no countdown or auto-resume
     if (sessionData.quiz_mode === "practice") return;
 
     // Exam mode: countdown if pause has duration
-    if (pauseTimeRemaining === null || pauseTimeRemaining <= 0) return;
+    let pauseTimer;
+    let pollTimer;
 
-    const timer = setInterval(() => {
-      setPauseTimeRemaining((prev) => {
-        if (prev === null || prev <= 0) {
-          // Backend will auto-resume, reload state
-          loadSessionState();
-          return 0;
+    if (pauseTimeRemaining !== null && pauseTimeRemaining > 0) {
+      // Countdown timer
+      pauseTimer = setInterval(() => {
+        setPauseTimeRemaining((prev) => {
+          if (prev === null || prev <= 0) {
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+
+    // Poll backend every 5 seconds to check for auto-resume
+    // This ensures we detect auto-resume even if countdown is slightly off
+    pollTimer = setInterval(async () => {
+      try {
+        const state = await getSessionState(sessionToken);
+        
+        // Check if session is no longer paused (backend auto-resumed)
+        if (!state.pause_info?.is_paused) {
+          // Backend has auto-resumed, reload full state
+          await loadSessionState();
+          return;
         }
-        return prev - 1;
-      });
-    }, 1000);
+        
+        // Update pause remaining time from backend (authoritative)
+        if (state.pause_info?.pause_remaining_seconds !== undefined) {
+          setPauseTimeRemaining(state.pause_info.pause_remaining_seconds);
+        }
+      } catch (error) {
+        console.error("Failed to poll pause state:", error);
+      }
+    }, 5000); // Poll every 5 seconds
 
-    return () => clearInterval(timer);
-  }, [sessionData?.pause_info?.is_paused, pauseTimeRemaining, loadSessionState]);
+    return () => {
+      if (pauseTimer) clearInterval(pauseTimer);
+      if (pollTimer) clearInterval(pollTimer);
+    };
+  }, [sessionData?.pause_info?.is_paused, sessionData?.quiz_mode, pauseTimeRemaining, sessionToken, loadSessionState]);
 
   // Heartbeat every 30 seconds
   useEffect(() => {
     if (!sessionToken || !sessionData) return;
+    
+    // Skip heartbeat if paused (we have separate polling for pause state)
+    if (sessionData.pause_info?.is_paused) return;
 
     const heartbeat = setInterval(async () => {
       try {
@@ -268,7 +298,7 @@ export const QuizTaking = () => {
         
         // Check for auto-resume
         if (response.auto_resumed) {
-          loadSessionState();
+          await loadSessionState();
         }
         
         // Check for auto-submit
@@ -731,6 +761,9 @@ export const QuizTaking = () => {
 
   // Paused state
   if (sessionData.pause_info?.is_paused) {
+    const isCountdownExpired = pauseTimeRemaining !== null && pauseTimeRemaining <= 0;
+    const showResumeButton = sessionData.quiz_mode === "practice" || !isCountdownExpired;
+
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
         <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md text-center border border-gray-200">
@@ -759,14 +792,28 @@ export const QuizTaking = () => {
             </div>
           )}
 
-          <button
-            onClick={handleResume}
-            disabled={isResuming}
-            className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            {isResuming ? <Spinner size="sm" /> : <Play className="w-5 h-5" />}
-            Resume Quiz
-          </button>
+          {isCountdownExpired && sessionData.quiz_mode === "exam" && (
+            <div className="mb-6">
+              <div className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-100 text-blue-700">
+                <Spinner size="sm" />
+                <span className="font-medium">Auto-resuming quiz...</span>
+              </div>
+              <p className="text-sm text-gray-500 mt-3">
+                The quiz will resume automatically. Please wait...
+              </p>
+            </div>
+          )}
+
+          {showResumeButton && (
+            <button
+              onClick={handleResume}
+              disabled={isResuming}
+              className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {isResuming ? <Spinner size="sm" /> : <Play className="w-5 h-5" />}
+              Resume Quiz
+            </button>
+          )}
         </div>
       </div>
     );
