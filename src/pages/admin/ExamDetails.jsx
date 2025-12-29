@@ -371,8 +371,7 @@ export default function ExamDetails() {
   return (
     <div className="p-6 space-y-6">
       <PageHeader
-        title={exam.title}
-        subtitle={exam.description || "Exam details and statistics"}
+        title="Exam Management - Detail"
         actions={
           <div className="flex gap-2">
             <Button
@@ -448,6 +447,18 @@ export default function ExamDetails() {
           </div>
         }
       />
+
+      {/* Exam Title and Description Card */}
+      <Card className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+        <div className="space-y-3">
+          <h1 className="text-3xl font-bold text-gray-900">{exam.title}</h1>
+          {exam.description && (
+            <p className="text-base text-gray-700 leading-relaxed">
+              {exam.description}
+            </p>
+          )}
+        </div>
+      </Card>
 
 
       {loadingStats ? (

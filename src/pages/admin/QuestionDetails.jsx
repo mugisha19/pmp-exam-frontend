@@ -159,17 +159,6 @@ const renderOptions = (question) => {
                     Correct Answer
                   </Badge>
                 )}
-                {option.explanation && (
-                  <div className="mt-3 pt-3 border-t border-gray-300">
-                    <p className="text-xs font-medium text-gray-600 mb-1">
-                      Explanation:
-                    </p>
-                    <p
-                      className="text-sm text-gray-700"
-                      dangerouslySetInnerHTML={{ __html: option.explanation }}
-                    />
-                  </div>
-                )}
               </div>
             </div>
           </div>
@@ -315,7 +304,7 @@ export const QuestionDetails = () => {
       {/* Question Info Card */}
       <Card>
         <CardContent className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <InfoItem
               icon={BookOpen}
               label="Topic"
@@ -338,6 +327,11 @@ export const QuestionDetails = () => {
                   {question.difficulty}
                 </Badge>
               }
+            />
+            <InfoItem
+              icon={Calendar}
+              label="Created"
+              value={formatDate(question.created_at)}
             />
           </div>
         </CardContent>
@@ -366,6 +360,21 @@ export const QuestionDetails = () => {
           {renderOptions(question)}
         </CardContent>
       </Card>
+
+      {/* Explanation */}
+      {question.explanation && (
+        <Card>
+          <CardContent className="p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              Explanation
+            </h3>
+            <div
+              className="prose max-w-none text-gray-700"
+              dangerouslySetInnerHTML={{ __html: question.explanation }}
+            />
+          </CardContent>
+        </Card>
+      )}
 
       {/* Metadata */}
       {question.metadata && Object.keys(question.metadata).length > 0 && (
