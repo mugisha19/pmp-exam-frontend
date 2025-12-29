@@ -121,7 +121,7 @@ export const Dashboard = () => {
       {!quizzesLoading && filteredQuizzes.length > 0 && (
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Continue Watching</h3>
+            <h3 className="text-lg font-semibold text-gray-900">Continue Practice</h3>
             <div className="flex items-center gap-2">
               <button
                 onClick={scrollLeft}

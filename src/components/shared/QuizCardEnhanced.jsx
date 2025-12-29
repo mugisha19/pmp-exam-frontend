@@ -191,12 +191,12 @@ export const QuizCardEnhanced = ({
     <div
       onClick={() => onView?.(quizId)}
       className={cn(
-        "bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-all cursor-pointer group",
+        "bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-all cursor-pointer group flex flex-col h-full",
         className
       )}
     >
       {/* Header with gradient */}
-      <div className="relative h-24 bg-gradient-to-r from-accent-primary/10 to-accent-secondary/10">
+      <div className="relative h-24 bg-gradient-to-r from-accent-primary/10 to-accent-secondary/10 flex-shrink-0">
         <div className="absolute inset-0 bg-gradient-to-br from-accent-primary/5 to-transparent" />
         <div className="absolute top-3 right-3 flex items-center gap-2">
           {isPublic ? (
@@ -214,7 +214,7 @@ export const QuizCardEnhanced = ({
       </div>
 
       {/* Content */}
-      <div className="p-4">
+      <div className="p-4 flex flex-col flex-1 min-h-0">
         {quiz?.description && (
           <p className="text-sm text-gray-600 line-clamp-2 mb-3">{quiz.description}</p>
         )}
@@ -250,8 +250,11 @@ export const QuizCardEnhanced = ({
           </div>
         )}
 
+        {/* Spacer to push actions to bottom */}
+        <div className="flex-1" />
+
         {/* Actions */}
-        <div className="flex items-center gap-2 pt-3 border-t border-gray-200">
+        <div className="flex items-center gap-2 pt-3 border-t border-gray-200 mt-auto">
           {canStart ? (
             <button
               onClick={(e) => {
