@@ -23,6 +23,7 @@ import { toast } from "react-hot-toast";
 
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
 import { Badge } from "@/components/ui/Badge";
 import { DataTable } from "@/components/shared/DataTable";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
@@ -264,7 +265,7 @@ export default function ExamManagement() {
     <div className="flex flex-col sm:flex-row gap-4 mb-6">
       <div className="flex-1">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
           <Input
             placeholder="Search exams..."
             value={searchQuery}
@@ -272,38 +273,41 @@ export default function ExamManagement() {
               setSearchQuery(e.target.value);
               setPage(1);
             }}
-            className="pl-10"
+            className="pl-9"
+            size="sm"
           />
         </div>
       </div>
 
-      <select
+      <Select
         value={statusFilter}
         onChange={(e) => {
           setStatusFilter(e.target.value);
           setPage(1);
         }}
-        className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-      >
-        <option value="all">All Status</option>
-        <option value="active">Active</option>
-        <option value="draft">Draft</option>
-        <option value="completed">Completed</option>
-        <option value="cancelled">Cancelled</option>
-      </select>
+        options={[
+          { value: "all", label: "All Status" },
+          { value: "active", label: "Active" },
+          { value: "draft", label: "Draft" },
+          { value: "completed", label: "Completed" },
+          { value: "cancelled", label: "Cancelled" },
+        ]}
+        size="sm"
+      />
 
-      <select
+      <Select
         value={typeFilter}
         onChange={(e) => {
           setTypeFilter(e.target.value);
           setPage(1);
         }}
-        className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-      >
-        <option value="all">All Types</option>
-        <option value="public">Public</option>
-        <option value="group">Group</option>
-      </select>
+        options={[
+          { value: "all", label: "All Types" },
+          { value: "public", label: "Public" },
+          { value: "group", label: "Group" },
+        ]}
+        size="sm"
+      />
     </div>
   );
 

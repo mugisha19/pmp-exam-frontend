@@ -257,7 +257,7 @@ export default function QuizBankManagement() {
     <div className="flex flex-col sm:flex-row gap-4 mb-6">
       <div className="flex-1">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
           <Input
             placeholder="Search quiz banks..."
             value={searchQuery}
@@ -265,7 +265,8 @@ export default function QuizBankManagement() {
               setSearchQuery(e.target.value);
               setPage(1);
             }}
-            className="pl-10"
+            className="pl-9"
+            size="sm"
           />
         </div>
       </div>
@@ -360,9 +361,6 @@ export default function QuizBankManagement() {
         data={quizBanks}
         columns={columns}
         loading={isLoading}
-        selectable
-        selectedRows={selectedQuizBanks}
-        onSelectionChange={setSelectedQuizBanks}
         rowKey="quiz_bank_id"
         paginated={true}
         pageSize={pageSize}

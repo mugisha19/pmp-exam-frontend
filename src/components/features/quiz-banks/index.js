@@ -4,3 +4,4 @@
  */
 
 export { CreateQuizBankModal, EditQuizBankModal } from "./QuizBankModals";
+export { AddQuestionsModal } from "./AddQuestionsModal";

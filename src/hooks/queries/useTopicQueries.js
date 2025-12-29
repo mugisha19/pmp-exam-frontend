@@ -10,12 +10,13 @@ import { queryKeys } from "@/lib/query-client";
 
 /**
  * Get all topics query hook
- * @param {Object} options - Query options
+ * @param {Object} [params={}] - Query parameters (skip, limit, domain_id, course_id, is_active, domain)
+ * @param {Object} [options={}] - Additional query options
  */
-export const useTopics = (options = {}) => {
+export const useTopics = (params = {}, options = {}) => {
   return useQuery({
-    queryKey: queryKeys.topics.list(),
-    queryFn: () => topicService.getTopics(),
+    queryKey: queryKeys.topics.list(params),
+    queryFn: () => topicService.getTopics(params),
     staleTime: 5 * 60 * 1000, // 5 minutes - topics don't change often
     onError: (error) => {
       const errorMessage = error.message || "Failed to fetch topics";

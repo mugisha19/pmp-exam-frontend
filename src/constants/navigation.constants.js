@@ -20,6 +20,7 @@ import {
   Target,
   BookMarked,
   FileQuestion,
+  FolderTree,
 } from "lucide-react";
 
 export const STUDENT_NAV_ITEMS = [
@@ -136,6 +137,12 @@ export const ADMIN_NAV_ITEMS = [
     label: "Topics",
     path: "/admin/topics",
     icon: BookMarked,
+  },
+  {
+    id: "courses-domains",
+    label: "Courses & Domains",
+    path: "/admin/courses-domains",
+    icon: FolderTree,
   },
   {
     id: "questions",

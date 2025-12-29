@@ -26,7 +26,7 @@ import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { DataTable } from "@/components/shared/DataTable";
-import { EditQuizBankModal } from "@/components/features/quiz-banks";
+import { EditQuizBankModal, AddQuestionsModal } from "@/components/features/quiz-banks";
 import { PublishQuizModal } from "@/components/features/quizzes/PublishQuizModal";
 
 /**
@@ -63,6 +63,7 @@ export const QuizBankDetails = () => {
   const navigate = useNavigate();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
+  const [isAddQuestionsModalOpen, setIsAddQuestionsModalOpen] = useState(false);
 
   // Fetch quiz bank details
   const {
@@ -258,9 +259,7 @@ export const QuizBankDetails = () => {
             <Button
               size="sm"
               leftIcon={<Plus className="w-4 h-4" />}
-              onClick={() =>
-                navigate(`/admin/quiz-banks/${quizBankId}/add-questions`)
-              }
+              onClick={() => setIsAddQuestionsModalOpen(true)}
             >
               Add Questions
             </Button>
@@ -312,6 +311,18 @@ export const QuizBankDetails = () => {
         isOpen={isPublishModalOpen}
         onClose={() => setIsPublishModalOpen(false)}
         quizBank={quizBank}
+      />
+
+      {/* Add Questions Modal */}
+      <AddQuestionsModal
+        isOpen={isAddQuestionsModalOpen}
+        onClose={() => setIsAddQuestionsModalOpen(false)}
+        quizBankId={quizBankId}
+        onSuccess={() => {
+          setIsAddQuestionsModalOpen(false);
+          refetchQuestions();
+          refetchQuizBank();
+        }}
       />
     </div>
   );

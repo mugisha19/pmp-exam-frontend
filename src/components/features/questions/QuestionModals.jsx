@@ -62,13 +62,12 @@ export function CreateQuestionModal({
       question_type: "multiple_choice",
       difficulty: "medium",
       image_url: "",
-      explanation: "",
       options: {
         choices: [
-          { text: "", is_correct: false },
-          { text: "", is_correct: false },
-          { text: "", is_correct: false },
-          { text: "", is_correct: false },
+          { text: "", is_correct: false, explanation: "" },
+          { text: "", is_correct: false, explanation: "" },
+          { text: "", is_correct: false, explanation: "" },
+          { text: "", is_correct: false, explanation: "" },
         ],
       },
     },
@@ -93,6 +92,7 @@ export function CreateQuestionModal({
           id: String.fromCharCode(65 + idx), // A, B, C, D...
           text: choice.text,
           is_correct: choice.is_correct || false,
+          explanation: choice.explanation || null,
         }));
       } else if (questionType === "true_false") {
         // Array format for true/false with specific IDs
@@ -148,10 +148,10 @@ export function CreateQuestionModal({
     if (newType === "multiple_choice" || newType === "multiple_response") {
       setValue("options", {
         choices: [
-          { text: "", is_correct: false },
-          { text: "", is_correct: false },
-          { text: "", is_correct: false },
-          { text: "", is_correct: false },
+          { text: "", is_correct: false, explanation: "" },
+          { text: "", is_correct: false, explanation: "" },
+          { text: "", is_correct: false, explanation: "" },
+          { text: "", is_correct: false, explanation: "" },
         ],
       });
     } else if (newType === "true_false") {
@@ -257,7 +257,7 @@ export function CreateQuestionModal({
                   <span className="text-sm font-semibold text-gray-700 min-w-6 mt-2">
                     {String.fromCharCode(65 + index)}.
                   </span>
-                  <div className="flex-1">
+                  <div className="flex-1 space-y-2">
                     <Input
                       {...register(`options.choices.${index}.text`, {
                         required: "Choice text is required",
@@ -272,6 +272,14 @@ export function CreateQuestionModal({
                         {errors.options.choices[index].text.message}
                       </p>
                     )}
+                    <textarea
+                      {...register(`options.choices.${index}.explanation`)}
+                      placeholder={`Explanation for choice ${String.fromCharCode(
+                        65 + index
+                      )} (optional)...`}
+                      rows={2}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                    />
                   </div>
                   <Controller
                     name={`options.choices.${index}.is_correct`}
@@ -624,26 +632,6 @@ export function CreateQuestionModal({
           />
         </div>
 
-        {/* Explanation (required) */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Explanation <span className="text-red-500">*</span>
-          </label>
-          <textarea
-            {...register("explanation", {
-              required: "Explanation is required",
-            })}
-            rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Provide an explanation for the correct answer (why it's correct)..."
-          />
-          {errors.explanation && (
-            <p className="text-xs text-red-500 mt-1">
-              {errors.explanation.message}
-            </p>
-          )}
-        </div>
-
         {/* Form Actions */}
         <div className="flex justify-end gap-3 pt-4 border-t">
           <Button type="button" variant="outline" onClick={handleClose}>
@@ -695,7 +683,6 @@ export function EditQuestionModal({
         question_type: question.question_type || "multiple_choice",
         difficulty: question.difficulty || "medium",
         image_url: question.image_url || "",
-        explanation: question.explanation || "",
       };
 
       // Handle options based on question type
@@ -746,6 +733,7 @@ export function EditQuestionModal({
           id: choice.id || String.fromCharCode(65 + idx),
           text: choice.text,
           is_correct: choice.is_correct || false,
+          explanation: choice.explanation || null,
         }));
       } else if (questionType === "true_false") {
         formattedOptions = [
@@ -796,35 +784,6 @@ export function EditQuestionModal({
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Edit Question" size="xl">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        {/* Topic Selection */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Topic <span className="text-red-500">*</span>
-          </label>
-          <Select
-            {...register("topic_id", { required: "Topic is required" })}
-            options={[{ value: "", label: "Select a topic" }, ...topicOptions]}
-          />
-          {errors.topic_id && (
-            <p className="text-xs text-red-500 mt-1">
-              {errors.topic_id.message}
-            </p>
-          )}
-        </div>
-
-        {/* Question Type */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Question Type
-          </label>
-          <Select
-            value={questionType}
-            onChange={(e) => setQuestionType(e.target.value)}
-            options={QUESTION_TYPE_OPTIONS}
-            disabled
-          />
-        </div>
-
         {/* Question Text */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -860,7 +819,7 @@ export function EditQuestionModal({
                 type="button"
                 variant="outline"
                 size="sm"
-                onClick={() => append({ text: "", is_correct: false })}
+                onClick={() => append({ text: "", is_correct: false, explanation: "" })}
               >
                 <Plus className="w-4 h-4 mr-1" />
                 Add Choice
@@ -875,7 +834,7 @@ export function EditQuestionModal({
                   <span className="text-sm font-semibold text-gray-700 min-w-6 mt-2">
                     {String.fromCharCode(65 + index)}.
                   </span>
-                  <div className="flex-1">
+                  <div className="flex-1 space-y-2">
                     <Input
                       {...register(`options.choices.${index}.text`, {
                         required: "Choice text is required",
@@ -890,6 +849,14 @@ export function EditQuestionModal({
                         {errors.options.choices[index].text.message}
                       </p>
                     )}
+                    <textarea
+                      {...register(`options.choices.${index}.explanation`)}
+                      placeholder={`Explanation for choice ${String.fromCharCode(
+                        65 + index
+                      )} (optional)...`}
+                      rows={2}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                    />
                   </div>
                   <Controller
                     name={`options.choices.${index}.is_correct`}
@@ -1229,25 +1196,6 @@ export function EditQuestionModal({
             type="url"
             placeholder="https://example.com/image.jpg"
           />
-        </div>
-
-        {/* Explanation */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Explanation <span className="text-red-500">*</span>
-          </label>
-          <textarea
-            {...register("explanation", {
-              required: "Explanation is required",
-            })}
-            rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          {errors.explanation && (
-            <p className="text-xs text-red-500 mt-1">
-              {errors.explanation.message}
-            </p>
-          )}
         </div>
 
         {/* Form Actions */}

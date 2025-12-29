@@ -8,11 +8,18 @@ import { QUIZ_ENDPOINTS } from "@/constants/api.constants";
 
 /**
  * Get all topics
- * @returns {Promise<Array>} List of topics
+ * @param {Object} [params={}] - Query parameters
+ * @param {number} [params.skip] - Number of items to skip
+ * @param {number} [params.limit] - Number of items to return
+ * @param {string} [params.domain_id] - Filter by domain ID
+ * @param {string} [params.course_id] - Filter by course ID
+ * @param {boolean} [params.is_active] - Filter by active status
+ * @param {string} [params.domain] - Filter by domain name
+ * @returns {Promise<Object>} Response with items, total, page, and size
  */
-export const getTopics = async () => {
+export const getTopics = async (params = {}) => {
   try {
-    const response = await api.get(QUIZ_ENDPOINTS.LIST_TOPICS);
+    const response = await api.get(QUIZ_ENDPOINTS.LIST_TOPICS, { params });
     return response.data;
   } catch (error) {
     throw handleTopicError(error);

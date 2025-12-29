@@ -424,9 +424,6 @@ export const UserManagement = () => {
             <DataTable
               columns={columns}
               data={users}
-              selectable
-              selectedRows={selectedUsers}
-              onSelectionChange={handleSelectionChange}
               rowKey="user_id"
               paginated={false}
             />

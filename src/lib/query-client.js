@@ -104,8 +104,22 @@ export const queryKeys = {
   // Topics
   topics: {
     all: ["topics"],
-    list: () => ["topics", "list"],
+    list: (params) => ["topics", "list", params],
     detail: (topicId) => ["topics", "detail", topicId],
+  },
+
+  // Courses
+  courses: {
+    all: ["courses"],
+    list: (params) => ["courses", "list", params],
+    detail: (courseId) => ["courses", "detail", courseId],
+  },
+
+  // Domains
+  domains: {
+    all: ["domains"],
+    list: (params) => ["domains", "list", params],
+    detail: (domainId) => ["domains", "detail", domainId],
   },
 
   // Performance

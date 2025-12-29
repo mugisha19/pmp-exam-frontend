@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Modal } from "@/components/ui/Modal";
+import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import {
   useCreateTopicMutation,
   useUpdateTopicMutation,
@@ -26,7 +27,9 @@ const STATUS_OPTIONS = [
  * Create Topic Modal
  */
 export const CreateTopicModal = ({ isOpen, onClose, onSuccess }) => {
-  const [parentType, setParentType] = useState("domain"); // "course" or "domain"
+  const [selectedCourseId, setSelectedCourseId] = useState("");
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [pendingFormData, setPendingFormData] = useState(null);
 
   const {
     register,
@@ -34,57 +37,109 @@ export const CreateTopicModal = ({ isOpen, onClose, onSuccess }) => {
     formState: { errors },
     reset,
     setValue,
+    watch,
   } = useForm();
 
   const createMutation = useCreateTopicMutation();
 
-  // Fetch courses and domains
+  // Fetch courses
   const { data: coursesData, isLoading: coursesLoading } = useCourses({
     is_active: true,
   });
+
+  // Fetch domains filtered by selected course
   const { data: domainsData, isLoading: domainsLoading } = useDomains({
+    course_id: selectedCourseId || undefined,
     is_active: true,
   });
 
   const courses = coursesData?.items || [];
   const domains = domainsData?.items || [];
 
-  const onSubmit = async (data) => {
+  // Watch course_id to update selectedCourseId
+  const courseId = watch("course_id");
+
+  // Get register handlers for course_id
+  const courseIdRegister = register("course_id", {
+    required: "Course is required",
+  });
+
+  // Update selectedCourseId when course_id changes
+  useEffect(() => {
+    if (courseId) {
+      setSelectedCourseId(courseId);
+      // Reset domain when course changes
+      setValue("domain_id", "");
+    } else {
+      setSelectedCourseId("");
+      setValue("domain_id", "");
+    }
+  }, [courseId, setValue]);
+
+  // Reset form when modal opens/closes
+  useEffect(() => {
+    if (!isOpen) {
+      reset();
+      setSelectedCourseId("");
+      setShowConfirmDialog(false);
+      setPendingFormData(null);
+    }
+  }, [isOpen, reset]);
+
+  const createTopic = async (data) => {
     try {
       const payload = {
         name: data.name,
         description: data.description || null,
       };
 
-      if (parentType === "course") {
-        if (!data.course_id || data.course_id === "") {
-          toast.error("Please select a course");
-          return;
-        }
-        payload.course_id = data.course_id;
-        // Explicitly don't include domain_id
-      } else {
-        if (!data.domain_id || data.domain_id === "") {
-          toast.error("Please select a domain");
-          return;
-        }
+      // If domain is provided, use domain_id, otherwise use course_id
+      if (data.domain_id && data.domain_id !== "") {
         payload.domain_id = data.domain_id;
-        // Explicitly don't include course_id
+      } else {
+        payload.course_id = data.course_id;
       }
 
       await createMutation.mutateAsync(payload);
       toast.success("Topic created successfully");
       reset();
-      setParentType("domain");
+      setSelectedCourseId("");
+      setShowConfirmDialog(false);
+      setPendingFormData(null);
       onSuccess?.();
     } catch (error) {
       toast.error(error.message || "Failed to create topic");
     }
   };
 
+  const onSubmit = async (data) => {
+    if (!data.course_id || data.course_id === "") {
+      toast.error("Please select a course");
+      return;
+    }
+
+    // If domain is not selected, show confirmation dialog
+    if (!data.domain_id || data.domain_id === "") {
+      setPendingFormData(data);
+      setShowConfirmDialog(true);
+      return;
+    }
+
+    // If domain is selected, create topic directly
+    await createTopic(data);
+  };
+
+  const handleConfirmCreate = async () => {
+    if (pendingFormData) {
+      await createTopic(pendingFormData);
+    }
+  };
+
   const handleClose = () => {
     reset();
-    setParentType("domain");
+    setSelectedCourseId("");
+    setShowConfirmDialog(false);
+    setPendingFormData(null);
     onClose();
   };
 
@@ -108,87 +163,58 @@ export const CreateTopicModal = ({ isOpen, onClose, onSuccess }) => {
           />
         </div>
 
-        {/* Parent Type Selection */}
+        {/* Course Selection - Required First */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Belongs To <span className="text-red-500">*</span>
+            Course <span className="text-red-500">*</span>
           </label>
-          <div className="flex gap-4 mb-3">
-            <label className="flex items-center">
-              <input
-                type="radio"
-                value="course"
-                checked={parentType === "course"}
-                onChange={(e) => {
-                  setParentType(e.target.value);
-                  setValue("domain_id", ""); // Reset domain when switching to course
-                }}
-                className="mr-2"
-              />
-              <span>Course</span>
-            </label>
-            <label className="flex items-center">
-              <input
-                type="radio"
-                value="domain"
-                checked={parentType === "domain"}
-                onChange={(e) => {
-                  setParentType(e.target.value);
-                  setValue("course_id", ""); // Reset course when switching to domain
-                }}
-                className="mr-2"
-              />
-              <span>Domain</span>
-            </label>
-          </div>
-
-          {parentType === "course" ? (
-            <div>
-              <select
-                {...register("course_id", {
-                  required: parentType === "course" ? "Course is required" : false,
-                })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                disabled={coursesLoading}
-              >
-                <option value="">Select a course</option>
-                {courses.map((course) => (
-                  <option key={course.course_id} value={course.course_id}>
-                    {course.name}
-                  </option>
-                ))}
-              </select>
-              {errors.course_id && (
-                <p className="mt-1 text-sm text-red-600">
-                  {errors.course_id.message}
-                </p>
-              )}
-            </div>
-          ) : (
-            <div>
-              <select
-                {...register("domain_id", {
-                  required: parentType === "domain" ? "Domain is required" : false,
-                })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                disabled={domainsLoading}
-              >
-                <option value="">
-                  {domainsLoading ? "Loading domains..." : "Select a domain"}
-                </option>
-                {domains.map((domain) => (
-                  <option key={domain.domain_id} value={domain.domain_id}>
-                    {domain.name}
-                  </option>
-                ))}
-              </select>
-              {errors.domain_id && (
-                <p className="mt-1 text-sm text-red-600">
-                  {errors.domain_id.message}
-                </p>
-              )}
-            </div>
+          <Select
+            {...courseIdRegister}
+            value={courseId || ""}
+            onChange={(e) => {
+              courseIdRegister.onChange(e); // Call register's onChange
+              setSelectedCourseId(e.target.value);
+              setValue("domain_id", ""); // Reset domain when course changes
+            }}
+            options={courses.map((course) => ({
+              value: course.course_id,
+              label: course.name,
+            }))}
+            placeholder={coursesLoading ? "Loading courses..." : "Select a course"}
+            disabled={coursesLoading}
+            error={errors.course_id?.message}
+          />
+          {errors.course_id && (
+            <p className="mt-1 text-sm text-red-600">
+              {errors.course_id.message}
+            </p>
           )}
+        </div>
+
+        {/* Domain Selection - Filtered by Course (Optional) */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Domain <span className="text-gray-400 text-xs">(Optional)</span>
+          </label>
+          <Select
+            {...register("domain_id")}
+            options={domains.map((domain) => ({
+              value: domain.domain_id,
+              label: domain.name,
+            }))}
+            placeholder={
+              !selectedCourseId
+                ? "Please select a course first"
+                : domainsLoading
+                ? "Loading domains..."
+                : domains.length === 0
+                ? "No domains available (optional)"
+                : "Select a domain (optional)"
+            }
+            disabled={domainsLoading || !selectedCourseId}
+            error={errors.domain_id?.message}
+          />
+          
         </div>
 
         <div>
@@ -217,6 +243,26 @@ export const CreateTopicModal = ({ isOpen, onClose, onSuccess }) => {
           </Button>
         </div>
       </form>
+
+      {/* Confirmation Dialog for Creating Topic without Domain */}
+      <ConfirmDialog
+        isOpen={showConfirmDialog}
+        onClose={() => {
+          setShowConfirmDialog(false);
+          setPendingFormData(null);
+        }}
+        onConfirm={handleConfirmCreate}
+        title="Create Topic Without Domain?"
+        message={
+          pendingFormData
+            ? `You are about to create the topic "${pendingFormData.name}" with only the course "${courses.find((c) => c.course_id === pendingFormData.course_id)?.name || "selected course"}" (no domain). Some courses may not have domains. Are you sure you want to proceed?`
+            : "You are about to create a topic with only a course (no domain). Some courses may not have domains. Are you sure you want to proceed?"
+        }
+        confirmText="Yes, Create Topic"
+        cancelText="Cancel"
+        variant="warning"
+        loading={createMutation.isPending}
+      />
     </Modal>
   );
 };

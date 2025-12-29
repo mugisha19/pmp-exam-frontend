@@ -375,7 +375,7 @@ export default function GroupManagement() {
     <div className="flex flex-col sm:flex-row gap-4 mb-6">
       <div className="flex-1">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
           <Input
             placeholder="Search groups..."
             value={searchQuery}
@@ -383,7 +383,8 @@ export default function GroupManagement() {
               setSearchQuery(e.target.value);
               setPage(1);
             }}
-            className="pl-10"
+            className="pl-9"
+            size="sm"
           />
         </div>
       </div>
@@ -397,6 +398,7 @@ export default function GroupManagement() {
           }}
           options={GROUP_TYPE_OPTIONS}
           className="w-36"
+          size="sm"
         />
 
         <Select
@@ -407,6 +409,7 @@ export default function GroupManagement() {
           }}
           options={STATUS_OPTIONS}
           className="w-36"
+          size="sm"
         />
       </div>
     </div>
@@ -518,9 +521,6 @@ export default function GroupManagement() {
         data={groups}
         columns={columns}
         loading={isLoading}
-        selectable
-        selectedRows={selectedGroups}
-        onSelectionChange={setSelectedGroups}
         rowKey="group_id"
         paginated={true}
         pageSize={pageSize}

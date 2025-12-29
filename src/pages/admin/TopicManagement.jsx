@@ -203,13 +203,23 @@ export default function TopicManagement() {
             Process: "bg-green-100 text-green-800",
             "Business Environment": "bg-purple-100 text-purple-800",
           };
+          const domainName = topic?.domain;
+          
+          if (!domainName) {
+            return (
+              <Badge className="bg-gray-100 text-gray-500">
+                N/A
+              </Badge>
+            );
+          }
+          
           return (
             <Badge
               className={
-                domainColors[topic?.domain] || "bg-gray-100 text-gray-800"
+                domainColors[domainName] || "bg-gray-100 text-gray-800"
               }
             >
-              {topic?.domain}
+              {domainName}
             </Badge>
           );
         },
@@ -222,58 +232,6 @@ export default function TopicManagement() {
           <div className="flex items-center gap-2">
             <BookOpen className="w-4 h-4 text-gray-400" />
             <span className="font-medium">{topic?.question_count || 0}</span>
-          </div>
-        ),
-      },
-      {
-        key: "is_active",
-        header: "Status",
-        sortable: true,
-        render: (_, topic) => (
-          <Badge variant={topic?.is_active ? "success" : "secondary"}>
-            {topic?.is_active ? "Active" : "Inactive"}
-          </Badge>
-        ),
-      },
-      {
-        key: "actions",
-        header: "Actions",
-        render: (_, topic) => (
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                navigate(`/admin/topics/${topic.topic_id}`);
-              }}
-              title="View details"
-            >
-              <Eye className="w-4 h-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                navigate(`/admin/topics/${topic.topic_id}`);
-              }}
-              title="Edit topic"
-            >
-              <Edit2 className="w-4 h-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleDeleteTopic(topic);
-              }}
-              className="text-red-600 hover:text-red-700 hover:bg-red-50"
-              title="Delete topic"
-            >
-              <Trash2 className="w-4 h-4" />
-            </Button>
           </div>
         ),
       },
@@ -339,12 +297,13 @@ export default function TopicManagement() {
         <div className="p-4 space-y-4">
           {/* Search Bar */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <Input
               placeholder="Search by topic name or description..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 h-11"
+              className="pl-9"
+              size="sm"
             />
           </div>
 
@@ -362,6 +321,7 @@ export default function TopicManagement() {
                 }}
                 options={DOMAIN_OPTIONS}
                 className="w-full"
+                size="sm"
               />
             </div>
 
@@ -377,6 +337,7 @@ export default function TopicManagement() {
                 }}
                 options={STATUS_OPTIONS}
                 className="w-full"
+                size="sm"
               />
             </div>
           </div>
@@ -472,9 +433,6 @@ export default function TopicManagement() {
         data={topics}
         columns={columns}
         loading={isLoading}
-        selectable
-        selectedRows={selectedTopics}
-        onSelectionChange={setSelectedTopics}
         rowKey="topic_id"
         paginated={false}
         emptyMessage="No topics found"

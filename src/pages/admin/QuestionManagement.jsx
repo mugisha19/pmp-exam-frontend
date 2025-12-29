@@ -288,63 +288,11 @@ export default function QuestionManagement() {
           );
         },
       },
-      {
-        key: "status",
-        header: "Status",
-        sortable: true,
-        render: (_, question) => {
-          const variants = {
-            draft: "secondary",
-            active: "success",
-            archived: "warning",
-          };
-          return (
-            <Badge variant={variants[question?.status] || "secondary"}>
-              {question?.status}
-            </Badge>
-          );
-        },
-      },
-      {
-        key: "times_used",
-        header: "Usage",
-        sortable: true,
-        render: (_, question) => (
-          <span className="text-sm text-gray-600">
-            {question?.times_used || 0}
-          </span>
-        ),
-      },
     ],
     []
   );
 
   // Filters UI
-  // Calculate stats from current questions data
-  const stats = useMemo(() => {
-    if (!questions || questions.length === 0) {
-      return {
-        total: totalCount || 0,
-        draft: 0,
-        active: 0,
-        archived: 0,
-      };
-    }
-
-    const counts = questions.reduce(
-      (acc, q) => {
-        acc[q.status?.toLowerCase()] = (acc[q.status?.toLowerCase()] || 0) + 1;
-        return acc;
-      },
-      { draft: 0, active: 0, archived: 0 }
-    );
-
-    return {
-      total: totalCount || 0,
-      ...counts,
-    };
-  }, [questions, totalCount]);
-
   const activeFilterCount = useMemo(() => {
     let count = 0;
     if (searchQuery) count++;
@@ -366,65 +314,28 @@ export default function QuestionManagement() {
     setPage(1);
   };
 
-  const statsCards = (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-      <div className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow">
+  const totalQuestionsCard = (
+    <div className="mb-6">
+      <div className="bg-gradient-to-r from-gray-100 to-gray-200 rounded-xl shadow-md p-6 border border-gray-300">
         <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-gray-600">Total Questions</p>
-            <p className="text-2xl font-bold text-gray-900 mt-1">
-              {stats.total}
-            </p>
-          </div>
-          <div className="bg-blue-100 p-3 rounded-lg">
-            <FileQuestion className="w-6 h-6 text-blue-600" />
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-gray-600">Active</p>
-            <p className="text-2xl font-bold text-green-600 mt-1">
-              {stats.active}
-            </p>
-          </div>
-          <div className="bg-green-100 p-3 rounded-lg">
-            <div className="w-6 h-6 flex items-center justify-center">
-              <div className="w-3 h-3 bg-green-600 rounded-full"></div>
+          <div className="flex items-center gap-4">
+            <div className="bg-gray-300 p-4 rounded-xl">
+              <FileQuestion className="w-8 h-8 text-gray-700" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-600 mb-1">
+                Total Questions
+              </p>
+              <p className="text-4xl font-bold text-gray-900">
+                {totalCount || 0}
+              </p>
             </div>
           </div>
-        </div>
-      </div>
-
-      <div className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-gray-600">Draft</p>
-            <p className="text-2xl font-bold text-yellow-600 mt-1">
-              {stats.draft}
-            </p>
-          </div>
-          <div className="bg-yellow-100 p-3 rounded-lg">
-            <div className="w-6 h-6 flex items-center justify-center">
-              <div className="w-3 h-3 bg-yellow-600 rounded-full"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-gray-600">Archived</p>
-            <p className="text-2xl font-bold text-gray-600 mt-1">
-              {stats.archived}
-            </p>
-          </div>
-          <div className="bg-gray-100 p-3 rounded-lg">
-            <div className="w-6 h-6 flex items-center justify-center">
-              <div className="w-3 h-3 bg-gray-600 rounded-full"></div>
+          <div className="hidden md:block">
+            <div className="text-right">
+              <p className="text-xs text-gray-600 font-medium">
+                Available questions
+              </p>
             </div>
           </div>
         </div>
@@ -433,33 +344,34 @@ export default function QuestionManagement() {
   );
 
   const filtersUI = (
-    <div className="bg-white rounded-lg border border-gray-200 mb-6">
-      <div className="p-4 border-b border-gray-200">
+    <div className="bg-white rounded-lg border border-gray-200 mb-4">
+      <div className="px-3 py-2 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Filter className="w-5 h-5 text-gray-600" />
-            <h3 className="text-sm font-semibold text-gray-900">Filters</h3>
+            <Filter className="w-4 h-4 text-gray-600" />
+            <h3 className="text-xs font-semibold text-gray-900">Filters</h3>
             {activeFilterCount > 0 && (
-              <Badge variant="primary" className="text-xs">
-                {activeFilterCount} active
+              <Badge variant="primary" className="text-xs px-1.5 py-0.5">
+                {activeFilterCount}
               </Badge>
             )}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             {activeFilterCount > 0 && (
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleClearFilters}
-                className="text-xs"
+                className="text-xs h-7 px-2"
               >
-                Clear all
+                Clear
               </Button>
             )}
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setShowFilters(!showFilters)}
+              className="h-7 px-2 text-xs"
             >
               {showFilters ? "Hide" : "Show"}
             </Button>
@@ -468,10 +380,10 @@ export default function QuestionManagement() {
       </div>
 
       {showFilters && (
-        <div className="p-4 space-y-4">
+        <div className="p-3 space-y-3">
           {/* Search Bar */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <Input
               placeholder="Search by question text or explanation..."
               value={searchQuery}
@@ -479,12 +391,13 @@ export default function QuestionManagement() {
                 setSearchQuery(e.target.value);
                 setPage(1);
               }}
-              className="pl-10 h-11"
+              className="pl-9"
+              size="sm"
             />
           </div>
 
           {/* Filter Dropdowns */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-1">
                 Topic
@@ -497,6 +410,7 @@ export default function QuestionManagement() {
                 }}
                 options={topicOptions}
                 className="w-full"
+                size="sm"
               />
             </div>
 
@@ -512,6 +426,7 @@ export default function QuestionManagement() {
                 }}
                 options={DOMAIN_OPTIONS}
                 className="w-full"
+                size="sm"
               />
             </div>
 
@@ -527,6 +442,7 @@ export default function QuestionManagement() {
                 }}
                 options={QUESTION_TYPE_OPTIONS}
                 className="w-full"
+                size="sm"
               />
             </div>
 
@@ -542,6 +458,7 @@ export default function QuestionManagement() {
                 }}
                 options={DIFFICULTY_OPTIONS}
                 className="w-full"
+                size="sm"
               />
             </div>
 
@@ -557,6 +474,7 @@ export default function QuestionManagement() {
                 }}
                 options={STATUS_OPTIONS}
                 className="w-full"
+                size="sm"
               />
             </div>
           </div>
@@ -638,7 +556,7 @@ export default function QuestionManagement() {
         }
       />
 
-      {statsCards}
+      {totalQuestionsCard}
 
       {filtersUI}
 
@@ -648,9 +566,6 @@ export default function QuestionManagement() {
         data={questions}
         columns={columns}
         loading={isLoading}
-        selectable
-        selectedRows={selectedQuestions}
-        onSelectionChange={setSelectedQuestions}
         rowKey="question_id"
         paginated={true}
         pageSize={pageSize}

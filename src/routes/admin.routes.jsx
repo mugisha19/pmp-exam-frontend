@@ -20,12 +20,12 @@ import {
   QuizAttemptDetails,
   AdminTopicsPage,
   AdminTopicDetailsPage,
+  AdminCourseDomainPage,
   AdminQuestionsPage,
   AdminQuestionDetailsPage,
   AdminQuestionEditPage,
   AdminQuizBanksPage,
   AdminQuizBankDetailsPage,
-  AdminQuizBankAddQuestionsPage,
   AnalyticsPage,
   NotificationsPage,
   SystemSettingsPage,
@@ -55,6 +55,7 @@ export const adminRoutes = (
     <Route path="groups/:groupId/quiz/:quizId/attempt/:attemptId" element={<QuizAttemptDetails />} />
     <Route path="topics" element={<AdminTopicsPage />} />
     <Route path="topics/:topicId" element={<AdminTopicDetailsPage />} />
+    <Route path="courses-domains" element={<AdminCourseDomainPage />} />
     <Route path="questions" element={<AdminQuestionsPage />} />
     <Route
       path="questions/:questionId"
@@ -68,10 +69,6 @@ export const adminRoutes = (
     <Route
       path="quiz-banks/:quizBankId"
       element={<AdminQuizBankDetailsPage />}
-    />
-    <Route
-      path="quiz-banks/:quizBankId/add-questions"
-      element={<AdminQuizBankAddQuestionsPage />}
     />
     <Route path="analytics" element={<AnalyticsPage />} />
     <Route path="notifications" element={<NotificationsPage />} />

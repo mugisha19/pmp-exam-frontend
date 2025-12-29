@@ -51,7 +51,7 @@ export const Modal = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+        className="absolute inset-0 bg-gray-900/40 backdrop-blur-md transition-opacity duration-300"
         onClick={closeOnOverlay ? onClose : undefined}
         aria-hidden="true"
       />
