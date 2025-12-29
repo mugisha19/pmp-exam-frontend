@@ -71,7 +71,6 @@ export const GroupDetails = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState("members");
-  const [clickCount, setClickCount] = useState(0);
   const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
   const [statusDialog, setStatusDialog] = useState({ isOpen: false, status: null });
@@ -161,79 +160,60 @@ export const GroupDetails = () => {
   // Generate invite link mutation
   const generateInviteMutation = useMutation({
     mutationFn: () => groupService.generateInviteLink(groupId),
-    onSuccess: (data) => {
-      console.log("=== COPY INVITE LINK DEBUG ===");
-      console.log("Backend response:", data);
-      console.log("Frontend URL:", frontendUrl);
-      console.log("Invite token from backend:", data.invite_token);
-
+    onSuccess: async (data) => {
       // Backend returns invite_token, construct full URL with frontend base URL
       const inviteLink = `${frontendUrl}/join-group?token=${data.invite_token}`;
-      console.log("Constructed full invite link:", inviteLink);
-      console.log("Link length:", inviteLink.length);
 
-      // Try to copy to clipboard
+      let copied = false;
+
+      // Try to copy to clipboard using modern API
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard
-          .writeText(inviteLink)
-          .then(() => {
-            console.log(
-              "✅ Successfully copied to clipboard via navigator.clipboard"
-            );
-            console.log("Copied text:", inviteLink);
-            toast.success("Invite link copied to clipboard!");
-          })
-          .catch((err) => {
-            console.error("❌ Failed to copy via navigator.clipboard:", err);
-            // Fallback method
-            copyToClipboardFallback(inviteLink);
-          });
+        try {
+          await navigator.clipboard.writeText(inviteLink);
+          copied = true;
+        } catch (err) {
+          // Fallback to execCommand if clipboard API fails
+        }
+      }
+
+      // Fallback method if clipboard API not available or failed
+      if (!copied) {
+        const textArea = document.createElement("textarea");
+        textArea.value = inviteLink;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        textArea.style.top = "-999999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+
+        try {
+          copied = document.execCommand("copy");
+        } catch (err) {
+          copied = false;
+        }
+
+        document.body.removeChild(textArea);
+      }
+
+      // Show success toast only once
+      if (copied) {
+        toast.success("Invite link copied to clipboard!");
       } else {
-        console.warn("navigator.clipboard not available, using fallback");
-        copyToClipboardFallback(inviteLink);
+        toast.error("Failed to copy link to clipboard");
       }
     },
     onError: (error) => {
-      console.error("Error generating invite link:", error);
       toast.error(error.message || "Failed to generate invite link");
     },
   });
 
-  // Fallback clipboard copy method
-  const copyToClipboardFallback = (text) => {
-    const textArea = document.createElement("textarea");
-    textArea.value = text;
-    textArea.style.position = "fixed";
-    textArea.style.left = "-999999px";
-    document.body.appendChild(textArea);
-    textArea.focus();
-    textArea.select();
-
-    try {
-      document.execCommand("copy");
-      console.log("✅ Successfully copied via fallback method");
-      console.log("Copied text:", text);
-      toast.success("Invite link copied to clipboard!");
-    } catch (err) {
-      console.error("❌ Fallback copy also failed:", err);
-      toast.error("Failed to copy link to clipboard");
-    }
-
-    document.body.removeChild(textArea);
-  };
-
   // Handle copy invite link
   const handleCopyInviteLink = () => {
-    setClickCount((prev) => prev + 1);
-    console.log("🔵 Copy Invite Link button clicked! Count:", clickCount + 1);
-    alert(`Button clicked ${clickCount + 1} times!`);
-    generateInviteMutation.mutate();
+    if (!generateInviteMutation.isPending) {
+      generateInviteMutation.mutate();
+    }
   };
-
-  // Debug: Log group data to see what's available
-  if (group) {
-    console.log("Group data:", group);
-  }
 
   // Check if group is private (for showing join requests tab)
   const isPrivateGroup =
@@ -331,14 +311,10 @@ export const GroupDetails = () => {
                 variant="primary"
                 size="sm"
                 leftIcon={<Copy className="w-4 h-4" />}
-                onClick={(e) => {
-                  console.log("DIRECT ONCLICK FIRED!", e);
-                  alert("Direct onClick working!");
-                  handleCopyInviteLink();
-                }}
+                onClick={handleCopyInviteLink}
                 loading={generateInviteMutation.isPending}
               >
-                {clickCount > 0 ? `Clicked ${clickCount}x` : "Copy Invite Link"}
+                Copy Invite Link
               </Button>
             )}
             <div className="relative inline-block" ref={statusDropdownRef}>
