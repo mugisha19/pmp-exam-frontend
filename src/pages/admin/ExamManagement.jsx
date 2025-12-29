@@ -10,11 +10,9 @@ import {
   Eye,
   Edit2,
   Trash2,
-  Calendar,
   X,
   BookOpen,
   Users,
-  Globe,
   Clock,
   Trophy,
   BarChart3,
@@ -31,18 +29,6 @@ import { PageHeader } from "@/components/shared/PageHeader";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getQuizzes, deleteQuiz } from "@/services/quiz.service";
 
-/**
- * Format date for display
- */
-const formatDate = (dateStr) => {
-  if (!dateStr) return "N/A";
-  return new Date(dateStr).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-};
-
 export default function ExamManagement() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -50,7 +36,6 @@ export default function ExamManagement() {
   // Filter states
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [typeFilter, setTypeFilter] = useState("all");
   const [page, setPage] = useState(1);
   const pageSize = 10;
 
@@ -100,16 +85,8 @@ export default function ExamManagement() {
       data = data.filter((exam) => exam.status === statusFilter);
     }
 
-    if (typeFilter !== "all") {
-      if (typeFilter === "public") {
-        data = data.filter((exam) => exam.is_public && !exam.group_id);
-      } else if (typeFilter === "group") {
-        data = data.filter((exam) => exam.group_id);
-      }
-    }
-
     return data;
-  }, [examsData, searchQuery, statusFilter, typeFilter]);
+  }, [examsData, searchQuery, statusFilter]);
 
   const totalCount = exams.length;
 
@@ -154,48 +131,24 @@ export default function ExamManagement() {
         header: "Exam Title",
         sortable: true,
         render: (_, exam) => (
-          <div className="flex flex-col">
-            <span className="font-medium text-gray-900">
-              {exam?.group_name ? `${exam.group_name} - ${exam.title}` : exam?.title}
-            </span>
-            {exam?.description && (
-              <span className="text-sm text-gray-500 truncate max-w-md">
-                {exam.description}
-              </span>
-            )}
-          </div>
+          <span className="font-medium text-gray-900">
+            {exam?.title}
+          </span>
         ),
       },
       {
-        key: "type",
-        header: "Type",
-        render: (_, exam) => (
-          <div className="flex items-center gap-2">
-            {exam?.is_public && !exam?.group_id ? (
-              <>
-                <Globe className="w-4 h-4 text-blue-500" />
-                <span className="text-sm">Public</span>
-              </>
-            ) : (
-              <>
-                <Users className="w-4 h-4 text-purple-500" />
-                <span className="text-sm">Group</span>
-              </>
-            )}
-          </div>
-        ),
-      },
-      {
-        key: "quiz_mode",
-        header: "Mode",
+        key: "group_name",
+        header: "Group Name",
         sortable: true,
         render: (_, exam) => (
-          <Badge variant={exam?.quiz_mode === "exam" ? "primary" : "secondary"}>
-            {exam?.quiz_mode || "practice"}
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Users className="w-4 h-4 text-gray-400" />
+            <span className="text-sm text-gray-700">
+              {exam?.group_name || "N/A"}
+            </span>
+          </div>
         ),
       },
-
       {
         key: "questions",
         header: "Questions",
@@ -245,17 +198,6 @@ export default function ExamManagement() {
           );
         },
       },
-      {
-        key: "created_at",
-        header: "Created",
-        sortable: true,
-        render: (_, exam) => (
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Calendar className="w-4 h-4 text-gray-400" />
-            <span>{formatDate(exam?.created_at)}</span>
-          </div>
-        ),
-      },
     ],
     []
   );
@@ -263,21 +205,7 @@ export default function ExamManagement() {
   // Filters UI
   const filtersUI = (
     <div className="flex flex-col sm:flex-row gap-4 mb-6">
-      <div className="flex-1">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-          <Input
-            placeholder="Search exams..."
-            value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-              setPage(1);
-            }}
-            className="pl-9"
-            size="sm"
-          />
-        </div>
-      </div>
+    
 
       <Select
         value={statusFilter}
@@ -288,23 +216,8 @@ export default function ExamManagement() {
         options={[
           { value: "all", label: "All Status" },
           { value: "active", label: "Active" },
-          { value: "draft", label: "Draft" },
           { value: "completed", label: "Completed" },
           { value: "cancelled", label: "Cancelled" },
-        ]}
-        size="sm"
-      />
-
-      <Select
-        value={typeFilter}
-        onChange={(e) => {
-          setTypeFilter(e.target.value);
-          setPage(1);
-        }}
-        options={[
-          { value: "all", label: "All Types" },
-          { value: "public", label: "Public" },
-          { value: "group", label: "Group" },
         ]}
         size="sm"
       />

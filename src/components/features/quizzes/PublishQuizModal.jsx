@@ -1,74 +1,43 @@
 /**
  * Publish Quiz Modal
- * Modal for publishing quiz banks to groups or publicly
+ * Modal for publishing quiz banks to groups
  */
 
 import React, { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Globe, Users, Calendar, Clock, Target, Settings } from "lucide-react";
+import { Users, Calendar, Clock, Target, Settings } from "lucide-react";
 import { Modal, ModalFooter } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { Button } from "@/components/ui/Button";
-import { Select } from "@/components/ui/Select";
 import {
   usePublishToGroupMutation,
-  usePublishPublicMutation,
 } from "@/hooks/queries/useQuizQueries";
 import { useGroups } from "@/hooks/queries/useGroupQueries";
 
-// Validation schema
+// Validation schema matching PublishToGroupRequest
 const publishSchema = z.object({
-  publish_type: z.enum(["group", "public"], {
-    required_error: "Please select a publish type",
-  }),
-  group_ids: z.array(z.string()).optional(),
-  title: z.string().optional(),
-  description: z.string().optional(),
-  quiz_mode: z.enum(["practice", "exam"]),
+  group_ids: z.array(z.string()).min(1, "Please select at least one group"),
+  title: z.string().optional().nullable(),
+  description: z.string().optional().nullable(),
   time_limit_minutes: z.union([z.number().min(1).max(480), z.nan(), z.undefined()]).optional().nullable().transform(val => (isNaN(val) || val === undefined) ? null : val),
   passing_score: z.number().min(0).max(100).default(70),
-  shuffle_questions: z.boolean().default(true),
-  shuffle_options: z.boolean().default(true),
-  show_results_immediately: z.boolean().default(true),
+  max_questions_practice: z.union([z.number().min(0), z.nan(), z.undefined()]).optional().nullable().transform(val => (isNaN(val) || val === undefined) ? null : val),
+  max_questions_exam: z.union([z.number().min(0), z.nan(), z.undefined()]).optional().nullable().transform(val => (isNaN(val) || val === undefined) ? null : val),
   max_attempts: z.union([z.number().min(1), z.nan(), z.undefined()]).optional().nullable().transform(val => (isNaN(val) || val === undefined) ? null : val),
-  use_all_questions: z.boolean().default(true),
-  subset_count: z.union([z.number().min(1), z.nan(), z.undefined()]).optional().nullable().transform(val => (isNaN(val) || val === undefined) ? null : val),
+  pause_after_questions: z.union([z.number().min(0), z.nan(), z.undefined()]).optional().nullable().transform(val => (isNaN(val) || val === undefined) ? null : val),
+  pause_duration_minutes: z.union([z.number().min(0).max(60), z.nan(), z.undefined()]).optional().nullable().transform(val => (isNaN(val) || val === undefined) ? null : val),
+  scheduling_enabled: z.boolean().default(false),
   starts_at: z.string().optional().nullable(),
   ends_at: z.string().optional().nullable(),
-  pause_after_questions: z.union([z.number().min(1), z.nan(), z.undefined()]).optional().nullable().transform(val => (isNaN(val) || val === undefined) ? null : val),
-  pause_duration_minutes: z.union([z.number().min(1).max(60), z.nan(), z.undefined()]).optional().nullable().transform(val => (isNaN(val) || val === undefined) ? null : val),
-}).refine(
-  (data) => {
-    if (data.publish_type === "group") {
-      return data.group_ids && data.group_ids.length > 0;
-    }
-    return true;
-  },
-  {
-    message: "Please select at least one group",
-    path: ["group_ids"],
-  }
-).refine(
-  (data) => {
-    if (data.quiz_mode === "exam") {
-      return !!data.time_limit_minutes;
-    }
-    return true;
-  },
-  {
-    message: "Time limit is required for exam mode",
-    path: ["time_limit_minutes"],
-  }
-);
+});
 
 export const PublishQuizModal = ({ isOpen, onClose, quizBank, preselectedGroupId = null }) => {
   const [selectedGroups, setSelectedGroups] = useState([]);
   
   const publishToGroupMutation = usePublishToGroupMutation();
-  const publishPublicMutation = usePublishPublicMutation();
   
   // Fetch groups for selection
   const { data: groupsData } = useGroups({}, { enabled: isOpen });
@@ -84,54 +53,34 @@ export const PublishQuizModal = ({ isOpen, onClose, quizBank, preselectedGroupId
   } = useForm({
     resolver: zodResolver(publishSchema),
     defaultValues: {
-      publish_type: preselectedGroupId ? "group" : "group",
-      quiz_mode: "practice",
       passing_score: 70,
-      shuffle_questions: true,
-      shuffle_options: true,
-      show_results_immediately: true,
-      use_all_questions: true,
+      scheduling_enabled: false,
       group_ids: preselectedGroupId ? [preselectedGroupId] : [],
     },
   });
 
-  const publishType = watch("publish_type");
-  const quizMode = watch("quiz_mode");
-  const useAllQuestions = watch("use_all_questions");
+  const schedulingEnabled = watch("scheduling_enabled");
 
   const onSubmit = async (data) => {
     try {
-      // Determine if scheduling is enabled based on dates provided
-      const hasScheduling = !!(data.starts_at || data.ends_at);
-      
       const publishData = {
         quiz_bank_id: quizBank.quiz_bank_id,
-        title: data.title || quizBank.title,
-        description: data.description || quizBank.description,
-        quiz_mode: data.quiz_mode,
+        group_ids: data.group_ids,
+        title: data.title || null,
+        description: data.description || null,
         time_limit_minutes: data.time_limit_minutes || null,
         passing_score: data.passing_score,
-        shuffle_questions: data.shuffle_questions,
-        shuffle_options: data.shuffle_options,
-        show_results_immediately: data.show_results_immediately,
+        max_questions_practice: data.max_questions_practice || null,
+        max_questions_exam: data.max_questions_exam || null,
         max_attempts: data.max_attempts || null,
-        use_all_questions: data.use_all_questions,
-        subset_count: data.use_all_questions ? null : data.subset_count,
-        scheduling_enabled: hasScheduling,
-        starts_at: data.starts_at || null,
-        ends_at: data.ends_at || null,
-        pause_after_questions: data.quiz_mode === 'exam' ? (data.pause_after_questions || null) : null,
-        pause_duration_minutes: data.quiz_mode === 'exam' ? (data.pause_duration_minutes || null) : null,
+        pause_after_questions: data.pause_after_questions || null,
+        pause_duration_minutes: data.pause_duration_minutes || null,
+        scheduling_enabled: data.scheduling_enabled,
+        starts_at: data.scheduling_enabled && data.starts_at ? data.starts_at : null,
+        ends_at: data.scheduling_enabled && data.ends_at ? data.ends_at : null,
       };
 
-      if (data.publish_type === "group") {
-        await publishToGroupMutation.mutateAsync({
-          ...publishData,
-          group_ids: data.group_ids,
-        });
-      } else {
-        await publishPublicMutation.mutateAsync(publishData);
-      }
+      await publishToGroupMutation.mutateAsync(publishData);
 
       reset();
       onClose();
@@ -160,62 +109,6 @@ export const PublishQuizModal = ({ isOpen, onClose, quizBank, preselectedGroupId
           </p>
         </div>
 
-        {/* Publish Type - Only show if no preselected group */}
-        {!preselectedGroupId && (
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">
-              Publish To <span className="text-red-500">*</span>
-            </label>
-            <div className="grid grid-cols-2 gap-3">
-              <label
-                className={`flex items-center gap-3 p-4 border rounded-xl cursor-pointer transition-all ${
-                  publishType === "group"
-                    ? "border-blue-500 bg-blue-50"
-                    : "border-gray-200 hover:border-gray-300"
-                }`}
-              >
-                <input
-                  type="radio"
-                  value="group"
-                  {...register("publish_type")}
-                  className="hidden"
-                />
-                <Users
-                  className={`w-5 h-5 ${
-                    publishType === "group" ? "text-blue-600" : "text-gray-400"
-                  }`}
-                />
-                <div>
-                  <p className="font-medium text-gray-900">Groups</p>
-                  <p className="text-xs text-gray-500">Select specific groups</p>
-                </div>
-              </label>
-              <label
-                className={`flex items-center gap-3 p-4 border rounded-xl cursor-pointer transition-all ${
-                  publishType === "public"
-                    ? "border-blue-500 bg-blue-50"
-                    : "border-gray-200 hover:border-gray-300"
-                }`}
-              >
-                <input
-                  type="radio"
-                  value="public"
-                  {...register("publish_type")}
-                  className="hidden"
-                />
-                <Globe
-                  className={`w-5 h-5 ${
-                    publishType === "public" ? "text-blue-600" : "text-gray-400"
-                  }`}
-                />
-                <div>
-                  <p className="font-medium text-gray-900">Public</p>
-                  <p className="text-xs text-gray-500">Available to all users</p>
-                </div>
-              </label>
-            </div>
-          </div>
-        )}
 
         {/* Show selected group when preselected */}
         {preselectedGroupId && (
@@ -232,8 +125,8 @@ export const PublishQuizModal = ({ isOpen, onClose, quizBank, preselectedGroupId
           </div>
         )}
 
-        {/* Group Selection (only show if publish_type is group and no preselected group) */}
-        {publishType === "group" && !preselectedGroupId && (
+        {/* Group Selection (only show if no preselected group) */}
+        {!preselectedGroupId && (
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">
               Select Groups <span className="text-red-500">*</span>
@@ -269,42 +162,61 @@ export const PublishQuizModal = ({ isOpen, onClose, quizBank, preselectedGroupId
           </div>
         )}
 
-        {/* Quiz Settings */}
-        <div className="grid grid-cols-2 gap-4">
-          {/* Quiz Mode */}
+        {/* Title and Description (Optional) */}
+        <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Quiz Mode <span className="text-red-500">*</span>
+              Title (Optional)
             </label>
-            <select
-              {...register("quiz_mode")}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="practice">Practice</option>
-              <option value="exam">Exam</option>
-            </select>
+            <Input
+              {...register("title")}
+              placeholder={quizBank.title || "Enter quiz title"}
+              error={errors.title?.message}
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Leave empty to use quiz bank title
+            </p>
           </div>
 
-          {/* Time Limit - Only show for exam mode */}
-          {quizMode === "exam" && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Time Limit (minutes) <span className="text-red-500">*</span>
-              </label>
-              <Input
-                type="number"
-                {...register("time_limit_minutes", { valueAsNumber: true })}
-                placeholder="e.g., 60"
-                error={errors.time_limit_minutes?.message}
-                leftIcon={<Clock className="w-4 h-4" />}
-              />
-            </div>
-          )}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Description (Optional)
+            </label>
+            <Textarea
+              {...register("description")}
+              placeholder={quizBank.description || "Enter quiz description"}
+              rows={3}
+              error={errors.description?.message}
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Leave empty to use quiz bank description
+            </p>
+          </div>
+        </div>
+
+        {/* Quiz Settings */}
+        <div className="grid grid-cols-2 gap-4">
+          {/* Time Limit */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Time Limit (minutes)
+            </label>
+            <Input
+              type="number"
+              {...register("time_limit_minutes", { valueAsNumber: true })}
+              placeholder="e.g., 60 (1-480)"
+              error={errors.time_limit_minutes?.message}
+              leftIcon={<Clock className="w-4 h-4" />}
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Leave empty for no time limit
+            </p>
+          </div>
 
           {/* Passing Score */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Passing Score (%)
+              Passing Score (%) <span className="text-red-500">*</span>
             </label>
             <Input
               type="number"
@@ -313,12 +225,15 @@ export const PublishQuizModal = ({ isOpen, onClose, quizBank, preselectedGroupId
               error={errors.passing_score?.message}
               leftIcon={<Target className="w-4 h-4" />}
             />
+            <p className="text-xs text-gray-500 mt-1">
+              Default: 70%
+            </p>
           </div>
 
           {/* Max Attempts */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Max Attempts
+              Max Attempts (Optional)
             </label>
             <Input
               type="number"
@@ -332,146 +247,124 @@ export const PublishQuizModal = ({ isOpen, onClose, quizBank, preselectedGroupId
           </div>
         </div>
 
-        {/* Pause Settings - Only show for exam mode */}
-        {quizMode === "exam" && (
-          <div className="space-y-3 bg-orange-50 p-4 rounded-lg border border-orange-200">
-            <h4 className="font-medium text-gray-900 flex items-center gap-2">
-              <Clock className="w-4 h-4 text-orange-600" />
-              Pause Settings (Exam Mode)
-            </h4>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Pause After Questions
-                </label>
-                <Input
-                  type="number"
-                  {...register("pause_after_questions", { valueAsNumber: true })}
-                  placeholder="e.g., 10"
-                  error={errors.pause_after_questions?.message}
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Student can pause after answering this many questions
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Pause Duration (minutes)
-                </label>
-                <Input
-                  type="number"
-                  {...register("pause_duration_minutes", { valueAsNumber: true })}
-                  placeholder="e.g., 5"
-                  error={errors.pause_duration_minutes?.message}
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Maximum time allowed for each pause break
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Question Selection */}
-        <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="use_all_questions"
-              {...register("use_all_questions")}
-              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-            />
-            <label htmlFor="use_all_questions" className="text-sm font-medium text-gray-700">
-              Use all questions ({quizBank.question_count} questions)
-            </label>
-          </div>
-
-          {!useAllQuestions && (
+        {/* Max Questions for Practice and Exam */}
+        <div className="space-y-4 bg-blue-50 p-4 rounded-lg border border-blue-200">
+          <h4 className="font-medium text-gray-900 flex items-center gap-2">
+            <Settings className="w-4 h-4" />
+            Question Limits (Optional)
+          </h4>
+          <p className="text-xs text-gray-600 mb-3">
+            Set maximum number of questions for practice and exam modes. Leave empty to use all questions.
+          </p>
+          
+          <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Number of Questions
+                Max Questions (Practice Mode)
               </label>
               <Input
                 type="number"
-                {...register("subset_count", { valueAsNumber: true })}
-                placeholder={`Max ${quizBank.question_count}`}
-                error={errors.subset_count?.message}
+                {...register("max_questions_practice", { valueAsNumber: true })}
+                placeholder={`Max ${quizBank.question_count} (leave empty for all)`}
+                error={errors.max_questions_practice?.message}
               />
             </div>
-          )}
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Max Questions (Exam Mode)
+              </label>
+              <Input
+                type="number"
+                {...register("max_questions_exam", { valueAsNumber: true })}
+                placeholder={`Max ${quizBank.question_count} (leave empty for all)`}
+                error={errors.max_questions_exam?.message}
+              />
+            </div>
+          </div>
         </div>
 
-        {/* Options */}
-        <div className="space-y-3 bg-gray-50 p-4 rounded-lg">
+        {/* Pause Settings */}
+        <div className="space-y-3 bg-orange-50 p-4 rounded-lg border border-orange-200">
           <h4 className="font-medium text-gray-900 flex items-center gap-2">
-            <Settings className="w-4 h-4" />
-            Quiz Options
+            <Clock className="w-4 h-4 text-orange-600" />
+            Pause Settings
           </h4>
           
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="shuffle_questions"
-                {...register("shuffle_questions")}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-              <label htmlFor="shuffle_questions" className="text-sm text-gray-700">
-                Shuffle questions
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Pause After Questions
               </label>
+              <Input
+                type="number"
+                {...register("pause_after_questions", { valueAsNumber: true })}
+                placeholder="e.g., 10 (0 = no auto-pause)"
+                error={errors.pause_after_questions?.message}
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Student can pause after answering this many questions
+              </p>
             </div>
 
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="shuffle_options"
-                {...register("shuffle_options")}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-              <label htmlFor="shuffle_options" className="text-sm text-gray-700">
-                Shuffle answer options
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Pause Duration (minutes)
               </label>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="show_results_immediately"
-                {...register("show_results_immediately")}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              <Input
+                type="number"
+                {...register("pause_duration_minutes", { valueAsNumber: true })}
+                placeholder="e.g., 5 (max 60)"
+                error={errors.pause_duration_minutes?.message}
               />
-              <label htmlFor="show_results_immediately" className="text-sm text-gray-700">
-                Show results immediately after completion
-              </label>
+              <p className="text-xs text-gray-500 mt-1">
+                Maximum time allowed for each pause break
+              </p>
             </div>
           </div>
         </div>
 
-        {/* Scheduling (Optional) */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Start Date/Time (Optional)
-            </label>
-            <Input
-              type="datetime-local"
-              {...register("starts_at")}
-              leftIcon={<Calendar className="w-4 h-4" />}
+        {/* Scheduling */}
+        <div className="space-y-4 bg-gray-50 p-4 rounded-lg border border-gray-200">
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="scheduling_enabled"
+              {...register("scheduling_enabled")}
+              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
             />
+            <label htmlFor="scheduling_enabled" className="text-sm font-medium text-gray-700">
+              Enable Scheduling <span className="text-red-500">*</span>
+            </label>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              End Date/Time (Optional)
-            </label>
-            <Input
-              type="datetime-local"
-              {...register("ends_at")}
-              leftIcon={<Calendar className="w-4 h-4" />}
-            />
-          </div>
+          {schedulingEnabled && (
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Start Date/Time
+                </label>
+                <Input
+                  type="datetime-local"
+                  {...register("starts_at")}
+                  leftIcon={<Calendar className="w-4 h-4" />}
+                  error={errors.starts_at?.message}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  End Date/Time
+                </label>
+                <Input
+                  type="datetime-local"
+                  {...register("ends_at")}
+                  leftIcon={<Calendar className="w-4 h-4" />}
+                  error={errors.ends_at?.message}
+                />
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Footer */}
@@ -480,14 +373,14 @@ export const PublishQuizModal = ({ isOpen, onClose, quizBank, preselectedGroupId
             type="button"
             variant="secondary"
             onClick={handleClose}
-            disabled={isSubmitting || publishToGroupMutation.isPending || publishPublicMutation.isPending}
+            disabled={isSubmitting || publishToGroupMutation.isPending}
           >
             Cancel
           </Button>
           <Button
             type="submit"
             variant="primary"
-            loading={isSubmitting || publishToGroupMutation.isPending || publishPublicMutation.isPending}
+            loading={isSubmitting || publishToGroupMutation.isPending}
           >
             Publish Quiz
           </Button>
