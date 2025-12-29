@@ -215,29 +215,6 @@ export default function QuizBankManagement() {
         ),
       },
       {
-        key: "times_used",
-        header: "Times Used",
-        sortable: true,
-        render: (_, quizBank) => (
-          <div className="flex items-center gap-2">
-            <BookOpen className="w-4 h-4 text-gray-400" />
-            <span>{quizBank?.times_used || 0}</span>
-          </div>
-        ),
-      },
-      {
-        key: "status",
-        header: "Status",
-        sortable: true,
-        render: (_, quizBank) => (
-          <Badge
-            variant={quizBank?.status === "draft" ? "secondary" : "success"}
-          >
-            {quizBank?.status || "draft"}
-          </Badge>
-        ),
-      },
-      {
         key: "created_at",
         header: "Created",
         sortable: true,

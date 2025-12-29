@@ -10,7 +10,6 @@ import {
   FileQuestion,
   Plus,
   Calendar,
-  BookOpen,
   Edit2,
   Send,
 } from "lucide-react";
@@ -19,7 +18,6 @@ import {
   useQuizBankQuestions,
 } from "@/hooks/queries/useQuizBankQueries";
 import { PageHeader } from "@/components/shared/PageHeader";
-import { StatusBadge } from "@/components/shared/StatusBadge";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -185,12 +183,7 @@ export const QuizBankDetails = () => {
     <div className="space-y-6">
       {/* Page Header */}
       <PageHeader
-        title={
-          <div className="flex items-center gap-3">
-            <span>{quizBank.title}</span>
-            <StatusBadge status={quizBank.status || "draft"} size="md" />
-          </div>
-        }
+        title={quizBank.title}
         subtitle={quizBank.description || "No description provided"}
         actions={
           <div className="flex items-center gap-2">
@@ -226,16 +219,11 @@ export const QuizBankDetails = () => {
       {/* Quiz Bank Info Card */}
       <Card>
         <CardContent className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <InfoItem
               icon={FileQuestion}
               label="Total Questions"
               value={quizBank.question_count || 0}
-            />
-            <InfoItem
-              icon={BookOpen}
-              label="Times Used"
-              value={quizBank.times_used || 0}
             />
             <InfoItem
               icon={Calendar}

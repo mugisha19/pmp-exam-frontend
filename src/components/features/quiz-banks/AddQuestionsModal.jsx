@@ -327,12 +327,6 @@ export function AddQuestionsModal({ isOpen, onClose, quizBankId, onSuccess }) {
     onClose();
   };
 
-  // Progress calculation
-  const selectionProgress = useMemo(() => {
-    if (availableQuestions.length === 0) return 0;
-    return Math.round((selectedQuestions.length / availableQuestions.length) * 100);
-  }, [selectedQuestions.length, availableQuestions.length]);
-
   return (
     <Modal
       isOpen={isOpen}
@@ -341,43 +335,6 @@ export function AddQuestionsModal({ isOpen, onClose, quizBankId, onSuccess }) {
       size="xl"
     >
       <div className="space-y-4 max-h-[80vh] overflow-y-auto">
-        {/* Progress Bar */}
-        {availableQuestions.length > 0 && (
-          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <CheckCircle2 className="w-5 h-5 text-blue-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-gray-900">
-                    {selectedQuestions.length} of {availableQuestions.length} questions selected
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    {selectionProgress}% selected
-                  </p>
-                </div>
-              </div>
-              {selectedQuestions.length > 0 && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={clearSelection}
-                  className="text-xs"
-                >
-                  Clear
-                </Button>
-              )}
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div
-                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${selectionProgress}%` }}
-              />
-            </div>
-          </div>
-        )}
-
         {/* Stats Cards */}
         <div className="grid grid-cols-3 gap-3">
           <Card>
