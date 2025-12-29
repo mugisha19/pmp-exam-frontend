@@ -75,6 +75,7 @@ export {
   getQuizBanks,
   getQuizBankById,
   createQuizBank,
+  mergeQuizBanks,
   updateQuizBank,
   deleteQuizBank,
   addQuestionToBank,

@@ -5,6 +5,7 @@
 
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   ArrowLeft,
   FileQuestion,
@@ -12,11 +13,14 @@ import {
   Calendar,
   Edit2,
   Send,
+  Trash2,
 } from "lucide-react";
 import {
   useQuizBank,
   useQuizBankQuestions,
+  useDeleteQuizBankMutation,
 } from "@/hooks/queries/useQuizBankQueries";
+import { queryKeys } from "@/lib/query-client";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { Card, CardContent } from "@/components/ui/Card";
@@ -24,8 +28,10 @@ import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { DataTable } from "@/components/shared/DataTable";
+import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { EditQuizBankModal, AddQuestionsModal } from "@/components/features/quiz-banks";
 import { PublishQuizModal } from "@/components/features/quizzes/PublishQuizModal";
+import toast from "react-hot-toast";
 
 /**
  * Format date for display
@@ -59,9 +65,13 @@ const InfoItem = ({ icon: IconComponent, label, value }) => (
 export const QuizBankDetails = () => {
   const { quizBankId } = useParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
   const [isAddQuestionsModalOpen, setIsAddQuestionsModalOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+  const deleteQuizBankMutation = useDeleteQuizBankMutation();
 
   // Fetch quiz bank details
   const {
@@ -70,16 +80,47 @@ export const QuizBankDetails = () => {
     isError,
     error,
     refetch: refetchQuizBank,
-  } = useQuizBank(quizBankId);
+  } = useQuizBank(quizBankId, {
+    retry: false, // Don't retry on errors
+    refetchOnWindowFocus: false, // Don't refetch on window focus
+    refetchOnMount: false, // Don't refetch on mount if data exists
+  });
 
   // Fetch questions
   const {
     data: questionsData,
     isLoading: questionsLoading,
     refetch: refetchQuestions,
-  } = useQuizBankQuestions(quizBankId);
+  } = useQuizBankQuestions(quizBankId, {
+    retry: false, // Don't retry on errors
+    refetchOnWindowFocus: false, // Don't refetch on window focus
+    refetchOnMount: false, // Don't refetch on mount if data exists
+  });
 
   const questions = questionsData?.items || questionsData || [];
+
+  const handleDelete = async () => {
+    try {
+      // Cancel any ongoing queries before deletion
+      // Note: The mutation will also cancel queries, but we do it here too for extra safety
+      queryClient.cancelQueries({
+        queryKey: queryKeys.quizBanks.detail(quizBankId),
+      });
+      queryClient.cancelQueries({
+        queryKey: ["quiz-bank-questions", quizBankId],
+      });
+
+      await deleteQuizBankMutation.mutateAsync(quizBankId);
+      // Navigate immediately to prevent further queries
+      navigate("/admin/quiz-banks");
+    } catch (error) {
+      const message =
+        typeof error === "object"
+          ? error.message || JSON.stringify(error)
+          : error;
+      toast.error(`Failed to delete quiz bank: ${message}`);
+    }
+  };
 
   // Loading state
   if (isLoading) {
@@ -205,6 +246,15 @@ export const QuizBankDetails = () => {
               Edit Details
             </Button>
             <Button
+              variant="danger"
+              size="sm"
+              leftIcon={<Trash2 className="w-4 h-4" />}
+              onClick={() => setIsDeleteDialogOpen(true)}
+              disabled={deleteQuizBankMutation.isPending}
+            >
+              Delete
+            </Button>
+            <Button
               variant="ghost"
               size="sm"
               leftIcon={<ArrowLeft className="w-4 h-4" />}
@@ -311,6 +361,18 @@ export const QuizBankDetails = () => {
           refetchQuestions();
           refetchQuizBank();
         }}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={isDeleteDialogOpen}
+        onClose={() => setIsDeleteDialogOpen(false)}
+        onConfirm={handleDelete}
+        title="Delete Quiz Bank"
+        message={`Are you sure you want to delete "${quizBank?.title}"? This action cannot be undone and will remove all questions from this quiz bank.`}
+        confirmText="Delete"
+        variant="danger"
+        loading={deleteQuizBankMutation.isPending}
       />
     </div>
   );

@@ -54,6 +54,23 @@ export const createQuizBank = async (data) => {
 };
 
 /**
+ * Merge multiple quiz banks into a new one
+ * @param {Object} data - Merge data
+ * @param {Array<string>} data.quiz_bank_ids - Array of quiz bank IDs to merge (minimum 2)
+ * @param {string} data.title - Title for the merged quiz bank
+ * @param {string} [data.description] - Description for the merged quiz bank
+ * @returns {Promise<Object>} Created merged quiz bank
+ */
+export const mergeQuizBanks = async (data) => {
+  try {
+    const response = await api.post(QUIZ_ENDPOINTS.MERGE_QUIZ_BANKS, data);
+    return response.data;
+  } catch (error) {
+    throw handleQuizBankError(error);
+  }
+};
+
+/**
  * Update an existing quiz bank
  * @param {string} quizBankId - Quiz bank ID
  * @param {Object} data - Quiz bank data to update
@@ -194,6 +211,7 @@ export default {
   getQuizBanks,
   getQuizBankById,
   createQuizBank,
+  mergeQuizBanks,
   updateQuizBank,
   deleteQuizBank,
   addQuestionToBank,

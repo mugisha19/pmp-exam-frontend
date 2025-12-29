@@ -35,12 +35,41 @@ export const useQuizBanks = (filters = {}, options = {}) => {
 export const useQuizBank = (quizBankId, options = {}) => {
   return useQuery({
     queryKey: queryKeys.quizBanks.detail(quizBankId),
-    queryFn: () => quizBankService.getQuizBankById(quizBankId),
+    queryFn: async () => {
+      try {
+        return await quizBankService.getQuizBankById(quizBankId);
+      } catch (error) {
+        // Handle 404 errors silently (quiz bank deleted)
+        if (error?.response?.status === 404) {
+          return null;
+        }
+        // Re-throw other errors
+        throw error;
+      }
+    },
     enabled: !!quizBankId,
     staleTime: 2 * 60 * 1000, // 2 minutes
+    retry: (failureCount, error) => {
+      // Don't retry on 404 errors (quiz bank not found/deleted)
+      if (error?.response?.status === 404) {
+        return false;
+      }
+      // Use custom retry from options if provided, otherwise default to 3 retries
+      if (options.retry === false) return false;
+      return failureCount < 3;
+    },
+    refetchOnWindowFocus: options.refetchOnWindowFocus !== undefined 
+      ? options.refetchOnWindowFocus 
+      : true,
+    refetchOnMount: options.refetchOnMount !== undefined 
+      ? options.refetchOnMount 
+      : true,
     onError: (error) => {
-      const errorMessage = error.message || "Failed to fetch quiz bank";
-      toast.error(errorMessage);
+      // Don't show error toast for 404s (likely deleted)
+      if (error?.response?.status !== 404) {
+        const errorMessage = error.message || "Failed to fetch quiz bank";
+        toast.error(errorMessage);
+      }
     },
     ...options,
   });
@@ -54,13 +83,42 @@ export const useQuizBank = (quizBankId, options = {}) => {
 export const useQuizBankQuestions = (quizBankId, options = {}) => {
   return useQuery({
     queryKey: ["quiz-bank-questions", quizBankId],
-    queryFn: () => quizBankService.getBankQuestions(quizBankId),
+    queryFn: async () => {
+      try {
+        return await quizBankService.getBankQuestions(quizBankId);
+      } catch (error) {
+        // Handle 404 errors silently (quiz bank deleted)
+        if (error?.response?.status === 404) {
+          return { items: [], total: 0 };
+        }
+        // Re-throw other errors
+        throw error;
+      }
+    },
     enabled: !!quizBankId,
     staleTime: 1 * 60 * 1000, // 1 minute
+    retry: (failureCount, error) => {
+      // Don't retry on 404 errors (quiz bank not found/deleted)
+      if (error?.response?.status === 404) {
+        return false;
+      }
+      // Use custom retry from options if provided, otherwise default to 3 retries
+      if (options.retry === false) return false;
+      return failureCount < 3;
+    },
+    refetchOnWindowFocus: options.refetchOnWindowFocus !== undefined 
+      ? options.refetchOnWindowFocus 
+      : true,
+    refetchOnMount: options.refetchOnMount !== undefined 
+      ? options.refetchOnMount 
+      : true,
     onError: (error) => {
-      const errorMessage =
-        error.message || "Failed to fetch quiz bank questions";
-      toast.error(errorMessage);
+      // Don't show error toast for 404s (likely deleted)
+      if (error?.response?.status !== 404) {
+        const errorMessage =
+          error.message || "Failed to fetch quiz bank questions";
+        toast.error(errorMessage);
+      }
     },
     ...options,
   });
@@ -138,14 +196,24 @@ export const useDeleteQuizBankMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (quizBankId) => quizBankService.deleteQuizBank(quizBankId),
+    mutationFn: async (quizBankId) => {
+      // Cancel any ongoing queries before deletion starts
+      queryClient.cancelQueries({
+        queryKey: queryKeys.quizBanks.detail(quizBankId),
+      });
+      queryClient.cancelQueries({
+        queryKey: ["quiz-bank-questions", quizBankId],
+      });
+      
+      return await quizBankService.deleteQuizBank(quizBankId);
+    },
     onSuccess: (_, quizBankId) => {
-      // Remove quiz bank from cache
+      // Remove quiz bank from cache immediately
       queryClient.removeQueries({
         queryKey: queryKeys.quizBanks.detail(quizBankId),
       });
 
-      // Remove quiz bank questions from cache
+      // Remove quiz bank questions from cache immediately
       queryClient.removeQueries({
         queryKey: ["quiz-bank-questions", quizBankId],
       });
@@ -153,7 +221,7 @@ export const useDeleteQuizBankMutation = () => {
       // Invalidate quiz banks list
       queryClient.invalidateQueries({ queryKey: queryKeys.quizBanks.all });
 
-      toast.success("Quiz bank deleted");
+      toast.success("Quiz bank deleted successfully");
     },
     onError: (error) => {
       const errorMessage =

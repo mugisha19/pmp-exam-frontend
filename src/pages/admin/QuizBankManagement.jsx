@@ -29,7 +29,11 @@ import {
   useQuizBanks,
   useDeleteQuizBankMutation,
 } from "@/hooks/queries/useQuizBankQueries";
-import { CreateQuizBankModal } from "@/components/features/quiz-banks";
+import {
+  CreateQuizBankModal,
+  CreateQuizBankSelectionModal,
+  MergeQuizBankModal,
+} from "@/components/features/quiz-banks";
 import { PublishQuizModal } from "@/components/features/quizzes/PublishQuizModal";
 
 /**
@@ -56,7 +60,9 @@ export default function QuizBankManagement() {
   const [selectedQuizBanks, setSelectedQuizBanks] = useState([]);
 
   // Modal states
+  const [isSelectionModalOpen, setIsSelectionModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isMergeModalOpen, setIsMergeModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
   const [selectedQuizBank, setSelectedQuizBank] = useState(null);
@@ -103,7 +109,15 @@ export default function QuizBankManagement() {
 
   // CRUD handlers
   const handleCreateQuizBank = useCallback(() => {
+    setIsSelectionModalOpen(true);
+  }, []);
+
+  const handleCreateNew = useCallback(() => {
     setIsCreateModalOpen(true);
+  }, []);
+
+  const handleMerge = useCallback(() => {
+    setIsMergeModalOpen(true);
   }, []);
 
   const handleEditQuizBank = useCallback((quizBank) => {
@@ -350,10 +364,25 @@ export default function QuizBankManagement() {
         }}
       />
 
+      {/* Create Quiz Bank Selection Modal */}
+      <CreateQuizBankSelectionModal
+        isOpen={isSelectionModalOpen}
+        onClose={() => setIsSelectionModalOpen(false)}
+        onCreateNew={handleCreateNew}
+        onMerge={handleMerge}
+      />
+
       {/* Create Quiz Bank Modal */}
       <CreateQuizBankModal
         isOpen={isCreateModalOpen}
         onClose={handleCreateModalClose}
+        onSuccess={handleCreateSuccess}
+      />
+
+      {/* Merge Quiz Banks Modal */}
+      <MergeQuizBankModal
+        isOpen={isMergeModalOpen}
+        onClose={() => setIsMergeModalOpen(false)}
         onSuccess={handleCreateSuccess}
       />
 

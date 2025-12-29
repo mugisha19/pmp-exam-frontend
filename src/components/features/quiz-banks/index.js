@@ -3,5 +3,10 @@
  * Export all quiz bank-related components
  */
 
-export { CreateQuizBankModal, EditQuizBankModal } from "./QuizBankModals";
+export {
+  CreateQuizBankModal,
+  EditQuizBankModal,
+  CreateQuizBankSelectionModal,
+  MergeQuizBankModal,
+} from "./QuizBankModals";
 export { AddQuestionsModal } from "./AddQuestionsModal";

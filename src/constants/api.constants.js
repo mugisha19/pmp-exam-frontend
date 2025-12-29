@@ -100,6 +100,7 @@ export const QUIZ_ENDPOINTS = {
   // Quiz Banks
   LIST_QUIZ_BANKS: "/quiz-banks",
   CREATE_QUIZ_BANK: "/quiz-banks",
+  MERGE_QUIZ_BANKS: "/quiz-banks/merge",
   GET_QUIZ_BANK: (quizBankId) => `/quiz-banks/${quizBankId}`,
   UPDATE_QUIZ_BANK: (quizBankId) => `/quiz-banks/${quizBankId}`,
   DELETE_QUIZ_BANK: (quizBankId) => `/quiz-banks/${quizBankId}`,
