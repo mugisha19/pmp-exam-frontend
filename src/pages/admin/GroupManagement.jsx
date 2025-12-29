@@ -44,8 +44,7 @@ const GROUP_TYPE_OPTIONS = [
 const STATUS_OPTIONS = [
   { value: "", label: "All Statuses" },
   { value: "active", label: "Active" },
-  { value: "inactive", label: "Inactive" },
-  { value: "archived", label: "Archived" },
+  { value: "disabled", label: "Disabled" },
 ];
 
 export default function GroupManagement() {
@@ -326,8 +325,7 @@ export default function GroupManagement() {
         render: (_, group) => {
           const statusVariant = {
             active: "success",
-            inactive: "warning",
-            archived: "secondary",
+            disabled: "secondary",
           };
           return (
             <Badge variant={statusVariant[group?.status] || "secondary"}>
@@ -357,13 +355,6 @@ export default function GroupManagement() {
               {formatDate(group?.from_date)} - {group?.to_date ? formatDate(group.to_date) : 'Ongoing'}
             </span>
           </div>
-        ),
-      },
-      {
-        key: "join_method",
-        header: "Join Method",
-        render: (_, group) => (
-          <Badge variant="outline">{group?.join_method || "invite"}</Badge>
         ),
       },
     ],
