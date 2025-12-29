@@ -362,17 +362,17 @@ export const QuizTaking = () => {
   const handleSaveAnswer = async () => {
     // Don't save if waiting for auto-submit
     if (isWaitingForAutoSubmit) {
-      return;
+      return { autoPaused: false };
     }
 
     // Don't save if paused
     if (!sessionData || sessionData.pause_info?.is_paused) {
-      return; // Silently return, don't show error (might be auto-paused)
+      return { autoPaused: false }; // Silently return, don't show error (might be auto-paused)
     }
 
     if (!selectedAnswer) {
       // Allow navigating without an answer (skipping)
-      return;
+      return { autoPaused: false };
     }
 
     setIsSaving(true);
@@ -392,27 +392,36 @@ export const QuizTaking = () => {
         // Reload session state immediately to get paused state
         await loadSessionState();
         toast.success(response.pause_message || "Auto-pause triggered");
-        return; // Exit early, don't reload again
+        return { autoPaused: true }; // Return flag to prevent navigation
       }
 
       // Reload session state to get updated progress (only if not auto-paused)
       await loadSessionState();
+      
+      // Check if session became paused after reload (double-check)
+      const updatedState = await getSessionState(sessionToken);
+      if (updatedState.pause_info?.is_paused) {
+        return { autoPaused: true };
+      }
+      
+      return { autoPaused: false };
     } catch (error) {
       console.error("Failed to save answer:", error);
       // Check if error is due to pause or expired session
       if (error.response?.status === 400 && error.response?.data?.detail?.includes("paused")) {
         // Session was paused, reload state
         await loadSessionState();
-        return;
+        return { autoPaused: true };
       }
       if (error.response?.status === 410) {
         // Session expired/submitted, redirect
         sessionStorage.removeItem("quiz_session_token");
         sessionStorage.removeItem("quiz_session_data");
         navigate(`/exams/${quizId}`);
-        return;
+        return { autoPaused: false };
       }
       toast.error("Failed to save answer");
+      return { autoPaused: false };
     } finally {
       setIsSaving(false);
     }
@@ -462,10 +471,31 @@ export const QuizTaking = () => {
 
     // Save current answer before navigating (if there's an answer)
     if (selectedAnswer) {
-      await handleSaveAnswer();
-      // Check if auto-pause happened during save
-      if (sessionData.pause_info?.is_paused) {
-        return; // Don't navigate if paused
+      const saveResult = await handleSaveAnswer();
+      
+      // Check if auto-pause happened during save - prevent navigation
+      if (saveResult?.autoPaused) {
+        return; // Don't navigate if auto-paused
+      }
+      
+      // Always reload session state after saving to get latest pause status
+      await loadSessionState();
+      
+      // Double-check if session is now paused (after reload) - use fresh state
+      // Since loadSessionState updates sessionData asynchronously, fetch fresh state
+      try {
+        const currentState = await getSessionState(sessionToken);
+        if (currentState.pause_info?.is_paused) {
+          // Session is paused, don't navigate
+          return;
+        }
+      } catch (error) {
+        // If we can't get state, don't navigate (might be expired/paused)
+        console.error("Failed to verify session state before navigation:", error);
+        if (error.response?.status === 400 || error.response?.status === 410) {
+          await loadSessionState(); // Reload to update UI
+          return;
+        }
       }
     }
 
@@ -485,13 +515,32 @@ export const QuizTaking = () => {
     }
 
     try {
-      // Only call backend navigation if session is active and not paused
-      if (!sessionData.pause_info?.is_paused && !isWaitingForAutoSubmit) {
+      // Final check before navigation - ensure session is not paused
+      // Reload state one more time to ensure we have latest pause status
+      const latestState = await getSessionState(sessionToken);
+      
+      // Don't navigate if paused, expired, or waiting for auto-submit
+      if (latestState.pause_info?.is_paused) {
+        // Session is paused, reload state to update UI and don't navigate
+        await loadSessionState();
+        return;
+      }
+      
+      if (latestState.status === "expired" || latestState.status === "submitted" || latestState.status === "auto_submitted") {
+        // Session expired/submitted, redirect
+        sessionStorage.removeItem("quiz_session_token");
+        sessionStorage.removeItem("quiz_session_data");
+        navigate(`/exams/${quizId}`);
+        return;
+      }
+      
+      if (!isWaitingForAutoSubmit) {
         await navigateToQuestion(sessionToken, newIndex + 1);
         // Reload session state to get latest data
         await loadSessionState();
       }
-      // Always update local state (even if backend call fails or skipped)
+      
+      // Only update local state if navigation succeeded
       setCurrentQuestionIndex(newIndex);
       const newQ = sessionData.questions[newIndex];
       setSelectedAnswer(newQ?.user_answer || null);
@@ -499,15 +548,29 @@ export const QuizTaking = () => {
       console.error("Failed to navigate:", error);
       // Check if session expired or invalid
       if (error.response?.status === 410 || error.response?.status === 404) {
+        // Session expired/submitted, redirect
         sessionStorage.removeItem("quiz_session_token");
         sessionStorage.removeItem("quiz_session_data");
         navigate(`/exams/${quizId}`);
         return;
       }
-      // Fallback to local navigation
-      setCurrentQuestionIndex(newIndex);
-      const newQ = sessionData.questions[newIndex];
-      setSelectedAnswer(newQ?.user_answer || null);
+      
+      // Check if error is due to pause (400 Bad Request)
+      if (error.response?.status === 400) {
+        // Check error message for pause indication
+        const errorDetail = error.response?.data?.detail || "";
+        if (errorDetail.includes("paused") || errorDetail.includes("pause")) {
+          // Session was paused, reload state and don't navigate
+          await loadSessionState();
+          return;
+        }
+        // Other 400 errors - don't navigate, just reload state
+        await loadSessionState();
+        return;
+      }
+      
+      // For other errors, don't update local state (navigation failed)
+      toast.error("Failed to navigate to question");
     }
   };
 
