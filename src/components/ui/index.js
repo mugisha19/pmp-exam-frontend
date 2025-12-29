@@ -11,4 +11,6 @@ export { Divider } from "./Divider";
 export { Spinner } from "./Spinner";
 export { Logo } from "./Logo";
 export { PasswordStrength } from "./PasswordStrength";
+export { RichTextEditor } from "./RichTextEditor";
+export { Modal, ModalHeader, ModalBody, ModalFooter } from "./Modal";
 export { default as Toaster } from "./Toaster";

@@ -453,9 +453,10 @@ export default function ExamDetails() {
         <div className="space-y-3">
           <h1 className="text-3xl font-bold text-gray-900">{exam.title}</h1>
           {exam.description && (
-            <p className="text-base text-gray-700 leading-relaxed">
-              {exam.description}
-            </p>
+            <div
+              className="text-base text-gray-700 leading-relaxed prose prose-sm max-w-none"
+              dangerouslySetInnerHTML={{ __html: exam.description }}
+            />
           )}
         </div>
       </Card>

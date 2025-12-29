@@ -13,10 +13,14 @@ const SESSION_BASE = "/sessions";
 /**
  * Start a new quiz session
  * @param {string} quizId - Quiz ID to start
+ * @param {string} mode - Quiz mode: 'practice' or 'exam'
  * @returns {Promise<Object>} Session state with questions
  */
-export const startQuizSession = async (quizId) => {
-  const response = await api.post(`${SESSION_BASE}/start`, { quiz_id: quizId });
+export const startQuizSession = async (quizId, mode = "practice") => {
+  const response = await api.post(`${SESSION_BASE}/start`, { 
+    quiz_id: quizId,
+    mode: mode 
+  });
   return response.data;
 };
 

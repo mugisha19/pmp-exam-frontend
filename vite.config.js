@@ -10,6 +10,16 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  optimizeDeps: {
+    include: [
+      "@tiptap/react",
+      "@tiptap/starter-kit",
+      "@tiptap/extension-link",
+      "react-is",
+      "recharts",
+    ],
+    exclude: ["@tanstack/react-query-devtools"], // Exclude devtools from optimization
+  },
   server: {
     host: true, // 👉 expose dev server to network (LAN)
     port: 5173,

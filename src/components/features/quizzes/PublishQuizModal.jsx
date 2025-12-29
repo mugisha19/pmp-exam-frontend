@@ -11,6 +11,7 @@ import { Users, Calendar, Clock, Target, Settings } from "lucide-react";
 import { Modal, ModalFooter } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
+import { RichTextEditor } from "@/components/ui/RichTextEditor";
 import { Button } from "@/components/ui/Button";
 import {
   usePublishToGroupMutation,
@@ -182,11 +183,21 @@ export const PublishQuizModal = ({ isOpen, onClose, quizBank, preselectedGroupId
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Description (Optional)
             </label>
-            <Textarea
-              {...register("description")}
-              placeholder={quizBank.description || "Enter quiz description"}
-              rows={3}
-              error={errors.description?.message}
+            <Controller
+              name="description"
+              control={control}
+              render={({ field }) => (
+                <RichTextEditor
+                  value={field.value || ""}
+                  onChange={(content) => {
+                    // Store HTML content, or null if empty (only whitespace/tags)
+                    const plainText = content.replace(/<[^>]*>/g, "").trim();
+                    field.onChange(plainText ? content : null);
+                  }}
+                  placeholder={quizBank.description || "Enter quiz description"}
+                  error={errors.description?.message}
+                />
+              )}
             />
             <p className="text-xs text-gray-500 mt-1">
               Leave empty to use quiz bank description

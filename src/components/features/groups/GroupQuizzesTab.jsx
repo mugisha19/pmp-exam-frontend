@@ -131,9 +131,12 @@ export const GroupQuizzesTab = ({ groupId }) => {
             <p className="font-medium text-gray-900">
               {quiz.title || quiz.name || "Untitled Quiz"}
             </p>
-            <p className="text-xs text-gray-500 truncate max-w-[200px]">
-              {quiz.description || "No description"}
-            </p>
+            <div
+              className="text-xs text-gray-500 truncate max-w-[200px] prose prose-xs max-w-none"
+              dangerouslySetInnerHTML={{
+                __html: quiz.description || "No description",
+              }}
+            />
           </div>
         </div>
       ),

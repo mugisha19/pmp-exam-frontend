@@ -119,7 +119,10 @@ export const QuizCardEnhanced = ({
             </div>
 
             {quiz?.description && (
-              <p className="text-sm text-gray-600 line-clamp-2 mb-3">{quiz.description}</p>
+              <div
+                className="text-sm text-gray-600 line-clamp-2 mb-3 prose prose-sm max-w-none"
+                dangerouslySetInnerHTML={{ __html: quiz.description }}
+              />
             )}
 
             <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-3">
@@ -216,7 +219,10 @@ export const QuizCardEnhanced = ({
       {/* Content */}
       <div className="p-4 flex flex-col flex-1 min-h-0">
         {quiz?.description && (
-          <p className="text-sm text-gray-600 line-clamp-2 mb-3">{quiz.description}</p>
+          <div
+            className="text-sm text-gray-600 line-clamp-2 mb-3 prose prose-sm max-w-none"
+            dangerouslySetInnerHTML={{ __html: quiz.description }}
+          />
         )}
 
         <div className="flex flex-wrap items-center gap-3 text-xs text-gray-600 mb-3">
