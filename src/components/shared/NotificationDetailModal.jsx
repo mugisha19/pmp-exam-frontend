@@ -25,8 +25,8 @@ const notificationIcons = {
   info: { icon: Info, color: "text-blue-600", bg: "bg-blue-500/10" },
   success: {
     icon: CheckCircle,
-    color: "text-emerald-600",
-    bg: "bg-emerald-500/10",
+    color: "",
+    bg: "",
   },
   warning: {
     icon: AlertCircle,
@@ -36,8 +36,8 @@ const notificationIcons = {
   error: { icon: AlertCircle, color: "text-red-600", bg: "bg-red-500/10" },
   message: {
     icon: MessageSquare,
-    color: "text-teal-600",
-    bg: "bg-teal-500/10",
+    color: "",
+    bg: "",
   },
   group: { icon: Users, color: "text-cyan-600", bg: "bg-cyan-500/10" },
   quiz: { icon: FileText, color: "text-blue-600", bg: "bg-blue-500/10" },
@@ -70,6 +70,7 @@ export function NotificationDetailModal({ isOpen, onClose, notification, onMarkR
   const isRead = read ?? is_read ?? false;
   const iconConfig = notificationIcons[type] || notificationIcons.default;
   const Icon = iconConfig.icon;
+  const useCustomColor = type === 'success' || type === 'message';
 
   const timeAgo = created_at
     ? formatDistanceToNow(new Date(created_at), { addSuffix: true })
@@ -98,8 +99,14 @@ export function NotificationDetailModal({ isOpen, onClose, notification, onMarkR
         <div className="space-y-6">
           {/* Header with Icon */}
           <div className="flex items-start gap-4">
-            <div className={`p-3 rounded-lg ${iconConfig.bg} flex-shrink-0`}>
-              <Icon className={`w-6 h-6 ${iconConfig.color}`} />
+            <div 
+              className={`p-3 rounded-lg flex-shrink-0 ${useCustomColor ? '' : iconConfig.bg}`}
+              style={useCustomColor ? { backgroundColor: 'rgba(71, 96, 114, 0.1)' } : {}}
+            >
+              <Icon 
+                className={`w-6 h-6 ${useCustomColor ? '' : iconConfig.color}`}
+                style={useCustomColor ? { color: '#476072' } : {}}
+              />
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-2">

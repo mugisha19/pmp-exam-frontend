@@ -72,8 +72,9 @@ export const Avatar = ({
           className={cn(
             "absolute bottom-0 right-0 block rounded-full ring-2 ring-gray-900",
             statusSizes[size],
-            isOnline ? "bg-green-500" : "bg-gray-500"
+            !isOnline && "bg-gray-500"
           )}
+          style={isOnline ? { backgroundColor: '#476072' } : {}}
         />
       )}
     </div>

@@ -14,7 +14,7 @@ const roleConfig = {
     label: "Student",
   },
   instructor: {
-    color: "bg-teal-500/10 text-teal-600 border-teal-500/20",
+    color: "",
     icon: User,
     label: "Instructor",
   },
@@ -66,14 +66,21 @@ export const RoleBadge = ({
   // Display label
   const displayLabel = label || config.label;
 
+  const isInstructor = normalizedRole === 'instructor';
+  
   return (
     <span
       className={cn(
         "inline-flex items-center gap-1.5 font-medium rounded-full border",
         sizeClasses[size],
-        config.color,
+        !isInstructor && config.color,
         className
       )}
+      style={isInstructor ? {
+        backgroundColor: 'rgba(71, 96, 114, 0.1)',
+        color: '#476072',
+        borderColor: 'rgba(71, 96, 114, 0.2)',
+      } : {}}
     >
       {showIcon && <Icon className={iconSizes[size]} />}
       {displayLabel}

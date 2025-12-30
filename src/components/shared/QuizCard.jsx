@@ -36,25 +36,25 @@ export const QuizCard = ({
     <div
       onClick={handleClick}
       className={cn(
-        "bg-gradient-to-br from-white to-gray-50/50 rounded-lg border border-gray-200 shadow-sm overflow-hidden hover:shadow transition-all duration-200 cursor-pointer group min-w-[240px] hover:border-teal-300",
+        "bg-gradient-to-br from-white to-gray-50/50 rounded-lg border border-gray-200 shadow-sm overflow-hidden hover:shadow transition-all duration-200 cursor-pointer group min-w-[240px]",
         className
       )}
     >
       {/* Thumbnail Placeholder */}
       <div className="w-full h-32 bg-gradient-to-br from-gray-100 via-gray-50 to-gray-200 flex items-center justify-center relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-teal-500/15 to-emerald-500/15 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-        <BookOpen className="w-10 h-10 text-gray-400 group-hover:text-teal-600 transition-colors duration-200" />
+        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200" style={{ background: 'rgba(71, 96, 114, 0.15)' }} />
+        <BookOpen className="w-10 h-10 text-gray-400 group-hover:text-[#476072] transition-colors duration-200" />
       </div>
 
       {/* Content */}
       <div className="p-4">
-        <h3 className="text-sm font-semibold text-gray-900 mb-2.5 line-clamp-2 group-hover:text-teal-600 transition-colors duration-200">
+        <h3 className="text-sm font-semibold text-gray-900 mb-2.5 line-clamp-2 transition-colors duration-200 group-hover:text-[#476072]">
           {quiz?.title || "Quiz Title"}
         </h3>
         
         {/* Category Badge */}
         <div className="mb-3">
-          <span className="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-medium bg-teal-50 text-teal-600 border border-teal-200">
+          <span className="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-medium border" style={{ backgroundColor: 'rgba(71, 96, 114, 0.1)', color: '#476072', borderColor: 'rgba(71, 96, 114, 0.2)' }}>
             {category}
           </span>
         </div>
@@ -62,7 +62,7 @@ export const QuizCard = ({
         {/* Instructor Info */}
         {instructor && (
           <div className="flex items-center gap-2 mb-2.5">
-            <div className="w-5 h-5 rounded-full bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center flex-shrink-0">
+            <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#476072' }}>
               <span className="text-white font-medium text-[10px]">
                 {getInitials(instructor.name)}
               </span>
@@ -80,8 +80,8 @@ export const QuizCard = ({
         {progress > 0 && (
           <div className="w-full bg-gray-200 rounded-full h-1.5">
             <div
-              className="h-1.5 rounded-full bg-gradient-to-r from-teal-500 to-emerald-600 transition-all duration-500"
-              style={{ width: `${progress}%` }}
+              className="h-1.5 rounded-full transition-all duration-500"
+              style={{ width: `${progress}%`, backgroundColor: '#476072' }}
             />
           </div>
         )}

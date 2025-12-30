@@ -186,10 +186,10 @@ export const ActivityStats = ({ className }) => {
       {/* Additional Info */}
       {overallStats && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mt-6">
-          <div className="bg-gradient-to-br from-white to-green-50/30 rounded-xl border-2 border-green-100 shadow-md hover:shadow-lg transition-all duration-200 p-5 hover:scale-105">
+          <div className="bg-gradient-to-br from-white rounded-xl border-2 shadow-md hover:shadow-lg transition-all duration-200 p-5 hover:scale-105" style={{ background: 'linear-gradient(to bottom right, white, rgba(71, 96, 114, 0.03))', borderColor: 'rgba(71, 96, 114, 0.1)' }}>
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center shadow-sm">
-                <Target className="w-6 h-6 text-green-600" />
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-sm" style={{ background: 'linear-gradient(to bottom right, rgba(71, 96, 114, 0.1), rgba(71, 96, 114, 0.2))' }}>
+                <Target className="w-6 h-6" style={{ color: '#476072' }} />
               </div>
               <div>
                 <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1">Highest Score</p>

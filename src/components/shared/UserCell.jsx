@@ -22,13 +22,13 @@ const getAvatarColor = (str) => {
 
   const colors = [
     "bg-blue-600",
-    "bg-green-600",
+    "",
     "bg-yellow-600",
-    "bg-teal-600",
+    "",
     "bg-orange-600",
     "bg-cyan-600",
     "bg-rose-600",
-    "bg-emerald-600",
+    "",
     "bg-sky-600",
     "bg-amber-600",
   ];
@@ -38,7 +38,15 @@ const getAvatarColor = (str) => {
     hash = str.charCodeAt(i) + ((hash << 5) - hash);
   }
 
-  return colors[Math.abs(hash) % colors.length];
+  const colorIndex = Math.abs(hash) % colors.length;
+  const colorClass = colors[colorIndex];
+  
+  // If it's an empty string (green/teal/emerald replacement), use #476072
+  if (!colorClass) {
+    return "";
+  }
+  
+  return colorClass;
 };
 
 // Size variants
@@ -106,9 +114,9 @@ export const UserCell = ({
         <div
           className={cn(
             "shrink-0 rounded-full flex items-center justify-center font-medium text-white",
-            config.avatar,
-            !displayAvatarUrl && avatarBgColor
+            config.avatar
           )}
+          style={!displayAvatarUrl && !avatarBgColor ? { backgroundColor: '#476072' } : {}}
         >
           {displayAvatarUrl ? (
             <img
@@ -170,6 +178,7 @@ export const UserAvatar = ({
         !displayAvatarUrl && avatarBgColor,
         className
       )}
+      style={!displayAvatarUrl && !avatarBgColor ? { backgroundColor: '#476072' } : {}}
       title={displayName}
     >
       {displayAvatarUrl ? (

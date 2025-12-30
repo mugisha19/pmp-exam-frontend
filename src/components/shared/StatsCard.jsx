@@ -30,7 +30,7 @@ export const StatsCard = ({
   };
 
   const getTrendColor = () => {
-    if (trendDirection === "up" || trend > 0) return "text-green-400";
+    if (trendDirection === "up" || trend > 0) return "";
     if (trendDirection === "down" || trend < 0) return "text-red-400";
     return "text-gray-400";
   };
@@ -71,6 +71,7 @@ export const StatsCard = ({
                 {trend !== undefined && (
                   <div
                     className={cn("flex items-center gap-1", getTrendColor())}
+                    style={(trendDirection === "up" || trend > 0) ? { color: '#476072' } : {}}
                   >
                     {getTrendIcon()}
                     <span className="text-sm font-medium">

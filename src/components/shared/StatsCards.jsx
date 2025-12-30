@@ -43,7 +43,7 @@ export const DashboardStatsCard = ({
         <div className="flex items-center gap-2 text-sm pt-3 border-t border-gray-100">
           <span className={cn(
             "font-semibold",
-            trend.value > 0 ? "text-green-600" : trend.value < 0 ? "text-red-600" : "text-gray-500"
+            trend.value > 0 ? "" : trend.value < 0 ? "text-red-600" : "text-gray-500"
           )}>
             {trend.value > 0 ? "↑" : trend.value < 0 ? "↓" : "→"} {Math.abs(trend.value)}%
           </span>

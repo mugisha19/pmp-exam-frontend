@@ -24,10 +24,10 @@ const _getNotificationStyle = (type) => {
       return "bg-blue-500/20 text-blue-600";
     case "result":
     case "grade":
-      return "bg-green-500/20 text-green-600";
+      return "";
     case "group":
     case "invitation":
-      return "bg-teal-500/20 text-teal-600";
+      return "";
     case "warning":
     case "alert":
       return "bg-yellow-500/20 text-yellow-600";

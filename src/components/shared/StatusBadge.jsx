@@ -7,16 +7,16 @@ import { cn } from "@/utils/cn";
 
 // Status to color mapping
 const statusColorMap = {
-  // Active/Positive states
-  active: "bg-green-500/10 text-green-400 border-green-500/20",
-  published: "bg-green-500/10 text-green-400 border-green-500/20",
-  approved: "bg-green-500/10 text-green-400 border-green-500/20",
-  completed: "bg-green-500/10 text-green-400 border-green-500/20",
-  success: "bg-green-500/10 text-green-400 border-green-500/20",
-  verified: "bg-green-500/10 text-green-400 border-green-500/20",
-  online: "bg-green-500/10 text-green-400 border-green-500/20",
-  enabled: "bg-green-500/10 text-green-400 border-green-500/20",
-  passed: "bg-green-500/10 text-green-400 border-green-500/20",
+  // Active/Positive states - using #476072
+  active: "",
+  published: "",
+  approved: "",
+  completed: "",
+  success: "",
+  verified: "",
+  online: "",
+  enabled: "",
+  passed: "",
 
   // Inactive/Neutral states
   inactive: "bg-gray-500/10 text-gray-400 border-gray-500/20",
@@ -46,10 +46,10 @@ const statusColorMap = {
   review: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
   "awaiting-review": "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
 
-  // Completed/Done states
-  finished: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20",
-  done: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20",
-  graded: "bg-teal-500/10 text-teal-600 border-teal-500/20",
+  // Completed/Done states - using #476072
+  finished: "",
+  done: "",
+  graded: "",
   submitted: "bg-cyan-500/10 text-cyan-600 border-cyan-500/20",
   closed: "bg-slate-500/10 text-slate-600 border-slate-500/20",
 
@@ -94,30 +94,49 @@ export const StatusBadge = ({
     status?.replace(/[-_]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) ||
     "Unknown";
 
+  // Determine if this is a green/teal/emerald status that should use #476072
+  const isGreenStatus = ['active', 'published', 'approved', 'completed', 'success', 'verified', 'online', 'enabled', 'passed', 'finished', 'done', 'graded'].includes(normalizedStatus);
+  
+  // Get inline styles for green/teal/emerald statuses
+  const getStatusStyle = () => {
+    if (isGreenStatus && !variant) {
+      return {
+        backgroundColor: 'rgba(71, 96, 114, 0.1)',
+        color: '#476072',
+        borderColor: 'rgba(71, 96, 114, 0.2)',
+      };
+    }
+    return {};
+  };
+
   return (
     <span
       className={cn(
         "inline-flex items-center gap-1.5 font-medium rounded-full border",
         sizeClasses[size],
-        colorClass,
+        !isGreenStatus && colorClass,
         className
       )}
+      style={getStatusStyle()}
     >
       {dot && (
         <span
           className={cn(
             "w-1.5 h-1.5 rounded-full",
             // Extract text color and make it background
-            colorClass.includes("green") && "bg-green-400",
-            colorClass.includes("gray") && "bg-gray-400",
-            colorClass.includes("blue") && "bg-blue-400",
-            colorClass.includes("yellow") && "bg-yellow-400",
-            colorClass.includes("emerald") && "bg-emerald-500",
-            colorClass.includes("teal") && "bg-teal-500",
-            colorClass.includes("cyan") && "bg-cyan-500",
-            colorClass.includes("slate") && "bg-slate-500",
-            colorClass.includes("red") && "bg-red-400"
+            isGreenStatus && !variant ? "" : (
+              colorClass.includes("green") && "bg-green-400",
+              colorClass.includes("gray") && "bg-gray-400",
+              colorClass.includes("blue") && "bg-blue-400",
+              colorClass.includes("yellow") && "bg-yellow-400",
+              colorClass.includes("emerald") && "bg-emerald-500",
+              colorClass.includes("teal") && "bg-teal-500",
+              colorClass.includes("cyan") && "bg-cyan-500",
+              colorClass.includes("slate") && "bg-slate-500",
+              colorClass.includes("red") && "bg-red-400"
+            )
           )}
+          style={isGreenStatus && !variant ? { backgroundColor: '#476072' } : {}}
         />
       )}
       {displayLabel}
