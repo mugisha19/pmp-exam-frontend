@@ -13,12 +13,12 @@ import {
 } from "recharts";
 
 const COLORS = [
-  "#14b8a6", // Teal
-  "#0d9488", // Emerald
-  "#06b6d4", // Cyan
-  "#2dd4bf", // Teal-400
-  "#5eead4", // Teal-300
-  "#99f6e4", // Teal-200
+  "#476072", // Primary
+  "#5a7a8f", // Lighter
+  "#3a4d5c", // Darker
+  "#6b8a9f", // Light variant
+  "#8ba3b5", // Lighter variant
+  "#a5b9c7", // Lightest variant
 ];
 
 export function PieChartComponent({

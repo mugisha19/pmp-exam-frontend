@@ -85,7 +85,10 @@ export const StudentLayout = () => {
               return (
                 <button
                   key={item.id}
-                  onClick={() => navigate(item.path)}
+                  onClick={() => {
+                    console.log('Navigating to:', item.path);
+                    navigate(item.path);
+                  }}
                   className={cn(
                     "group relative w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200",
                     active

@@ -195,7 +195,8 @@ export function Profile() {
         {!isEditing && (
           <Button 
             onClick={() => setIsEditing(true)}
-            className="bg-gradient-to-r from-accent-primary to-accent-secondary hover:shadow-lg transition-all duration-200 hover:scale-105"
+            className="bg-gradient-to-r hover:shadow-lg transition-all duration-200 hover:scale-105"
+            style={{ background: 'linear-gradient(to right, #476072, #5a7a8f)' }}
           >
             Edit Profile
           </Button>
@@ -213,7 +214,8 @@ export function Profile() {
                   <img
                     src={displayAvatar}
                     alt={`${user?.first_name} ${user?.last_name}`}
-                    className="w-32 h-32 rounded-2xl object-cover border-4 border-white shadow-xl ring-4 ring-accent-primary/10"
+                    className="w-32 h-32 rounded-2xl object-cover border-4 border-white shadow-xl ring-4"
+                    style={{ '--tw-ring-color': 'rgba(71, 96, 114, 0.1)' }}
                     onError={(e) => {
                       e.target.style.display = "none";
                       e.target.nextSibling.style.display = "flex";
@@ -221,8 +223,8 @@ export function Profile() {
                   />
                 ) : null}
                 <div
-                  className="w-32 h-32 rounded-2xl bg-gradient-to-br from-accent-primary to-accent-secondary flex items-center justify-center text-white text-4xl font-bold border-4 border-white shadow-xl ring-4 ring-accent-primary/10"
-                  style={{ display: displayAvatar ? "none" : "flex" }}
+                  className="w-32 h-32 rounded-2xl flex items-center justify-center text-white text-4xl font-bold border-4 border-white shadow-xl ring-4"
+                  style={{ background: 'linear-gradient(to bottom right, #476072, #5a7a8f)', '--tw-ring-color': 'rgba(71, 96, 114, 0.1)', display: displayAvatar ? "none" : "flex" }}
                 >
                   {user?.first_name?.[0]}
                   {user?.last_name?.[0]}
@@ -232,7 +234,8 @@ export function Profile() {
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className="absolute -bottom-2 -right-2 p-3 bg-gradient-to-r from-accent-primary to-accent-secondary border-4 border-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-110"
+                      className="absolute -bottom-2 -right-2 p-3 border-4 border-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-110"
+                      style={{ background: 'linear-gradient(to right, #476072, #5a7a8f)' }}
                       title="Upload photo"
                     >
                       <Camera className="w-5 h-5 text-white" />
@@ -282,8 +285,8 @@ export function Profile() {
             {/* Profile Information */}
             <div className="space-y-8">
               <h3 className="text-xl font-bold text-gray-900 flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent-primary/20 to-accent-secondary/20 flex items-center justify-center">
-                  <User className="w-5 h-5 text-accent-primary" />
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'linear-gradient(to bottom right, rgba(71, 96, 114, 0.2), rgba(71, 96, 114, 0.1))' }}>
+                  <User className="w-5 h-5" style={{ color: '#476072' }} />
                 </div>
                 Personal Information
               </h3>
@@ -334,7 +337,7 @@ export function Profile() {
                   <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100/50 border-2 border-gray-200 rounded-xl shadow-sm">
                     <Mail className="w-5 h-5 text-gray-500" />
                     <span className="text-gray-900 font-medium">{user?.email}</span>
-                    <CheckCircle className="w-5 h-5 text-green-500 ml-auto" />
+                    <CheckCircle className="w-5 h-5 text-blue-500 ml-auto" />
                   </div>
                   <p className="text-xs text-gray-600 mt-2 font-medium">
                     Email address cannot be changed
@@ -413,7 +416,8 @@ export function Profile() {
                     (!isDirty && !selectedFile) ||
                     updateProfileMutation.isPending
                   }
-                  className="bg-gradient-to-r from-accent-primary to-accent-secondary hover:shadow-lg transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  className="bg-gradient-to-r hover:shadow-lg transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  style={{ background: 'linear-gradient(to right, #476072, #5a7a8f)' }}
                 >
                   {updateProfileMutation.isPending ? (
                     <>
@@ -446,23 +450,23 @@ export function Profile() {
       <Card className="border-2 border-gray-100 shadow-lg shadow-gray-100/50">
         <CardContent className="p-8">
           <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent-primary/20 to-accent-secondary/20 flex items-center justify-center">
-              <Shield className="w-5 h-5 text-accent-primary" />
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'linear-gradient(to bottom right, rgba(71, 96, 114, 0.2), rgba(71, 96, 114, 0.1))' }}>
+              <Shield className="w-5 h-5" style={{ color: '#476072' }} />
             </div>
             Account Status
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="p-6 bg-gradient-to-br from-green-50 to-green-100/30 rounded-xl border-2 border-green-200 shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105">
+            <div className="p-6 bg-gradient-to-br from-blue-50 to-blue-100/30 rounded-xl border-2 border-blue-200 shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105">
               <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-lg bg-green-200 flex items-center justify-center shadow-sm">
-                  <CheckCircle className="w-5 h-5 text-green-700" />
+                <div className="w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center shadow-sm">
+                  <CheckCircle className="w-5 h-5 text-blue-700" />
                 </div>
-                <span className="text-sm font-bold text-green-700 uppercase tracking-wide">
+                <span className="text-sm font-bold text-blue-700 uppercase tracking-wide">
                   Active
                 </span>
               </div>
-              <p className="text-xs text-green-600 font-medium">Account is active</p>
+              <p className="text-xs text-blue-600 font-medium">Account is active</p>
             </div>
 
             <div className="p-6 bg-gradient-to-br from-blue-50 to-blue-100/30 rounded-xl border-2 border-blue-200 shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105">

@@ -25,7 +25,7 @@ export const ProgressCard = ({
     >
       <div className="flex items-start justify-between mb-2.5">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-md bg-gradient-to-br from-accent-primary to-accent-secondary flex items-center justify-center flex-shrink-0">
+          <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0" style={{ background: 'linear-gradient(to bottom right, #476072, #5a7a8f)' }}>
             <Bell className="w-4 h-4 text-white" />
           </div>
           <div className="flex-1 min-w-0">
@@ -39,8 +39,8 @@ export const ProgressCard = ({
       </div>
       <div className="w-full bg-gray-200 rounded-full h-1.5">
         <div
-          className="h-1.5 rounded-full bg-gradient-to-r from-accent-primary to-accent-secondary transition-all duration-300"
-          style={{ width: `${progress}%` }}
+          className="h-1.5 rounded-full transition-all duration-300"
+          style={{ background: 'linear-gradient(to right, #476072, #5a7a8f)', width: `${progress}%` }}
         />
       </div>
     </div>

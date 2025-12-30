@@ -883,14 +883,15 @@ export const QuizTaking = () => {
                         className={cn(
                           "min-h-[80px] border-2 border-dashed rounded-lg p-4 transition-all",
                           rightItem
-                            ? "border-green-400 bg-green-50"
+                            ? "bg-blue-50"
                             : "border-gray-300 bg-gray-50"
                         )}
+                        style={rightItem ? { borderColor: '#476072', borderWidth: '2px' } : {}}
                       >
                         {rightItem ? (
                           <div className="flex items-start justify-between gap-3">
                             <div className="flex items-start gap-2 flex-1">
-                              <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                              <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: '#476072' }} />
                               <span className="text-sm text-gray-700">{rightItem.text}</span>
                             </div>
                             <button
@@ -935,13 +936,14 @@ export const QuizTaking = () => {
                         className={cn(
                           "border-2 rounded-xl p-4 transition-all",
                           isMatched
-                            ? "border-green-300 bg-green-50 opacity-60"
+                            ? "bg-blue-50 opacity-60"
                             : "border-purple-300 bg-purple-50 cursor-grab hover:border-purple-400 hover:shadow-lg"
                         )}
+                        style={isMatched ? { borderColor: '#476072' } : {}}
                       >
                         <p className="text-sm text-gray-700">{rightItem.text}</p>
                         {isMatched && (
-                          <div className="flex items-center gap-1 mt-2 text-green-700">
+                          <div className="flex items-center gap-1 mt-2" style={{ color: '#476072' }}>
                             <CheckCircle className="w-4 h-4" />
                             <span className="text-xs font-medium">Matched</span>
                           </div>
@@ -1035,7 +1037,10 @@ export const QuizTaking = () => {
             <button
               onClick={handleResume}
               disabled={isResuming}
-              className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="w-full px-6 py-3 text-white rounded-lg font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              style={{ backgroundColor: '#476072' }}
+              onMouseEnter={(e) => e.target.style.backgroundColor = '#3d5161'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = '#476072'}
             >
               {isResuming ? <Spinner size="sm" /> : <Play className="w-5 h-5" />}
               Resume Quiz
@@ -1119,7 +1124,10 @@ export const QuizTaking = () => {
               <button
                 onClick={handleSubmitClick}
                 disabled={isSubmitting || isWaitingForAutoSubmit}
-                className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-semibold transition-colors"
+                className="px-6 py-2 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-semibold transition-colors"
+                style={{ backgroundColor: '#476072' }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#3d5161'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#476072'}
               >
                 {isSubmitting ? <Spinner size="sm" /> : <Send className="w-4 h-4" />}
                 Submit
@@ -1198,7 +1206,10 @@ export const QuizTaking = () => {
                       !selectedAnswer ||
                       lastQuestionAnswerSaved
                     }
-                    className="flex items-center gap-2 px-5 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
+                    className="flex items-center gap-2 px-5 py-2.5 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
+                    style={{ backgroundColor: '#476072' }}
+                    onMouseEnter={(e) => e.target.style.backgroundColor = '#3d5161'}
+                    onMouseLeave={(e) => e.target.style.backgroundColor = '#476072'}
                   >
                     {isSaving ? (
                       <>
@@ -1259,9 +1270,10 @@ export const QuizTaking = () => {
                           : isFlagged
                           ? "bg-red-100 text-red-700 hover:bg-red-200 border-2 border-red-300"
                           : isAnswered
-                          ? "bg-green-100 text-green-700 hover:bg-green-200"
+                          ? "hover:bg-blue-200"
                           : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                       )}
+                      style={isAnswered && !isCurrent && !isFlagged ? { backgroundColor: 'rgba(71, 96, 114, 0.1)', color: '#476072' } : {}}
                     >
                       {idx + 1}
                     </button>
@@ -1273,7 +1285,7 @@ export const QuizTaking = () => {
               <div className="space-y-2 text-sm border-t border-gray-200 pt-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-green-500 rounded"></div>
+                    <div className="w-3 h-3 rounded" style={{ backgroundColor: '#476072' }}></div>
                     <span className="text-gray-700">Answered</span>
                   </div>
                   <span className="font-bold text-gray-900">
@@ -1351,7 +1363,10 @@ export const QuizTaking = () => {
           <button
             onClick={handleSubmitConfirm}
             disabled={isSubmitting}
-            className="px-5 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors flex items-center gap-2"
+            className="px-5 py-2.5 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors flex items-center gap-2"
+            style={{ backgroundColor: '#476072' }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#3d5161'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = '#476072'}
           >
             {isSubmitting ? (
               <>

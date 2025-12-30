@@ -18,7 +18,7 @@ export const DashboardStatsCard = ({
     <div
       onClick={onClick}
       className={cn(
-        "bg-gradient-to-br from-white to-gray-50/50 rounded-2xl border-2 border-gray-100 shadow-lg shadow-gray-100/50 p-6 hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 hover:scale-105 hover:border-accent-primary/20",
+        "bg-gradient-to-br from-white to-gray-50/50 rounded-2xl border-2 border-gray-100 shadow-lg shadow-gray-100/50 p-6 hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 hover:scale-105",
         onClick && "cursor-pointer",
         className
       )}
@@ -34,8 +34,8 @@ export const DashboardStatsCard = ({
           )}
         </div>
         {Icon && (
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-accent-primary/20 to-accent-secondary/20 flex items-center justify-center flex-shrink-0 shadow-md shadow-accent-primary/10">
-            <Icon className="w-6 h-6 text-accent-primary" />
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md" style={{ background: 'linear-gradient(to bottom right, rgba(71, 96, 114, 0.2), rgba(71, 96, 114, 0.1))', boxShadow: '0 4px 6px -1px rgba(71, 96, 114, 0.1)' }}>
+            <Icon className="w-6 h-6" style={{ color: '#476072' }} />
           </div>
         )}
       </div>
@@ -44,7 +44,8 @@ export const DashboardStatsCard = ({
           <span className={cn(
             "font-semibold",
             trend.value > 0 ? "" : trend.value < 0 ? "text-red-600" : "text-gray-500"
-          )}>
+          )}
+          style={trend.value > 0 ? { color: '#476072' } : {}}>
             {trend.value > 0 ? "↑" : trend.value < 0 ? "↓" : "→"} {Math.abs(trend.value)}%
           </span>
           <span className="text-gray-600 font-medium">{trend.label}</span>

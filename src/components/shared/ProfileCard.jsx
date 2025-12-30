@@ -31,7 +31,7 @@ export const ProfileCard = ({ className }) => {
 
       <div className="flex flex-col items-center mb-5">
         <div className="relative mb-4">
-          <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-accent-primary to-accent-secondary flex items-center justify-center border-4 border-white shadow-xl ring-4 ring-accent-primary/10">
+          <div className="w-24 h-24 rounded-2xl flex items-center justify-center border-4 border-white shadow-xl ring-4" style={{ background: 'linear-gradient(to bottom right, #476072, #5a7a8f)', '--tw-ring-color': 'rgba(71, 96, 114, 0.1)' }}>
             <span className="text-white font-bold text-2xl">{initials}</span>
           </div>
           <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full border-3 border-white shadow-lg" style={{ backgroundColor: '#476072' }}></div>

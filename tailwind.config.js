@@ -37,7 +37,7 @@ export default {
         },
         // Semantic colors
         error: "#ef4444",
-        success: "#10b981",
+        success: "#476072",
         warning: "#f59e0b",
       },
       fontFamily: {

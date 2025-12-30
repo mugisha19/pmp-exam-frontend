@@ -111,44 +111,44 @@ export const AttemptReview = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100/50">
       {/* Header */}
-      <div className="bg-gradient-to-br from-white to-gray-50/50 border-b-2 border-gray-200 sticky top-0 z-10 shadow-lg shadow-gray-100/50">
-        <div className="max-w-7xl mx-auto px-8 py-6">
+      <div className="bg-gradient-to-br from-white to-gray-50/50 border-b border-gray-200 sticky top-0 z-10">
+        <div className="max-w-7xl mx-auto px-3 py-1.5">
           <button
             onClick={() => navigate(`/exams/${quizId}`)}
-            className="flex items-center gap-2 text-gray-600 hover:text-accent-primary mb-6 font-semibold transition-colors duration-200 group"
+            className="flex items-center gap-1 text-gray-600 hover:text-accent-primary mb-1.5 text-xs font-semibold transition-colors duration-200 group"
           >
-            <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform duration-200" />
+            <ArrowLeft className="w-3 h-3 group-hover:-translate-x-1 transition-transform duration-200" />
             Back to Quiz
           </button>
           
           <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              <h1 className="text-lg font-bold text-gray-900">
                 {attempt.quiz_title}
               </h1>
-              <p className="text-gray-600 font-medium text-lg">
+              <p className="text-gray-600 font-medium text-xs">
                 Attempt #{attempt.attempt_number} Review
               </p>
             </div>
             
-            <div className={`px-8 py-5 rounded-2xl shadow-xl ${
+            <div className={`px-3 py-1.5 rounded-md shadow ${
               attempt.passed 
-                ? "bg-gradient-to-br from-green-100 to-green-200 border-2 border-green-500 shadow-green-200/50" 
+                ? "bg-gradient-to-br from-blue-100 to-blue-200 border-2 border-blue-500 shadow-blue-200/50" 
                 : "bg-gradient-to-br from-red-100 to-red-200 border-2 border-red-500 shadow-red-200/50"
             }`}>
-              <div className="flex items-center gap-3 mb-2">
+              <div className="flex items-center gap-1">
                 {attempt.passed ? (
-                  <CheckCircle className="w-8 h-8 text-green-700" />
+                  <CheckCircle className="w-4 h-4 text-blue-700" />
                 ) : (
-                  <XCircle className="w-8 h-8 text-red-700" />
+                  <XCircle className="w-4 h-4 text-red-700" />
                 )}
-                <span className={`text-4xl font-bold ${
-                  attempt.passed ? "text-green-700" : "text-red-700"
+                <span className={`text-xl font-bold ${
+                  attempt.passed ? "text-blue-700" : "text-red-700"
                 }`}>
                   {attempt.score}%
                 </span>
               </div>
-              <p className={`text-base font-bold uppercase tracking-wide ${
+              <p className={`text-[10px] font-bold uppercase tracking-wide ${
                 attempt.passed ? "text-green-700" : "text-red-700"
               }`}>
                 {attempt.passed ? "Passed" : "Failed"}
@@ -159,106 +159,108 @@ export const AttemptReview = () => {
       </div>
 
       {/* Stats Overview */}
-      <div className="max-w-7xl mx-auto px-8 py-8">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
-          <div className="bg-gradient-to-br from-white to-blue-50/30 p-6 rounded-xl border-2 border-blue-100 shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105">
-            <div className="flex items-center gap-3 text-gray-600 mb-3">
-              <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                <Target className="w-5 h-5 text-blue-600" />
+      <div className="max-w-7xl mx-auto px-3 py-3">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
+          <div className="bg-gradient-to-br from-white to-blue-50/30 p-2 rounded-md border border-blue-100">
+            <div className="flex items-center gap-1 text-gray-600 mb-1">
+              <div className="w-5 h-5 rounded bg-blue-100 flex items-center justify-center">
+                <Target className="w-3 h-3 text-blue-600" />
               </div>
-              <span className="text-xs font-bold uppercase tracking-wide">Correct Answers</span>
+              <span className="text-[9px] font-bold uppercase tracking-wide">Correct</span>
             </div>
-            <p className="text-3xl font-bold text-gray-900">
+            <p className="text-lg font-bold text-gray-900">
               {attempt.correct_answers || 0} / {attempt.total_questions}
             </p>
           </div>
 
-          <div className="bg-gradient-to-br from-white to-purple-50/30 p-6 rounded-xl border-2 border-purple-100 shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105">
-            <div className="flex items-center gap-3 text-gray-600 mb-3">
-              <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
-                <Timer className="w-5 h-5 text-purple-600" />
+          <div className="bg-gradient-to-br from-white to-purple-50/30 p-2 rounded-md border border-purple-100">
+            <div className="flex items-center gap-1 text-gray-600 mb-1">
+              <div className="w-5 h-5 rounded bg-purple-100 flex items-center justify-center">
+                <Timer className="w-3 h-3 text-purple-600" />
               </div>
-              <span className="text-xs font-bold uppercase tracking-wide">Time Spent</span>
+              <span className="text-[9px] font-bold uppercase tracking-wide">Time</span>
             </div>
-            <p className="text-3xl font-bold text-gray-900">
+            <p className="text-lg font-bold text-gray-900">
               {formatTime(attempt.time_spent_seconds)}
             </p>
           </div>
 
-          <div className="bg-gradient-to-br from-white to-green-50/30 p-6 rounded-xl border-2 border-green-100 shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105">
-            <div className="flex items-center gap-3 text-gray-600 mb-3">
-              <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
-                <Award className="w-5 h-5 text-green-600" />
+          <div className="bg-gradient-to-br from-white to-blue-50/30 p-2 rounded-md border border-blue-100">
+            <div className="flex items-center gap-1 text-gray-600 mb-1">
+              <div className="w-5 h-5 rounded bg-blue-100 flex items-center justify-center">
+                <Award className="w-3 h-3 text-blue-600" />
               </div>
-              <span className="text-xs font-bold uppercase tracking-wide">Passing Score</span>
+              <span className="text-[9px] font-bold uppercase tracking-wide">Passing</span>
             </div>
-            <p className="text-3xl font-bold text-gray-900">
+            <p className="text-lg font-bold text-gray-900">
               {attempt.passing_score}%
             </p>
           </div>
 
-          <div className="bg-gradient-to-br from-white to-gray-50/30 p-6 rounded-xl border-2 border-gray-100 shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105">
-            <div className="flex items-center gap-3 text-gray-600 mb-3">
-              <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
-                <Clock className="w-5 h-5 text-gray-600" />
+          {attempt.completed_at && (
+            <div className="bg-gradient-to-br from-white to-gray-50/30 p-2 rounded-md border border-gray-100">
+              <div className="flex items-center gap-1 text-gray-600 mb-1">
+                <div className="w-5 h-5 rounded bg-gray-100 flex items-center justify-center">
+                  <Clock className="w-3 h-3 text-gray-600" />
+                </div>
+                <span className="text-[9px] font-bold uppercase tracking-wide">Completed</span>
               </div>
-              <span className="text-xs font-bold uppercase tracking-wide">Completed</span>
+              <p className="text-[11px] font-bold text-gray-900">
+                {formatDate(attempt.completed_at)}
+              </p>
+              <p className="text-[9px] text-gray-600 font-medium">
+                {formatDateTime(attempt.completed_at)}
+              </p>
             </div>
-            <p className="text-base font-bold text-gray-900 mb-1">
-              {formatDate(attempt.completed_at)}
-            </p>
-            <p className="text-sm text-gray-600 font-medium">
-              {formatDateTime(attempt.completed_at)}
-            </p>
-          </div>
+          )}
         </div>
 
         {/* Questions Review */}
-        <div className="space-y-6">
+        <div className="space-y-2">
           {questions.map((question, index) => (
             <div
               key={question.question_id}
-              className={`bg-gradient-to-br from-white to-gray-50/50 rounded-2xl border-2 p-8 shadow-lg hover:shadow-xl transition-all duration-200 ${
+              className={`bg-gradient-to-br from-white to-gray-50/50 rounded-md border p-2 shadow-sm ${
                 question.is_correct
-                  ? "border-green-200 shadow-green-100/50"
+                  ? "border-blue-200 shadow-blue-100/50"
                   : "border-red-200 shadow-red-100/50"
               }`}
             >
               {/* Question Header */}
-              <div className="flex items-start justify-between mb-6">
+              <div className="flex items-start justify-between mb-2">
                 <div className="flex items-start gap-4 flex-1">
-                  <span className={`flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center font-bold text-lg shadow-md ${
+                  <span className={`flex-shrink-0 w-6 h-6 rounded flex items-center justify-center font-bold text-xs ${
                     question.is_correct
-                      ? "bg-gradient-to-br from-green-100 to-green-200 text-green-700 border-2 border-green-300"
+                      ? "bg-gradient-to-br from-blue-100 to-blue-200 text-blue-700 border-2 border-blue-300"
                       : "bg-gradient-to-br from-red-100 to-red-200 text-red-700 border-2 border-red-300"
                   }`}>
                     {index + 1}
                   </span>
                   <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-3">
+                    <div className="flex items-center gap-1 mb-1">
                       {question.is_correct ? (
-                        <div className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center">
-                          <CheckCircle className="w-5 h-5 text-green-600" />
+                        <div className="w-4 h-4 rounded bg-blue-100 flex items-center justify-center">
+                          <CheckCircle className="w-3 h-3 text-blue-600" />
                         </div>
                       ) : (
-                        <div className="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center">
-                          <XCircle className="w-5 h-5 text-red-600" />
+                        <div className="w-4 h-4 rounded bg-red-100 flex items-center justify-center">
+                          <XCircle className="w-3 h-3 text-red-600" />
                         </div>
                       )}
-                      <span className={`text-base font-bold uppercase tracking-wide ${
-                        question.is_correct ? "text-green-700" : "text-red-700"
+                      <span className={`text-[10px] font-bold uppercase tracking-wide ${
+                        question.is_correct ? "text-blue-700" : "text-red-700"
                       }`}>
                         {question.is_correct ? "Correct" : "Incorrect"}
                       </span>
                       {question.was_flagged && (
-                        <div className="px-3 py-1 bg-yellow-100 rounded-lg border border-yellow-300 flex items-center gap-1.5">
-                          <Flag className="w-4 h-4 text-yellow-600 fill-yellow-600" />
-                          <span className="text-xs font-bold text-yellow-700">Flagged</span>
+                        <div className="px-1 py-0.5 bg-yellow-100 rounded border border-yellow-300 flex items-center gap-0.5">
+                          <Flag className="w-2 h-2 text-yellow-600 fill-yellow-600" />
+                          <span className="text-[9px] font-bold text-yellow-700">Flag</span>
                         </div>
                       )}
                     </div>
                     <div
-                      className="text-gray-900 prose max-w-none font-medium text-lg leading-relaxed"
+                      className="text-gray-900 prose max-w-none font-medium text-xs leading-snug"
                       dangerouslySetInnerHTML={{ __html: question.question_text }}
                     />
                   </div>
@@ -268,7 +270,7 @@ export const AttemptReview = () => {
               {/* Options */}
 
               {/* Matching type: show user matches and correct matches */}
-              <div className="ml-11 space-y-2">
+              <div className="ml-6 space-y-1">
                 {(() => {
                   // Parse options if it's a JSON string
                   let options = question.options;
@@ -317,25 +319,25 @@ export const AttemptReview = () => {
                             cp => cp.left_id === pair.left_id && cp.right_id === pair.right_id
                           );
                           return (
-                            <div key={idx} className={`p-2 rounded border flex items-center gap-2 ${isCorrect ? 'bg-green-50 border-green-300' : 'bg-red-50 border-red-300'}`}>
-                              {isCorrect ? <CheckCircle className="w-4 h-4 text-green-600" /> : <XCircle className="w-4 h-4 text-red-600" />}
+                            <div key={idx} className={`p-2 rounded border flex items-center gap-2 ${isCorrect ? 'bg-blue-50 border-blue-300' : 'bg-red-50 border-red-300'}`}>
+                              {isCorrect ? <CheckCircle className="w-4 h-4 text-blue-600" /> : <XCircle className="w-4 h-4 text-red-600" />}
                               <span className="text-gray-900 font-medium">{left?.text || '—'}</span>
                               <span className="mx-2 text-gray-500">→</span>
                               <span className="text-gray-900 font-medium">{right?.text || '—'}</span>
-                              <span className={`ml-auto text-xs px-2 py-1 rounded font-semibold ${isCorrect ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'}`}>{isCorrect ? 'Correct' : 'Wrong'}</span>
+                              <span className={`ml-auto text-xs px-2 py-1 rounded font-semibold ${isCorrect ? 'bg-blue-200 text-blue-800' : 'bg-red-200 text-red-800'}`}>{isCorrect ? 'Correct' : 'Wrong'}</span>
                             </div>
                           );
                         })}
                         {/* Show correct matches if any were wrong */}
                         {userPairs.length > 0 && userPairs.some(pair => !correctPairs.some(cp => cp.left_id === pair.left_id && cp.right_id === pair.right_id)) && (
                           <div className="mt-2">
-                            <p className="text-sm font-semibold text-green-700">Correct Matches:</p>
+                            <p className="text-sm font-semibold text-blue-700">Correct Matches:</p>
                             {correctPairs.map((pair, idx) => {
                               const left = leftItems.find(l => l.id === pair.left_id);
                               const right = rightItems.find(r => r.id === pair.right_id);
                               return (
-                                <div key={idx} className="p-2 rounded border border-green-200 bg-green-50 flex items-center gap-2">
-                                  <CheckCircle className="w-4 h-4 text-green-600" />
+                                <div key={idx} className="p-2 rounded border border-blue-200 bg-blue-50 flex items-center gap-2">
+                                  <CheckCircle className="w-4 h-4 text-blue-600" />
                                   <span className="text-gray-900 font-medium">{left?.text || '—'}</span>
                                   <span className="mx-2 text-gray-500">→</span>
                                   <span className="text-gray-900 font-medium">{right?.text || '—'}</span>
@@ -392,11 +394,11 @@ export const AttemptReview = () => {
                     let icon = null;
                     let label = null;
                     if (isUserAnswer && isCorrect) {
-                      bgColor = "bg-green-50";
-                      borderColor = "border-green-500";
-                      textColor = "text-green-900";
-                      icon = <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />;
-                      label = <span className="ml-auto text-xs bg-green-200 text-green-800 px-2 py-1 rounded font-semibold">✓ Your Answer (Correct)</span>;
+                      bgColor = "bg-blue-50";
+                      borderColor = "border-blue-500";
+                      textColor = "text-blue-900";
+                      icon = <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0" />;
+                      label = <span className="ml-auto text-xs bg-blue-200 text-blue-800 px-2 py-1 rounded font-semibold">✓ Your Answer (Correct)</span>;
                     } else if (isUserAnswer && !isCorrect) {
                       bgColor = "bg-red-50";
                       borderColor = "border-red-500";
@@ -404,11 +406,11 @@ export const AttemptReview = () => {
                       icon = <XCircle className="w-5 h-5 text-red-600 flex-shrink-0" />;
                       label = <span className="ml-auto text-xs bg-red-200 text-red-800 px-2 py-1 rounded font-semibold">✗ Your Answer (Wrong)</span>;
                     } else if (!isUserAnswer && isCorrect) {
-                      bgColor = "bg-green-50";
-                      borderColor = "border-green-300";
-                      textColor = "text-green-900";
-                      icon = <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />;
-                      label = <span className="ml-auto text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Correct Answer</span>;
+                      bgColor = "bg-blue-50";
+                      borderColor = "border-blue-300";
+                      textColor = "text-blue-900";
+                      icon = <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0" />;
+                      label = <span className="ml-auto text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">Correct Answer</span>;
                     }
                     return (
                       <div
@@ -430,8 +432,8 @@ export const AttemptReview = () => {
 
               {/* Explanation - Only show for incorrect answers */}
               {!question.is_correct && question.explanation && (
-                <div className="ml-16 mt-6 p-5 bg-gradient-to-br from-blue-50 to-blue-100/30 rounded-xl border-2 border-blue-200 shadow-md">
-                  <p className="text-base font-bold text-blue-900 mb-2 flex items-center gap-2">
+                <div className="ml-6 mt-2 p-2 bg-gradient-to-br from-blue-50 to-blue-100/30 rounded border border-blue-200">
+                  <p className="text-[10px] font-bold text-blue-900 mb-0.5 flex items-center gap-1">
                     <span className="text-xl">💡</span> Explanation:
                   </p>
                   <div
@@ -445,10 +447,11 @@ export const AttemptReview = () => {
         </div>
 
         {/* Footer Actions */}
-        <div className="mt-10 flex justify-center">
+        <div className="mt-3 flex justify-center">
           <button
             onClick={() => navigate(`/exams/${quizId}`)}
-            className="px-8 py-4 bg-gradient-to-r from-accent-primary to-accent-secondary text-white rounded-xl hover:shadow-xl font-bold transition-all duration-200 hover:scale-105"
+            className="px-4 py-1.5 text-white text-xs rounded-md hover:shadow font-bold transition-all duration-200"
+            style={{ background: 'linear-gradient(to right, #476072, #5a7a8f)' }}
           >
             Back to Quiz
           </button>

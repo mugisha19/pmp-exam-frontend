@@ -17,15 +17,11 @@ export const QuizModeModal = ({ isOpen, onClose, onSelectMode, quiz }) => {
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title="Select Quiz Mode"
-      size="lg"
-    >
+    <Modal isOpen={isOpen} onClose={onClose} title="Select Quiz Mode" size="lg">
       <div className="space-y-6">
         <p className="text-gray-600">
-          Choose how you want to take this quiz. You can change this for each attempt.
+          Choose how you want to take this quiz. You can change this for each
+          attempt.
         </p>
 
         {/* Practice Mode Option */}
@@ -49,7 +45,9 @@ export const QuizModeModal = ({ isOpen, onClose, onSelectMode, quiz }) => {
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
-                <h3 className="text-lg font-semibold text-gray-900">Practice Mode</h3>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Practice Mode
+                </h3>
                 {selectedMode === "practice" && (
                   <CheckCircle className="w-5 h-5 text-blue-500" />
                 )}
@@ -96,13 +94,16 @@ export const QuizModeModal = ({ isOpen, onClose, onSelectMode, quiz }) => {
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
-                <h3 className="text-lg font-semibold text-gray-900">Exam Mode</h3>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Exam Mode
+                </h3>
                 {selectedMode === "exam" && (
                   <CheckCircle className="w-5 h-5 text-blue-500" />
                 )}
               </div>
               <p className="text-sm text-gray-600 mb-3">
-                Simulate real exam conditions with time limits and structured pauses
+                Simulate real exam conditions with time limits and structured
+                pauses
               </p>
               <ul className="space-y-1 text-xs text-gray-500">
                 <li className="flex items-center gap-2">
@@ -125,7 +126,8 @@ export const QuizModeModal = ({ isOpen, onClose, onSelectMode, quiz }) => {
                   <div className="flex items-start gap-2">
                     <AlertCircle className="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0" />
                     <p className="text-xs text-yellow-800">
-                      This quiz has a {quiz.time_limit_minutes}-minute time limit in exam mode.
+                      This quiz has a {quiz.time_limit_minutes}-minute time
+                      limit in exam mode.
                     </p>
                   </div>
                 </div>
@@ -154,4 +156,3 @@ export const QuizModeModal = ({ isOpen, onClose, onSelectMode, quiz }) => {
     </Modal>
   );
 };
-

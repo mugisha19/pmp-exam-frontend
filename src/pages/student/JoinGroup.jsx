@@ -284,8 +284,8 @@ export const JoinGroup = () => {
                   <div className="flex items-center gap-2">
                     {groupPreview.is_active ? (
                       <>
-                        <CheckCircle className="w-4 h-4 text-green-600" />
-                        <span className="text-sm font-semibold text-green-600">
+                        <CheckCircle className="w-4 h-4 text-blue-600" />
+                        <span className="text-sm font-semibold text-blue-600">
                           Active
                         </span>
                       </>

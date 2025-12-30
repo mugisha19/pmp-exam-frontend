@@ -241,9 +241,10 @@ export const Groups = () => {
           onClick={() => handleTabChange("all")}
           className={`px-5 md:px-7 py-3.5 font-bold text-sm border-b-3 -mb-0.5 transition-all duration-200 whitespace-nowrap rounded-t-lg ${
             activeTab === "all"
-              ? "border-teal-500 text-teal-600 bg-white shadow-sm"
+              ? "text-white bg-white shadow-sm"
               : "border-transparent text-gray-600 hover:text-gray-900 hover:bg-white/50"
           }`}
+          style={activeTab === "all" ? { borderColor: '#476072', color: '#476072' } : {}}
         >
           Browse All Groups
         </button>
@@ -251,9 +252,10 @@ export const Groups = () => {
           onClick={() => handleTabChange("my-groups")}
           className={`px-5 md:px-7 py-3.5 font-bold text-sm border-b-3 -mb-0.5 transition-all duration-200 whitespace-nowrap rounded-t-lg ${
             activeTab === "my-groups"
-              ? "border-teal-500 text-teal-600 bg-white shadow-sm"
+              ? "text-white bg-white shadow-sm"
               : "border-transparent text-gray-600 hover:text-gray-900 hover:bg-white/50"
           }`}
+          style={activeTab === "my-groups" ? { borderColor: '#476072', color: '#476072' } : {}}
         >
           My Groups ({myGroups?.length || 0})
         </button>
@@ -277,7 +279,10 @@ export const Groups = () => {
               <select
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
-                className="px-4 py-2.5 border border-gray-200 rounded-lg text-xs font-medium bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all duration-200 hover:border-teal-300 shadow-sm"
+                className="px-4 py-2.5 border border-gray-200 rounded-lg text-xs font-medium bg-white focus:outline-none focus:ring-2 transition-all duration-200 shadow-sm"
+                style={{ '--tw-ring-color': 'rgba(71, 96, 114, 0.3)' }}
+                onFocus={(e) => e.target.style.borderColor = '#476072'}
+                onBlur={(e) => e.target.style.borderColor = ''}
               >
                 <option value="all">All Types</option>
                 <option value="class">Class</option>
@@ -291,7 +296,10 @@ export const Groups = () => {
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="px-4 py-2.5 border border-gray-200 rounded-lg text-xs font-medium bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all duration-200 hover:border-teal-300 shadow-sm"
+                  className="px-4 py-2.5 border border-gray-200 rounded-lg text-xs font-medium bg-white focus:outline-none focus:ring-2 transition-all duration-200 shadow-sm"
+                  style={{ '--tw-ring-color': 'rgba(71, 96, 114, 0.3)' }}
+                  onFocus={(e) => e.target.style.borderColor = '#476072'}
+                  onBlur={(e) => e.target.style.borderColor = ''}
                 >
                   <option value="all">All Status</option>
                   <option value="active">Active</option>

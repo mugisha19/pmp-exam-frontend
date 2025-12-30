@@ -105,10 +105,10 @@ export const GroupDetail = () => {
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-white to-green-50/30 rounded-xl border-2 border-green-100 shadow-md hover:shadow-lg transition-all duration-200 p-6 hover:scale-105">
+        <div className="bg-gradient-to-br from-white to-blue-50/30 rounded-xl border-2 border-blue-100 shadow-md hover:shadow-lg transition-all duration-200 p-6 hover:scale-105">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center shadow-sm">
-              <BookOpen className="w-7 h-7 text-green-600" />
+            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center shadow-sm">
+              <BookOpen className="w-7 h-7 text-blue-600" />
             </div>
             <div>
               <p className="text-xs font-bold text-gray-600 uppercase tracking-wide mb-1">Quizzes</p>
@@ -117,10 +117,10 @@ export const GroupDetail = () => {
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-white to-teal-50/30 rounded-lg border border-teal-100 shadow-sm hover:shadow transition-all duration-200 p-4">
+        <div className="bg-gradient-to-br from-white to-blue-50/30 rounded-lg border shadow-sm hover:shadow transition-all duration-200 p-4" style={{ borderColor: 'rgba(71, 96, 114, 0.2)' }}>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-teal-50 flex items-center justify-center">
-              <Calendar className="w-5 h-5 text-teal-600" />
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgba(71, 96, 114, 0.1)' }}>
+              <Calendar className="w-5 h-5" style={{ color: '#476072' }} />
             </div>
             <div>
               <p className="text-xs font-bold text-gray-600 uppercase tracking-wide mb-1">Duration</p>
@@ -168,15 +168,15 @@ export const GroupDetail = () => {
                   </span>
                   <span className="text-gray-300">•</span>
                   <span className="flex items-center gap-2 text-gray-700">
-                    <div className="w-7 h-7 rounded-md bg-teal-50 flex items-center justify-center">
-                      <Clock className="w-3.5 h-3.5 text-teal-600" />
+                    <div className="w-7 h-7 rounded-md flex items-center justify-center" style={{ backgroundColor: 'rgba(71, 96, 114, 0.1)' }}>
+                      <Clock className="w-3.5 h-3.5" style={{ color: '#476072' }} />
                     </div>
                     {quiz.time_limit_minutes || 0} min
                   </span>
                   <span className="text-gray-300">•</span>
                   <span className="flex items-center gap-2 text-gray-700">
-                    <div className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center">
-                      <Trophy className="w-4 h-4 text-green-600" />
+                    <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
+                      <Trophy className="w-4 h-4 text-blue-600" />
                     </div>
                     {quiz.passing_score}% pass
                   </span>

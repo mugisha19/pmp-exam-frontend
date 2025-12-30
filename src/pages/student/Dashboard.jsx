@@ -521,12 +521,12 @@ export const Dashboard = () => {
             </div>
 
             {/* Average Score */}
-            <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 border border-cyan-200 shadow-sm hover:shadow transition-all duration-200">
+            <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 border shadow-sm hover:shadow transition-all duration-200" style={{ borderColor: 'rgba(71, 96, 114, 0.2)' }}>
               <div className="flex items-center justify-between mb-3">
                 <div className="w-10 h-10 rounded-lg flex items-center justify-center shadow-sm" style={{ backgroundColor: '#476072' }}>
                   <Award className="w-5 h-5 text-white" />
                 </div>
-                <TrendingUp className="w-4 h-4 text-cyan-600" />
+                <TrendingUp className="w-4 h-4" style={{ color: '#476072' }} />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-1">
                 {dashboardStats.averageScore > 0 ? `${dashboardStats.averageScore}%` : "N/A"}
@@ -557,7 +557,7 @@ export const Dashboard = () => {
               </h3>
               <BarChartComponent
                 data={learningHoursData}
-                color="#14b8a6"
+                color="#476072"
                 height={180}
                 showGrid={true}
               />
@@ -571,16 +571,16 @@ export const Dashboard = () => {
               </h3>
               <LineChartComponent
                 data={progressTrendData}
-                color="#0d9488"
+                color="#476072"
                 height={180}
                 showGrid={true}
               />
             </div>
 
             {/* Score Distribution Chart */}
-            <div className="bg-white/90 backdrop-blur-sm rounded-xl border border-cyan-200 shadow-sm p-4">
+            <div className="bg-white/90 backdrop-blur-sm rounded-xl border shadow-sm p-4" style={{ borderColor: 'rgba(71, 96, 114, 0.2)' }}>
               <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                <Award className="w-4 h-4 text-cyan-600" />
+                <Award className="w-4 h-4" style={{ color: '#476072' }} />
                 Score Distribution
               </h3>
               <PieChartComponent
@@ -680,7 +680,8 @@ export const Dashboard = () => {
                               </div>
                               <button
                                 onClick={() => navigate(`/exams/${quiz.quiz_id || quiz.id}`)}
-                                className="px-3 py-1.5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-xs font-medium rounded-lg hover:from-emerald-600 hover:to-teal-700 transition-all shadow-sm"
+                                className="px-3 py-1.5 text-white text-xs font-medium rounded-lg transition-all shadow-sm"
+                                style={{ backgroundColor: '#476072' }}
                               >
                                 ADD REMINDER
                               </button>
@@ -701,10 +702,11 @@ export const Dashboard = () => {
                     {filteredQuizzesByStatus.upcoming.slice(3, 5).map((quiz) => (
                       <div
                         key={quiz.quiz_id || quiz.id}
-                        className="bg-white/90 backdrop-blur-sm rounded-lg border border-teal-200 p-3 shadow-sm hover:shadow transition-all duration-200"
+                        className="bg-white/90 backdrop-blur-sm rounded-lg border p-3 shadow-sm hover:shadow transition-all duration-200"
+                        style={{ borderColor: 'rgba(71, 96, 114, 0.2)' }}
                       >
                         <div className="flex items-center gap-2 mb-1.5">
-                          <span className="text-teal-600 font-semibold text-xs">{quiz.title}</span>
+                          <span className="font-semibold text-xs" style={{ color: '#476072' }}>{quiz.title}</span>
                         </div>
                         <p className="text-[10px] text-gray-600">
                           {quiz.start_time && quiz.end_time 
@@ -721,7 +723,7 @@ export const Dashboard = () => {
               )}
 
               {/* Virtual Class Attendance / Quiz Completion */}
-              <div className="bg-white/90 backdrop-blur-sm rounded-lg border border-emerald-200 p-4 shadow-sm">
+              <div className="bg-white/90 backdrop-blur-sm rounded-lg border p-4 shadow-sm" style={{ borderColor: 'rgba(71, 96, 114, 0.2)' }}>
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-sm font-semibold text-gray-900">Quiz Completion</h3>
                   <button className="text-xs text-accent-primary hover:underline font-medium">
@@ -736,8 +738,7 @@ export const Dashboard = () => {
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
                       className="h-2 rounded-full transition-all duration-300"
-                      style={{ backgroundColor: '#476072' }}
-                      style={{ width: `${dashboardStats.progressPercentage}%` }}
+                      style={{ backgroundColor: '#476072', width: `${dashboardStats.progressPercentage}%` }}
                     />
                   </div>
                 </div>
@@ -798,11 +799,12 @@ export const Dashboard = () => {
                       className={cn(
                         "aspect-square flex items-center justify-center text-xs rounded-md cursor-pointer transition-colors",
                         dayInfo.isToday
-                          ? "bg-teal-500 text-white font-semibold"
+                          ? "text-white font-semibold"
                           : dayInfo.isCurrentMonth
-                          ? "hover:bg-teal-50 text-gray-700"
+                          ? "text-gray-700"
                           : "text-gray-400 hover:bg-gray-50"
                       )}
+                      style={dayInfo.isToday ? { backgroundColor: '#476072' } : dayInfo.isCurrentMonth ? { hover: { backgroundColor: 'rgba(71, 96, 114, 0.1)' } } : {}}
                     >
                       {dayInfo.day}
                     </div>
@@ -811,7 +813,7 @@ export const Dashboard = () => {
               </div>
 
               {/* Courses */}
-              <div className="bg-white/90 backdrop-blur-sm rounded-lg border border-emerald-200 p-4 shadow-sm">
+              <div className="bg-white/90 backdrop-blur-sm rounded-lg border p-4 shadow-sm" style={{ borderColor: 'rgba(71, 96, 114, 0.2)' }}>
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-sm font-semibold text-gray-900">Courses</h3>
                   <button className="text-xs text-accent-primary hover:underline font-medium">
@@ -892,7 +894,8 @@ export const Dashboard = () => {
                     </p>
                     <button
                       onClick={() => navigate(`/exams/${quiz.quiz_id || quiz.id}`)}
-                      className="w-full px-3 py-1.5 bg-gradient-to-r from-teal-500 to-emerald-600 text-white text-xs font-medium rounded-lg hover:from-teal-600 hover:to-emerald-700 transition-all shadow-sm"
+                      className="w-full px-3 py-1.5 text-white text-xs font-medium rounded-lg transition-all shadow-sm"
+                      style={{ backgroundColor: '#476072' }}
                     >
                       Learn more
                     </button>

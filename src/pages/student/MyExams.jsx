@@ -244,7 +244,10 @@ export const MyExams = () => {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-4 py-2.5 border border-gray-200 rounded-lg text-xs font-medium bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all duration-200 hover:border-teal-300 shadow-sm"
+                className="px-4 py-2.5 border border-gray-200 rounded-lg text-xs font-medium bg-white focus:outline-none focus:ring-2 transition-all duration-200 shadow-sm"
+                style={{ '--tw-ring-color': 'rgba(71, 96, 114, 0.3)' }}
+                onFocus={(e) => e.target.style.borderColor = '#476072'}
+                onBlur={(e) => e.target.style.borderColor = ''}
               >
                 <option value="all">All Status</option>
                 <option value="active">Active</option>
@@ -258,7 +261,10 @@ export const MyExams = () => {
               <select
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
-                className="px-4 py-2.5 border border-gray-200 rounded-lg text-xs font-medium bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all duration-200 hover:border-teal-300 shadow-sm"
+                className="px-4 py-2.5 border border-gray-200 rounded-lg text-xs font-medium bg-white focus:outline-none focus:ring-2 transition-all duration-200 shadow-sm"
+                style={{ '--tw-ring-color': 'rgba(71, 96, 114, 0.3)' }}
+                onFocus={(e) => e.target.style.borderColor = '#476072'}
+                onBlur={(e) => e.target.style.borderColor = ''}
               >
                 <option value="all">All Types</option>
                 <option value="public">Public</option>
@@ -270,7 +276,10 @@ export const MyExams = () => {
               <select
                 value={dateFilter}
                 onChange={(e) => setDateFilter(e.target.value)}
-                className="px-4 py-2.5 border border-gray-200 rounded-lg text-xs font-medium bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all duration-200 hover:border-teal-300 shadow-sm"
+                className="px-4 py-2.5 border border-gray-200 rounded-lg text-xs font-medium bg-white focus:outline-none focus:ring-2 transition-all duration-200 shadow-sm"
+                style={{ '--tw-ring-color': 'rgba(71, 96, 114, 0.3)' }}
+                onFocus={(e) => e.target.style.borderColor = '#476072'}
+                onBlur={(e) => e.target.style.borderColor = ''}
               >
                 <option value="all">All Time</option>
                 <option value="upcoming">Upcoming</option>
@@ -316,11 +325,11 @@ export const MyExams = () => {
         <div>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6 p-4 bg-gradient-to-r from-gray-50 to-white rounded-xl border-2 border-gray-100">
             <p className="text-sm font-semibold text-gray-700">
-              Showing <span className="text-teal-600 font-semibold">{filteredAndSortedQuizzes.length}</span> of <span className="font-semibold">{allQuizzes.length}</span> quiz
+              Showing <span className="font-semibold" style={{ color: '#476072' }}>{filteredAndSortedQuizzes.length}</span> of <span className="font-semibold">{allQuizzes.length}</span> quiz
               {allQuizzes.length !== 1 ? "zes" : ""}
             </p>
             <p className="text-sm font-semibold text-gray-700">
-              <span className="text-green-600 font-bold">
+              <span className="font-bold" style={{ color: '#476072' }}>
                 {filteredAndSortedQuizzes.filter((q) => {
                   const now = new Date();
                   if (q.scheduling_enabled && q.starts_at && q.ends_at) {

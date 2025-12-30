@@ -64,7 +64,7 @@ export const QuizCardEnhanced = ({
 
       if (now >= startDate && now <= endDate) {
         return (
-          <span className="inline-flex items-center gap-1 px-2 py-1 bg-success/10 text-success rounded-full text-xs font-medium">
+          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium" style={{ backgroundColor: 'rgba(71, 96, 114, 0.1)', color: '#476072' }}>
             <Play className="w-3 h-3" />
             Active
           </span>
@@ -72,7 +72,7 @@ export const QuizCardEnhanced = ({
       }
 
       return (
-        <span className="inline-flex items-center gap-1 px-2 py-1 bg-accent-primary/10 text-accent-primary rounded-full text-xs font-medium">
+        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium" style={{ backgroundColor: 'rgba(71, 96, 114, 0.1)', color: '#476072' }}>
           <Calendar className="w-3 h-3" />
           Scheduled
         </span>
@@ -81,7 +81,7 @@ export const QuizCardEnhanced = ({
 
     if (isActive) {
       return (
-        <span className="inline-flex items-center gap-1 px-2 py-1 bg-success/10 text-success rounded-full text-xs font-medium">
+        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium" style={{ backgroundColor: 'rgba(71, 96, 114, 0.1)', color: '#476072' }}>
           <Play className="w-3 h-3" />
           Available
         </span>
@@ -108,11 +108,11 @@ export const QuizCardEnhanced = ({
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-3 mb-2">
               {isPublic ? (
-                <Globe className="w-5 h-5 text-accent-primary flex-shrink-0" />
+                <Globe className="w-5 h-5 flex-shrink-0" style={{ color: '#476072' }} />
               ) : (
-                <Users className="w-5 h-5 text-accent-secondary flex-shrink-0" />
+                <Users className="w-5 h-5 flex-shrink-0" style={{ color: '#476072' }} />
               )}
-              <h3 className="text-lg font-semibold text-gray-900 group-hover:text-accent-primary transition-colors line-clamp-1">
+              <h3 className="text-lg font-semibold text-gray-900 transition-colors line-clamp-1" style={{ '--hover-color': '#476072' }} onMouseEnter={(e) => e.currentTarget.style.color = '#476072'} onMouseLeave={(e) => e.currentTarget.style.color = ''}>
                 {quiz?.title}
               </h3>
               {getStatusBadge()}
@@ -163,7 +163,10 @@ export const QuizCardEnhanced = ({
                   e.stopPropagation();
                   onStart?.(quizId);
                 }}
-                className="px-4 py-2 bg-accent-primary text-white text-sm font-medium rounded-lg hover:bg-accent-secondary transition-colors flex items-center gap-2"
+                className="px-4 py-2 text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-2"
+                style={{ backgroundColor: '#476072' }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#3a4d5c'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#476072'}
               >
                 <Play className="w-4 h-4" />
                 Start
@@ -180,8 +183,8 @@ export const QuizCardEnhanced = ({
                 View Attempts
               </button>
             )}
-            <div className="p-2 bg-gray-50 rounded-lg group-hover:bg-accent-primary/10 transition-colors">
-              <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-accent-primary transition-colors" />
+            <div className="p-2 bg-gray-50 rounded-lg transition-colors" style={{ '--hover-bg': 'rgba(71, 96, 114, 0.1)' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(71, 96, 114, 0.1)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = ''}>
+              <ArrowRight className="w-5 h-5 text-gray-400 transition-colors" onMouseEnter={(e) => e.currentTarget.style.color = '#476072'} onMouseLeave={(e) => e.currentTarget.style.color = ''} />
             </div>
           </div>
         </div>
@@ -199,18 +202,18 @@ export const QuizCardEnhanced = ({
       )}
     >
       {/* Header with gradient */}
-      <div className="relative h-24 bg-gradient-to-r from-accent-primary/10 to-accent-secondary/10 flex-shrink-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-accent-primary/5 to-transparent" />
+      <div className="relative h-24 flex-shrink-0" style={{ background: 'linear-gradient(to right, rgba(71, 96, 114, 0.1), rgba(71, 96, 114, 0.05))' }}>
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom right, rgba(71, 96, 114, 0.05), transparent)' }} />
         <div className="absolute top-3 right-3 flex items-center gap-2">
           {isPublic ? (
-            <Globe className="w-4 h-4 text-accent-primary" />
+            <Globe className="w-4 h-4" style={{ color: '#476072' }} />
           ) : (
-            <Users className="w-4 h-4 text-accent-secondary" />
+            <Users className="w-4 h-4" style={{ color: '#476072' }} />
           )}
           {getStatusBadge()}
         </div>
         <div className="absolute bottom-3 left-3 right-3">
-          <h3 className="text-base font-semibold text-gray-900 group-hover:text-accent-primary transition-colors line-clamp-2">
+          <h3 className="text-base font-semibold text-gray-900 transition-colors line-clamp-2" onMouseEnter={(e) => e.currentTarget.style.color = '#476072'} onMouseLeave={(e) => e.currentTarget.style.color = ''}>
             {quiz?.title}
           </h3>
         </div>
@@ -267,7 +270,10 @@ export const QuizCardEnhanced = ({
                 e.stopPropagation();
                 onStart?.(quizId);
               }}
-              className="flex-1 px-4 py-2 bg-accent-primary text-white text-sm font-medium rounded-lg hover:bg-accent-secondary transition-colors flex items-center justify-center gap-2"
+              className="flex-1 px-4 py-2 text-white text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
+              style={{ backgroundColor: '#476072' }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#3a4d5c'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#476072'}
             >
               <Play className="w-4 h-4" />
               Start Quiz

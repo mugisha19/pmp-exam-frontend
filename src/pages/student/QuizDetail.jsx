@@ -198,7 +198,7 @@ export const QuizDetail = () => {
 
       if (now >= startDate && now <= endDate) {
         return (
-          <span className="inline-flex items-center gap-1 px-4 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-medium">
+          <span className="inline-flex items-center gap-1 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium">
             <Play className="w-4 h-4" />
             Active Now
           </span>
@@ -215,7 +215,7 @@ export const QuizDetail = () => {
 
     if (quiz.status === "active" || quiz.is_available) {
       return (
-        <span className="inline-flex items-center gap-1 px-4 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-medium">
+        <span className="inline-flex items-center gap-1 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium">
           <Play className="w-4 h-4" />
           Available
         </span>
@@ -429,7 +429,7 @@ export const QuizDetail = () => {
                     <p className="text-3xl font-bold text-gray-900">{totalAttempts}</p>
                   </div>
                   {bestScore !== null && (
-                    <div className="p-6 bg-gradient-to-br from-green-50 to-green-100/30 rounded-xl border-2 border-green-200 shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105">
+                    <div className="p-6 bg-gradient-to-br from-blue-50 to-blue-100/30 rounded-xl border-2 border-blue-200 shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105">
                       <p className="text-xs font-bold text-gray-600 uppercase tracking-wide mb-2">Best Score</p>
                       <p className="text-3xl font-bold text-gray-900">{bestScore}%</p>
                     </div>
@@ -502,7 +502,7 @@ export const QuizDetail = () => {
                             Score: {attempt.score !== null ? `${attempt.score}%` : "N/A"}
                           </p>
                           {attempt.passed && (
-                            <span className="px-3 py-1 bg-gradient-to-r from-green-100 to-green-200 text-green-700 rounded-lg text-xs font-bold border border-green-300">
+                            <span className="px-3 py-1 bg-gradient-to-r from-blue-100 to-blue-200 text-blue-700 rounded-lg text-xs font-bold border border-blue-300">
                               ✓ Passed
                             </span>
                           )}

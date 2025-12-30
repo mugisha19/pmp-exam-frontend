@@ -278,7 +278,7 @@ function EmptyState({ filter }) {
     <div className="flex flex-col items-center justify-center py-20 text-center">
       <div className="w-24 h-24 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center shadow-inner mb-6">
         {filter === "unread" ? (
-          <CheckCheck className="w-12 h-12 text-emerald-500" />
+          <CheckCheck className="w-12 h-12" style={{ color: '#476072' }} />
         ) : (
           <Inbox className="w-12 h-12 text-gray-400" />
         )}
