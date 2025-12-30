@@ -34,7 +34,7 @@ export const ProfileCard = ({ className }) => {
           <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-accent-primary to-accent-secondary flex items-center justify-center border-4 border-white shadow-xl ring-4 ring-accent-primary/10">
             <span className="text-white font-bold text-2xl">{initials}</span>
           </div>
-          <div className="absolute -bottom-1 -right-1 w-7 h-7 bg-gradient-to-br from-green-400 to-green-500 rounded-full border-3 border-white shadow-lg"></div>
+          <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full border-3 border-white shadow-lg" style={{ backgroundColor: '#476072' }}></div>
         </div>
         <h4 className="text-lg font-bold text-gray-900 mb-2">
           {getGreeting()} {user?.first_name}

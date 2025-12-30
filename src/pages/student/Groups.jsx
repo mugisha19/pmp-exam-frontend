@@ -209,7 +209,7 @@ export const Groups = () => {
       {/* Header */}
       <div className="pb-4 border-b-2 border-gray-100">
         <h1 className="text-3xl font-bold text-gray-900 mb-3">Study Groups</h1>
-        <p className="text-gray-600 font-medium text-lg">
+        <p className="text-gray-600 font-medium text-sm">
           Join groups to access quizzes and study materials
         </p>
       </div>
@@ -241,7 +241,7 @@ export const Groups = () => {
           onClick={() => handleTabChange("all")}
           className={`px-5 md:px-7 py-3.5 font-bold text-sm border-b-3 -mb-0.5 transition-all duration-200 whitespace-nowrap rounded-t-lg ${
             activeTab === "all"
-              ? "border-purple-500 text-purple-600 bg-white shadow-lg shadow-purple-500/10"
+              ? "border-teal-500 text-teal-600 bg-white shadow-sm"
               : "border-transparent text-gray-600 hover:text-gray-900 hover:bg-white/50"
           }`}
         >
@@ -251,7 +251,7 @@ export const Groups = () => {
           onClick={() => handleTabChange("my-groups")}
           className={`px-5 md:px-7 py-3.5 font-bold text-sm border-b-3 -mb-0.5 transition-all duration-200 whitespace-nowrap rounded-t-lg ${
             activeTab === "my-groups"
-              ? "border-purple-500 text-purple-600 bg-white shadow-lg shadow-purple-500/10"
+              ? "border-teal-500 text-teal-600 bg-white shadow-sm"
               : "border-transparent text-gray-600 hover:text-gray-900 hover:bg-white/50"
           }`}
         >
@@ -277,7 +277,7 @@ export const Groups = () => {
               <select
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
-                className="px-4 py-2.5 border-2 border-gray-200 rounded-xl text-sm font-medium bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all duration-200 hover:border-purple-300 shadow-sm hover:shadow-md"
+                className="px-4 py-2.5 border border-gray-200 rounded-lg text-xs font-medium bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all duration-200 hover:border-teal-300 shadow-sm"
               >
                 <option value="all">All Types</option>
                 <option value="class">Class</option>
@@ -291,7 +291,7 @@ export const Groups = () => {
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="px-4 py-2.5 border-2 border-gray-200 rounded-xl text-sm font-medium bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all duration-200 hover:border-purple-300 shadow-sm hover:shadow-md"
+                  className="px-4 py-2.5 border border-gray-200 rounded-lg text-xs font-medium bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all duration-200 hover:border-teal-300 shadow-sm"
                 >
                   <option value="all">All Status</option>
                   <option value="active">Active</option>

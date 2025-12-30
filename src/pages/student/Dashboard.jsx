@@ -254,16 +254,81 @@ export const Dashboard = () => {
     return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
   };
 
+  // Calendar state
+  const [calendarDate, setCalendarDate] = useState(new Date());
+  
   // Get current date info for calendar
   const currentDate = new Date();
-  const currentMonth = currentDate.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+  const currentYear = calendarDate.getFullYear();
+  const currentMonthIndex = calendarDate.getMonth();
+  const currentMonth = calendarDate.toLocaleDateString("en-US", { month: "long", year: "numeric" });
   const currentDay = currentDate.getDate();
+  const currentMonthForToday = currentDate.getMonth();
+  const currentYearForToday = currentDate.getFullYear();
 
-  // Mock notifications (TODO: Fetch from backend)
-  const notifications = [
-    { id: 1, type: "info", title: "Portal Maintenance", message: "Scheduled maintenance on March 15", time: "2 hours ago", icon: "P" },
-    { id: 2, type: "success", title: "New Quiz Available", message: "Behavioral Economics quiz is now available", time: "5 hours ago", icon: "Q" },
-  ];
+  // Navigate calendar
+  const navigateMonth = (direction) => {
+    setCalendarDate((prevDate) => {
+      const newDate = new Date(prevDate);
+      newDate.setMonth(prevDate.getMonth() + direction);
+      return newDate;
+    });
+  };
+
+  // Get calendar days for the current month
+  const getCalendarDays = () => {
+    const year = calendarDate.getFullYear();
+    const month = calendarDate.getMonth();
+    
+    // First day of the month
+    const firstDay = new Date(year, month, 1);
+    const firstDayOfWeek = firstDay.getDay(); // 0 = Sunday, 1 = Monday, etc.
+    
+    // Last day of the month
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    
+    // Previous month's last days
+    const prevMonthLastDay = new Date(year, month, 0).getDate();
+    
+    const days = [];
+    
+    // Add previous month's trailing days
+    for (let i = firstDayOfWeek - 1; i >= 0; i--) {
+      days.push({
+        day: prevMonthLastDay - i,
+        isCurrentMonth: false,
+        isToday: false,
+      });
+    }
+    
+    // Add current month's days
+    for (let day = 1; day <= daysInMonth; day++) {
+      const isToday = 
+        day === currentDay && 
+        month === currentMonthForToday && 
+        year === currentYearForToday;
+      days.push({
+        day,
+        isCurrentMonth: true,
+        isToday,
+      });
+    }
+    
+    // Add next month's leading days to fill the grid (35 days total)
+    const remainingDays = 35 - days.length;
+    for (let day = 1; day <= remainingDays; day++) {
+      days.push({
+        day,
+        isCurrentMonth: false,
+        isToday: false,
+      });
+    }
+    
+    return days;
+  };
+
+  const calendarDays = getCalendarDays();
 
   // Mock upcoming quizzes for "ONGOING NOW" and "UP NEXT" sections
   const ongoingQuizzes = filteredQuizzesByStatus.in_progress.slice(0, 2);
@@ -343,13 +408,13 @@ export const Dashboard = () => {
               {filteredQuizzes.length > 0 && (
         <div>
           <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                      <BookOpen className="w-5 h-5 text-accent-primary" />
+                    <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
+                      <BookOpen className="w-4 h-4 text-accent-primary" />
                       Quizzes ({filteredQuizzes.length})
                     </h3>
               <button
                       onClick={() => navigate(`/exams?search=${encodeURIComponent(searchQuery)}`)}
-                      className="text-sm text-purple-600 hover:text-violet-600 font-semibold transition-colors duration-200 hover:underline"
+                      className="text-xs text-teal-600 hover:text-emerald-600 font-medium transition-colors duration-200 hover:underline"
                     >
                       View All
               </button>
@@ -371,13 +436,13 @@ export const Dashboard = () => {
               {filteredGroups.length > 0 && (
           <div>
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                      <Users className="w-5 h-5 text-accent-primary" />
+                    <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
+                      <Users className="w-4 h-4 text-accent-primary" />
                       Groups ({filteredGroups.length})
             </h3>
           <button
                       onClick={() => navigate(`/groups?search=${encodeURIComponent(searchQuery)}`)}
-                      className="text-sm text-purple-600 hover:text-violet-600 font-semibold transition-colors duration-200 hover:underline"
+                      className="text-xs text-teal-600 hover:text-emerald-600 font-medium transition-colors duration-200 hover:underline"
           >
                       View All
           </button>
@@ -405,8 +470,8 @@ export const Dashboard = () => {
               <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center shadow-inner">
                 <Search className="w-12 h-12 text-gray-400" />
             </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">No results found</h3>
-              <p className="text-sm text-gray-600 font-medium mb-6">
+              <h3 className="text-base font-semibold text-gray-900 mb-2">No results found</h3>
+              <p className="text-xs text-gray-600 font-medium mb-4">
                 Try searching with different keywords
               </p>
               <button
@@ -414,7 +479,7 @@ export const Dashboard = () => {
                   setSearchQuery("");
                   setShowSearchResults(false);
                 }}
-                    className="px-6 py-3 bg-gradient-to-r from-purple-500 to-violet-600 text-white font-bold rounded-xl hover:shadow-lg transition-all duration-200 hover:scale-105"
+                    className="px-4 py-2 bg-gradient-to-r from-teal-500 to-emerald-600 text-white text-sm font-medium rounded-lg hover:shadow-sm transition-all duration-200"
               >
                 Clear Search
               </button>
@@ -427,99 +492,99 @@ export const Dashboard = () => {
       {!showSearchResults && (
         <>
           {/* Stats Cards Row */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 relative z-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 relative z-10">
             {/* Completed Attempts */}
-            <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 border-2 border-purple-200 shadow-xl hover:shadow-2xl transition-all duration-200 hover:scale-105">
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center shadow-lg">
-                  <CheckCircle2 className="w-6 h-6 text-white" />
+            <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 border border-teal-200 shadow-sm hover:shadow transition-all duration-200">
+              <div className="flex items-center justify-between mb-3">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center shadow-sm">
+                  <CheckCircle2 className="w-5 h-5 text-white" />
                 </div>
-                <TrendingUp className="w-5 h-5 text-purple-600" />
+                <TrendingUp className="w-4 h-4 text-teal-600" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-1">{dashboardStats.completedAttempts}</h3>
-              <p className="text-sm text-gray-600 font-medium">Completed Attempts</p>
+              <h3 className="text-lg font-semibold text-gray-900 mb-1">{dashboardStats.completedAttempts}</h3>
+              <p className="text-xs text-gray-600 font-medium">Completed Attempts</p>
             </div>
 
             {/* Learning Hours */}
-            <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 border-2 border-violet-200 shadow-xl hover:shadow-2xl transition-all duration-200 hover:scale-105">
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-lg">
-                  <Clock className="w-6 h-6 text-white" />
+            <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 border border-emerald-200 shadow-sm hover:shadow transition-all duration-200">
+              <div className="flex items-center justify-between mb-3">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-sm">
+                  <Clock className="w-5 h-5 text-white" />
                 </div>
-                <TrendingUp className="w-5 h-5 text-violet-600" />
+                <TrendingUp className="w-4 h-4 text-emerald-600" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-1">{dashboardStats.learningHours}h</h3>
-              <p className="text-sm text-gray-600 font-medium">Learning Hours</p>
+              <h3 className="text-lg font-semibold text-gray-900 mb-1">{dashboardStats.learningHours}h</h3>
+              <p className="text-xs text-gray-600 font-medium">Learning Hours</p>
             </div>
 
             {/* Average Score */}
-            <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 border-2 border-indigo-200 shadow-xl hover:shadow-2xl transition-all duration-200 hover:scale-105">
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
-                  <Award className="w-6 h-6 text-white" />
+            <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 border border-cyan-200 shadow-sm hover:shadow transition-all duration-200">
+              <div className="flex items-center justify-between mb-3">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-teal-600 flex items-center justify-center shadow-sm">
+                  <Award className="w-5 h-5 text-white" />
                 </div>
-                <TrendingUp className="w-5 h-5 text-indigo-600" />
+                <TrendingUp className="w-4 h-4 text-cyan-600" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-1">
+              <h3 className="text-lg font-semibold text-gray-900 mb-1">
                 {dashboardStats.averageScore > 0 ? `${dashboardStats.averageScore}%` : "N/A"}
               </h3>
-              <p className="text-sm text-gray-600 font-medium">Average Score</p>
+              <p className="text-xs text-gray-600 font-medium">Average Score</p>
             </div>
 
             {/* Progress */}
-            <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 border-2 border-fuchsia-200 shadow-xl hover:shadow-2xl transition-all duration-200 hover:scale-105">
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-fuchsia-500 to-pink-600 flex items-center justify-center shadow-lg">
-                  <TrendingUp className="w-6 h-6 text-white" />
+            <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 border border-teal-200 shadow-sm hover:shadow transition-all duration-200">
+              <div className="flex items-center justify-between mb-3">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center shadow-sm">
+                  <TrendingUp className="w-5 h-5 text-white" />
                 </div>
-                <TrendingUp className="w-5 h-5 text-fuchsia-600" />
+                <TrendingUp className="w-4 h-4 text-teal-600" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-1">{dashboardStats.progressPercentage}%</h3>
-              <p className="text-sm text-gray-600 font-medium">Overall Progress</p>
+              <h3 className="text-lg font-semibold text-gray-900 mb-1">{dashboardStats.progressPercentage}%</h3>
+              <p className="text-xs text-gray-600 font-medium">Overall Progress</p>
             </div>
           </div>
 
           {/* Charts Row */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 relative z-10">
             {/* Learning Hours Chart */}
-            <div className="bg-white/90 backdrop-blur-sm rounded-2xl border-2 border-purple-200 shadow-xl p-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <Clock className="w-5 h-5 text-purple-600" />
+            <div className="bg-white/90 backdrop-blur-sm rounded-xl border border-teal-200 shadow-sm p-4">
+              <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <Clock className="w-4 h-4 text-teal-600" />
                 Learning Hours This Week
               </h3>
               <BarChartComponent
                 data={learningHoursData}
-                color="#8b5cf6"
-                height={200}
+                color="#14b8a6"
+                height={180}
                 showGrid={true}
               />
             </div>
 
             {/* Progress Trend Chart */}
-            <div className="bg-white/90 backdrop-blur-sm rounded-2xl border-2 border-violet-200 shadow-xl p-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-violet-600" />
+            <div className="bg-white/90 backdrop-blur-sm rounded-xl border border-emerald-200 shadow-sm p-4">
+              <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <TrendingUp className="w-4 h-4 text-emerald-600" />
                 Progress Trend
               </h3>
               <LineChartComponent
                 data={progressTrendData}
-                color="#7c3aed"
-                height={200}
+                color="#0d9488"
+                height={180}
                 showGrid={true}
               />
             </div>
 
             {/* Score Distribution Chart */}
-            <div className="bg-white/90 backdrop-blur-sm rounded-2xl border-2 border-indigo-200 shadow-xl p-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <Award className="w-5 h-5 text-indigo-600" />
+            <div className="bg-white/90 backdrop-blur-sm rounded-xl border border-cyan-200 shadow-sm p-4">
+              <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <Award className="w-4 h-4 text-cyan-600" />
                 Score Distribution
               </h3>
               <PieChartComponent
                 data={scoreDistributionData}
-                height={200}
-                innerRadius={40}
-                outerRadius={80}
+                height={180}
+                innerRadius={35}
+                outerRadius={70}
                 showLegend={false}
               />
             </div>
@@ -540,23 +605,23 @@ export const Dashboard = () => {
                         {ongoingQuizzes.map((quiz) => (
                           <div
                             key={quiz.quiz_id || quiz.id}
-                            className="bg-white/90 backdrop-blur-sm rounded-xl border-2 border-purple-300 p-5 shadow-xl hover:shadow-2xl transition-all duration-200"
+                            className="bg-white/90 backdrop-blur-sm rounded-lg border border-teal-200 p-4 shadow-sm hover:shadow transition-all duration-200"
                           >
                             <div className="flex items-start justify-between">
                               <div className="flex-1">
                                 <div className="flex items-center gap-2 mb-2">
-                                  <span className="text-purple-600 font-bold text-sm">{quiz.title}</span>
+                                  <span className="text-teal-600 font-semibold text-xs">{quiz.title}</span>
                                 </div>
-                                <div className="space-y-1 text-sm text-gray-600">
-                                  <p className="flex items-center gap-2">
-                                    <Clock className="w-4 h-4" />
+                                <div className="space-y-1 text-xs text-gray-600">
+                                  <p className="flex items-center gap-1.5">
+                                    <Clock className="w-3.5 h-3.5" />
                                     {quiz.start_time && quiz.end_time 
                                       ? `${formatTime(quiz.start_time)} - ${formatTime(quiz.end_time)}`
                                       : "No time limit"}
                                   </p>
                                   {quiz.group_id && (
-                                    <p className="flex items-center gap-2">
-                                      <Users className="w-4 h-4" />
+                                    <p className="flex items-center gap-1.5">
+                                      <Users className="w-3.5 h-3.5" />
                                       Group Quiz
                                     </p>
                                   )}
@@ -565,7 +630,7 @@ export const Dashboard = () => {
                               <div className="flex gap-2">
                                 <button
                                   onClick={() => navigate(`/exams/${quiz.quiz_id || quiz.id}`)}
-                                  className="px-4 py-2 bg-gradient-to-r from-purple-500 to-violet-600 text-white text-sm font-semibold rounded-lg hover:from-purple-600 hover:to-violet-700 transition-all shadow-md hover:shadow-lg"
+                                  className="px-3 py-1.5 bg-gradient-to-r from-teal-500 to-emerald-600 text-white text-xs font-medium rounded-lg hover:from-teal-600 hover:to-emerald-700 transition-all shadow-sm"
                                 >
                                   JOIN
                                 </button>
@@ -585,23 +650,23 @@ export const Dashboard = () => {
                         {upcomingQuizzes.map((quiz) => (
                           <div
                             key={quiz.quiz_id || quiz.id}
-                            className="bg-white/90 backdrop-blur-sm rounded-xl border-2 border-violet-300 p-5 shadow-xl hover:shadow-2xl transition-all duration-200"
+                            className="bg-white/90 backdrop-blur-sm rounded-lg border border-emerald-200 p-4 shadow-sm hover:shadow transition-all duration-200"
                           >
                             <div className="flex items-start justify-between">
                               <div className="flex-1">
                                 <div className="flex items-center gap-2 mb-2">
-                                  <span className="text-violet-600 font-bold text-sm">{quiz.title}</span>
+                                  <span className="text-emerald-600 font-semibold text-xs">{quiz.title}</span>
                                 </div>
-                                <div className="space-y-1 text-sm text-gray-600">
-                                  <p className="flex items-center gap-2">
-                                    <Clock className="w-4 h-4" />
+                                <div className="space-y-1 text-xs text-gray-600">
+                                  <p className="flex items-center gap-1.5">
+                                    <Clock className="w-3.5 h-3.5" />
                                     {quiz.start_time && quiz.end_time 
                                       ? `${formatTime(quiz.start_time)} - ${formatTime(quiz.end_time)}`
                                       : "No time limit"}
                                   </p>
                                   {quiz.start_time && (
-                                    <p className="flex items-center gap-2">
-                                      <Calendar className="w-4 h-4" />
+                                    <p className="flex items-center gap-1.5">
+                                      <Calendar className="w-3.5 h-3.5" />
                                       Starts: {formatDate(quiz.start_time)}
                                     </p>
                                   )}
@@ -609,7 +674,7 @@ export const Dashboard = () => {
                               </div>
                               <button
                                 onClick={() => navigate(`/exams/${quiz.quiz_id || quiz.id}`)}
-                                className="px-4 py-2 bg-gradient-to-r from-violet-500 to-indigo-600 text-white text-sm font-semibold rounded-lg hover:from-violet-600 hover:to-indigo-700 transition-all shadow-md hover:shadow-lg"
+                                className="px-3 py-1.5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-xs font-medium rounded-lg hover:from-emerald-600 hover:to-teal-700 transition-all shadow-sm"
                               >
                                 ADD REMINDER
                               </button>
@@ -630,12 +695,12 @@ export const Dashboard = () => {
                     {filteredQuizzesByStatus.upcoming.slice(3, 5).map((quiz) => (
                       <div
                         key={quiz.quiz_id || quiz.id}
-                        className="bg-white/90 backdrop-blur-sm rounded-xl border-2 border-purple-200 p-4 shadow-xl hover:shadow-2xl transition-all duration-200"
+                        className="bg-white/90 backdrop-blur-sm rounded-lg border border-teal-200 p-3 shadow-sm hover:shadow transition-all duration-200"
                       >
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="text-purple-600 font-bold text-sm">{quiz.title}</span>
+                        <div className="flex items-center gap-2 mb-1.5">
+                          <span className="text-teal-600 font-semibold text-xs">{quiz.title}</span>
                         </div>
-                        <p className="text-xs text-gray-600">
+                        <p className="text-[10px] text-gray-600">
                           {quiz.start_time && quiz.end_time 
                             ? `${formatTime(quiz.start_time)} - ${formatTime(quiz.end_time)}`
                             : "No time limit"}
@@ -649,57 +714,33 @@ export const Dashboard = () => {
                 </div>
               )}
 
-              {/* Notifications */}
-              <div className="bg-white/90 backdrop-blur-sm rounded-xl border-2 border-purple-200 p-6 shadow-xl">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-bold text-gray-900">Notifications</h3>
-                  <button className="text-sm text-accent-primary hover:underline font-semibold">
-                    View notifications
-                  </button>
-                </div>
-                <div className="space-y-3">
-                  {notifications.map((notif) => (
-                    <div key={notif.id} className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
-                      <div className="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center flex-shrink-0">
-                        <span className="text-yellow-600 font-bold text-xs">{notif.icon}</span>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-gray-900">{notif.title}</p>
-                        <p className="text-xs text-gray-600">{notif.message}</p>
-                        <p className="text-xs text-gray-400 mt-1">{notif.time}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
               {/* Virtual Class Attendance / Quiz Completion */}
-              <div className="bg-white/90 backdrop-blur-sm rounded-xl border-2 border-violet-200 p-6 shadow-xl">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-bold text-gray-900">Quiz Completion</h3>
-                  <button className="text-sm text-accent-primary hover:underline font-semibold">
+              <div className="bg-white/90 backdrop-blur-sm rounded-lg border border-emerald-200 p-4 shadow-sm">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-semibold text-gray-900">Quiz Completion</h3>
+                  <button className="text-xs text-accent-primary hover:underline font-medium">
                     View history
                   </button>
                 </div>
-                <div className="mb-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-700">Overall Progress</span>
-                    <span className="text-sm font-bold text-gray-900">{dashboardStats.progressPercentage}%</span>
+                <div className="mb-3">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-xs font-medium text-gray-700">Overall Progress</span>
+                    <span className="text-xs font-semibold text-gray-900">{dashboardStats.progressPercentage}%</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-3">
+                  <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
-                      className="bg-gradient-to-r from-purple-500 to-violet-600 h-3 rounded-full transition-all duration-300"
+                      className="bg-gradient-to-r from-teal-500 to-emerald-600 h-2 rounded-full transition-all duration-300"
                       style={{ width: `${dashboardStats.progressPercentage}%` }}
                     />
                   </div>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                   {allQuizzes.slice(0, 2).map((quiz) => (
-                    <div key={quiz.quiz_id || quiz.id} className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50">
-                      <span className="text-sm font-medium text-gray-700">{quiz.title}</span>
-                      <div className="flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-green-600" />
-                        <span className="text-xs text-gray-600">Completed</span>
+                    <div key={quiz.quiz_id || quiz.id} className="flex items-center justify-between p-1.5 rounded-lg hover:bg-gray-50">
+                      <span className="text-xs font-medium text-gray-700">{quiz.title}</span>
+                      <div className="flex items-center gap-1.5">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-green-600" />
+                        <span className="text-[10px] text-gray-600">Completed</span>
                       </div>
                     </div>
                   ))}
@@ -710,76 +751,82 @@ export const Dashboard = () => {
             {/* Right Column - Calendar & Courses */}
             <div className="space-y-6">
               {/* Calendar */}
-              <div className="bg-white/90 backdrop-blur-sm rounded-xl border-2 border-purple-200 p-6 shadow-xl">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-bold text-gray-900">Calendar</h3>
-                  <button className="text-sm text-accent-primary hover:underline font-semibold">
+              <div className="bg-white/90 backdrop-blur-sm rounded-lg border border-teal-200 p-4 shadow-sm">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-semibold text-gray-900">Calendar</h3>
+                  <button className="text-xs text-accent-primary hover:underline font-medium">
                     View schedule
                   </button>
                 </div>
-                <div className="flex items-center justify-between mb-4">
-                  <h4 className="text-md font-semibold text-gray-800">{currentMonth}</h4>
-                  <div className="flex gap-2">
-                    <button className="p-1 hover:bg-gray-100 rounded">
-                      <ChevronLeft className="w-4 h-4" />
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-xs font-medium text-gray-800">{currentMonth}</h4>
+                  <div className="flex gap-1.5">
+                    <button 
+                      onClick={() => navigateMonth(-1)}
+                      className="p-0.5 hover:bg-gray-100 rounded transition-colors"
+                      aria-label="Previous month"
+                    >
+                      <ChevronLeft className="w-3.5 h-3.5" />
                     </button>
-                    <button className="p-1 hover:bg-gray-100 rounded">
-                      <ChevronRight className="w-4 h-4" />
+                    <button 
+                      onClick={() => navigateMonth(1)}
+                      className="p-0.5 hover:bg-gray-100 rounded transition-colors"
+                      aria-label="Next month"
+                    >
+                      <ChevronRight className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </div>
-                <div className="grid grid-cols-7 gap-1 mb-2">
+                <div className="grid grid-cols-7 gap-0.5 mb-1.5">
                   {["S", "M", "T", "W", "T", "F", "S"].map((day, index) => (
-                    <div key={`day-header-${index}`} className="text-center text-xs font-semibold text-gray-600 py-2">
+                    <div key={`day-header-${index}`} className="text-center text-[10px] font-medium text-gray-600 py-1">
                       {day}
                     </div>
                   ))}
                 </div>
-                <div className="grid grid-cols-7 gap-1">
-                  {Array.from({ length: 35 }, (_, i) => {
-                    const day = i + 1;
-                    const isToday = day === currentDay;
-                  return (
-                      <div
-                        key={i}
-                        className={cn(
-                          "aspect-square flex items-center justify-center text-sm rounded-lg cursor-pointer transition-colors",
-                          isToday
-                            ? "bg-purple-500 text-white font-bold"
-                            : "hover:bg-purple-50 text-gray-700"
-                        )}
-                      >
-                        {day <= 31 ? day : ""}
-                      </div>
-                    );
-                  })}
+                <div className="grid grid-cols-7 gap-0.5">
+                  {calendarDays.map((dayInfo, i) => (
+                    <div
+                      key={i}
+                      className={cn(
+                        "aspect-square flex items-center justify-center text-xs rounded-md cursor-pointer transition-colors",
+                        dayInfo.isToday
+                          ? "bg-teal-500 text-white font-semibold"
+                          : dayInfo.isCurrentMonth
+                          ? "hover:bg-teal-50 text-gray-700"
+                          : "text-gray-400 hover:bg-gray-50"
+                      )}
+                    >
+                      {dayInfo.day}
+                    </div>
+                  ))}
                 </div>
               </div>
 
               {/* Courses */}
-              <div className="bg-white/90 backdrop-blur-sm rounded-xl border-2 border-violet-200 p-6 shadow-xl">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-bold text-gray-900">Courses</h3>
-                  <button className="text-sm text-accent-primary hover:underline font-semibold">
+              <div className="bg-white/90 backdrop-blur-sm rounded-lg border border-emerald-200 p-4 shadow-sm">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-semibold text-gray-900">Courses</h3>
+                  <button className="text-xs text-accent-primary hover:underline font-medium">
                     View courses
                   </button>
                 </div>
                 {myGroups.length > 0 ? (
-                  <div className="space-y-3">
+                  <div className="space-y-2.5">
                     {myGroups.slice(0, 2).map((group) => (
                       <div
                         key={group.group_id || group.id}
-                        className="p-4 rounded-lg border-2 border-gray-200 hover:border-accent-primary transition-colors"
+                        className="p-3 rounded-lg border border-gray-200 hover:border-accent-primary transition-colors"
                       >
-                        <div className="flex items-center justify-between mb-2">
-                          <h4 className="font-semibold text-gray-900 text-sm">{group.name}</h4>
+                        <div className="flex items-center justify-between mb-1.5">
+                          <h4 className="font-medium text-gray-900 text-xs">{group.name}</h4>
                         </div>
-                        <p className="text-xs text-gray-600 mb-3">
+                        <p className="text-[10px] text-gray-600 mb-2.5">
                           {group.quiz_count || 0} quizzes available
                         </p>
                         <button
                           onClick={() => navigate(`/groups/${group.group_id || group.id}`)}
-                          className="w-full px-4 py-2 bg-gradient-to-r from-purple-500 to-violet-600 text-white text-sm font-semibold rounded-lg hover:from-purple-600 hover:to-violet-700 transition-all shadow-md hover:shadow-lg"
+                          className="w-full px-3 py-1.5 bg-gradient-to-r from-teal-500 to-emerald-600 text-white text-xs font-medium rounded-lg hover:from-teal-600 hover:to-emerald-700 transition-all shadow-sm"
                         >
                           VIEW COURSEWARE
                         </button>
@@ -787,12 +834,12 @@ export const Dashboard = () => {
                     ))}
                   </div>
                 ) : (
-                  <div className="p-4 bg-red-50 border-2 border-red-200 rounded-lg">
-                    <div className="flex items-center gap-2 mb-2">
-                      <AlertCircle className="w-5 h-5 text-red-600" />
-                      <p className="text-sm font-semibold text-red-900">No Courses Yet</p>
+                  <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <AlertCircle className="w-4 h-4 text-red-600" />
+                      <p className="text-xs font-medium text-red-900">No Courses Yet</p>
                     </div>
-                    <p className="text-xs text-red-700">
+                    <p className="text-[10px] text-red-700">
                       You haven't joined any groups yet. Join a group to access quizzes.
                     </p>
                   </div>
@@ -804,39 +851,39 @@ export const Dashboard = () => {
           {/* Recommended Quizzes */}
           {availableQuizzes && availableQuizzes.length > 0 && (
             <div>
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-3">
                 <div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-1">Recommended for you</h3>
-                  <p className="text-sm text-gray-500">Based on your learning progress</p>
+                  <h3 className="text-base font-semibold text-gray-900 mb-0.5">Recommended for you</h3>
+                  <p className="text-xs text-gray-500">Based on your learning progress</p>
                 </div>
                 <button
                   onClick={() => navigate("/exams")}
-                  className="text-sm text-accent-primary hover:text-accent-secondary font-semibold transition-colors duration-200 hover:underline"
+                  className="text-xs text-accent-primary hover:text-accent-secondary font-medium transition-colors duration-200 hover:underline"
                 >
                   View all
                 </button>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 {availableQuizzes.slice(0, 3).map((quiz) => (
                   <div
                     key={quiz.quiz_id || quiz.id}
-                    className="bg-white/90 backdrop-blur-sm rounded-xl border-2 border-purple-200 p-6 shadow-xl hover:shadow-2xl transition-all duration-200"
+                    className="bg-white/90 backdrop-blur-sm rounded-lg border border-teal-200 p-4 shadow-sm hover:shadow transition-all duration-200"
                   >
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">
+                    <div className="flex items-center gap-2 mb-2.5">
+                      <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-medium rounded-full">
                         {quiz.group_id ? "GROUP" : "PUBLIC"}
                       </span>
-                      <span className="text-xs text-gray-500">
+                      <span className="text-[10px] text-gray-500">
                         {quiz.total_questions || 0} questions
                       </span>
                     </div>
-                    <h4 className="text-lg font-bold text-gray-900 mb-2">{quiz.title}</h4>
-                    <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+                    <h4 className="text-sm font-semibold text-gray-900 mb-1.5">{quiz.title}</h4>
+                    <p className="text-xs text-gray-600 mb-3 line-clamp-2">
                       {quiz.description || "Test your knowledge with this comprehensive quiz"}
                     </p>
                     <button
                       onClick={() => navigate(`/exams/${quiz.quiz_id || quiz.id}`)}
-                      className="w-full px-4 py-2 bg-gradient-to-r from-purple-500 to-violet-600 text-white font-semibold rounded-lg hover:from-purple-600 hover:to-violet-700 transition-all shadow-md hover:shadow-lg"
+                      className="w-full px-3 py-1.5 bg-gradient-to-r from-teal-500 to-emerald-600 text-white text-xs font-medium rounded-lg hover:from-teal-600 hover:to-emerald-700 transition-all shadow-sm"
                     >
                       Learn more
                     </button>

@@ -30,10 +30,10 @@ export default {
           tertiary: "#64748b",
           quaternary: "#94a3b8",
         },
-        // Accent
+        // Accent - Teal/Emerald theme (avoiding AI-popular purple/blue)
         accent: {
-          primary: "#7c3aed",
-          secondary: "#6d28d9",
+          primary: "#14b8a6",
+          secondary: "#0d9488",
         },
         // Semantic colors
         error: "#ef4444",

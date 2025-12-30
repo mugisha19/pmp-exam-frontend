@@ -117,10 +117,10 @@ export const GroupDetail = () => {
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-white to-purple-50/30 rounded-xl border-2 border-purple-100 shadow-md hover:shadow-lg transition-all duration-200 p-6 hover:scale-105">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-100 to-purple-200 flex items-center justify-center shadow-sm">
-              <Calendar className="w-7 h-7 text-purple-600" />
+        <div className="bg-gradient-to-br from-white to-teal-50/30 rounded-lg border border-teal-100 shadow-sm hover:shadow transition-all duration-200 p-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-teal-50 flex items-center justify-center">
+              <Calendar className="w-5 h-5 text-teal-600" />
             </div>
             <div>
               <p className="text-xs font-bold text-gray-600 uppercase tracking-wide mb-1">Duration</p>
@@ -168,8 +168,8 @@ export const GroupDetail = () => {
                   </span>
                   <span className="text-gray-300">•</span>
                   <span className="flex items-center gap-2 text-gray-700">
-                    <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center">
-                      <Clock className="w-4 h-4 text-purple-600" />
+                    <div className="w-7 h-7 rounded-md bg-teal-50 flex items-center justify-center">
+                      <Clock className="w-3.5 h-3.5 text-teal-600" />
                     </div>
                     {quiz.time_limit_minutes || 0} min
                   </span>
