@@ -274,6 +274,20 @@ export const createJoinRequest = async (data) => {
 };
 
 /**
+ * Join a public group directly (no approval needed)
+ * @param {string} groupId - Group ID to join
+ * @returns {Promise<Object>} Join response
+ */
+export const joinPublicGroup = async (groupId) => {
+  try {
+    const response = await api.post(GROUP_ENDPOINTS.JOIN_PUBLIC_GROUP(groupId));
+    return response.data;
+  } catch (error) {
+    throw handleGroupError(error);
+  }
+};
+
+/**
  * Get quiz statistics for a group
  * @param {string} groupId - Group ID
  * @param {Object} [params] - Query parameters
@@ -372,4 +386,5 @@ export default {
   getUserGroups,
   getGroupPreviewByToken,
   joinGroupByToken,
+  joinPublicGroup,
 };

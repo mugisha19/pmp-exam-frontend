@@ -39,38 +39,35 @@ export function BarChartComponent({
         ];
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">{title}</h3>
-      <ResponsiveContainer width="100%" height={height}>
-        <BarChart
-          data={chartData}
-          margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
-        >
-          {showGrid && <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />}
-          <XAxis
-            dataKey={xAxisKey}
-            tick={{ fill: "#6b7280", fontSize: 12 }}
-            axisLine={{ stroke: "#d1d5db" }}
-            tickLine={{ stroke: "#d1d5db" }}
-          />
-          <YAxis
-            tick={{ fill: "#6b7280", fontSize: 12 }}
-            axisLine={{ stroke: "#d1d5db" }}
-            tickLine={{ stroke: "#d1d5db" }}
-          />
-          <Tooltip
-            contentStyle={{
-              backgroundColor: "#fff",
-              border: "1px solid #e5e7eb",
-              borderRadius: "8px",
-              boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-            }}
-          />
-          {showLegend && <Legend />}
-          <Bar dataKey={dataKey} fill={color} radius={[4, 4, 0, 0]} />
-        </BarChart>
-      </ResponsiveContainer>
-    </div>
+    <ResponsiveContainer width="100%" height={height}>
+      <BarChart
+        data={chartData}
+        margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+      >
+        {showGrid && <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />}
+        <XAxis
+          dataKey={xAxisKey}
+          tick={{ fill: "#6b7280", fontSize: 12 }}
+          axisLine={{ stroke: "#d1d5db" }}
+          tickLine={{ stroke: "#d1d5db" }}
+        />
+        <YAxis
+          tick={{ fill: "#6b7280", fontSize: 12 }}
+          axisLine={{ stroke: "#d1d5db" }}
+          tickLine={{ stroke: "#d1d5db" }}
+        />
+        <Tooltip
+          contentStyle={{
+            backgroundColor: "#fff",
+            border: "1px solid #e5e7eb",
+            borderRadius: "8px",
+            boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+          }}
+        />
+        {showLegend && <Legend />}
+        <Bar dataKey={dataKey} fill={color} radius={[4, 4, 0, 0]} />
+      </BarChart>
+    </ResponsiveContainer>
   );
 }
 

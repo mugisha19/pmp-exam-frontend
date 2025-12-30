@@ -21,6 +21,7 @@ import {
   AlertCircle,
   TrendingUp,
   Award,
+  Trophy,
   Bell,
   Filter,
   Download,
@@ -35,6 +36,7 @@ import { useMyGroups } from "@/hooks/queries/useGroupQueries";
 import { useQuery } from "@tanstack/react-query";
 import { getGroups } from "@/services/group.service";
 import { getQuizzes, getQuizAttempts } from "@/services/quiz.service";
+import { analyticsService } from "@/services/analytics.service";
 import { SearchBar } from "@/components/shared/SearchBar";
 import { ProgressCard } from "@/components/shared/ProgressCard";
 import { QuizCard } from "@/components/shared/QuizCard";
@@ -55,6 +57,28 @@ export const Dashboard = () => {
   const { data: availableQuizzes, isLoading: quizzesLoading } = useAvailableQuizzes(50);
   const { data: myGroupsData } = useMyGroups();
   const myGroups = myGroupsData || [];
+  
+  // Fetch analytics data
+  const { data: performanceData } = useQuery({
+    queryKey: ["student-performance", user?.user_id, "7days"],
+    queryFn: () => analyticsService.getStudentPerformance(user?.user_id, "7days"),
+    enabled: !!user?.user_id,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const { data: topicData } = useQuery({
+    queryKey: ["student-topics", user?.user_id],
+    queryFn: () => analyticsService.getStudentTopicPerformance(user?.user_id),
+    enabled: !!user?.user_id,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const { data: quizSpecificData } = useQuery({
+    queryKey: ["student-quiz-specific", user?.user_id],
+    queryFn: () => analyticsService.getStudentQuizSpecific(user?.user_id, "month"),
+    enabled: !!user?.user_id,
+    staleTime: 5 * 60 * 1000,
+  });
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const [showSearchResults, setShowSearchResults] = useState(false);
@@ -334,38 +358,61 @@ export const Dashboard = () => {
   const ongoingQuizzes = filteredQuizzesByStatus.in_progress.slice(0, 2);
   const upcomingQuizzes = filteredQuizzesByStatus.upcoming.slice(0, 3);
 
-  // Mock chart data (will be replaced with real data from backend)
-  const learningHoursData = useMemo(() => {
-    return [
-      { name: "Mon", value: 2.5 },
-      { name: "Tue", value: 3.0 },
-      { name: "Wed", value: 2.0 },
-      { name: "Thu", value: 4.0 },
-      { name: "Fri", value: 3.5 },
-      { name: "Sat", value: 5.0 },
-      { name: "Sun", value: 4.5 },
-    ];
-  }, []);
+  // Chart data from analytics
+  const performanceTrendData = useMemo(() => {
+    if (!performanceData?.attempts) return [];
+    
+    const attempts = performanceData.attempts.slice(0, 10).reverse();
+    return attempts.map((att, idx) => ({
+      name: `#${idx + 1}`,
+      score: Math.round(att.score || 0),
+      date: new Date(att.submitted_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    }));
+  }, [performanceData]);
 
-  const progressTrendData = useMemo(() => {
-    return [
-      { name: "Week 1", value: 45 },
-      { name: "Week 2", value: 52 },
-      { name: "Week 3", value: 58 },
-      { name: "Week 4", value: 65 },
-      { name: "Week 5", value: 72 },
-      { name: "Week 6", value: 78 },
-    ];
-  }, []);
+  const attemptFrequencyData = useMemo(() => {
+    if (!performanceData?.attempts) return [];
+    
+    const last7Days = [];
+    const today = new Date();
+    
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      const dateStr = date.toISOString().split('T')[0];
+      last7Days.push({
+        date: dateStr,
+        label: date.toLocaleDateString('en-US', { weekday: 'short' }),
+        count: 0
+      });
+    }
+    
+    performanceData.attempts.forEach(att => {
+      const attDate = new Date(att.submitted_at).toISOString().split('T')[0];
+      const dayData = last7Days.find(d => d.date === attDate);
+      if (dayData) dayData.count++;
+    });
+    
+    return last7Days.map(d => ({ name: d.label, value: d.count }));
+  }, [performanceData]);
 
-  const scoreDistributionData = useMemo(() => {
-    return [
-      { name: "Excellent (90-100%)", value: 25 },
-      { name: "Good (70-89%)", value: 45 },
-      { name: "Average (50-69%)", value: 20 },
-      { name: "Needs Improvement (<50%)", value: 10 },
-    ];
-  }, []);
+  const topicMasteryData = useMemo(() => {
+    if (!topicData?.topics) return [];
+    
+    return topicData.topics.slice(0, 5).map(topic => ({
+      name: topic.topic_name?.substring(0, 20) || 'Topic',
+      score: Math.round(topic.accuracy || 0)
+    }));
+  }, [topicData]);
+
+  const quizComparisonData = useMemo(() => {
+    if (!quizSpecificData?.quiz_stats) return [];
+    
+    return quizSpecificData.quiz_stats.slice(0, 5).map(quiz => ({
+      name: quiz.quiz_title?.substring(0, 15) || 'Quiz',
+      score: Math.round(quiz.best_score || 0)
+    }));
+  }, [quizSpecificData]);
 
   return (
     <div className="space-y-6 relative">
@@ -548,48 +595,89 @@ export const Dashboard = () => {
           </div>
 
           {/* Charts Row */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 relative z-10">
-            {/* Learning Hours Chart */}
-            <div className="bg-white/90 backdrop-blur-sm rounded-xl border shadow-sm p-4" style={{ borderColor: 'rgba(71, 96, 114, 0.2)' }}>
-              <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                <Clock className="w-4 h-4" style={{ color: '#476072' }} />
-                Learning Hours This Week
-              </h3>
-              <BarChartComponent
-                data={learningHoursData}
-                color="#476072"
-                height={180}
-                showGrid={true}
-              />
-            </div>
-
-            {/* Progress Trend Chart */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 relative z-10">
+            {/* Score Trend Chart */}
             <div className="bg-white/90 backdrop-blur-sm rounded-xl border shadow-sm p-4" style={{ borderColor: 'rgba(71, 96, 114, 0.2)' }}>
               <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
                 <TrendingUp className="w-4 h-4" style={{ color: '#476072' }} />
-                Progress Trend
+                Score Trend (Last 10 Attempts)
               </h3>
-              <LineChartComponent
-                data={progressTrendData}
-                color="#476072"
-                height={180}
-                showGrid={true}
-              />
+              {performanceTrendData.length > 0 ? (
+                <LineChartComponent
+                  data={performanceTrendData}
+                  dataKey="score"
+                  color="#476072"
+                  height={180}
+                  showGrid={true}
+                />
+              ) : (
+                <div className="h-[180px] flex items-center justify-center text-gray-400 text-sm">
+                  No data available
+                </div>
+              )}
             </div>
 
-            {/* Score Distribution Chart */}
+            {/* Attempt Frequency Chart */}
             <div className="bg-white/90 backdrop-blur-sm rounded-xl border shadow-sm p-4" style={{ borderColor: 'rgba(71, 96, 114, 0.2)' }}>
               <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                <Award className="w-4 h-4" style={{ color: '#476072' }} />
-                Score Distribution
+                <Calendar className="w-4 h-4" style={{ color: '#476072' }} />
+                Activity (Last 7 Days)
               </h3>
-              <PieChartComponent
-                data={scoreDistributionData}
-                height={180}
-                innerRadius={35}
-                outerRadius={70}
-                showLegend={false}
-              />
+              {attemptFrequencyData.length > 0 ? (
+                <BarChartComponent
+                  data={attemptFrequencyData}
+                  dataKey="value"
+                  color="#476072"
+                  height={180}
+                  showGrid={true}
+                />
+              ) : (
+                <div className="h-[180px] flex items-center justify-center text-gray-400 text-sm">
+                  No data available
+                </div>
+              )}
+            </div>
+
+            {/* Topic Mastery Chart */}
+            <div className="bg-white/90 backdrop-blur-sm rounded-xl border shadow-sm p-4" style={{ borderColor: 'rgba(71, 96, 114, 0.2)' }}>
+              <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <Trophy className="w-4 h-4" style={{ color: '#476072' }} />
+                Topic Mastery
+              </h3>
+              {topicMasteryData.length > 0 ? (
+                <BarChartComponent
+                  data={topicMasteryData}
+                  dataKey="score"
+                  color="#476072"
+                  height={180}
+                  showGrid={true}
+                />
+              ) : (
+                <div className="h-[180px] flex items-center justify-center text-gray-400 text-sm">
+                  No data available
+                </div>
+              )}
+            </div>
+
+            {/* Quiz Comparison Chart */}
+            <div className="bg-white/90 backdrop-blur-sm rounded-xl border shadow-sm p-4" style={{ borderColor: 'rgba(71, 96, 114, 0.2)' }}>
+              <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <BookOpen className="w-4 h-4" style={{ color: '#476072' }} />
+                Quiz Scores
+              </h3>
+              {quizComparisonData.length > 0 ? (
+                <BarChartComponent
+                  data={quizComparisonData}
+                  dataKey="score"
+                  color="#476072"
+                  height={180}
+                  showGrid={true}
+                />
+              ) : (
+                <div className="h-[180px] flex items-center justify-center text-gray-400 text-sm">
+                  No data available
+                </div>
+              )}
             </div>
           </div>
 

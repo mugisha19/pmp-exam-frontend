@@ -1270,7 +1270,7 @@ export const QuizTaking = () => {
                           : isFlagged
                           ? "bg-red-100 text-red-700 hover:bg-red-200 border-2 border-red-300"
                           : isAnswered
-                          ? "hover:bg-blue-200"
+                          ? "bg-gray-100 hover:bg-blue-200"
                           : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                       )}
                       style={isAnswered && !isCurrent && !isFlagged ? { backgroundColor: 'rgba(71, 96, 114, 0.1)', color: '#476072' } : {}}

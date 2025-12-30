@@ -26,23 +26,15 @@ export default defineConfig({
     strictPort: false,
 
     proxy: {
+      "/api/v1/statistics": {
+        target: "http://localhost:8003",
+        changeOrigin: true,
+        secure: false,
+      },
       "/api/v1": {
         target: "http://localhost:8000",
         changeOrigin: true,
         secure: false,
-        configure: (proxy, options) => {
-          proxy.on("proxyReq", (proxyReq, req, res) => {
-            console.log(
-              "[Vite Proxy] Forwarding:",
-              req.url,
-              "->",
-              options.target + req.url
-            );
-          });
-          proxy.on("error", (err, req, res) => {
-            console.error("[Vite Proxy] Error:", err.message);
-          });
-        },
       },
     },
   },

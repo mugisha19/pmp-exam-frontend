@@ -6,7 +6,7 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { getGroups, getMyGroups, createJoinRequest } from "@/services/group.service";
+import { getGroups, getMyGroups, joinPublicGroup } from "@/services/group.service";
 import { Spinner } from "@/components/ui";
 import { Modal, ModalBody, ModalFooter } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
@@ -105,12 +105,14 @@ export const Groups = () => {
 
   // Join group mutation
   const joinGroupMutation = useMutation({
-    mutationFn: (groupId) => createJoinRequest({ group_id: groupId }),
+    mutationFn: async (groupId) => {
+      // For public groups, join directly without approval
+      return joinPublicGroup(groupId);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries(["my-groups"]);
-      queryClient.invalidateQueries(["available-groups"]);
-      // Show success modal
-      setShowJoinRequestModal(true);
+      queryClient.invalidateQueries(["public-groups"]);
+      toast.success("Successfully joined the group!");
     },
     onError: (error) => {
       toast.error(error?.message || "Failed to join group");

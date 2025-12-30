@@ -5,7 +5,7 @@
 
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getPerformanceDashboard, getPerformanceTrends } from "@/services/analytics.service";
+import { analyticsService } from "@/services/analytics.service";
 import { DashboardStatsCard, StatsGrid } from "@/components/shared/StatsCards";
 import { Spinner } from "@/components/ui";
 import { 
@@ -31,19 +31,17 @@ export const ActivityStats = ({ className }) => {
   // Fetch performance dashboard data
   const { data: dashboardData, isLoading: dashboardLoading, error: dashboardError } = useQuery({
     queryKey: ["performance-dashboard"],
-    queryFn: getPerformanceDashboard,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    retry: false, // Don't retry on 404
+    queryFn: () => analyticsService.getStudentPerformance(null, "all"),
+    staleTime: 5 * 60 * 1000,
+    retry: false,
   });
 
-  // Check if there's an error (excluding 404 which means no data yet)
   const hasError = dashboardError && dashboardError?.status !== 404 && dashboardError?.response?.status !== 404;
   const hasNoData = dashboardData === null && !dashboardLoading && !hasError;
 
-  // Fetch trends data for selected period (only if not "All Time")
   const { data: trendsData, isLoading: trendsLoading } = useQuery({
     queryKey: ["performance-trends", selectedPeriod],
-    queryFn: () => getPerformanceTrends(selectedPeriod),
+    queryFn: () => analyticsService.getStudentPerformance(null, selectedPeriod === 7 ? "7days" : selectedPeriod === 30 ? "month" : "all"),
     enabled: selectedPeriod !== null && !hasError,
     staleTime: 5 * 60 * 1000,
     retry: false,

@@ -373,38 +373,57 @@ export const QuizDetail = () => {
               </div>
             )}
 
+            {/* Maximum Attempts Warning */}
+            {canStartQuiz() && !canRetake && quiz.max_attempts && (
+              <div className="mb-8 p-6 bg-gradient-to-br from-red-50 to-red-100/30 border-2 border-red-200 rounded-xl shadow-md">
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-red-200 flex items-center justify-center flex-shrink-0">
+                    <AlertCircle className="w-6 h-6 text-red-700" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-bold text-red-900 mb-2 text-lg">Maximum Attempts Reached</h3>
+                    <p className="text-sm text-red-800 font-medium">
+                      You have used all {quiz.max_attempts} attempts for this quiz. You cannot take this quiz anymore.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Action Buttons */}
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => navigate(-1)}
-                className="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 font-bold transition-all duration-200 hover:shadow-md"
-              >
-                Skip test
-              </button>
-              {canStartQuiz() ? (
+            {!(canStartQuiz() && !canRetake && quiz.max_attempts) && (
+              <div className="flex items-center gap-4">
                 <button
-                  onClick={handleStartQuiz}
-                  disabled={isStarting}
-                  className="px-8 py-3 bg-gradient-to-r from-gray-900 to-gray-800 text-white rounded-xl hover:shadow-xl font-bold disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-200 hover:scale-105 disabled:hover:scale-100"
+                  onClick={() => navigate(-1)}
+                  className="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 font-bold transition-all duration-200 hover:shadow-md"
                 >
-                  {isStarting ? (
-                    <>
-                      <Spinner size="sm" />
-                      Starting...
-                    </>
-                  ) : (
-                    "Begin test"
-                  )}
+                  Skip test
                 </button>
-              ) : (
-                <button
-                  disabled
-                  className="px-8 py-3 bg-gray-300 text-gray-500 rounded-xl cursor-not-allowed font-bold"
-                >
-                  Quiz Not Available
-                </button>
-              )}
-            </div>
+                {canStartQuiz() && canRetake ? (
+                  <button
+                    onClick={handleStartQuiz}
+                    disabled={isStarting}
+                    className="px-8 py-3 bg-gradient-to-r from-gray-900 to-gray-800 text-white rounded-xl hover:shadow-xl font-bold disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-200 hover:scale-105 disabled:hover:scale-100"
+                  >
+                    {isStarting ? (
+                      <>
+                        <Spinner size="sm" />
+                        Starting...
+                      </>
+                    ) : (
+                      "Begin test"
+                    )}
+                  </button>
+                ) : (
+                  <button
+                    disabled
+                    className="px-8 py-3 bg-gray-300 text-gray-500 rounded-xl cursor-not-allowed font-bold"
+                  >
+                    Quiz Not Available
+                  </button>
+                )}
+              </div>
+            )}
 
             {/* Mode Selection Modal */}
             <QuizModeModal

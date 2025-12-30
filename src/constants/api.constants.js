@@ -58,6 +58,7 @@ export const GROUP_ENDPOINTS = {
   PREVIEW_BY_TOKEN: (token) => `/groups/preview/${token}`,
   JOIN_BY_TOKEN: (token) => `/groups/join/${token}`,
   JOIN_REQUEST: "/groups/join-request",
+  JOIN_PUBLIC_GROUP: (groupId) => `/groups/${groupId}/join`,
   JOIN_REQUESTS: (groupId) => `/groups/${groupId}/join-requests`,
   APPROVE_REQUEST: (groupId, requestId) =>
     `/groups/${groupId}/approve-request/${requestId}`,
