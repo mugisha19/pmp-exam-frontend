@@ -36,6 +36,7 @@ import { useMyGroups } from "@/hooks/queries/useGroupQueries";
 import { useQuery } from "@tanstack/react-query";
 import { getGroups } from "@/services/group.service";
 import { getQuizzes, getQuizAttempts } from "@/services/quiz.service";
+import api from "@/services/api";
 import { analyticsService } from "@/services/analytics.service";
 import { SearchBar } from "@/components/shared/SearchBar";
 import { ProgressCard } from "@/components/shared/ProgressCard";
@@ -58,24 +59,70 @@ export const Dashboard = () => {
   const { data: myGroupsData } = useMyGroups();
   const myGroups = myGroupsData || [];
   
-  // Fetch analytics data
-  const { data: performanceData } = useQuery({
-    queryKey: ["student-performance", user?.user_id, "7days"],
-    queryFn: () => analyticsService.getStudentPerformance(user?.user_id, "7days"),
-    enabled: !!user?.user_id,
-    staleTime: 5 * 60 * 1000,
+  // Fetch all quizzes for the user (from all groups)
+  const { data: allQuizzesData, isLoading: allQuizzesLoading } = useQuery({
+    queryKey: ["all-quizzes-dashboard"],
+    queryFn: () => getQuizzes({ limit: 100 }),
+    staleTime: 2 * 60 * 1000,
   });
+
+  const allQuizzes = allQuizzesData?.quizzes || allQuizzesData?.items || [];
+
+  // Fetch all quiz attempts for the user
+  const { data: allAttemptsData } = useQuery({
+    queryKey: ["all-quiz-attempts", user?.user_id, allQuizzes.length],
+    queryFn: async () => {
+      try {
+        if (allQuizzes.length === 0) return { attempts: [] };
+        
+        const attemptsPromises = allQuizzes.map(async (quiz) => {
+          try {
+            const response = await getQuizAttempts(quiz.quiz_id || quiz.id);
+            return response.attempts || [];
+          } catch (error) {
+            return [];
+          }
+        });
+        
+        const attemptsArrays = await Promise.all(attemptsPromises);
+        const allAttempts = attemptsArrays.flat();
+        
+        return { attempts: allAttempts };
+      } catch (error) {
+        console.error("Error fetching attempts:", error);
+        return { attempts: [] };
+      }
+    },
+    enabled: !!user?.user_id && allQuizzes.length > 0,
+    staleTime: 2 * 60 * 1000,
+  });
+
+  const performanceData = allAttemptsData;
 
   const { data: topicData } = useQuery({
     queryKey: ["student-topics", user?.user_id],
-    queryFn: () => analyticsService.getStudentTopicPerformance(user?.user_id),
+    queryFn: async () => {
+      try {
+        return await analyticsService.getStudentTopicPerformance(user?.user_id);
+      } catch (error) {
+        console.error("Error fetching topic data:", error);
+        return { topics: [] };
+      }
+    },
     enabled: !!user?.user_id,
     staleTime: 5 * 60 * 1000,
   });
 
   const { data: quizSpecificData } = useQuery({
     queryKey: ["student-quiz-specific", user?.user_id],
-    queryFn: () => analyticsService.getStudentQuizSpecific(user?.user_id, "month"),
+    queryFn: async () => {
+      try {
+        return await analyticsService.getStudentQuizSpecific(user?.user_id, "month");
+      } catch (error) {
+        console.error("Error fetching quiz specific data:", error);
+        return { quiz_stats: [] };
+      }
+    },
     enabled: !!user?.user_id,
     staleTime: 5 * 60 * 1000,
   });
@@ -108,30 +155,40 @@ export const Dashboard = () => {
 
   const allGroups = allGroupsData?.groups || allGroupsData?.items || [];
 
-  // Fetch all quizzes for the user (from all groups)
-  const { data: allQuizzesData, isLoading: allQuizzesLoading } = useQuery({
-    queryKey: ["all-quizzes-dashboard"],
-    queryFn: () => getQuizzes({ limit: 100 }),
-    staleTime: 2 * 60 * 1000,
-  });
-
-  const allQuizzes = allQuizzesData?.quizzes || allQuizzesData?.items || [];
-
   // Calculate dashboard statistics
   const dashboardStats = useMemo(() => {
-    // Calculate completed attempts (would need to fetch all attempts)
-    const completedAttempts = 0; // TODO: Fetch from backend
+    // Use real data from performanceData if available
+    const attempts = performanceData?.attempts || [];
+    console.log('Dashboard - Performance attempts:', attempts);
     
-    // Calculate learning hours (sum of all attempt times)
-    const learningHours = 0; // TODO: Fetch from backend
+    const completedAttempts = attempts.filter(att => att.status === 'completed').length;
     
-    // Calculate average score
-    const averageScore = 0; // TODO: Fetch from backend
+    // Calculate learning hours from time_spent_seconds
+    const totalSeconds = attempts.reduce((sum, att) => sum + (att.time_spent_seconds || 0), 0);
+    const learningHours = Math.round(totalSeconds / 3600);
     
-    // Calculate progress percentage (quizzes completed / total available)
+    // Calculate average score from completed attempts
+    const completedScores = attempts
+      .filter(att => att.status === 'completed' && att.score != null)
+      .map(att => att.score);
+    const averageScore = completedScores.length > 0
+      ? Math.round(completedScores.reduce((sum, score) => sum + score, 0) / completedScores.length)
+      : 0;
+    
+    // Calculate progress percentage (unique quizzes completed / total available)
     const totalQuizzes = allQuizzes.length;
-    const completedQuizzes = 0; // TODO: Calculate from attempts
+    const completedQuizIds = new Set(attempts.filter(att => att.status === 'completed').map(att => att.quiz_id));
+    const completedQuizzes = completedQuizIds.size;
     const progressPercentage = totalQuizzes > 0 ? Math.round((completedQuizzes / totalQuizzes) * 100) : 0;
+
+    console.log('Dashboard stats:', {
+      completedAttempts,
+      learningHours,
+      averageScore,
+      progressPercentage,
+      totalQuizzes,
+      completedQuizzes,
+    });
 
     return {
       completedAttempts,
@@ -141,7 +198,7 @@ export const Dashboard = () => {
       totalQuizzes,
       completedQuizzes,
     };
-  }, [allQuizzes]);
+  }, [allQuizzes, performanceData]);
 
   // Filter quizzes by status
   const filteredQuizzesByStatus = useMemo(() => {
@@ -388,9 +445,15 @@ export const Dashboard = () => {
     }
     
     performanceData.attempts.forEach(att => {
-      const attDate = new Date(att.submitted_at).toISOString().split('T')[0];
-      const dayData = last7Days.find(d => d.date === attDate);
-      if (dayData) dayData.count++;
+      if (att.submitted_at) {
+        try {
+          const attDate = new Date(att.submitted_at).toISOString().split('T')[0];
+          const dayData = last7Days.find(d => d.date === attDate);
+          if (dayData) dayData.count++;
+        } catch (error) {
+          console.error('Invalid date:', att.submitted_at);
+        }
+      }
     });
     
     return last7Days.map(d => ({ name: d.label, value: d.count }));
@@ -684,7 +747,7 @@ export const Dashboard = () => {
           {/* Main Content Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-10">
             {/* Left Column - Classes/Quizzes */}
-            <div className="lg:col-span-2 space-y-6">
+            <div className="lg:col-span-3 space-y-6">
               {/* Ongoing Now & Up Next */}
               {(ongoingQuizzes.length > 0 || upcomingQuizzes.length > 0) && (
                 <div className="space-y-4">
@@ -810,42 +873,11 @@ export const Dashboard = () => {
                 </div>
               )}
 
-              {/* Virtual Class Attendance / Quiz Completion */}
-              <div className="bg-white/90 backdrop-blur-sm rounded-lg border p-4 shadow-sm" style={{ borderColor: 'rgba(71, 96, 114, 0.2)' }}>
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-sm font-semibold text-gray-900">Quiz Completion</h3>
-                  <button className="text-xs text-accent-primary hover:underline font-medium">
-                    View history
-                  </button>
-                </div>
-                <div className="mb-3">
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-xs font-medium text-gray-700">Overall Progress</span>
-                    <span className="text-xs font-semibold text-gray-900">{dashboardStats.progressPercentage}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className="h-2 rounded-full transition-all duration-300"
-                      style={{ backgroundColor: '#476072', width: `${dashboardStats.progressPercentage}%` }}
-                    />
-                  </div>
-                </div>
-                <div className="space-y-1.5">
-                  {allQuizzes.slice(0, 2).map((quiz) => (
-                    <div key={quiz.quiz_id || quiz.id} className="flex items-center justify-between p-1.5 rounded-lg hover:bg-gray-50">
-                      <span className="text-xs font-medium text-gray-700">{quiz.title}</span>
-                      <div className="flex items-center gap-1.5">
-                        <CheckCircle2 className="w-3.5 h-3.5" style={{ color: '#476072' }} />
-                        <span className="text-[10px] text-gray-600">Completed</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+
             </div>
 
-            {/* Right Column - Calendar & Courses */}
-            <div className="space-y-6">
+            {/* Right Column - Calendar & Courses - Full Width */}
+            <div className="lg:col-span-3 grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Calendar */}
               <div className="bg-white/90 backdrop-blur-sm rounded-lg border p-4 shadow-sm" style={{ borderColor: 'rgba(71, 96, 114, 0.2)' }}>
                 <div className="flex items-center justify-between mb-3">
