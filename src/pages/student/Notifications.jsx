@@ -1,9 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Bell, CheckCheck, Inbox, Loader2, RefreshCw } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { NotificationItem } from "@/components/shared/NotificationItem";
+import { NotificationDetailModal } from "@/components/shared/NotificationDetailModal";
 import { Pagination } from "@/components/shared/Pagination";
 import {
   useNotifications,
@@ -18,60 +19,11 @@ const FILTER_TABS = [
   { value: "unread", label: "Unread" },
 ];
 
-const MOCK_NOTIFICATIONS = [
-  {
-    id: "1",
-    type: "quiz",
-    title: "New Quiz Available",
-    message: "A new quiz 'PMP Process Groups' has been assigned to you.",
-    created_at: "2024-12-15T10:55:00.000Z",
-    is_read: false,
-  },
-  {
-    id: "2",
-    type: "success",
-    title: "Quiz Completed",
-    message: "Congratulations! You scored 85% on the Risk Management quiz.",
-    created_at: "2024-12-15T10:30:00.000Z",
-    is_read: false,
-  },
-  {
-    id: "3",
-    type: "group",
-    title: "Group Invitation",
-    message: "You have been invited to join 'PMP Prep 2024' study group.",
-    created_at: "2024-12-15T09:00:00.000Z",
-    is_read: true,
-  },
-  {
-    id: "4",
-    type: "warning",
-    title: "Quiz Deadline Approaching",
-    message: "The quiz 'Agile Methodology' is due in 24 hours.",
-    created_at: "2024-12-15T06:00:00.000Z",
-    is_read: true,
-  },
-  {
-    id: "5",
-    type: "system",
-    title: "System Maintenance",
-    message: "Scheduled maintenance on December 5th from 2-4 AM UTC.",
-    created_at: "2024-12-14T11:00:00.000Z",
-    is_read: true,
-  },
-  {
-    id: "6",
-    type: "achievement",
-    title: "Achievement Unlocked",
-    message: "You have completed 10 quizzes! Keep up the great work.",
-    created_at: "2024-12-13T11:00:00.000Z",
-    is_read: true,
-  },
-];
-
 export function Notifications() {
   const [activeFilter, setActiveFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedNotification, setSelectedNotification] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const pageSize = 10;
 
   // Fetch notifications
@@ -80,11 +32,24 @@ export function Notifications() {
     isLoading,
     error,
     refetch,
+    isFetching,
   } = useNotifications({
-    page: currentPage,
-    page_size: pageSize,
+    skip: (currentPage - 1) * pageSize,
+    limit: pageSize,
     unread_only: activeFilter === "unread",
   });
+
+  // Refetch when query becomes enabled (after auth initializes)
+  useEffect(() => {
+    // Refetch once when query is ready and we have no data yet
+    if (!isLoading && !notificationsData && !isFetching && !error) {
+      // Small delay to ensure query is fully enabled
+      const timer = setTimeout(() => {
+        refetch();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading, notificationsData, isFetching, error, refetch]);
 
   // Mutations
   const markReadMutation = useMarkAsReadMutation();
@@ -99,18 +64,22 @@ export function Notifications() {
     if (Array.isArray(notificationsData)) {
       return notificationsData;
     }
-    return MOCK_NOTIFICATIONS;
+    // Return empty array instead of mock data when no data is available
+    return [];
   }, [notificationsData]);
 
-  const totalPages =
-    notificationsData?.total_pages ||
-    Math.ceil(notifications.length / pageSize);
+  // Calculate pagination - if we got exactly pageSize items, there might be more
+  const hasMore = notifications.length === pageSize;
+  // Show pagination if we have items and either we're not on page 1 or there might be more
+  const showPagination = notifications.length > 0 && (currentPage > 1 || hasMore);
   const unreadCount = notifications.filter((n) => !n.is_read && !n.read).length;
 
   // Handle mark as read
   const handleMarkRead = async (notificationId) => {
     try {
       await markReadMutation.mutateAsync(notificationId);
+      // Refetch notifications to update the list
+      refetch();
     } catch {
       toast.error("Failed to mark notification as read");
     }
@@ -131,9 +100,33 @@ export function Notifications() {
     try {
       await deleteMutation.mutateAsync(notificationId);
       toast.success("Notification deleted");
+      // Close modal if deleted notification is currently open
+      if (selectedNotification?.id === notificationId) {
+        setIsModalOpen(false);
+        setSelectedNotification(null);
+      }
     } catch {
       toast.error("Failed to delete notification");
     }
+  };
+
+  // Handle notification click - open modal
+  const handleNotificationClick = async (notification) => {
+    // Mark as read if unread BEFORE opening modal
+    if (!notification.read && !notification.is_read) {
+      try {
+        await handleMarkRead(notification.id);
+      } catch (error) {
+        console.error("Failed to mark notification as read:", error);
+      }
+    }
+    // Update notification state to reflect read status and open modal
+    setSelectedNotification({
+      ...notification,
+      is_read: true,
+      read: true,
+    });
+    setIsModalOpen(true);
   };
 
   // Handle filter change
@@ -236,18 +229,44 @@ export function Notifications() {
               notification={notification}
               onRead={handleMarkRead}
               onDelete={handleDelete}
+              onClick={handleNotificationClick}
             />
           ))}
         </div>
       )}
 
+      {/* Notification Detail Modal */}
+      <NotificationDetailModal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedNotification(null);
+        }}
+        notification={selectedNotification}
+        onMarkRead={handleMarkRead}
+      />
+
       {/* Pagination */}
-      {filteredNotifications.length > 0 && totalPages > 1 && (
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-        />
+      {showPagination && (
+        <div className="flex items-center justify-between">
+          <Button
+            variant="outline"
+            onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </Button>
+          <span className="text-sm text-gray-600">
+            Page {currentPage}
+          </span>
+          <Button
+            variant="outline"
+            onClick={() => setCurrentPage((prev) => prev + 1)}
+            disabled={!hasMore}
+          >
+            Next
+          </Button>
+        </div>
       )}
     </div>
   );

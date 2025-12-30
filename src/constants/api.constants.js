@@ -1,4 +1,6 @@
-export const API_BASE_URL = import.meta.env.VITE_API_URL || "/api/v1";
+// In development, use full URL with port; in production, use relative path for proxy
+export const API_BASE_URL = import.meta.env.VITE_API_URL || 
+  (import.meta.env.DEV ? "http://localhost:8000/api/v1" : "/api/v1");
 
 if (import.meta.env.DEV) {
   console.log(
@@ -164,7 +166,7 @@ export const QUIZ_ENDPOINTS = {
 
 // Notification endpoints
 export const NOTIFICATION_ENDPOINTS = {
-  LIST_NOTIFICATIONS: "/notifications/",
+  LIST_NOTIFICATIONS: "/notifications",
   GET_NOTIFICATION: (notificationId) => `/notifications/${notificationId}`,
   MARK_AS_READ: (notificationId) => `/notifications/${notificationId}/read`,
   MARK_ALL_READ: "/notifications/mark-all-read",

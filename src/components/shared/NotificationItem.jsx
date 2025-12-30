@@ -17,6 +17,7 @@ import {
   X,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { useNavigate } from "react-router-dom";
 
 // Icon mapping based on notification type
 const notificationIcons = {
@@ -54,7 +55,9 @@ export function NotificationItem({
   onDelete,
   showDeleteButton = true,
   compact = false,
+  onClick,
 }) {
+  const navigate = useNavigate();
   const {
     id,
     type = "default",
@@ -63,6 +66,7 @@ export function NotificationItem({
     created_at,
     read,
     is_read,
+    link,
   } = notification;
 
   // Support both read and is_read field names
@@ -78,8 +82,20 @@ export function NotificationItem({
     : "";
 
   const handleClick = () => {
+    // Call custom onClick handler first (for modal opening)
+    if (onClick) {
+      onClick(notification);
+      return; // Let the parent handle marking as read
+    }
+    
+    // Fallback: Mark as read if unread and no onClick handler
     if (!isRead && onRead) {
       onRead(id);
+    }
+    
+    // Navigate to link if provided and no onClick handler
+    if (link && !onClick) {
+      navigate(link);
     }
   };
 

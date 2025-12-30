@@ -41,6 +41,9 @@ export const useNotifications = (filters = {}, options = {}) => {
     staleTime: 30 * 1000, // 30 seconds - notifications need fresher data
     keepPreviousData: true,
     enabled: canFetch,
+    refetchOnMount: 'always', // Always refetch when component mounts, even if data is fresh
+    refetchOnWindowFocus: true, // Refetch when window regains focus
+    retry: 1, // Retry once on failure
     onError: (error) => {
       const errorMessage = error.message || "Failed to fetch notifications";
       console.error(errorMessage); // Don't show toast for notifications fetch
