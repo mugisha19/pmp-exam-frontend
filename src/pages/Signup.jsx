@@ -14,9 +14,7 @@ import {
   FormField,
   FormPasswordField,
   FormCheckbox,
-  SocialAuthButtons,
 } from "@/components/forms";
-import { Divider } from "@/components/ui";
 import { useRegisterMutation } from "@/hooks/queries";
 const signupSchema = z.object({
   first_name: z.string().min(2, "First name must be at least 2 characters"),
@@ -59,14 +57,6 @@ export const Signup = () => {
     } catch {
       // Error handled by mutation
     }
-  };
-
-  const handleGoogleSignup = () => {
-    window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`;
-  };
-
-  const handleAppleSignup = () => {
-    window.location.href = `${import.meta.env.VITE_API_URL}/auth/apple`;
   };
 
   return (
@@ -154,13 +144,6 @@ export const Signup = () => {
           >
             Create Account
           </Button>
-
-          <Divider text="Or" />
-
-          <SocialAuthButtons
-            onGoogleClick={handleGoogleSignup}
-            onAppleClick={handleAppleSignup}
-          />
         </form>
       </AuthFormWrapper>
     </AuthLayout>

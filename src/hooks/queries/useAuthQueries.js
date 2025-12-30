@@ -24,7 +24,8 @@ export const useLoginMutation = ({ redirectUrl } = {}) => {
 
   return useMutation({
     retry: false, // Don't retry failed login attempts
-    mutationFn: ({ email, password }) => authService.login(email, password),
+    mutationFn: ({ email, password, rememberMe = true }) => 
+      authService.login(email, password, rememberMe),
     onSuccess: (data) => {
       // Extract user from response
       const user = data.user || data;

@@ -14,9 +14,7 @@ import {
   FormField,
   FormPasswordField,
   FormCheckbox,
-  SocialAuthButtons,
 } from "@/components/forms";
-import { Divider } from "@/components/ui";
 import { useLoginMutation } from "@/hooks/queries";
 
 const loginSchema = z.object({
@@ -52,14 +50,6 @@ export const Login = () => {
     } catch {
       // Error handled by mutation's onError callback
     }
-  };
-
-  const handleGoogleLogin = () => {
-    window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`;
-  };
-
-  const handleAppleLogin = () => {
-    window.location.href = `${import.meta.env.VITE_API_URL}/auth/apple`;
   };
 
   return (
@@ -122,13 +112,6 @@ export const Login = () => {
           >
             Log in
           </Button>
-
-          <Divider text="Or" />
-
-          <SocialAuthButtons
-            onGoogleClick={handleGoogleLogin}
-            onAppleClick={handleAppleLogin}
-          />
         </form>
       </AuthFormWrapper>
     </AuthLayout>

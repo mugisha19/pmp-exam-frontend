@@ -8,17 +8,20 @@ import { AUTH_ENDPOINTS } from "@/constants/api.constants";
 import {
   TOKEN_KEYS,
   STORAGE_KEYS,
+  STORAGE_TYPE,
   setStorageItem,
   removeStorageItem,
+  getStorageItem,
 } from "@/constants/storage.constants";
 
 /**
  * Login with email and password
  * @param {string} email - User email or username
  * @param {string} password - User password
+ * @param {boolean} rememberMe - If true, store tokens in localStorage; if false, use sessionStorage
  * @returns {Promise<Object>} User data and tokens
  */
-export const login = async (email, password) => {
+export const login = async (email, password, rememberMe = true) => {
   try {
     const response = await api.post(AUTH_ENDPOINTS.LOGIN, {
       email,
@@ -37,13 +40,13 @@ export const login = async (email, password) => {
       throw new Error("Missing authentication tokens in response");
     }
 
-    // Store tokens
-    setAuthToken(access_token, refresh_token);
+    // Store tokens with rememberMe preference
+    setAuthToken(access_token, refresh_token, rememberMe);
 
     // Fetch user data after successful login
     const user = await validateSession();
 
-    // Store user data
+    // Store user data (always in localStorage for persistence)
     if (user) {
       setStorageItem(STORAGE_KEYS.USER, user);
       setStorageItem(STORAGE_KEYS.USER_ROLE, user.role);

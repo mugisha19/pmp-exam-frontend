@@ -7,6 +7,7 @@ import axios from "axios";
 import {
   TOKEN_KEYS,
   STORAGE_KEYS,
+  STORAGE_TYPE,
   removeStorageItem,
   getStorageItem,
   setStorageItem,
@@ -56,7 +57,11 @@ api.interceptors.request.use(
       config._suppress404Log = true;
     }
 
-    const token = getStorageItem(TOKEN_KEYS.ACCESS_TOKEN);
+    // Check both localStorage and sessionStorage for token
+    let token = getStorageItem(TOKEN_KEYS.ACCESS_TOKEN, STORAGE_TYPE.LOCAL);
+    if (!token) {
+      token = getStorageItem(TOKEN_KEYS.ACCESS_TOKEN, STORAGE_TYPE.SESSION);
+    }
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -127,7 +132,14 @@ api.interceptors.response.use(
       originalRequest._retry = true;
       isRefreshing = true;
 
-      const refreshToken = getStorageItem(TOKEN_KEYS.REFRESH_TOKEN);
+      // Check both storages for refresh token
+      let refreshToken = getStorageItem(TOKEN_KEYS.REFRESH_TOKEN, STORAGE_TYPE.LOCAL);
+      let rememberMe = true; // Default to localStorage
+      
+      if (!refreshToken) {
+        refreshToken = getStorageItem(TOKEN_KEYS.REFRESH_TOKEN, STORAGE_TYPE.SESSION);
+        rememberMe = false; // Found in sessionStorage
+      }
 
       if (!refreshToken) {
         // No refresh token, clear auth and redirect
@@ -149,11 +161,8 @@ api.interceptors.response.use(
 
         const { access_token, refresh_token: newRefreshToken } = response.data;
 
-        // Store new tokens
-        setStorageItem(TOKEN_KEYS.ACCESS_TOKEN, access_token);
-        if (newRefreshToken) {
-          setStorageItem(TOKEN_KEYS.REFRESH_TOKEN, newRefreshToken);
-        }
+        // Store new tokens using the same storage type as before
+        setAuthToken(access_token, newRefreshToken || refreshToken, rememberMe);
 
         // Update authorization header
         api.defaults.headers.common.Authorization = `Bearer ${access_token}`;
@@ -244,7 +253,14 @@ const clearAuthAndRedirect = () => {
  * @returns {Promise<string>} New access token
  */
 export const refreshAccessToken = async () => {
-  const refreshToken = getStorageItem(TOKEN_KEYS.REFRESH_TOKEN);
+  // Check both storages for refresh token
+  let refreshToken = getStorageItem(TOKEN_KEYS.REFRESH_TOKEN, STORAGE_TYPE.LOCAL);
+  let rememberMe = true; // Default to localStorage
+  
+  if (!refreshToken) {
+    refreshToken = getStorageItem(TOKEN_KEYS.REFRESH_TOKEN, STORAGE_TYPE.SESSION);
+    rememberMe = false; // Found in sessionStorage
+  }
 
   if (!refreshToken) {
     throw new Error("No refresh token available");
@@ -262,10 +278,8 @@ export const refreshAccessToken = async () => {
 
   const { access_token, refresh_token: newRefreshToken } = response.data;
 
-  setStorageItem(TOKEN_KEYS.ACCESS_TOKEN, access_token);
-  if (newRefreshToken) {
-    setStorageItem(TOKEN_KEYS.REFRESH_TOKEN, newRefreshToken);
-  }
+  // Store new tokens using the same storage type as before
+  setAuthToken(access_token, newRefreshToken || refreshToken, rememberMe);
 
   return access_token;
 };
@@ -283,20 +297,39 @@ export const isAuthenticated = () => {
  * Set authentication token
  * @param {string} accessToken
  * @param {string} refreshToken
+ * @param {boolean} rememberMe - If true, use localStorage; if false, use sessionStorage
  */
-export const setAuthToken = (accessToken, refreshToken) => {
-  setStorageItem(TOKEN_KEYS.ACCESS_TOKEN, accessToken);
-  setStorageItem(TOKEN_KEYS.REFRESH_TOKEN, refreshToken);
+export const setAuthToken = (accessToken, refreshToken, rememberMe = true) => {
+  const storageType = rememberMe ? STORAGE_TYPE.LOCAL : STORAGE_TYPE.SESSION;
+  
+  // Clear tokens from the other storage type first to avoid conflicts
+  if (rememberMe) {
+    // Switching to localStorage, clear sessionStorage
+    removeStorageItem(TOKEN_KEYS.ACCESS_TOKEN, STORAGE_TYPE.SESSION);
+    removeStorageItem(TOKEN_KEYS.REFRESH_TOKEN, STORAGE_TYPE.SESSION);
+  } else {
+    // Switching to sessionStorage, clear localStorage
+    removeStorageItem(TOKEN_KEYS.ACCESS_TOKEN, STORAGE_TYPE.LOCAL);
+    removeStorageItem(TOKEN_KEYS.REFRESH_TOKEN, STORAGE_TYPE.LOCAL);
+  }
+  
+  // Store tokens in the appropriate storage
+  setStorageItem(TOKEN_KEYS.ACCESS_TOKEN, accessToken, storageType);
+  setStorageItem(TOKEN_KEYS.REFRESH_TOKEN, refreshToken, storageType);
   api.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
 };
 
 /**
- * Clear authentication token
+ * Clear authentication token from both localStorage and sessionStorage
  */
 export const clearAuthToken = () => {
-  removeStorageItem(TOKEN_KEYS.ACCESS_TOKEN);
-  removeStorageItem(TOKEN_KEYS.REFRESH_TOKEN);
-  removeStorageItem(TOKEN_KEYS.TOKEN_EXPIRY);
+  // Clear from both storage types to ensure complete cleanup
+  removeStorageItem(TOKEN_KEYS.ACCESS_TOKEN, STORAGE_TYPE.LOCAL);
+  removeStorageItem(TOKEN_KEYS.REFRESH_TOKEN, STORAGE_TYPE.LOCAL);
+  removeStorageItem(TOKEN_KEYS.TOKEN_EXPIRY, STORAGE_TYPE.LOCAL);
+  removeStorageItem(TOKEN_KEYS.ACCESS_TOKEN, STORAGE_TYPE.SESSION);
+  removeStorageItem(TOKEN_KEYS.REFRESH_TOKEN, STORAGE_TYPE.SESSION);
+  removeStorageItem(TOKEN_KEYS.TOKEN_EXPIRY, STORAGE_TYPE.SESSION);
   delete api.defaults.headers.common.Authorization;
 };
 

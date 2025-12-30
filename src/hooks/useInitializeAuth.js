@@ -6,7 +6,7 @@
 import { useEffect } from "react";
 import { useAuthStore } from "@/stores/auth.store";
 import * as authService from "@/services/auth.service";
-import { TOKEN_KEYS, getStorageItem } from "@/constants/storage.constants";
+import { TOKEN_KEYS, STORAGE_TYPE, getStorageItem } from "@/constants/storage.constants";
 
 export const useInitializeAuth = () => {
   const { setUser, clearAuth, setLoading } = useAuthStore();
@@ -16,8 +16,11 @@ export const useInitializeAuth = () => {
 
     const initAuth = async () => {
       try {
-        // Check if tokens exist in localStorage
-        const accessToken = getStorageItem(TOKEN_KEYS.ACCESS_TOKEN);
+        // Check if tokens exist in localStorage or sessionStorage
+        let accessToken = getStorageItem(TOKEN_KEYS.ACCESS_TOKEN, STORAGE_TYPE.LOCAL);
+        if (!accessToken) {
+          accessToken = getStorageItem(TOKEN_KEYS.ACCESS_TOKEN, STORAGE_TYPE.SESSION);
+        }
 
         if (!accessToken) {
           // No token, clear auth and stop loading immediately
