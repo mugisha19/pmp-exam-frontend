@@ -17,7 +17,6 @@ import {
   ChevronDown,
   BookOpen,
   GraduationCap,
-  Settings,
   Loader2
 } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -203,18 +202,6 @@ export const StudentLayout = () => {
                       <User className="w-4 h-4 text-gray-600 group-hover:text-accent-primary transition-colors" />
                     </div>
                     <span className="font-medium">My Profile</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      navigate("/settings");
-                      setProfileMenuOpen(false);
-                    }}
-                    className="w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 flex items-center gap-3 transition-all duration-200 group"
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-gray-100 group-hover:bg-accent-primary/10 flex items-center justify-center transition-colors">
-                      <Settings className="w-4 h-4 text-gray-600 group-hover:text-accent-primary transition-colors" />
-                    </div>
-                    <span className="font-medium">Settings</span>
                   </button>
                   <div className="border-t border-gray-100 my-1"></div>
                   <button
