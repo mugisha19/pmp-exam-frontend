@@ -40,6 +40,10 @@ import { ProgressCard } from "@/components/shared/ProgressCard";
 import { QuizCard } from "@/components/shared/QuizCard";
 import { GroupCard } from "@/components/shared/GroupCard";
 import { ActivityStats } from "@/components/shared/ActivityStats";
+import { GrassBackground } from "@/components/shared/GrassBackground";
+import { LineChartComponent } from "@/components/charts/LineChartComponent";
+import { BarChartComponent } from "@/components/charts/BarChartComponent";
+import { PieChartComponent } from "@/components/charts/PieChartComponent";
 import { Spinner } from "@/components/ui";
 import { cn } from "@/utils/cn";
 import toast from "react-hot-toast";
@@ -265,10 +269,46 @@ export const Dashboard = () => {
   const ongoingQuizzes = filteredQuizzesByStatus.in_progress.slice(0, 2);
   const upcomingQuizzes = filteredQuizzesByStatus.upcoming.slice(0, 3);
 
+  // Mock chart data (will be replaced with real data from backend)
+  const learningHoursData = useMemo(() => {
+    return [
+      { name: "Mon", value: 2.5 },
+      { name: "Tue", value: 3.0 },
+      { name: "Wed", value: 2.0 },
+      { name: "Thu", value: 4.0 },
+      { name: "Fri", value: 3.5 },
+      { name: "Sat", value: 5.0 },
+      { name: "Sun", value: 4.5 },
+    ];
+  }, []);
+
+  const progressTrendData = useMemo(() => {
+    return [
+      { name: "Week 1", value: 45 },
+      { name: "Week 2", value: 52 },
+      { name: "Week 3", value: 58 },
+      { name: "Week 4", value: 65 },
+      { name: "Week 5", value: 72 },
+      { name: "Week 6", value: 78 },
+    ];
+  }, []);
+
+  const scoreDistributionData = useMemo(() => {
+    return [
+      { name: "Excellent (90-100%)", value: 25 },
+      { name: "Good (70-89%)", value: 45 },
+      { name: "Average (50-69%)", value: 20 },
+      { name: "Needs Improvement (<50%)", value: 10 },
+    ];
+  }, []);
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
+      {/* Grass Background */}
+      <GrassBackground />
+      
       {/* Search Bar */}
-      <div className="mb-6">
+      <div className="mb-6 relative z-10">
         <SearchBar
           placeholder="Search quizzes, groups, and more..."
           value={searchQuery}
@@ -296,52 +336,52 @@ export const Dashboard = () => {
               <div className="flex flex-col items-center gap-4">
                 <Spinner size="lg" />
                 <p className="text-sm text-gray-500 font-medium">Searching...</p>
-              </div>
-            </div>
+          </div>
+        </div>
           ) : hasSearchResults ? (
             <>
               {filteredQuizzes.length > 0 && (
-                <div>
-                  <div className="flex items-center justify-between mb-4">
+        <div>
+          <div className="flex items-center justify-between mb-4">
                     <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                       <BookOpen className="w-5 h-5 text-accent-primary" />
                       Quizzes ({filteredQuizzes.length})
                     </h3>
-                    <button
+              <button
                       onClick={() => navigate(`/exams?search=${encodeURIComponent(searchQuery)}`)}
-                      className="text-sm text-accent-primary hover:text-accent-secondary font-semibold transition-colors duration-200 hover:underline"
+                      className="text-sm text-purple-600 hover:text-violet-600 font-semibold transition-colors duration-200 hover:underline"
                     >
                       View All
-                    </button>
-                  </div>
+              </button>
+            </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {filteredQuizzes.slice(0, 6).map((quiz) => (
-                      <QuizCard
+              <QuizCard
                         key={quiz.quiz_id || quiz.id}
-                        quiz={quiz}
-                        category={quiz.group_id ? "GROUP" : "PUBLIC"}
-                        instructor={quiz.instructor || null}
-                        progress={quiz.progress || 0}
-                      />
-                    ))}
-                  </div>
-                </div>
-              )}
+                quiz={quiz}
+                category={quiz.group_id ? "GROUP" : "PUBLIC"}
+                instructor={quiz.instructor || null}
+                progress={quiz.progress || 0}
+              />
+            ))}
+          </div>
+        </div>
+      )}
 
               {filteredGroups.length > 0 && (
-                <div>
+          <div>
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                       <Users className="w-5 h-5 text-accent-primary" />
                       Groups ({filteredGroups.length})
-                    </h3>
-                    <button
+            </h3>
+          <button
                       onClick={() => navigate(`/groups?search=${encodeURIComponent(searchQuery)}`)}
-                      className="text-sm text-accent-primary hover:text-accent-secondary font-semibold transition-colors duration-200 hover:underline"
-                    >
+                      className="text-sm text-purple-600 hover:text-violet-600 font-semibold transition-colors duration-200 hover:underline"
+          >
                       View All
-                    </button>
-                  </div>
+          </button>
+        </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {filteredGroups.slice(0, 6).map((group) => {
                       const groupId = group.group_id || group.id;
@@ -364,7 +404,7 @@ export const Dashboard = () => {
             <div className="text-center py-16 bg-gradient-to-br from-white to-gray-50/50 rounded-2xl border-2 border-gray-200 shadow-lg">
               <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center shadow-inner">
                 <Search className="w-12 h-12 text-gray-400" />
-              </div>
+            </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">No results found</h3>
               <p className="text-sm text-gray-600 font-medium mb-6">
                 Try searching with different keywords
@@ -374,7 +414,7 @@ export const Dashboard = () => {
                   setSearchQuery("");
                   setShowSearchResults(false);
                 }}
-                className="px-6 py-3 bg-gradient-to-r from-accent-primary to-accent-secondary text-white font-bold rounded-xl hover:shadow-lg transition-all duration-200 hover:scale-105"
+                    className="px-6 py-3 bg-gradient-to-r from-purple-500 to-violet-600 text-white font-bold rounded-xl hover:shadow-lg transition-all duration-200 hover:scale-105"
               >
                 Clear Search
               </button>
@@ -387,38 +427,38 @@ export const Dashboard = () => {
       {!showSearchResults && (
         <>
           {/* Stats Cards Row */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 relative z-10">
             {/* Completed Attempts */}
-            <div className="bg-gradient-to-br from-white to-blue-50/30 rounded-2xl p-6 border-2 border-blue-100 shadow-lg hover:shadow-xl transition-all duration-200">
+            <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 border-2 border-purple-200 shadow-xl hover:shadow-2xl transition-all duration-200 hover:scale-105">
               <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-md">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center shadow-lg">
                   <CheckCircle2 className="w-6 h-6 text-white" />
                 </div>
-                <TrendingUp className="w-5 h-5 text-blue-600" />
+                <TrendingUp className="w-5 h-5 text-purple-600" />
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-1">{dashboardStats.completedAttempts}</h3>
               <p className="text-sm text-gray-600 font-medium">Completed Attempts</p>
             </div>
 
             {/* Learning Hours */}
-            <div className="bg-gradient-to-br from-white to-purple-50/30 rounded-2xl p-6 border-2 border-purple-100 shadow-lg hover:shadow-xl transition-all duration-200">
+            <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 border-2 border-violet-200 shadow-xl hover:shadow-2xl transition-all duration-200 hover:scale-105">
               <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-md">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-lg">
                   <Clock className="w-6 h-6 text-white" />
                 </div>
-                <TrendingUp className="w-5 h-5 text-purple-600" />
+                <TrendingUp className="w-5 h-5 text-violet-600" />
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-1">{dashboardStats.learningHours}h</h3>
               <p className="text-sm text-gray-600 font-medium">Learning Hours</p>
             </div>
 
             {/* Average Score */}
-            <div className="bg-gradient-to-br from-white to-green-50/30 rounded-2xl p-6 border-2 border-green-100 shadow-lg hover:shadow-xl transition-all duration-200">
+            <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 border-2 border-indigo-200 shadow-xl hover:shadow-2xl transition-all duration-200 hover:scale-105">
               <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-md">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
                   <Award className="w-6 h-6 text-white" />
                 </div>
-                <TrendingUp className="w-5 h-5 text-green-600" />
+                <TrendingUp className="w-5 h-5 text-indigo-600" />
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-1">
                 {dashboardStats.averageScore > 0 ? `${dashboardStats.averageScore}%` : "N/A"}
@@ -427,20 +467,66 @@ export const Dashboard = () => {
             </div>
 
             {/* Progress */}
-            <div className="bg-gradient-to-br from-white to-orange-50/30 rounded-2xl p-6 border-2 border-orange-100 shadow-lg hover:shadow-xl transition-all duration-200">
+            <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 border-2 border-fuchsia-200 shadow-xl hover:shadow-2xl transition-all duration-200 hover:scale-105">
               <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-md">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-fuchsia-500 to-pink-600 flex items-center justify-center shadow-lg">
                   <TrendingUp className="w-6 h-6 text-white" />
                 </div>
-                <TrendingUp className="w-5 h-5 text-orange-600" />
+                <TrendingUp className="w-5 h-5 text-fuchsia-600" />
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-1">{dashboardStats.progressPercentage}%</h3>
               <p className="text-sm text-gray-600 font-medium">Overall Progress</p>
             </div>
           </div>
 
+          {/* Charts Row */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-10">
+            {/* Learning Hours Chart */}
+            <div className="bg-white/90 backdrop-blur-sm rounded-2xl border-2 border-purple-200 shadow-xl p-6">
+              <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <Clock className="w-5 h-5 text-purple-600" />
+                Learning Hours This Week
+              </h3>
+              <BarChartComponent
+                data={learningHoursData}
+                color="#8b5cf6"
+                height={200}
+                showGrid={true}
+              />
+            </div>
+
+            {/* Progress Trend Chart */}
+            <div className="bg-white/90 backdrop-blur-sm rounded-2xl border-2 border-violet-200 shadow-xl p-6">
+              <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-violet-600" />
+                Progress Trend
+              </h3>
+              <LineChartComponent
+                data={progressTrendData}
+                color="#7c3aed"
+                height={200}
+                showGrid={true}
+              />
+            </div>
+
+            {/* Score Distribution Chart */}
+            <div className="bg-white/90 backdrop-blur-sm rounded-2xl border-2 border-indigo-200 shadow-xl p-6">
+              <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <Award className="w-5 h-5 text-indigo-600" />
+                Score Distribution
+              </h3>
+              <PieChartComponent
+                data={scoreDistributionData}
+                height={200}
+                innerRadius={40}
+                outerRadius={80}
+                showLegend={false}
+              />
+            </div>
+          </div>
+
           {/* Main Content Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-10">
             {/* Left Column - Classes/Quizzes */}
             <div className="lg:col-span-2 space-y-6">
               {/* Ongoing Now & Up Next */}
@@ -454,12 +540,12 @@ export const Dashboard = () => {
                         {ongoingQuizzes.map((quiz) => (
                           <div
                             key={quiz.quiz_id || quiz.id}
-                            className="bg-white rounded-xl border-2 border-orange-200 p-5 shadow-md hover:shadow-lg transition-all duration-200"
+                            className="bg-white/90 backdrop-blur-sm rounded-xl border-2 border-purple-300 p-5 shadow-xl hover:shadow-2xl transition-all duration-200"
                           >
                             <div className="flex items-start justify-between">
                               <div className="flex-1">
                                 <div className="flex items-center gap-2 mb-2">
-                                  <span className="text-orange-600 font-bold text-sm">{quiz.title}</span>
+                                  <span className="text-purple-600 font-bold text-sm">{quiz.title}</span>
                                 </div>
                                 <div className="space-y-1 text-sm text-gray-600">
                                   <p className="flex items-center gap-2">
@@ -479,7 +565,7 @@ export const Dashboard = () => {
                               <div className="flex gap-2">
                                 <button
                                   onClick={() => navigate(`/exams/${quiz.quiz_id || quiz.id}`)}
-                                  className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                                  className="px-4 py-2 bg-gradient-to-r from-purple-500 to-violet-600 text-white text-sm font-semibold rounded-lg hover:from-purple-600 hover:to-violet-700 transition-all shadow-md hover:shadow-lg"
                                 >
                                   JOIN
                                 </button>
@@ -499,12 +585,12 @@ export const Dashboard = () => {
                         {upcomingQuizzes.map((quiz) => (
                           <div
                             key={quiz.quiz_id || quiz.id}
-                            className="bg-white rounded-xl border-2 border-purple-200 p-5 shadow-md hover:shadow-lg transition-all duration-200"
+                            className="bg-white/90 backdrop-blur-sm rounded-xl border-2 border-violet-300 p-5 shadow-xl hover:shadow-2xl transition-all duration-200"
                           >
                             <div className="flex items-start justify-between">
                               <div className="flex-1">
                                 <div className="flex items-center gap-2 mb-2">
-                                  <span className="text-purple-600 font-bold text-sm">{quiz.title}</span>
+                                  <span className="text-violet-600 font-bold text-sm">{quiz.title}</span>
                                 </div>
                                 <div className="space-y-1 text-sm text-gray-600">
                                   <p className="flex items-center gap-2">
@@ -523,7 +609,7 @@ export const Dashboard = () => {
                               </div>
                               <button
                                 onClick={() => navigate(`/exams/${quiz.quiz_id || quiz.id}`)}
-                                className="px-4 py-2 bg-green-600 text-white text-sm font-semibold rounded-lg hover:bg-green-700 transition-colors"
+                                className="px-4 py-2 bg-gradient-to-r from-violet-500 to-indigo-600 text-white text-sm font-semibold rounded-lg hover:from-violet-600 hover:to-indigo-700 transition-all shadow-md hover:shadow-lg"
                               >
                                 ADD REMINDER
                               </button>
@@ -544,10 +630,10 @@ export const Dashboard = () => {
                     {filteredQuizzesByStatus.upcoming.slice(3, 5).map((quiz) => (
                       <div
                         key={quiz.quiz_id || quiz.id}
-                        className="bg-white rounded-xl border-2 border-gray-200 p-4 shadow-md hover:shadow-lg transition-all duration-200"
+                        className="bg-white/90 backdrop-blur-sm rounded-xl border-2 border-purple-200 p-4 shadow-xl hover:shadow-2xl transition-all duration-200"
                       >
                         <div className="flex items-center gap-2 mb-2">
-                          <span className="text-blue-600 font-bold text-sm">{quiz.title}</span>
+                          <span className="text-purple-600 font-bold text-sm">{quiz.title}</span>
                         </div>
                         <p className="text-xs text-gray-600">
                           {quiz.start_time && quiz.end_time 
@@ -564,7 +650,7 @@ export const Dashboard = () => {
               )}
 
               {/* Notifications */}
-              <div className="bg-white rounded-xl border-2 border-gray-200 p-6 shadow-md">
+              <div className="bg-white/90 backdrop-blur-sm rounded-xl border-2 border-purple-200 p-6 shadow-xl">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-bold text-gray-900">Notifications</h3>
                   <button className="text-sm text-accent-primary hover:underline font-semibold">
@@ -588,7 +674,7 @@ export const Dashboard = () => {
               </div>
 
               {/* Virtual Class Attendance / Quiz Completion */}
-              <div className="bg-white rounded-xl border-2 border-gray-200 p-6 shadow-md">
+              <div className="bg-white/90 backdrop-blur-sm rounded-xl border-2 border-violet-200 p-6 shadow-xl">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-bold text-gray-900">Quiz Completion</h3>
                   <button className="text-sm text-accent-primary hover:underline font-semibold">
@@ -602,7 +688,7 @@ export const Dashboard = () => {
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-3">
                     <div
-                      className="bg-gradient-to-r from-accent-primary to-accent-secondary h-3 rounded-full transition-all duration-300"
+                      className="bg-gradient-to-r from-purple-500 to-violet-600 h-3 rounded-full transition-all duration-300"
                       style={{ width: `${dashboardStats.progressPercentage}%` }}
                     />
                   </div>
@@ -624,7 +710,7 @@ export const Dashboard = () => {
             {/* Right Column - Calendar & Courses */}
             <div className="space-y-6">
               {/* Calendar */}
-              <div className="bg-white rounded-xl border-2 border-gray-200 p-6 shadow-md">
+              <div className="bg-white/90 backdrop-blur-sm rounded-xl border-2 border-purple-200 p-6 shadow-xl">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-bold text-gray-900">Calendar</h3>
                   <button className="text-sm text-accent-primary hover:underline font-semibold">
@@ -653,14 +739,14 @@ export const Dashboard = () => {
                   {Array.from({ length: 35 }, (_, i) => {
                     const day = i + 1;
                     const isToday = day === currentDay;
-                    return (
+                  return (
                       <div
                         key={i}
                         className={cn(
                           "aspect-square flex items-center justify-center text-sm rounded-lg cursor-pointer transition-colors",
                           isToday
-                            ? "bg-green-500 text-white font-bold"
-                            : "hover:bg-gray-100 text-gray-700"
+                            ? "bg-purple-500 text-white font-bold"
+                            : "hover:bg-purple-50 text-gray-700"
                         )}
                       >
                         {day <= 31 ? day : ""}
@@ -671,7 +757,7 @@ export const Dashboard = () => {
               </div>
 
               {/* Courses */}
-              <div className="bg-white rounded-xl border-2 border-gray-200 p-6 shadow-md">
+              <div className="bg-white/90 backdrop-blur-sm rounded-xl border-2 border-violet-200 p-6 shadow-xl">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-bold text-gray-900">Courses</h3>
                   <button className="text-sm text-accent-primary hover:underline font-semibold">
@@ -693,7 +779,7 @@ export const Dashboard = () => {
                         </p>
                         <button
                           onClick={() => navigate(`/groups/${group.group_id || group.id}`)}
-                          className="w-full px-4 py-2 bg-accent-primary text-white text-sm font-semibold rounded-lg hover:bg-accent-secondary transition-colors"
+                          className="w-full px-4 py-2 bg-gradient-to-r from-purple-500 to-violet-600 text-white text-sm font-semibold rounded-lg hover:from-purple-600 hover:to-violet-700 transition-all shadow-md hover:shadow-lg"
                         >
                           VIEW COURSEWARE
                         </button>
@@ -710,9 +796,9 @@ export const Dashboard = () => {
                       You haven't joined any groups yet. Join a group to access quizzes.
                     </p>
                   </div>
-                )}
-              </div>
-            </div>
+          )}
+        </div>
+      </div>
           </div>
 
           {/* Recommended Quizzes */}
@@ -734,7 +820,7 @@ export const Dashboard = () => {
                 {availableQuizzes.slice(0, 3).map((quiz) => (
                   <div
                     key={quiz.quiz_id || quiz.id}
-                    className="bg-white rounded-xl border-2 border-gray-200 p-6 shadow-md hover:shadow-lg transition-all duration-200"
+                    className="bg-white/90 backdrop-blur-sm rounded-xl border-2 border-purple-200 p-6 shadow-xl hover:shadow-2xl transition-all duration-200"
                   >
                     <div className="flex items-center gap-2 mb-3">
                       <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">
@@ -750,7 +836,7 @@ export const Dashboard = () => {
                     </p>
                     <button
                       onClick={() => navigate(`/exams/${quiz.quiz_id || quiz.id}`)}
-                      className="w-full px-4 py-2 bg-accent-primary text-white font-semibold rounded-lg hover:bg-accent-secondary transition-colors"
+                      className="w-full px-4 py-2 bg-gradient-to-r from-purple-500 to-violet-600 text-white font-semibold rounded-lg hover:from-purple-600 hover:to-violet-700 transition-all shadow-md hover:shadow-lg"
                     >
                       Learn more
                     </button>
@@ -766,7 +852,7 @@ export const Dashboard = () => {
       {(quizzesLoading || allQuizzesLoading) && !showSearchResults && (
         <div className="flex items-center justify-center py-16">
           <div className="flex flex-col items-center gap-4">
-            <Spinner size="lg" />
+          <Spinner size="lg" />
             <p className="text-sm text-gray-500 font-medium">Loading dashboard...</p>
           </div>
         </div>

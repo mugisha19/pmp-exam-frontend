@@ -244,7 +244,7 @@ export const MyExams = () => {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-4 py-2.5 border-2 border-gray-200 rounded-xl text-sm font-medium bg-white focus:outline-none focus:ring-2 focus:ring-accent-primary/30 focus:border-accent-primary transition-all duration-200 hover:border-gray-300 shadow-sm hover:shadow-md"
+                className="px-4 py-2.5 border-2 border-gray-200 rounded-xl text-sm font-medium bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all duration-200 hover:border-purple-300 shadow-sm hover:shadow-md"
               >
                 <option value="all">All Status</option>
                 <option value="active">Active</option>
@@ -258,7 +258,7 @@ export const MyExams = () => {
               <select
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
-                className="px-4 py-2.5 border-2 border-gray-200 rounded-xl text-sm font-medium bg-white focus:outline-none focus:ring-2 focus:ring-accent-primary/30 focus:border-accent-primary transition-all duration-200 hover:border-gray-300 shadow-sm hover:shadow-md"
+                className="px-4 py-2.5 border-2 border-gray-200 rounded-xl text-sm font-medium bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all duration-200 hover:border-purple-300 shadow-sm hover:shadow-md"
               >
                 <option value="all">All Types</option>
                 <option value="public">Public</option>
@@ -270,7 +270,7 @@ export const MyExams = () => {
               <select
                 value={dateFilter}
                 onChange={(e) => setDateFilter(e.target.value)}
-                className="px-4 py-2.5 border-2 border-gray-200 rounded-xl text-sm font-medium bg-white focus:outline-none focus:ring-2 focus:ring-accent-primary/30 focus:border-accent-primary transition-all duration-200 hover:border-gray-300 shadow-sm hover:shadow-md"
+                className="px-4 py-2.5 border-2 border-gray-200 rounded-xl text-sm font-medium bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all duration-200 hover:border-purple-300 shadow-sm hover:shadow-md"
               >
                 <option value="all">All Time</option>
                 <option value="upcoming">Upcoming</option>
@@ -316,7 +316,7 @@ export const MyExams = () => {
         <div>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6 p-4 bg-gradient-to-r from-gray-50 to-white rounded-xl border-2 border-gray-100">
             <p className="text-sm font-semibold text-gray-700">
-              Showing <span className="text-accent-primary font-bold">{filteredAndSortedQuizzes.length}</span> of <span className="font-bold">{allQuizzes.length}</span> quiz
+              Showing <span className="text-purple-600 font-bold">{filteredAndSortedQuizzes.length}</span> of <span className="font-bold">{allQuizzes.length}</span> quiz
               {allQuizzes.length !== 1 ? "zes" : ""}
             </p>
             <p className="text-sm font-semibold text-gray-700">

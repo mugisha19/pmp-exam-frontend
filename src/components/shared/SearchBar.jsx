@@ -113,7 +113,7 @@ export const SearchBar = ({
             "bg-white border-2 border-gray-200",
             "text-gray-900 placeholder:text-gray-400",
             "transition-all duration-200",
-            "focus:outline-none focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20",
+            "focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20",
             "hover:border-gray-300 shadow-sm hover:shadow-md",
             showSuggestions && "rounded-b-none"
           )}
@@ -148,7 +148,7 @@ export const SearchBar = ({
                   className={cn(
                     "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 text-left",
                     isSelected 
-                      ? "bg-gradient-to-r from-accent-primary/10 to-accent-secondary/10 border-2 border-accent-primary/20" 
+                      ? "bg-gradient-to-r from-purple-500/10 to-violet-500/10 border-2 border-purple-500/20" 
                       : "hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100"
                   )}
                 >

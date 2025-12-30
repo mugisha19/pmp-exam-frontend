@@ -13,12 +13,12 @@ import {
 } from "recharts";
 
 const COLORS = [
-  "#3b82f6",
-  "#10b981",
-  "#f59e0b",
-  "#ef4444",
-  "#8b5cf6",
-  "#06b6d4",
+  "#8b5cf6", // Purple
+  "#7c3aed", // Violet
+  "#6366f1", // Indigo
+  "#a855f7", // Fuchsia
+  "#ec4899", // Pink
+  "#d946ef", // Magenta
 ];
 
 export function PieChartComponent({

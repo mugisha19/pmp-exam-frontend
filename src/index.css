@@ -23,9 +23,9 @@
   --color-text-tertiary: #64748b;
   --color-text-quaternary: #94a3b8;
 
-  /* Accent - Now neutral */
-  --color-accent-primary: #374151;
-  --color-accent-secondary: #1f2937;
+  /* Accent - Purple/Violet Theme */
+  --color-accent-primary: #8b5cf6;
+  --color-accent-secondary: #7c3aed;
 
   /* Semantic */
   --color-error: #ef4444;

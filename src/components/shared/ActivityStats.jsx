@@ -112,7 +112,7 @@ export const ActivityStats = ({ className }) => {
                 className={cn(
                   "px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200",
                   isSelected
-                    ? "bg-gradient-to-r from-accent-primary to-accent-secondary text-white shadow-md shadow-accent-primary/30 scale-105"
+                    ? "bg-gradient-to-r from-purple-500 to-violet-600 text-white shadow-md shadow-purple-500/30 scale-105"
                     : "text-gray-600 hover:text-gray-900 hover:bg-white/50"
                 )}
               >

@@ -52,16 +52,16 @@ export const GroupCard = ({
   return (
     <div
       className={cn(
-        "bg-gradient-to-br from-white to-gray-50/50 rounded-2xl border-2 border-gray-100 shadow-lg shadow-gray-100/50 overflow-hidden hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 group hover:scale-105 hover:border-accent-primary/30",
+        "bg-gradient-to-br from-white to-gray-50/50 rounded-2xl border-2 border-gray-100 shadow-lg shadow-gray-100/50 overflow-hidden hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 group hover:scale-105 hover:border-purple-500/30",
         className
       )}
     >
       {/* Header with gradient */}
-      <div className="relative h-24 bg-gradient-to-br from-accent-primary/20 via-accent-primary/15 to-accent-secondary/20">
-        <div className="absolute inset-0 bg-gradient-to-br from-accent-primary/10 to-transparent" />
+      <div className="relative h-24 bg-gradient-to-br from-purple-500/20 via-purple-500/15 to-violet-500/20">
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent" />
         <div className="absolute top-4 right-4 flex items-center gap-2">
           {isJoined && (
-            <div className="px-3 py-1.5 bg-gradient-to-r from-green-500/20 to-green-600/20 text-green-700 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-md border border-green-200">
+            <div className="px-3 py-1.5 bg-gradient-to-r from-purple-500/20 to-violet-500/20 text-purple-700 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-md border border-purple-200">
               <CheckCircle className="w-3.5 h-3.5" />
               Joined
             </div>
@@ -79,8 +79,8 @@ export const GroupCard = ({
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-3">
               {isPublic ? (
-                <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-accent-primary/20 to-accent-secondary/20 flex items-center justify-center">
-                  <Globe className="w-3.5 h-3.5 text-accent-primary flex-shrink-0" />
+                <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-purple-500/20 to-violet-500/20 flex items-center justify-center">
+                  <Globe className="w-3.5 h-3.5 text-purple-600 flex-shrink-0" />
                 </div>
               ) : (
                 <div className="w-6 h-6 rounded-lg bg-gray-100 flex items-center justify-center">
@@ -91,7 +91,7 @@ export const GroupCard = ({
                 {getGroupTypeLabel(group?.group_type)}
               </span>
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-accent-primary transition-colors duration-200 line-clamp-1">
+            <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-purple-600 transition-colors duration-200 line-clamp-1">
               {group?.name}
             </h3>
             {group?.description && (
@@ -146,7 +146,7 @@ export const GroupCard = ({
             <>
               <button
                 onClick={() => onView?.(groupId)}
-                className="flex-1 px-5 py-3 bg-gradient-to-r from-accent-primary to-accent-secondary text-white text-sm font-bold rounded-xl hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2 hover:scale-105"
+                className="flex-1 px-5 py-3 bg-gradient-to-r from-purple-500 to-violet-600 text-white text-sm font-bold rounded-xl hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2 hover:scale-105"
               >
                 View Details
                 <ArrowRight className="w-4 h-4" />
@@ -158,7 +158,7 @@ export const GroupCard = ({
                 <button
                   onClick={() => onJoin?.(groupId)}
                   disabled={isLoading}
-                  className="flex-1 px-5 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white text-sm font-bold rounded-xl hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105"
+                  className="flex-1 px-5 py-3 bg-gradient-to-r from-purple-500 to-violet-600 text-white text-sm font-bold rounded-xl hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105"
                 >
                   {isLoading ? "Joining..." : "Join Group"}
                 </button>

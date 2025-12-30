@@ -34,8 +34,8 @@ export const ProgressChart = ({ className, data = [] }) => {
                   className={cn(
                     "w-full rounded-t-xl transition-all duration-500 shadow-lg hover:shadow-xl",
                     isEven 
-                      ? "bg-gradient-to-t from-accent-secondary via-accent-primary to-accent-primary" 
-                      : "bg-gradient-to-t from-accent-primary/90 via-accent-primary to-accent-secondary"
+                      ? "bg-gradient-to-t from-violet-500 via-purple-500 to-purple-600" 
+                      : "bg-gradient-to-t from-purple-500/90 via-purple-500 to-violet-600"
                   )}
                   style={{ height: `${height}%` }}
                 />

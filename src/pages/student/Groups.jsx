@@ -241,7 +241,7 @@ export const Groups = () => {
           onClick={() => handleTabChange("all")}
           className={`px-5 md:px-7 py-3.5 font-bold text-sm border-b-3 -mb-0.5 transition-all duration-200 whitespace-nowrap rounded-t-lg ${
             activeTab === "all"
-              ? "border-accent-primary text-accent-primary bg-white shadow-lg shadow-accent-primary/10"
+              ? "border-purple-500 text-purple-600 bg-white shadow-lg shadow-purple-500/10"
               : "border-transparent text-gray-600 hover:text-gray-900 hover:bg-white/50"
           }`}
         >
@@ -251,7 +251,7 @@ export const Groups = () => {
           onClick={() => handleTabChange("my-groups")}
           className={`px-5 md:px-7 py-3.5 font-bold text-sm border-b-3 -mb-0.5 transition-all duration-200 whitespace-nowrap rounded-t-lg ${
             activeTab === "my-groups"
-              ? "border-accent-primary text-accent-primary bg-white shadow-lg shadow-accent-primary/10"
+              ? "border-purple-500 text-purple-600 bg-white shadow-lg shadow-purple-500/10"
               : "border-transparent text-gray-600 hover:text-gray-900 hover:bg-white/50"
           }`}
         >
@@ -277,7 +277,7 @@ export const Groups = () => {
               <select
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
-                className="px-4 py-2.5 border-2 border-gray-200 rounded-xl text-sm font-medium bg-white focus:outline-none focus:ring-2 focus:ring-accent-primary/30 focus:border-accent-primary transition-all duration-200 hover:border-gray-300 shadow-sm hover:shadow-md"
+                className="px-4 py-2.5 border-2 border-gray-200 rounded-xl text-sm font-medium bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all duration-200 hover:border-purple-300 shadow-sm hover:shadow-md"
               >
                 <option value="all">All Types</option>
                 <option value="class">Class</option>
@@ -291,7 +291,7 @@ export const Groups = () => {
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="px-4 py-2.5 border-2 border-gray-200 rounded-xl text-sm font-medium bg-white focus:outline-none focus:ring-2 focus:ring-accent-primary/30 focus:border-accent-primary transition-all duration-200 hover:border-gray-300 shadow-sm hover:shadow-md"
+                  className="px-4 py-2.5 border-2 border-gray-200 rounded-xl text-sm font-medium bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all duration-200 hover:border-purple-300 shadow-sm hover:shadow-md"
                 >
                   <option value="all">All Status</option>
                   <option value="active">Active</option>
@@ -338,7 +338,7 @@ export const Groups = () => {
           {activeTab === "my-groups" && (
             <button
               onClick={() => handleTabChange("all")}
-              className="px-6 py-3 bg-gradient-to-r from-accent-primary to-accent-secondary text-white font-bold rounded-xl hover:shadow-lg transition-all duration-200 hover:scale-105"
+              className="px-6 py-3 bg-gradient-to-r from-purple-500 to-violet-600 text-white font-bold rounded-xl hover:shadow-lg transition-all duration-200 hover:scale-105"
             >
               Browse Groups
             </button>

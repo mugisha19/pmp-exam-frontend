@@ -36,25 +36,25 @@ export const QuizCard = ({
     <div
       onClick={handleClick}
       className={cn(
-        "bg-gradient-to-br from-white to-gray-50/50 rounded-2xl border-2 border-gray-100 shadow-lg shadow-gray-100/50 overflow-hidden hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 cursor-pointer group min-w-[280px] hover:scale-105 hover:border-accent-primary/30",
+        "bg-gradient-to-br from-white to-gray-50/50 rounded-2xl border-2 border-gray-100 shadow-lg shadow-gray-100/50 overflow-hidden hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 cursor-pointer group min-w-[280px] hover:scale-105 hover:border-purple-500/30",
         className
       )}
     >
       {/* Thumbnail Placeholder */}
       <div className="w-full h-40 bg-gradient-to-br from-gray-100 via-gray-50 to-gray-200 flex items-center justify-center relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-accent-primary/20 to-accent-secondary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        <BookOpen className="w-14 h-14 text-gray-400 group-hover:text-accent-primary transition-colors duration-300" />
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-violet-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <BookOpen className="w-14 h-14 text-gray-400 group-hover:text-purple-600 transition-colors duration-300" />
       </div>
 
       {/* Content */}
       <div className="p-5">
-        <h3 className="text-base font-bold text-gray-900 mb-3 line-clamp-2 group-hover:text-accent-primary transition-colors duration-200">
+        <h3 className="text-base font-bold text-gray-900 mb-3 line-clamp-2 group-hover:text-purple-600 transition-colors duration-200">
           {quiz?.title || "Quiz Title"}
         </h3>
         
         {/* Category Badge */}
         <div className="mb-4">
-          <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold bg-gradient-to-r from-accent-primary/10 to-accent-secondary/10 text-accent-primary border border-accent-primary/20">
+          <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold bg-gradient-to-r from-purple-500/10 to-violet-500/10 text-purple-600 border border-purple-500/20">
             {category}
           </span>
         </div>
@@ -62,7 +62,7 @@ export const QuizCard = ({
         {/* Instructor Info */}
         {instructor && (
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-accent-primary to-accent-secondary flex items-center justify-center flex-shrink-0">
+            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center flex-shrink-0">
               <span className="text-white font-semibold text-xs">
                 {getInitials(instructor.name)}
               </span>
@@ -80,7 +80,7 @@ export const QuizCard = ({
         {progress > 0 && (
           <div className="w-full bg-gray-200 rounded-full h-2 shadow-inner">
             <div
-              className="h-2 rounded-full bg-gradient-to-r from-accent-primary to-accent-secondary transition-all duration-500 shadow-sm"
+              className="h-2 rounded-full bg-gradient-to-r from-purple-500 to-violet-600 transition-all duration-500 shadow-sm"
               style={{ width: `${progress}%` }}
             />
           </div>

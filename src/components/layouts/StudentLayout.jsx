@@ -25,6 +25,7 @@ import { useNotifications } from "@/hooks/queries/useNotificationQueries";
 import { ProfileCard } from "@/components/shared/ProfileCard";
 import { ProgressChart } from "@/components/shared/ProgressChart";
 import { GroupMembersCard } from "@/components/shared/GroupMembersCard";
+import { GrassBackground } from "@/components/shared/GrassBackground";
 
 export const StudentLayout = () => {
   const navigate = useNavigate();
@@ -53,21 +54,22 @@ export const StudentLayout = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <div className="flex min-h-screen bg-bg-primary">
+    <div className="flex min-h-screen bg-bg-primary relative">
+      <GrassBackground />
       {/* Left Sidebar Navigation */}
-      <aside className="hidden lg:flex flex-col fixed left-4 top-1/2 -translate-y-1/2 w-72 h-[95vh] bg-gradient-to-br from-white via-gray-50/30 to-white backdrop-blur-xl shadow-2xl shadow-gray-300/50 rounded-3xl border-2 border-gray-200/60 z-50 overflow-hidden">
+      <aside className="hidden lg:flex flex-col fixed left-4 top-1/2 -translate-y-1/2 w-72 h-[95vh] bg-white/90 backdrop-blur-xl shadow-2xl shadow-purple-300/30 rounded-3xl border-2 border-purple-200/60 z-50 overflow-hidden">
         <div className="flex flex-col h-full">
           {/* Logo & Brand */}
           <div className="p-7 pb-5 border-b-2 border-gray-100 bg-gradient-to-r from-gray-50/50 to-white">
             <div className="flex items-center gap-4">
               <div className="relative">
-                <div className="flex items-center justify-center w-14 h-14 bg-gradient-to-br from-accent-primary via-accent-primary to-accent-secondary rounded-2xl shadow-lg shadow-accent-primary/30 ring-4 ring-accent-primary/10">
+                <div className="flex items-center justify-center w-14 h-14 bg-gradient-to-br from-purple-500 via-violet-500 to-indigo-600 rounded-2xl shadow-lg shadow-purple-500/30 ring-4 ring-purple-500/10">
                   <GraduationCap className="w-7 h-7 text-white" />
                 </div>
                 <div className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-br from-green-400 to-green-500 rounded-full border-3 border-white shadow-md animate-pulse"></div>
               </div>
               <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-accent-primary to-accent-secondary bg-clip-text text-transparent">
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-violet-600 bg-clip-text text-transparent">
                   PMP Portal
                 </h1>
                 <p className="text-xs text-gray-600 font-bold mt-1 uppercase tracking-wide">Student Dashboard</p>
@@ -88,8 +90,8 @@ export const StudentLayout = () => {
                     "group relative w-full flex items-center gap-4 px-5 py-4 rounded-2xl transition-all duration-300",
                     "hover:scale-[1.02] hover:shadow-lg",
                     active
-                      ? "bg-gradient-to-r from-accent-primary to-accent-secondary text-white shadow-xl shadow-accent-primary/30 scale-[1.02]"
-                      : "text-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 hover:shadow-md"
+                      ? "bg-gradient-to-r from-purple-500 to-violet-600 text-white shadow-xl shadow-purple-500/30 scale-[1.02]"
+                      : "text-gray-700 hover:bg-gradient-to-r hover:from-purple-50 hover:to-violet-50 hover:shadow-md"
                   )}
                 >
                   {/* Active indicator */}
@@ -100,11 +102,11 @@ export const StudentLayout = () => {
                     "flex items-center justify-center w-11 h-11 rounded-xl transition-all duration-300 shadow-sm",
                     active 
                       ? "bg-white/25 shadow-md" 
-                      : "bg-gradient-to-br from-gray-100 to-gray-200 group-hover:bg-accent-primary/15 group-hover:shadow-md"
+                      : "bg-gradient-to-br from-gray-100 to-gray-200 group-hover:bg-purple-500/15 group-hover:shadow-md"
                   )}>
                     <Icon className={cn(
                       "w-5 h-5 transition-all duration-300",
-                      active ? "text-white" : "text-gray-600 group-hover:text-accent-primary"
+                      active ? "text-white" : "text-gray-600 group-hover:text-purple-600"
                     )} />
                   </div>
                   <span className={cn(
@@ -136,12 +138,12 @@ export const StudentLayout = () => {
                 <div className={cn(
                   "flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-300 shadow-md",
                   isActive("/notifications")
-                    ? "bg-gradient-to-br from-accent-primary/20 to-accent-secondary/20"
-                    : "bg-gradient-to-br from-gray-100 to-gray-200 group-hover:bg-accent-primary/15"
+                    ? "bg-gradient-to-br from-purple-100 to-violet-100"
+                    : "bg-gradient-to-br from-gray-100 to-gray-200 group-hover:bg-purple-500/15"
                 )}>
                   <Bell className={cn(
                     "w-5 h-5 transition-colors duration-300",
-                    isActive("/notifications") ? "text-accent-primary" : "text-gray-600 group-hover:text-accent-primary"
+                    isActive("/notifications") ? "text-purple-600" : "text-gray-600 group-hover:text-purple-600"
                   )} />
                 </div>
                 {unreadCount > 0 && (
@@ -152,7 +154,7 @@ export const StudentLayout = () => {
               </div>
               <span className={cn(
                 "text-sm font-bold transition-colors duration-300",
-                isActive("/notifications") ? "text-accent-primary" : "text-gray-700 group-hover:text-gray-900"
+                isActive("/notifications") ? "text-purple-600" : "text-gray-700 group-hover:text-gray-900"
               )}>
                 Notifications
               </span>
@@ -169,7 +171,7 @@ export const StudentLayout = () => {
                 )}
               >
                 <div className="relative">
-                  <div className="w-12 h-12 bg-gradient-to-br from-accent-primary to-accent-secondary rounded-xl flex items-center justify-center shadow-lg ring-4 ring-accent-primary/10">
+                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-violet-600 rounded-xl flex items-center justify-center shadow-lg ring-4 ring-purple-500/10">
                     <span className="text-white font-bold text-base">
                       {user?.first_name?.[0]}{user?.last_name?.[0]}
                     </span>
@@ -196,10 +198,10 @@ export const StudentLayout = () => {
                       navigate("/profile");
                       setProfileMenuOpen(false);
                     }}
-                    className="w-full px-5 py-3.5 text-left text-sm text-gray-700 hover:bg-gradient-to-r hover:from-accent-primary/5 hover:to-accent-secondary/5 flex items-center gap-4 transition-all duration-200 group"
+                    className="w-full px-5 py-3.5 text-left text-sm text-gray-700 hover:bg-gradient-to-r hover:from-purple-50 hover:to-violet-50 flex items-center gap-4 transition-all duration-200 group"
                   >
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 group-hover:bg-gradient-to-br group-hover:from-accent-primary/20 group-hover:to-accent-secondary/20 flex items-center justify-center transition-all duration-200 shadow-sm group-hover:shadow-md">
-                      <User className="w-5 h-5 text-gray-600 group-hover:text-accent-primary transition-colors" />
+                    <div                       className="w-10 h-10 rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 group-hover:bg-gradient-to-br group-hover:from-purple-100 group-hover:to-violet-100 flex items-center justify-center transition-all duration-200 shadow-sm group-hover:shadow-md">
+                      <User className="w-5 h-5 text-gray-600 group-hover:text-purple-600 transition-colors" />
                     </div>
                     <span className="font-bold">My Profile</span>
                   </button>
