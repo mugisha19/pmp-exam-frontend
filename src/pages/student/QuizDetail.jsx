@@ -13,6 +13,7 @@ import {
   BookOpen,
   FileText,
   Timer,
+  Trophy,
 } from "lucide-react";
 
 export const QuizDetail = () => {
@@ -102,20 +103,25 @@ export const QuizDetail = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <Spinner size="lg" />
+        <div className="flex flex-col items-center gap-4">
+          <Spinner size="lg" />
+          <p className="text-sm text-gray-500 font-medium">Loading quiz details...</p>
+        </div>
       </div>
     );
   }
 
   if (!quizData) {
     return (
-      <div className="text-center py-12">
-        <AlertCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+      <div className="text-center py-16">
+        <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center shadow-inner">
+          <AlertCircle className="w-12 h-12 text-gray-400" />
+        </div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Quiz Not Found</h2>
-        <p className="text-gray-600 mb-6">The quiz you're looking for doesn't exist.</p>
+        <p className="text-gray-600 mb-8 font-medium">The quiz you're looking for doesn't exist.</p>
         <button
           onClick={() => navigate(-1)}
-          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          className="px-6 py-3 bg-gradient-to-r from-accent-primary to-accent-secondary text-white font-bold rounded-xl hover:shadow-lg transition-all duration-200 hover:scale-105"
         >
           Go Back
         </button>
@@ -227,22 +233,24 @@ export const QuizDetail = () => {
   return (
     <div className="max-w-6xl mx-auto">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
+      <div className="bg-gradient-to-br from-white to-gray-50/50 border-b-2 border-gray-200 shadow-lg shadow-gray-100/50 px-8 py-6">
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">{quiz.title}</h1>
-            <div className="flex items-center gap-4 text-sm text-gray-600">
-              <span>{quiz.total_questions}-questions</span>
-              <span>|</span>
-              <span className="flex items-center gap-1">
-                <Clock className="w-4 h-4" />
+            <h1 className="text-3xl font-bold text-gray-900 mb-3">{quiz.title}</h1>
+            <div className="flex items-center gap-5 text-sm font-medium text-gray-700">
+              <span className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg font-semibold">{quiz.total_questions} questions</span>
+              <span className="text-gray-300">•</span>
+              <span className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-gray-500" />
                 {quiz.time_limit_minutes ? `${quiz.time_limit_minutes} minutes` : "No time limit"}
               </span>
-              <span>|</span>
               {canStartQuiz() && quiz.passing_score && (
-                <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-xs font-medium">
-                  {quiz.passing_score}% correct required to pass
-                </span>
+                <>
+                  <span className="text-gray-300">•</span>
+                  <span className="px-3 py-1.5 bg-gradient-to-r from-yellow-100 to-yellow-200 text-yellow-800 rounded-lg font-semibold border border-yellow-300">
+                    {quiz.passing_score}% pass required
+                  </span>
+                </>
               )}
             </div>
           </div>
@@ -250,24 +258,24 @@ export const QuizDetail = () => {
       </div>
 
       {/* Tabs Navigation */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="flex items-center gap-1 px-6 overflow-x-auto">
+      <div className="bg-gradient-to-r from-gray-50/50 to-white border-b-2 border-gray-200">
+        <div className="flex items-center gap-2 px-8 overflow-x-auto">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+                className={`flex items-center gap-2 px-6 py-4 text-sm font-bold border-b-3 transition-all duration-200 whitespace-nowrap rounded-t-lg ${
                   activeTab === tab.id
-                    ? "border-blue-600 text-blue-600"
-                    : "border-transparent text-gray-600 hover:text-gray-900"
+                    ? "border-accent-primary text-accent-primary bg-white shadow-lg shadow-accent-primary/10"
+                    : "border-transparent text-gray-600 hover:text-gray-900 hover:bg-white/50"
                 }`}
               >
-                <Icon className="w-4 h-4" />
+                <Icon className="w-5 h-5" />
                 {tab.label}
                 {tab.badge && (
-                  <span className="ml-1 px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs">
+                  <span className="ml-1 px-2.5 py-1 bg-accent-primary/20 text-accent-primary rounded-full text-xs font-bold">
                     {tab.badge}
                   </span>
                 )}
@@ -278,45 +286,52 @@ export const QuizDetail = () => {
       </div>
 
       {/* Tab Content */}
-      <div className="bg-white px-6 py-8">
+      <div className="bg-white px-8 py-10">
         {activeTab === "overview" && (
           <div className="max-w-4xl">
             {/* Instructions Section */}
-            <div className="mb-8">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Instructions</h2>
-              <ul className="space-y-2 text-gray-700">
-                <li className="flex items-start gap-2">
-                  <span className="text-gray-400 mt-1">•</span>
-                  <span>You can pause the test at any time and resume later.</span>
+            <div className="mb-10">
+              <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent-primary/20 to-accent-secondary/20 flex items-center justify-center">
+                  <BookOpen className="w-5 h-5 text-accent-primary" />
+                </div>
+                Instructions
+              </h2>
+              <ul className="space-y-4 text-gray-700">
+                <li className="flex items-start gap-3 p-3 bg-gradient-to-r from-gray-50 to-gray-100/50 rounded-xl border-l-4 border-accent-primary">
+                  <span className="text-accent-primary font-bold mt-0.5">•</span>
+                  <span className="font-medium">You can pause the test at any time and resume later.</span>
                 </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-gray-400 mt-1">•</span>
-                  <span>You can retake the test as many times as you would like.</span>
+                <li className="flex items-start gap-3 p-3 bg-gradient-to-r from-gray-50 to-gray-100/50 rounded-xl border-l-4 border-accent-primary">
+                  <span className="text-accent-primary font-bold mt-0.5">•</span>
+                  <span className="font-medium">You can retake the test as many times as you would like.</span>
                 </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-gray-400 mt-1">•</span>
-                  <span>This practice test will not be timed, so you can take as much time as you need as well as the time remaining to the end of the course.</span>
+                <li className="flex items-start gap-3 p-3 bg-gradient-to-r from-gray-50 to-gray-100/50 rounded-xl border-l-4 border-accent-primary">
+                  <span className="text-accent-primary font-bold mt-0.5">•</span>
+                  <span className="font-medium">This practice test will not be timed, so you can take as much time as you need as well as the time remaining to the end of the course.</span>
                 </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-gray-400 mt-1">•</span>
-                  <span>You can review your answers and compare them to the correct answers after you submit the test.</span>
+                <li className="flex items-start gap-3 p-3 bg-gradient-to-r from-gray-50 to-gray-100/50 rounded-xl border-l-4 border-accent-primary">
+                  <span className="text-accent-primary font-bold mt-0.5">•</span>
+                  <span className="font-medium">You can review your answers and compare them to the correct answers after you submit the test.</span>
                 </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-gray-400 mt-1">•</span>
-                  <span>You can skip a question to come back to it at the end of the test.</span>
+                <li className="flex items-start gap-3 p-3 bg-gradient-to-r from-gray-50 to-gray-100/50 rounded-xl border-l-4 border-accent-primary">
+                  <span className="text-accent-primary font-bold mt-0.5">•</span>
+                  <span className="font-medium">You can skip a question to come back to it at the end of the test.</span>
                 </li>
               </ul>
             </div>
 
             {/* Active Quiz Warning */}
             {activeQuizError && (
-              <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <div className="flex items-start gap-3">
-                  <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5" />
+              <div className="mb-8 p-6 bg-gradient-to-br from-yellow-50 to-yellow-100/30 border-2 border-yellow-200 rounded-xl shadow-md">
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-yellow-200 flex items-center justify-center flex-shrink-0">
+                    <AlertCircle className="w-6 h-6 text-yellow-700" />
+                  </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-yellow-900 mb-1">Active Quiz Detected</h3>
-                    <p className="text-sm text-yellow-800 mb-3">{activeQuizError.message}</p>
-                    <div className="flex gap-2">
+                    <h3 className="font-bold text-yellow-900 mb-2 text-lg">Active Quiz Detected</h3>
+                    <p className="text-sm text-yellow-800 mb-4 font-medium">{activeQuizError.message}</p>
+                    <div className="flex gap-3">
                       <button
                         onClick={() => {
                           const sessionToken = sessionStorage.getItem("quiz_session_token");
@@ -327,7 +342,7 @@ export const QuizDetail = () => {
                             setActiveQuizError(null);
                           }
                         }}
-                        className="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700 text-sm font-medium"
+                        className="px-5 py-2.5 bg-gradient-to-r from-yellow-600 to-yellow-700 text-white rounded-xl hover:shadow-lg text-sm font-bold transition-all duration-200 hover:scale-105"
                       >
                         Resume Quiz
                       </button>
@@ -348,7 +363,7 @@ export const QuizDetail = () => {
                             setActiveQuizError(null);
                           }
                         }}
-                        className="px-4 py-2 border border-yellow-600 text-yellow-700 rounded hover:bg-yellow-50 text-sm font-medium"
+                        className="px-5 py-2.5 border-2 border-yellow-600 text-yellow-700 rounded-xl hover:bg-yellow-50 text-sm font-bold transition-all duration-200"
                       >
                         Abandon & Start New
                       </button>
@@ -362,7 +377,7 @@ export const QuizDetail = () => {
             <div className="flex items-center gap-4">
               <button
                 onClick={() => navigate(-1)}
-                className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors"
+                className="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 font-bold transition-all duration-200 hover:shadow-md"
               >
                 Skip test
               </button>
@@ -370,7 +385,7 @@ export const QuizDetail = () => {
                 <button
                   onClick={handleStartQuiz}
                   disabled={isStarting}
-                  className="px-6 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 font-medium disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+                  className="px-8 py-3 bg-gradient-to-r from-gray-900 to-gray-800 text-white rounded-xl hover:shadow-xl font-bold disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-200 hover:scale-105 disabled:hover:scale-100"
                 >
                   {isStarting ? (
                     <>
@@ -384,7 +399,7 @@ export const QuizDetail = () => {
               ) : (
                 <button
                   disabled
-                  className="px-6 py-2.5 bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed font-medium"
+                  className="px-8 py-3 bg-gray-300 text-gray-500 rounded-xl cursor-not-allowed font-bold"
                 >
                   Quiz Not Available
                 </button>
@@ -401,23 +416,28 @@ export const QuizDetail = () => {
 
             {/* Progress Stats */}
             {totalAttempts > 0 && (
-              <div className="mt-8 pt-8 border-t border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Your Progress</h3>
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="p-4 bg-gray-50 rounded-lg">
-                    <p className="text-sm text-gray-600 mb-1">Total Attempts</p>
-                    <p className="text-2xl font-bold text-gray-900">{totalAttempts}</p>
+              <div className="mt-10 pt-10 border-t-2 border-gray-200">
+                <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent-primary/20 to-accent-secondary/20 flex items-center justify-center">
+                    <Trophy className="w-5 h-5 text-accent-primary" />
+                  </div>
+                  Your Progress
+                </h3>
+                <div className="grid grid-cols-3 gap-6">
+                  <div className="p-6 bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-xl border-2 border-gray-200 shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105">
+                    <p className="text-xs font-bold text-gray-600 uppercase tracking-wide mb-2">Total Attempts</p>
+                    <p className="text-3xl font-bold text-gray-900">{totalAttempts}</p>
                   </div>
                   {bestScore !== null && (
-                    <div className="p-4 bg-gray-50 rounded-lg">
-                      <p className="text-sm text-gray-600 mb-1">Best Score</p>
-                      <p className="text-2xl font-bold text-gray-900">{bestScore}%</p>
+                    <div className="p-6 bg-gradient-to-br from-green-50 to-green-100/30 rounded-xl border-2 border-green-200 shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105">
+                      <p className="text-xs font-bold text-gray-600 uppercase tracking-wide mb-2">Best Score</p>
+                      <p className="text-3xl font-bold text-gray-900">{bestScore}%</p>
                     </div>
                   )}
                   {remainingAttempts !== null && (
-                    <div className="p-4 bg-gray-50 rounded-lg">
-                      <p className="text-sm text-gray-600 mb-1">Remaining</p>
-                      <p className="text-2xl font-bold text-gray-900">{remainingAttempts}</p>
+                    <div className="p-6 bg-gradient-to-br from-blue-50 to-blue-100/30 rounded-xl border-2 border-blue-200 shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105">
+                      <p className="text-xs font-bold text-gray-600 uppercase tracking-wide mb-2">Remaining</p>
+                      <p className="text-3xl font-bold text-gray-900">{remainingAttempts}</p>
                     </div>
                   )}
                 </div>
@@ -429,32 +449,37 @@ export const QuizDetail = () => {
         {activeTab === "attempts" && (
           <div className="max-w-4xl">
             {loadingAttempts ? (
-              <div className="flex justify-center py-12">
-                <Spinner size="lg" />
+              <div className="flex justify-center py-16">
+                <div className="flex flex-col items-center gap-4">
+                  <Spinner size="lg" />
+                  <p className="text-sm text-gray-500 font-medium">Loading attempts...</p>
+                </div>
               </div>
             ) : attempts.length === 0 ? (
-              <div className="text-center py-12 text-gray-500">
-                <FileText className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-                <p>No attempts yet</p>
-                <p className="text-sm mt-2">Start the quiz to see your attempts here</p>
+              <div className="text-center py-16">
+                <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center shadow-inner">
+                  <FileText className="w-12 h-12 text-gray-400" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">No attempts yet</h3>
+                <p className="text-sm text-gray-600 font-medium">Start the quiz to see your attempts here</p>
               </div>
             ) : (
-              <div className="space-y-3">
-                <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                  <div className="grid grid-cols-3 gap-4 text-center">
+              <div className="space-y-4">
+                <div className="mb-8 p-6 bg-gradient-to-br from-blue-50 to-blue-100/30 rounded-xl border-2 border-blue-200 shadow-md">
+                  <div className="grid grid-cols-3 gap-6 text-center">
                     <div>
-                      <p className="text-sm text-blue-600 font-medium">Total Attempts</p>
-                      <p className="text-2xl font-bold text-blue-900">{attemptsData?.attempts_used || 0}</p>
+                      <p className="text-xs font-bold text-blue-600 uppercase tracking-wide mb-2">Total Attempts</p>
+                      <p className="text-3xl font-bold text-blue-900">{attemptsData?.attempts_used || 0}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-blue-600 font-medium">Max Allowed</p>
-                      <p className="text-2xl font-bold text-blue-900">
+                      <p className="text-xs font-bold text-blue-600 uppercase tracking-wide mb-2">Max Allowed</p>
+                      <p className="text-3xl font-bold text-blue-900">
                         {attemptsData?.max_attempts || "Unlimited"}
                       </p>
                     </div>
                     <div>
-                      <p className="text-sm text-blue-600 font-medium">Best Score</p>
-                      <p className="text-2xl font-bold text-blue-900">
+                      <p className="text-xs font-bold text-blue-600 uppercase tracking-wide mb-2">Best Score</p>
+                      <p className="text-3xl font-bold text-blue-900">
                         {bestScore !== null ? `${bestScore}%` : "N/A"}
                       </p>
                     </div>
@@ -464,30 +489,30 @@ export const QuizDetail = () => {
                 {attempts.map((attempt) => (
                   <div
                     key={attempt.attempt_id}
-                    className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+                    className="flex items-center justify-between p-6 bg-gradient-to-br from-white to-gray-50/50 rounded-xl border-2 border-gray-100 shadow-md hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-200 cursor-pointer hover:scale-[1.02] hover:border-accent-primary/30"
                     onClick={() => handleViewAttempt(attempt.attempt_id)}
                   >
-                    <div className="flex items-center gap-4">
-                      <div className="p-3 bg-white rounded-lg border border-gray-200">
-                        <span className="text-lg font-bold text-gray-900">#{attempt.attempt_number}</span>
+                    <div className="flex items-center gap-5">
+                      <div className="p-4 bg-gradient-to-br from-accent-primary/10 to-accent-secondary/10 rounded-xl border-2 border-accent-primary/20 shadow-sm">
+                        <span className="text-xl font-bold text-gray-900">#{attempt.attempt_number}</span>
                       </div>
                       <div>
-                        <div className="flex items-center gap-2">
-                          <p className="font-medium text-gray-900">
+                        <div className="flex items-center gap-3 mb-2">
+                          <p className="font-bold text-gray-900 text-lg">
                             Score: {attempt.score !== null ? `${attempt.score}%` : "N/A"}
                           </p>
                           {attempt.passed && (
-                            <span className="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-semibold">
+                            <span className="px-3 py-1 bg-gradient-to-r from-green-100 to-green-200 text-green-700 rounded-lg text-xs font-bold border border-green-300">
                               ✓ Passed
                             </span>
                           )}
                           {attempt.passed === false && (
-                            <span className="px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-semibold">
+                            <span className="px-3 py-1 bg-gradient-to-r from-red-100 to-red-200 text-red-700 rounded-lg text-xs font-bold border border-red-300">
                               ✗ Failed
                             </span>
                           )}
                         </div>
-                        <p className="text-sm text-gray-600 mt-1">
+                        <p className="text-sm text-gray-600 font-medium">
                           {attempt.status === "completed" ? (
                             <>
                               Completed on {new Date(attempt.completed_at).toLocaleDateString()} at{" "}
@@ -501,15 +526,15 @@ export const QuizDetail = () => {
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-4">
                       {attempt.time_spent_seconds > 0 && (
-                        <div className="flex items-center gap-1 text-sm text-gray-600">
-                          <Timer className="w-4 h-4" />
+                        <div className="flex items-center gap-2 text-sm text-gray-600 font-medium">
+                          <Timer className="w-5 h-5 text-gray-500" />
                           <span>{Math.floor(attempt.time_spent_seconds / 60)} min</span>
                         </div>
                       )}
                       {attempt.status === "completed" && (
-                        <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
+                        <button className="px-5 py-2.5 bg-gradient-to-r from-accent-primary to-accent-secondary text-white rounded-xl hover:shadow-lg text-sm font-bold transition-all duration-200 hover:scale-105">
                           View Details
                         </button>
                       )}

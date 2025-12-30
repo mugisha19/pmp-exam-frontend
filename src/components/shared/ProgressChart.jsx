@@ -8,9 +8,9 @@ import { cn } from "@/utils/cn";
 export const ProgressChart = ({ className, data = [] }) => {
   if (!data || data.length === 0) {
     return (
-      <div className={cn("bg-white rounded-xl border border-gray-200 shadow-sm p-5", className)}>
-        <h3 className="text-sm font-semibold text-gray-900 mb-4">Your Progress</h3>
-        <div className="flex items-center justify-center h-32 text-sm text-gray-500">
+      <div className={cn("bg-gradient-to-br from-white via-gray-50/30 to-white rounded-2xl border-2 border-gray-200 shadow-xl shadow-gray-200/50 p-6 hover:shadow-2xl transition-all duration-300", className)}>
+        <h3 className="text-base font-bold text-gray-900 mb-5 uppercase tracking-wide">Your Progress</h3>
+        <div className="flex items-center justify-center h-40 text-sm text-gray-600 font-medium bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-xl border-2 border-dashed border-gray-200">
           No progress data available
         </div>
       </div>
@@ -20,27 +20,27 @@ export const ProgressChart = ({ className, data = [] }) => {
   const maxValue = Math.max(...data.map(d => d.value), 100);
 
   return (
-    <div className={cn("bg-white rounded-xl border border-gray-200 shadow-sm p-5", className)}>
-      <h3 className="text-sm font-semibold text-gray-900 mb-4">Your Progress</h3>
-      <div className="flex items-end justify-between gap-2 h-32">
+    <div className={cn("bg-gradient-to-br from-white via-gray-50/30 to-white rounded-2xl border-2 border-gray-200 shadow-xl shadow-gray-200/50 p-6 hover:shadow-2xl transition-all duration-300", className)}>
+      <h3 className="text-base font-bold text-gray-900 mb-5 uppercase tracking-wide">Your Progress</h3>
+      <div className="flex items-end justify-between gap-3 h-40">
         {data.map((item, index) => {
           const height = (item.value / maxValue) * 100;
           const isEven = index % 2 === 0;
           
           return (
-            <div key={index} className="flex-1 flex flex-col items-center gap-2">
+            <div key={index} className="flex-1 flex flex-col items-center gap-3">
               <div className="w-full flex flex-col items-center justify-end h-full">
                 <div
                   className={cn(
-                    "w-full rounded-t transition-all duration-300",
+                    "w-full rounded-t-xl transition-all duration-500 shadow-lg hover:shadow-xl",
                     isEven 
-                      ? "bg-gradient-to-t from-accent-secondary to-accent-primary" 
-                      : "bg-gradient-to-t from-accent-primary/80 to-accent-primary"
+                      ? "bg-gradient-to-t from-accent-secondary via-accent-primary to-accent-primary" 
+                      : "bg-gradient-to-t from-accent-primary/90 via-accent-primary to-accent-secondary"
                   )}
                   style={{ height: `${height}%` }}
                 />
               </div>
-              <span className="text-xs text-gray-500 font-medium">{item.label}</span>
+              <span className="text-xs text-gray-600 font-bold">{item.label}</span>
             </div>
           );
         })}

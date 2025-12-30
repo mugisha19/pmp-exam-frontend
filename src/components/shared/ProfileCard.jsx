@@ -4,7 +4,6 @@
  */
 
 import { useAuthStore } from "@/stores/auth.store";
-import { Bell, MessageSquare, Settings } from "lucide-react";
 import { cn } from "@/utils/cn";
 
 export const ProfileCard = ({ className }) => {
@@ -20,41 +19,29 @@ export const ProfileCard = ({ className }) => {
   const initials = `${user?.first_name?.[0] || ""}${user?.last_name?.[0] || ""}`.toUpperCase();
 
   return (
-    <div className={cn("bg-white rounded-xl border border-gray-200 shadow-sm p-5", className)}>
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold text-gray-900">Your Profile</h3>
-        <button className="text-gray-400 hover:text-gray-600">
+    <div className={cn("bg-gradient-to-br from-white via-gray-50/30 to-white rounded-2xl border-2 border-gray-200 shadow-xl shadow-gray-200/50 p-6 hover:shadow-2xl transition-all duration-300", className)}>
+      <div className="flex items-center justify-between mb-5">
+        <h3 className="text-base font-bold text-gray-900 uppercase tracking-wide">Your Profile</h3>
+        <button className="text-gray-400 hover:text-gray-600 transition-colors p-1.5 rounded-lg hover:bg-gray-100">
           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
             <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
           </svg>
         </button>
       </div>
 
-      <div className="flex flex-col items-center mb-4">
-        <div className="relative mb-3">
-          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-accent-primary to-accent-secondary flex items-center justify-center border-4 border-white shadow-md">
-            <span className="text-white font-bold text-xl">{initials}</span>
+      <div className="flex flex-col items-center mb-5">
+        <div className="relative mb-4">
+          <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-accent-primary to-accent-secondary flex items-center justify-center border-4 border-white shadow-xl ring-4 ring-accent-primary/10">
+            <span className="text-white font-bold text-2xl">{initials}</span>
           </div>
-          <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-accent-primary rounded-full border-2 border-white"></div>
+          <div className="absolute -bottom-1 -right-1 w-7 h-7 bg-gradient-to-br from-green-400 to-green-500 rounded-full border-3 border-white shadow-lg"></div>
         </div>
-        <h4 className="text-base font-semibold text-gray-900 mb-1">
+        <h4 className="text-lg font-bold text-gray-900 mb-2">
           {getGreeting()} {user?.first_name}
         </h4>
-        <p className="text-xs text-gray-600 text-center">
+        <p className="text-xs text-gray-600 text-center font-medium leading-relaxed">
           Continue Your Journey And Achieve Your Target
         </p>
-      </div>
-
-      <div className="flex items-center justify-center gap-3 pt-3 border-t border-gray-200">
-        <button className="p-2 rounded-lg hover:bg-gray-100 transition-colors">
-          <Bell className="w-4 h-4 text-gray-600" />
-        </button>
-        <button className="p-2 rounded-lg hover:bg-gray-100 transition-colors">
-          <MessageSquare className="w-4 h-4 text-gray-600" />
-        </button>
-        <button className="p-2 rounded-lg hover:bg-gray-100 transition-colors">
-          <Settings className="w-4 h-4 text-gray-600" />
-        </button>
       </div>
     </div>
   );

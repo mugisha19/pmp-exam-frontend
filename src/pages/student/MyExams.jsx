@@ -190,11 +190,11 @@ export const MyExams = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">My Exams</h1>
-        <p className="text-gray-600">
+      <div className="pb-4 border-b-2 border-gray-100">
+        <h1 className="text-3xl font-bold text-gray-900 mb-3">My Exams</h1>
+        <p className="text-gray-600 font-medium text-lg">
           View and take all available quizzes from your groups and public quizzes
         </p>
       </div>
@@ -244,7 +244,7 @@ export const MyExams = () => {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-primary/20 focus:border-accent-primary"
+                className="px-4 py-2.5 border-2 border-gray-200 rounded-xl text-sm font-medium bg-white focus:outline-none focus:ring-2 focus:ring-accent-primary/30 focus:border-accent-primary transition-all duration-200 hover:border-gray-300 shadow-sm hover:shadow-md"
               >
                 <option value="all">All Status</option>
                 <option value="active">Active</option>
@@ -258,7 +258,7 @@ export const MyExams = () => {
               <select
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
-                className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-primary/20 focus:border-accent-primary"
+                className="px-4 py-2.5 border-2 border-gray-200 rounded-xl text-sm font-medium bg-white focus:outline-none focus:ring-2 focus:ring-accent-primary/30 focus:border-accent-primary transition-all duration-200 hover:border-gray-300 shadow-sm hover:shadow-md"
               >
                 <option value="all">All Types</option>
                 <option value="public">Public</option>
@@ -270,7 +270,7 @@ export const MyExams = () => {
               <select
                 value={dateFilter}
                 onChange={(e) => setDateFilter(e.target.value)}
-                className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-primary/20 focus:border-accent-primary"
+                className="px-4 py-2.5 border-2 border-gray-200 rounded-xl text-sm font-medium bg-white focus:outline-none focus:ring-2 focus:ring-accent-primary/30 focus:border-accent-primary transition-all duration-200 hover:border-gray-300 shadow-sm hover:shadow-md"
               >
                 <option value="all">All Time</option>
                 <option value="upcoming">Upcoming</option>
@@ -292,16 +292,21 @@ export const MyExams = () => {
 
       {/* Quizzes List */}
       {loadingQuizzes ? (
-        <div className="flex items-center justify-center py-12">
-          <Spinner size="lg" />
+        <div className="flex items-center justify-center py-16">
+          <div className="flex flex-col items-center gap-4">
+            <Spinner size="lg" />
+            <p className="text-sm text-gray-500 font-medium">Loading quizzes...</p>
+          </div>
         </div>
       ) : filteredAndSortedQuizzes.length === 0 ? (
-        <div className="text-center py-12 bg-white rounded-xl border border-gray-200">
-          <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+        <div className="text-center py-16 bg-gradient-to-br from-white to-gray-50/50 rounded-2xl border-2 border-gray-200 shadow-lg">
+          <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center shadow-inner">
+            <BookOpen className="w-12 h-12 text-gray-400" />
+          </div>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">
             No quizzes found
           </h3>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-600 font-medium">
             {activeFiltersCount > 0
               ? "Try adjusting your filters"
               : "No quizzes are available at the moment"}
@@ -309,25 +314,27 @@ export const MyExams = () => {
         </div>
       ) : (
         <div>
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
-            <p className="text-sm text-gray-600">
-              Showing {filteredAndSortedQuizzes.length} of {allQuizzes.length} quiz
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6 p-4 bg-gradient-to-r from-gray-50 to-white rounded-xl border-2 border-gray-100">
+            <p className="text-sm font-semibold text-gray-700">
+              Showing <span className="text-accent-primary font-bold">{filteredAndSortedQuizzes.length}</span> of <span className="font-bold">{allQuizzes.length}</span> quiz
               {allQuizzes.length !== 1 ? "zes" : ""}
             </p>
-            <p className="text-sm text-gray-600">
-              {filteredAndSortedQuizzes.filter((q) => {
-                const now = new Date();
-                if (q.scheduling_enabled && q.starts_at && q.ends_at) {
-                  const start = new Date(q.starts_at);
-                  const end = new Date(q.ends_at);
-                  return now >= start && now <= end && q.status !== "cancelled" && q.status !== "completed";
-                }
-                return q.is_available && q.status !== "cancelled" && q.status !== "completed";
-              }).length} available to take now
+            <p className="text-sm font-semibold text-gray-700">
+              <span className="text-green-600 font-bold">
+                {filteredAndSortedQuizzes.filter((q) => {
+                  const now = new Date();
+                  if (q.scheduling_enabled && q.starts_at && q.ends_at) {
+                    const start = new Date(q.starts_at);
+                    const end = new Date(q.ends_at);
+                    return now >= start && now <= end && q.status !== "cancelled" && q.status !== "completed";
+                  }
+                  return q.is_available && q.status !== "cancelled" && q.status !== "completed";
+                }).length}
+              </span> available to take now
             </p>
           </div>
           {viewMode === "grid" ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredAndSortedQuizzes.map((quiz) => {
                 const quizId = quiz.quiz_id || quiz.id;
                 const attemptInfo = attemptsMap[quizId] || null;
@@ -345,7 +352,7 @@ export const MyExams = () => {
               })}
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-4">
               {filteredAndSortedQuizzes.map((quiz) => {
                 const quizId = quiz.quiz_id || quiz.id;
                 const attemptInfo = attemptsMap[quizId] || null;

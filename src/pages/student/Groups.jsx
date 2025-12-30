@@ -205,11 +205,11 @@ export const Groups = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Study Groups</h1>
-        <p className="text-gray-600">
+      <div className="pb-4 border-b-2 border-gray-100">
+        <h1 className="text-3xl font-bold text-gray-900 mb-3">Study Groups</h1>
+        <p className="text-gray-600 font-medium text-lg">
           Join groups to access quizzes and study materials
         </p>
       </div>
@@ -236,23 +236,23 @@ export const Groups = () => {
       )}
 
       {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-gray-200 overflow-x-auto scrollbar-hide">
+      <div className="flex items-center gap-2 border-b-2 border-gray-200 overflow-x-auto scrollbar-hide bg-gradient-to-r from-gray-50/50 to-white rounded-t-xl px-2">
         <button
           onClick={() => handleTabChange("all")}
-          className={`px-4 md:px-6 py-3 font-semibold text-sm border-b-2 -mb-0.5 transition-colors whitespace-nowrap ${
+          className={`px-5 md:px-7 py-3.5 font-bold text-sm border-b-3 -mb-0.5 transition-all duration-200 whitespace-nowrap rounded-t-lg ${
             activeTab === "all"
-              ? "border-accent-primary text-accent-primary"
-              : "border-transparent text-gray-600 hover:text-gray-900"
+              ? "border-accent-primary text-accent-primary bg-white shadow-lg shadow-accent-primary/10"
+              : "border-transparent text-gray-600 hover:text-gray-900 hover:bg-white/50"
           }`}
         >
           Browse All Groups
         </button>
         <button
           onClick={() => handleTabChange("my-groups")}
-          className={`px-4 md:px-6 py-3 font-semibold text-sm border-b-2 -mb-0.5 transition-colors whitespace-nowrap ${
+          className={`px-5 md:px-7 py-3.5 font-bold text-sm border-b-3 -mb-0.5 transition-all duration-200 whitespace-nowrap rounded-t-lg ${
             activeTab === "my-groups"
-              ? "border-accent-primary text-accent-primary"
-              : "border-transparent text-gray-600 hover:text-gray-900"
+              ? "border-accent-primary text-accent-primary bg-white shadow-lg shadow-accent-primary/10"
+              : "border-transparent text-gray-600 hover:text-gray-900 hover:bg-white/50"
           }`}
         >
           My Groups ({myGroups?.length || 0})
@@ -277,7 +277,7 @@ export const Groups = () => {
               <select
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
-                className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-primary/20 focus:border-accent-primary"
+                className="px-4 py-2.5 border-2 border-gray-200 rounded-xl text-sm font-medium bg-white focus:outline-none focus:ring-2 focus:ring-accent-primary/30 focus:border-accent-primary transition-all duration-200 hover:border-gray-300 shadow-sm hover:shadow-md"
               >
                 <option value="all">All Types</option>
                 <option value="class">Class</option>
@@ -291,7 +291,7 @@ export const Groups = () => {
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-primary/20 focus:border-accent-primary"
+                  className="px-4 py-2.5 border-2 border-gray-200 rounded-xl text-sm font-medium bg-white focus:outline-none focus:ring-2 focus:ring-accent-primary/30 focus:border-accent-primary transition-all duration-200 hover:border-gray-300 shadow-sm hover:shadow-md"
                 >
                   <option value="all">All Status</option>
                   <option value="active">Active</option>
@@ -314,13 +314,18 @@ export const Groups = () => {
 
       {/* Groups List */}
       {isLoading ? (
-        <div className="flex items-center justify-center py-12">
-          <Spinner size="lg" />
+        <div className="flex items-center justify-center py-16">
+          <div className="flex flex-col items-center gap-4">
+            <Spinner size="lg" />
+            <p className="text-sm text-gray-500 font-medium">Loading groups...</p>
+          </div>
         </div>
       ) : filteredAndSortedGroups.length === 0 ? (
-        <div className="text-center py-12 bg-white rounded-xl border border-gray-200">
-          <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+        <div className="text-center py-16 bg-gradient-to-br from-white to-gray-50/50 rounded-2xl border-2 border-gray-200 shadow-lg">
+          <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center shadow-inner">
+            <Users className="w-12 h-12 text-gray-400" />
+          </div>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">
             {activeTab === "all" ? "No groups found" : "No groups yet"}
           </h3>
           <p className="text-sm text-gray-600 mb-4">
@@ -333,7 +338,7 @@ export const Groups = () => {
           {activeTab === "my-groups" && (
             <button
               onClick={() => handleTabChange("all")}
-              className="px-6 py-2 bg-accent-primary text-white font-semibold rounded-lg hover:bg-accent-secondary transition-colors"
+              className="px-6 py-3 bg-gradient-to-r from-accent-primary to-accent-secondary text-white font-bold rounded-xl hover:shadow-lg transition-all duration-200 hover:scale-105"
             >
               Browse Groups
             </button>

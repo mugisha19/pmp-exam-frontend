@@ -185,30 +185,35 @@ export function Profile() {
   const displayAvatar = avatarPreview || currentAvatarUrl || user?.avatar_url;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between pb-4 border-b-2 border-gray-100">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">My Profile</h1>
-          <p className="text-gray-600 mt-1">View and manage your account information</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">My Profile</h1>
+          <p className="text-gray-600 font-medium text-lg">View and manage your account information</p>
         </div>
         {!isEditing && (
-          <Button onClick={() => setIsEditing(true)}>Edit Profile</Button>
+          <Button 
+            onClick={() => setIsEditing(true)}
+            className="bg-gradient-to-r from-accent-primary to-accent-secondary hover:shadow-lg transition-all duration-200 hover:scale-105"
+          >
+            Edit Profile
+          </Button>
         )}
       </div>
 
       {/* Profile Card */}
-      <Card>
-        <CardContent className="p-6">
+      <Card className="border-2 border-gray-100 shadow-lg shadow-gray-100/50">
+        <CardContent className="p-8">
           <form onSubmit={handleSubmit(onSubmit)}>
             {/* Avatar Section */}
-            <div className="flex items-start gap-6 mb-8 pb-6 border-b border-gray-200">
+            <div className="flex items-start gap-8 mb-10 pb-8 border-b-2 border-gray-100">
               <div className="relative">
                 {displayAvatar ? (
                   <img
                     src={displayAvatar}
                     alt={`${user?.first_name} ${user?.last_name}`}
-                    className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg"
+                    className="w-32 h-32 rounded-2xl object-cover border-4 border-white shadow-xl ring-4 ring-accent-primary/10"
                     onError={(e) => {
                       e.target.style.display = "none";
                       e.target.nextSibling.style.display = "flex";
@@ -216,7 +221,7 @@ export function Profile() {
                   />
                 ) : null}
                 <div
-                  className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-3xl font-bold border-4 border-white shadow-lg"
+                  className="w-32 h-32 rounded-2xl bg-gradient-to-br from-accent-primary to-accent-secondary flex items-center justify-center text-white text-4xl font-bold border-4 border-white shadow-xl ring-4 ring-accent-primary/10"
                   style={{ display: displayAvatar ? "none" : "flex" }}
                 >
                   {user?.first_name?.[0]}
@@ -227,19 +232,19 @@ export function Profile() {
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className="absolute -bottom-1 -right-1 p-2 bg-blue-600 border-2 border-white rounded-full shadow-md hover:bg-blue-700 transition-colors"
+                      className="absolute -bottom-2 -right-2 p-3 bg-gradient-to-r from-accent-primary to-accent-secondary border-4 border-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-110"
                       title="Upload photo"
                     >
-                      <Camera className="w-4 h-4 text-white" />
+                      <Camera className="w-5 h-5 text-white" />
                     </button>
                     {displayAvatar && (
                       <button
                         type="button"
                         onClick={handleRemoveAvatar}
-                        className="absolute -top-1 -right-1 p-1.5 bg-white border border-gray-200 rounded-full shadow-md hover:bg-red-50 transition-colors"
+                        className="absolute -top-2 -right-2 p-2 bg-white border-2 border-gray-200 rounded-full shadow-lg hover:bg-red-50 hover:border-red-200 transition-all duration-200 hover:scale-110"
                         title="Remove photo"
                       >
-                        <X className="w-3.5 h-3.5 text-red-500" />
+                        <X className="w-4 h-4 text-red-500" />
                       </button>
                     )}
                     <input
@@ -254,20 +259,20 @@ export function Profile() {
               </div>
 
               <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
-                  <h2 className="text-2xl font-bold text-gray-900">
+                <div className="flex items-center gap-3 mb-3">
+                  <h2 className="text-3xl font-bold text-gray-900">
                     {user?.first_name} {user?.last_name}
                   </h2>
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 text-sm font-medium bg-blue-100 text-blue-700 rounded-full">
-                    <Shield className="w-3.5 h-3.5" />
+                  <span className="inline-flex items-center gap-1.5 px-4 py-1.5 text-sm font-bold bg-gradient-to-r from-blue-100 to-blue-200 text-blue-700 rounded-xl shadow-sm border border-blue-200">
+                    <Shield className="w-4 h-4" />
                     Student
                   </span>
                 </div>
-                <p className="text-gray-500 flex items-center gap-2">
-                  <Mail className="w-4 h-4" />
+                <p className="text-gray-600 font-medium flex items-center gap-2 mb-2">
+                  <Mail className="w-5 h-5 text-gray-500" />
                   {user?.email}
                 </p>
-                <p className="text-gray-400 text-sm mt-2 flex items-center gap-2">
+                <p className="text-gray-500 text-sm font-medium mt-3 flex items-center gap-2">
                   <Calendar className="w-4 h-4" />
                   Member since {formatDate(user?.created_at)}
                 </p>
@@ -275,9 +280,11 @@ export function Profile() {
             </div>
 
             {/* Profile Information */}
-            <div className="space-y-6">
-              <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                <User className="w-5 h-5 text-gray-400" />
+            <div className="space-y-8">
+              <h3 className="text-xl font-bold text-gray-900 flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent-primary/20 to-accent-secondary/20 flex items-center justify-center">
+                  <User className="w-5 h-5 text-accent-primary" />
+                </div>
                 Personal Information
               </h3>
 
@@ -294,7 +301,7 @@ export function Profile() {
                       error={errors.first_name?.message}
                     />
                   ) : (
-                    <p className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-900">
+                    <p className="px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100/50 border-2 border-gray-200 rounded-xl text-gray-900 font-medium shadow-sm">
                       {user?.first_name || "—"}
                     </p>
                   )}
@@ -302,7 +309,7 @@ export function Profile() {
 
                 {/* Last Name */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
                     Last Name
                   </label>
                   {isEditing ? (
@@ -310,9 +317,10 @@ export function Profile() {
                       {...register("last_name")}
                       placeholder="Enter last name"
                       error={errors.last_name?.message}
+                      className="border-2 focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/30"
                     />
                   ) : (
-                    <p className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-900">
+                    <p className="px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100/50 border-2 border-gray-200 rounded-xl text-gray-900 font-medium shadow-sm">
                       {user?.last_name || "—"}
                     </p>
                   )}
@@ -320,27 +328,27 @@ export function Profile() {
 
                 {/* Email (Read-only) */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
                     Email Address
                   </label>
-                  <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg">
-                    <Mail className="w-4 h-4 text-gray-400" />
-                    <span className="text-gray-900">{user?.email}</span>
-                    <CheckCircle className="w-4 h-4 text-green-500 ml-auto" />
+                  <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100/50 border-2 border-gray-200 rounded-xl shadow-sm">
+                    <Mail className="w-5 h-5 text-gray-500" />
+                    <span className="text-gray-900 font-medium">{user?.email}</span>
+                    <CheckCircle className="w-5 h-5 text-green-500 ml-auto" />
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-600 mt-2 font-medium">
                     Email address cannot be changed
                   </p>
                 </div>
 
                 {/* Role (Read-only) */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
                     Role
                   </label>
-                  <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg">
-                    <Shield className="w-4 h-4 text-blue-500" />
-                    <span className="text-gray-900 capitalize">
+                  <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-blue-50 to-blue-100/50 border-2 border-blue-200 rounded-xl shadow-sm">
+                    <Shield className="w-5 h-5 text-blue-600" />
+                    <span className="text-gray-900 font-bold capitalize">
                       {user?.role}
                     </span>
                   </div>
@@ -398,13 +406,14 @@ export function Profile() {
 
             {/* Action Buttons */}
             {isEditing && (
-              <div className="flex items-center gap-3 mt-8 pt-6 border-t border-gray-200">
+              <div className="flex items-center gap-4 mt-10 pt-8 border-t-2 border-gray-100">
                 <Button
                   type="submit"
                   disabled={
                     (!isDirty && !selectedFile) ||
                     updateProfileMutation.isPending
                   }
+                  className="bg-gradient-to-r from-accent-primary to-accent-secondary hover:shadow-lg transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 >
                   {updateProfileMutation.isPending ? (
                     <>
@@ -423,6 +432,7 @@ export function Profile() {
                   variant="secondary"
                   onClick={handleCancel}
                   disabled={updateProfileMutation.isPending}
+                  className="border-2 hover:bg-gray-100 transition-all duration-200"
                 >
                   Cancel
                 </Button>
@@ -433,41 +443,50 @@ export function Profile() {
       </Card>
 
       {/* Account Status */}
-      <Card>
-        <CardContent className="p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+      <Card className="border-2 border-gray-100 shadow-lg shadow-gray-100/50">
+        <CardContent className="p-8">
+          <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent-primary/20 to-accent-secondary/20 flex items-center justify-center">
+              <Shield className="w-5 h-5 text-accent-primary" />
+            </div>
             Account Status
           </h3>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-              <div className="flex items-center gap-2 mb-1">
-                <CheckCircle className="w-4 h-4 text-green-600" />
-                <span className="text-sm font-medium text-green-700">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="p-6 bg-gradient-to-br from-green-50 to-green-100/30 rounded-xl border-2 border-green-200 shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-10 h-10 rounded-lg bg-green-200 flex items-center justify-center shadow-sm">
+                  <CheckCircle className="w-5 h-5 text-green-700" />
+                </div>
+                <span className="text-sm font-bold text-green-700 uppercase tracking-wide">
                   Active
                 </span>
               </div>
-              <p className="text-xs text-green-600">Account is active</p>
+              <p className="text-xs text-green-600 font-medium">Account is active</p>
             </div>
 
-            <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-              <div className="flex items-center gap-2 mb-1">
-                <Mail className="w-4 h-4 text-blue-600" />
-                <span className="text-sm font-medium text-blue-700">
+            <div className="p-6 bg-gradient-to-br from-blue-50 to-blue-100/30 rounded-xl border-2 border-blue-200 shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center shadow-sm">
+                  <Mail className="w-5 h-5 text-blue-700" />
+                </div>
+                <span className="text-sm font-bold text-blue-700 uppercase tracking-wide">
                   Verified
                 </span>
               </div>
-              <p className="text-xs text-blue-600">Email is verified</p>
+              <p className="text-xs text-blue-600 font-medium">Email is verified</p>
             </div>
 
-            <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
-              <div className="flex items-center gap-2 mb-1">
-                <Shield className="w-4 h-4 text-purple-600" />
-                <span className="text-sm font-medium text-purple-700">
+            <div className="p-6 bg-gradient-to-br from-purple-50 to-purple-100/30 rounded-xl border-2 border-purple-200 shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-10 h-10 rounded-lg bg-purple-200 flex items-center justify-center shadow-sm">
+                  <Shield className="w-5 h-5 text-purple-700" />
+                </div>
+                <span className="text-sm font-bold text-purple-700 uppercase tracking-wide">
                   Student
                 </span>
               </div>
-              <p className="text-xs text-purple-600">Learning access</p>
+              <p className="text-xs text-purple-600 font-medium">Learning access</p>
             </div>
           </div>
         </CardContent>

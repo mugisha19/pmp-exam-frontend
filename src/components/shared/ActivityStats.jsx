@@ -91,16 +91,16 @@ export const ActivityStats = ({ className }) => {
     : 0;
 
   return (
-    <div className={cn("space-y-4", className)}>
+    <div className={cn("space-y-6", className)}>
       {/* Header with Period Filter */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">Activity Statistics</h3>
-          <p className="text-sm text-gray-500 mt-1">
+          <h3 className="text-2xl font-bold text-gray-900 mb-1">Activity Statistics</h3>
+          <p className="text-sm text-gray-600 font-medium">
             Track your learning progress and performance
           </p>
         </div>
-        <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
+        <div className="flex items-center gap-2 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-1.5 shadow-inner border border-gray-200/50">
           {PERIOD_OPTIONS.map((period) => {
             const isSelected = period.value === null 
               ? selectedPeriod === null 
@@ -110,10 +110,10 @@ export const ActivityStats = ({ className }) => {
                 key={period.value || "all"}
                 onClick={() => setSelectedPeriod(period.value)}
                 className={cn(
-                  "px-3 py-1.5 text-sm font-medium rounded-md transition-colors",
+                  "px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200",
                   isSelected
-                    ? "bg-white text-accent-primary shadow-sm"
-                    : "text-gray-600 hover:text-gray-900"
+                    ? "bg-gradient-to-r from-accent-primary to-accent-secondary text-white shadow-md shadow-accent-primary/30 scale-105"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-white/50"
                 )}
               >
                 {period.label}
@@ -129,10 +129,12 @@ export const ActivityStats = ({ className }) => {
           <Spinner size="lg" />
         </div>
       ) : hasNoData || !overallStats ? (
-        <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
-          <BookOpen className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <h4 className="text-lg font-semibold text-gray-900 mb-2">No Activity Data Yet</h4>
-          <p className="text-sm text-gray-500">
+        <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl border-2 border-gray-200 shadow-lg p-12 text-center">
+          <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center shadow-inner">
+            <BookOpen className="w-10 h-10 text-gray-400" />
+          </div>
+          <h4 className="text-xl font-bold text-gray-900 mb-2">No Activity Data Yet</h4>
+          <p className="text-sm text-gray-600 font-medium max-w-md mx-auto">
             Start taking quizzes to see your activity statistics here.
           </p>
         </div>
@@ -183,41 +185,41 @@ export const ActivityStats = ({ className }) => {
 
       {/* Additional Info */}
       {overallStats && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-          <div className="bg-white rounded-lg border border-gray-200 p-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
-                <Target className="w-5 h-5 text-green-600" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mt-6">
+          <div className="bg-gradient-to-br from-white to-green-50/30 rounded-xl border-2 border-green-100 shadow-md hover:shadow-lg transition-all duration-200 p-5 hover:scale-105">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center shadow-sm">
+                <Target className="w-6 h-6 text-green-600" />
               </div>
               <div>
-                <p className="text-xs text-gray-500">Highest Score</p>
-                <p className="text-lg font-semibold text-gray-900">
+                <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1">Highest Score</p>
+                <p className="text-2xl font-bold text-gray-900">
                   {overallStats.highest_score?.toFixed(1) || "0"}%
                 </p>
               </div>
             </div>
           </div>
-          <div className="bg-white rounded-lg border border-gray-200 p-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                <Calendar className="w-5 h-5 text-blue-600" />
+          <div className="bg-gradient-to-br from-white to-blue-50/30 rounded-xl border-2 border-blue-100 shadow-md hover:shadow-lg transition-all duration-200 p-5 hover:scale-105">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center shadow-sm">
+                <Calendar className="w-6 h-6 text-blue-600" />
               </div>
               <div>
-                <p className="text-xs text-gray-500">Longest Streak</p>
-                <p className="text-lg font-semibold text-gray-900">
+                <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1">Longest Streak</p>
+                <p className="text-2xl font-bold text-gray-900">
                   {overallStats.longest_streak_days || 0} days
                 </p>
               </div>
             </div>
           </div>
-          <div className="bg-white rounded-lg border border-gray-200 p-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-purple-600" />
+          <div className="bg-gradient-to-br from-white to-purple-50/30 rounded-xl border-2 border-purple-100 shadow-md hover:shadow-lg transition-all duration-200 p-5 hover:scale-105">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-100 to-purple-200 flex items-center justify-center shadow-sm">
+                <TrendingUp className="w-6 h-6 text-purple-600" />
               </div>
               <div>
-                <p className="text-xs text-gray-500">Improvement Rate</p>
-                <p className="text-lg font-semibold text-gray-900">
+                <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1">Improvement Rate</p>
+                <p className="text-2xl font-bold text-gray-900">
                   {overallStats.improvement_rate?.toFixed(1) || "0"}%
                 </p>
               </div>
