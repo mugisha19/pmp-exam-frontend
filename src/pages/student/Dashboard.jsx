@@ -916,15 +916,16 @@ export const Dashboard = () => {
                   {calendarDays.map((dayInfo, i) => (
                     <div
                       key={i}
+                      onClick={() => handleDayClick(dayInfo)}
                       className={cn(
                         "aspect-square flex items-center justify-center text-xs rounded-md cursor-pointer transition-colors",
                         dayInfo.isToday
                           ? "text-white font-semibold"
                           : dayInfo.isCurrentMonth
-                          ? "text-gray-700"
-                          : "text-gray-400 hover:bg-gray-50"
+                          ? "text-gray-700 hover:bg-gray-100"
+                          : "text-gray-400"
                       )}
-                      style={dayInfo.isToday ? { backgroundColor: '#476072' } : dayInfo.isCurrentMonth ? { hover: { backgroundColor: 'rgba(71, 96, 114, 0.1)' } } : {}}
+                      style={dayInfo.isToday ? { backgroundColor: '#476072' } : {}}
                     >
                       {dayInfo.day}
                     </div>
@@ -1033,6 +1034,55 @@ export const Dashboard = () => {
           <div className="flex flex-col items-center gap-4">
           <Spinner size="lg" />
             <p className="text-sm text-gray-500 font-medium">Loading dashboard...</p>
+          </div>
+        </div>
+      )}
+
+      {/* Reminder Modal */}
+      {showReminderModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Schedule Quiz Reminder</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Set a reminder for {selectedDate?.toLocaleDateString()}
+            </p>
+            
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Select Quiz</label>
+              <select
+                value={selectedQuiz || ''}
+                onChange={(e) => setSelectedQuiz(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="">Choose a quiz...</option>
+                {allQuizzes.map((quiz) => (
+                  <option key={quiz.quiz_id || quiz.id} value={quiz.quiz_id || quiz.id}>
+                    {quiz.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowReminderModal(false);
+                  setSelectedQuiz(null);
+                  setSelectedDate(null);
+                }}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleScheduleReminder}
+                disabled={!selectedQuiz}
+                className="flex-1 px-4 py-2 text-white rounded-lg font-medium disabled:bg-gray-300 disabled:cursor-not-allowed"
+                style={{ backgroundColor: selectedQuiz ? '#476072' : undefined }}
+              >
+                Set Reminder
+              </button>
+            </div>
           </div>
         </div>
       )}
