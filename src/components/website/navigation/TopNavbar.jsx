@@ -133,7 +133,7 @@ export const TopNavbar = () => {
                 </div>
                 <div className="hidden sm:block">
                   <span className="text-lg font-bold text-gray-900">
-                    PMP<span className="text-emerald-600">Prep</span>
+                    <span className="text-emerald-600">PMP</span>
                   </span>
                 </div>
               </Link>
