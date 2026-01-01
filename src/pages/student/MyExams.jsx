@@ -562,7 +562,7 @@ const ExamCardModern = ({ quiz, bestScore, attemptCount, onClick }) => {
   return (
     <div
       onClick={onClick}
-      className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg hover:border-gray-300 transition-all duration-200 cursor-pointer group"
+      className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg hover:border-gray-300 transition-all duration-200 cursor-pointer group flex flex-col"
     >
       {/* Header */}
       <div className="h-24 bg-linear-to-br from-emerald-500 to-teal-600 relative">
@@ -595,15 +595,16 @@ const ExamCardModern = ({ quiz, bestScore, attemptCount, onClick }) => {
       </div>
 
       {/* Content */}
-      <div className="p-5">
+      <div className="p-5 flex flex-col h-full">
         <h3 className="font-semibold text-gray-900 mb-2 line-clamp-1 group-hover:text-emerald-600 transition-colors">
           {quiz.title}
         </h3>
 
         {quiz.description && (
-          <p className="text-sm text-gray-600 line-clamp-2 mb-4">
-            {quiz.description}
-          </p>
+          <div
+            className="text-sm text-gray-600 line-clamp-2 mb-4"
+            dangerouslySetInnerHTML={{ __html: quiz.description }}
+          />
         )}
 
         {/* Stats */}
@@ -636,7 +637,7 @@ const ExamCardModern = ({ quiz, bestScore, attemptCount, onClick }) => {
         </div>
 
         {/* Actions */}
-        <div className="mt-4">
+        <div className="mt-auto pt-4">
           <button
             onClick={(e) => {
               e.stopPropagation();
