@@ -47,7 +47,11 @@ export const Home = () => {
 
   // Fetch all quiz attempts - refetch when allQuizzes changes
   const { data: allAttemptsData, refetch: refetchAttempts } = useQuery({
-    queryKey: ["all-quiz-attempts", user?.user_id, allQuizzes.map(q => q.quiz_id || q.id).join(",")],
+    queryKey: [
+      "all-quiz-attempts",
+      user?.user_id,
+      allQuizzes.map((q) => q.quiz_id || q.id).join(","),
+    ],
     queryFn: async () => {
       try {
         if (allQuizzes.length === 0) return { attempts: [] };
@@ -95,7 +99,11 @@ export const Home = () => {
     const learningHours = Math.round(totalSeconds / 3600);
 
     const completedScores = attempts
-      .filter((att) => (att.status === "submitted" || att.status === "auto_submitted") && att.score != null)
+      .filter(
+        (att) =>
+          (att.status === "submitted" || att.status === "auto_submitted") &&
+          att.score != null
+      )
       .map((att) => att.score);
     const averageScore =
       completedScores.length > 0
@@ -108,7 +116,9 @@ export const Home = () => {
     const totalQuizzes = allQuizzes.length;
     const completedQuizIds = new Set(
       attempts
-        .filter((att) => att.status === "submitted" || att.status === "auto_submitted")
+        .filter(
+          (att) => att.status === "submitted" || att.status === "auto_submitted"
+        )
         .map((att) => att.quiz_id)
     );
     const completedQuizzes = completedQuizIds.size;
@@ -143,7 +153,9 @@ export const Home = () => {
     const attempts = allAttemptsData?.attempts || [];
     const completedQuizIds = new Set(
       attempts
-        .filter((att) => att.status === "submitted" || att.status === "auto_submitted")
+        .filter(
+          (att) => att.status === "submitted" || att.status === "auto_submitted"
+        )
         .map((att) => att.quiz_id)
     );
 
