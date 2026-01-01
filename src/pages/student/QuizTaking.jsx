@@ -655,12 +655,14 @@ export const QuizTaking = () => {
       await submitQuiz(sessionToken);
       sessionStorage.removeItem("quiz_session_token");
       sessionStorage.removeItem("quiz_session_data");
-      
+
       // Invalidate queries to refetch fresh data
       await queryClient.invalidateQueries({ queryKey: ["quiz", quizId] });
-      await queryClient.invalidateQueries({ queryKey: ["quiz-attempts", quizId] });
+      await queryClient.invalidateQueries({
+        queryKey: ["quiz-attempts", quizId],
+      });
       await queryClient.invalidateQueries({ queryKey: ["quizzes"] });
-      
+
       toast.success("Quiz submitted successfully!");
       navigate(`/exams/${quizId}`);
     } catch (error) {
@@ -668,12 +670,14 @@ export const QuizTaking = () => {
       if (error.response?.status === 200 || error.response?.status === 410) {
         sessionStorage.removeItem("quiz_session_token");
         sessionStorage.removeItem("quiz_session_data");
-        
+
         // Invalidate queries to refetch fresh data
         await queryClient.invalidateQueries({ queryKey: ["quiz", quizId] });
-        await queryClient.invalidateQueries({ queryKey: ["quiz-attempts", quizId] });
+        await queryClient.invalidateQueries({
+          queryKey: ["quiz-attempts", quizId],
+        });
         await queryClient.invalidateQueries({ queryKey: ["quizzes"] });
-        
+
         toast("Quiz has already been submitted");
         navigate(`/exams/${quizId}`);
         return;
