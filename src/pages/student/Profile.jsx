@@ -146,7 +146,6 @@ export function Profile() {
       setAvatarPreview(null);
       setSelectedFile(null);
     } catch (error) {
-
       if (error.response?.status === 401) {
         toast.error("Session expired. Please log in again.");
       } else if (error.response?.status === 413) {
@@ -185,108 +184,99 @@ export function Profile() {
   const displayAvatar = avatarPreview || currentAvatarUrl || user?.avatar_url;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
-      {/* Header */}
-      <div className="flex items-center justify-between pb-4 border-b-2 border-gray-100">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">My Profile</h1>
-          <p className="text-gray-600 font-medium text-lg">View and manage your account information</p>
+    <div className="max-w-5xl mx-auto space-y-6">
+      {/* Cover Photo Section */}
+      <div className="relative h-48 bg-gradient-to-br from-primary via-primary/90 to-secondary rounded-2xl overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent"></div>
+        <div className="absolute bottom-0 left-0 right-0 p-8">
+          <div className="flex items-end gap-6">
+            {/* Avatar */}
+            <div className="relative -mb-16">
+              {displayAvatar ? (
+                <img
+                  src={displayAvatar}
+                  alt={`${user?.first_name} ${user?.last_name}`}
+                  className="w-32 h-32 rounded-2xl object-cover border-4 border-white shadow-xl"
+                  onError={(e) => {
+                    e.target.style.display = "none";
+                    e.target.nextSibling.style.display = "flex";
+                  }}
+                />
+              ) : null}
+              <div
+                className="w-32 h-32 rounded-2xl flex items-center justify-center text-white text-4xl font-bold border-4 border-white shadow-xl"
+                style={{
+                  background:
+                    "linear-gradient(to bottom right, #10b981, #0d9488)",
+                  display: displayAvatar ? "none" : "flex",
+                }}
+              >
+                {user?.first_name?.[0]}
+                {user?.last_name?.[0]}
+              </div>
+              {isEditing && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="absolute -bottom-2 -right-2 p-3 bg-primary border-4 border-white rounded-full shadow-lg hover:shadow-xl transition-all"
+                    title="Upload photo"
+                  >
+                    <Camera className="w-5 h-5 text-white" />
+                  </button>
+                  {displayAvatar && (
+                    <button
+                      type="button"
+                      onClick={handleRemoveAvatar}
+                      className="absolute -top-2 -right-2 p-2 bg-white border-2 border-gray-200 rounded-full shadow-lg hover:bg-red-50 hover:border-red-200 transition-all"
+                      title="Remove photo"
+                    >
+                      <X className="w-4 h-4 text-red-500" />
+                    </button>
+                  )}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileSelect}
+                    className="hidden"
+                  />
+                </>
+              )}
+            </div>
+            {/* Name and Edit Button */}
+            <div className="flex-1 pb-4 flex items-end justify-between">
+              <div>
+                <h1 className="text-3xl font-bold text-white mb-2">
+                  {user?.first_name} {user?.last_name}
+                </h1>
+                <p className="text-white/90 font-medium flex items-center gap-2">
+                  <Mail className="w-4 h-4" />
+                  {user?.email}
+                </p>
+              </div>
+              {!isEditing && (
+                <Button
+                  onClick={() => setIsEditing(true)}
+                  className="bg-white text-primary hover:shadow-lg transition-all font-semibold"
+                >
+                  Edit Profile
+                </Button>
+              )}
+            </div>
+          </div>
         </div>
-        {!isEditing && (
-          <Button 
-            onClick={() => setIsEditing(true)}
-            className="bg-gradient-to-r hover:shadow-lg transition-all duration-200 hover:scale-105"
-            style={{ background: 'linear-gradient(to right, #476072, #5a7a8f)' }}
-          >
-            Edit Profile
-          </Button>
-        )}
       </div>
 
       {/* Profile Card */}
-      <Card className="border-2 border-gray-100 shadow-lg shadow-gray-100/50">
+      <Card className="border-2 border-gray-100 shadow-soft mt-20">
         <CardContent className="p-8">
           <form onSubmit={handleSubmit(onSubmit)}>
-            {/* Avatar Section */}
-            <div className="flex items-start gap-8 mb-10 pb-8 border-b-2 border-gray-100">
-              <div className="relative">
-                {displayAvatar ? (
-                  <img
-                    src={displayAvatar}
-                    alt={`${user?.first_name} ${user?.last_name}`}
-                    className="w-32 h-32 rounded-2xl object-cover border-4 border-white shadow-xl ring-4"
-                    style={{ '--tw-ring-color': 'rgba(71, 96, 114, 0.1)' }}
-                    onError={(e) => {
-                      e.target.style.display = "none";
-                      e.target.nextSibling.style.display = "flex";
-                    }}
-                  />
-                ) : null}
-                <div
-                  className="w-32 h-32 rounded-2xl flex items-center justify-center text-white text-4xl font-bold border-4 border-white shadow-xl ring-4"
-                  style={{ background: 'linear-gradient(to bottom right, #476072, #5a7a8f)', '--tw-ring-color': 'rgba(71, 96, 114, 0.1)', display: displayAvatar ? "none" : "flex" }}
-                >
-                  {user?.first_name?.[0]}
-                  {user?.last_name?.[0]}
-                </div>
-                {isEditing && (
-                  <>
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="absolute -bottom-2 -right-2 p-3 border-4 border-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-110"
-                      style={{ background: 'linear-gradient(to right, #476072, #5a7a8f)' }}
-                      title="Upload photo"
-                    >
-                      <Camera className="w-5 h-5 text-white" />
-                    </button>
-                    {displayAvatar && (
-                      <button
-                        type="button"
-                        onClick={handleRemoveAvatar}
-                        className="absolute -top-2 -right-2 p-2 bg-white border-2 border-gray-200 rounded-full shadow-lg hover:bg-red-50 hover:border-red-200 transition-all duration-200 hover:scale-110"
-                        title="Remove photo"
-                      >
-                        <X className="w-4 h-4 text-red-500" />
-                      </button>
-                    )}
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/*"
-                      onChange={handleFileSelect}
-                      className="hidden"
-                    />
-                  </>
-                )}
-              </div>
-
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-3">
-                  <h2 className="text-3xl font-bold text-gray-900">
-                    {user?.first_name} {user?.last_name}
-                  </h2>
-                  <span className="inline-flex items-center gap-1.5 px-4 py-1.5 text-sm font-bold bg-gradient-to-r from-blue-100 to-blue-200 text-blue-700 rounded-xl shadow-sm border border-blue-200">
-                    <Shield className="w-4 h-4" />
-                    Student
-                  </span>
-                </div>
-                <p className="text-gray-600 font-medium flex items-center gap-2 mb-2">
-                  <Mail className="w-5 h-5 text-gray-500" />
-                  {user?.email}
-                </p>
-                <p className="text-gray-500 text-sm font-medium mt-3 flex items-center gap-2">
-                  <Calendar className="w-4 h-4" />
-                  Member since {formatDate(user?.created_at)}
-                </p>
-              </div>
-            </div>
-
             {/* Profile Information */}
-            <div className="space-y-8">
-              <h3 className="text-xl font-bold text-gray-900 flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'linear-gradient(to bottom right, rgba(71, 96, 114, 0.2), rgba(71, 96, 114, 0.1))' }}>
-                  <User className="w-5 h-5" style={{ color: '#476072' }} />
+            <div className="space-y-6">
+              <h3 className="text-xl font-bold text-gray-900 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <User className="w-5 h-5 text-primary" />
                 </div>
                 Personal Information
               </h3>
@@ -294,7 +284,7 @@ export function Profile() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* First Name */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
                     First Name
                   </label>
                   {isEditing ? (
@@ -302,9 +292,10 @@ export function Profile() {
                       {...register("first_name")}
                       placeholder="Enter first name"
                       error={errors.first_name?.message}
+                      className="border-2 focus:border-primary"
                     />
                   ) : (
-                    <p className="px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100/50 border-2 border-gray-200 rounded-xl text-gray-900 font-medium shadow-sm">
+                    <p className="px-4 py-3 bg-gray-50 border-2 border-gray-100 rounded-xl text-gray-900 font-medium">
                       {user?.first_name || "—"}
                     </p>
                   )}
@@ -312,7 +303,7 @@ export function Profile() {
 
                 {/* Last Name */}
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Last Name
                   </label>
                   {isEditing ? (
@@ -320,10 +311,10 @@ export function Profile() {
                       {...register("last_name")}
                       placeholder="Enter last name"
                       error={errors.last_name?.message}
-                      className="border-2 focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/30"
+                      className="border-2 focus:border-primary"
                     />
                   ) : (
-                    <p className="px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100/50 border-2 border-gray-200 rounded-xl text-gray-900 font-medium shadow-sm">
+                    <p className="px-4 py-3 bg-gray-50 border-2 border-gray-100 rounded-xl text-gray-900 font-medium">
                       {user?.last_name || "—"}
                     </p>
                   )}
@@ -331,93 +322,59 @@ export function Profile() {
 
                 {/* Email (Read-only) */}
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Email Address
                   </label>
-                  <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100/50 border-2 border-gray-200 rounded-xl shadow-sm">
-                    <Mail className="w-5 h-5 text-gray-500" />
-                    <span className="text-gray-900 font-medium">{user?.email}</span>
-                    <CheckCircle className="w-5 h-5 text-blue-500 ml-auto" />
+                  <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 border-2 border-gray-100 rounded-xl">
+                    <Mail className="w-5 h-5 text-gray-400" />
+                    <span className="text-gray-900 font-medium">
+                      {user?.email}
+                    </span>
+                    <CheckCircle className="w-5 h-5 text-emerald-500 ml-auto" />
                   </div>
-                  <p className="text-xs text-gray-600 mt-2 font-medium">
+                  <p className="text-xs text-gray-500 mt-1.5">
                     Email address cannot be changed
                   </p>
                 </div>
 
                 {/* Role (Read-only) */}
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Role
                   </label>
-                  <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-blue-50 to-blue-100/50 border-2 border-blue-200 rounded-xl shadow-sm">
-                    <Shield className="w-5 h-5 text-blue-600" />
-                    <span className="text-gray-900 font-bold capitalize">
+                  <div className="flex items-center gap-3 px-4 py-3 bg-primary/5 border-2 border-primary/20 rounded-xl">
+                    <Shield className="w-5 h-5 text-primary" />
+                    <span className="text-gray-900 font-semibold capitalize">
                       {user?.role}
                     </span>
                   </div>
                 </div>
-              </div>
 
-              {/* Avatar Upload/URL (when editing) */}
-              {isEditing && (
-                <div className="md:col-span-2 space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Upload Profile Picture
-                    </label>
-                    <div className="flex items-center gap-3">
-                      <Button
-                        type="button"
-                        variant="secondary"
-                        onClick={() => fileInputRef.current?.click()}
-                      >
-                        <Upload className="w-4 h-4 mr-2" />
-                        Choose File
-                      </Button>
-                      <span className="text-sm text-gray-500">
-                        {selectedFile ? selectedFile.name : "No file selected"}
-                      </span>
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Supported formats: JPEG, PNG, GIF, WebP (max 5MB)
-                    </p>
-                  </div>
-
-                  <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                      <div className="w-full border-t border-gray-300" />
-                    </div>
-                    <div className="relative flex justify-center text-sm">
-                      <span className="px-2 bg-white text-gray-500">or</span>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                      Profile Picture URL
-                    </label>
-                    <Input
-                      {...register("avatar_url")}
-                      placeholder="https://example.com/avatar.jpg"
-                      error={errors.avatar_url?.message}
-                      helperText="Enter a publicly accessible image URL"
-                    />
+                {/* Member Since */}
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Member Since
+                  </label>
+                  <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 border-2 border-gray-100 rounded-xl">
+                    <Calendar className="w-5 h-5 text-gray-400" />
+                    <span className="text-gray-900 font-medium">
+                      {formatDate(user?.created_at)}
+                    </span>
                   </div>
                 </div>
-              )}
+              </div>
             </div>
 
             {/* Action Buttons */}
             {isEditing && (
-              <div className="flex items-center gap-4 mt-10 pt-8 border-t-2 border-gray-100">
+              <div className="flex items-center gap-4 mt-8 pt-6 border-t-2 border-gray-100">
                 <Button
                   type="submit"
                   disabled={
                     (!isDirty && !selectedFile) ||
                     updateProfileMutation.isPending
                   }
-                  className="bg-gradient-to-r hover:shadow-lg transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-                  style={{ background: 'linear-gradient(to right, #476072, #5a7a8f)' }}
+                  className="bg-primary hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {updateProfileMutation.isPending ? (
                     <>
@@ -436,7 +393,7 @@ export function Profile() {
                   variant="secondary"
                   onClick={handleCancel}
                   disabled={updateProfileMutation.isPending}
-                  className="border-2 hover:bg-gray-100 transition-all duration-200"
+                  className="border-2 hover:bg-gray-100 transition-all"
                 >
                   Cancel
                 </Button>
@@ -447,50 +404,56 @@ export function Profile() {
       </Card>
 
       {/* Account Status */}
-      <Card className="border-2 border-gray-100 shadow-lg shadow-gray-100/50">
+      <Card className="border-2 border-gray-100 shadow-soft">
         <CardContent className="p-8">
           <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'linear-gradient(to bottom right, rgba(71, 96, 114, 0.2), rgba(71, 96, 114, 0.1))' }}>
-              <Shield className="w-5 h-5" style={{ color: '#476072' }} />
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <Shield className="w-5 h-5 text-primary" />
             </div>
             Account Status
           </h3>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="p-6 bg-gradient-to-br from-blue-50 to-blue-100/30 rounded-xl border-2 border-blue-200 shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="p-6 bg-gradient-to-br from-emerald-50 to-emerald-100/30 rounded-xl border-2 border-emerald-200">
               <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center shadow-sm">
-                  <CheckCircle className="w-5 h-5 text-blue-700" />
+                <div className="w-10 h-10 rounded-lg bg-emerald-200 flex items-center justify-center">
+                  <CheckCircle className="w-5 h-5 text-emerald-700" />
                 </div>
-                <span className="text-sm font-bold text-blue-700 uppercase tracking-wide">
+                <span className="text-sm font-bold text-emerald-700 uppercase tracking-wide">
                   Active
                 </span>
               </div>
-              <p className="text-xs text-blue-600 font-medium">Account is active</p>
+              <p className="text-xs text-emerald-600 font-medium">
+                Account is active
+              </p>
             </div>
 
-            <div className="p-6 bg-gradient-to-br from-blue-50 to-blue-100/30 rounded-xl border-2 border-blue-200 shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105">
+            <div className="p-6 bg-gradient-to-br from-emerald-50 to-emerald-100/30 rounded-xl border-2 border-emerald-200">
               <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center shadow-sm">
-                  <Mail className="w-5 h-5 text-blue-700" />
+                <div className="w-10 h-10 rounded-lg bg-emerald-200 flex items-center justify-center">
+                  <Mail className="w-5 h-5 text-emerald-700" />
                 </div>
-                <span className="text-sm font-bold text-blue-700 uppercase tracking-wide">
+                <span className="text-sm font-bold text-emerald-700 uppercase tracking-wide">
                   Verified
                 </span>
               </div>
-              <p className="text-xs text-blue-600 font-medium">Email is verified</p>
+              <p className="text-xs text-emerald-600 font-medium">
+                Email is verified
+              </p>
             </div>
 
-            <div className="p-6 bg-gradient-to-br from-purple-50 to-purple-100/30 rounded-xl border-2 border-purple-200 shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105">
+            <div className="p-6 bg-gradient-to-br from-primary/5 to-primary/10 rounded-xl border-2 border-primary/20">
               <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-lg bg-purple-200 flex items-center justify-center shadow-sm">
-                  <Shield className="w-5 h-5 text-purple-700" />
+                <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
+                  <Shield className="w-5 h-5 text-primary" />
                 </div>
-                <span className="text-sm font-bold text-purple-700 uppercase tracking-wide">
+                <span className="text-sm font-bold text-primary uppercase tracking-wide">
                   Student
                 </span>
               </div>
-              <p className="text-xs text-purple-600 font-medium">Learning access</p>
+              <p className="text-xs text-primary/80 font-medium">
+                Learning access
+              </p>
             </div>
           </div>
         </CardContent>

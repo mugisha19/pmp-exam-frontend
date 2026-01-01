@@ -21,6 +21,7 @@ import {
   BookMarked,
   FileQuestion,
   FolderTree,
+  TrendingUp,
 } from "lucide-react";
 
 export const STUDENT_NAV_ITEMS = [
@@ -37,10 +38,10 @@ export const STUDENT_NAV_ITEMS = [
     icon: Users,
   },
   {
-    id: "my-exams",
-    label: "My Exams",
-    path: "/exams",
-    icon: ClipboardList,
+    id: "my-learning",
+    label: "My Learning",
+    path: "/my-learning",
+    icon: TrendingUp,
   },
 ];
 

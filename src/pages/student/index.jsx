@@ -1,4 +1,5 @@
 export { Dashboard } from "./Dashboard";
+export { default as Home } from "./Home";
 export { Groups } from "./Groups";
 export { GroupDetail } from "./GroupDetail";
 export { MyExams } from "./MyExams";
@@ -8,3 +9,7 @@ export { default as AttemptReview } from "./AttemptReview";
 export { default as Profile } from "./Profile";
 export { Notifications } from "./Notifications";
 export { default as JoinGroup } from "./JoinGroup";
+export { default as BrowseExams } from "./BrowseExams";
+export { default as LearningPaths } from "./LearningPaths";
+export { default as Achievements } from "./Achievements";
+export { default as Resources } from "./Resources";
