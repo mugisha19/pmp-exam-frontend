@@ -183,8 +183,8 @@ export const Home = () => {
   const recentActivity = useMemo(() => {
     const attempts = allAttemptsData?.attempts || [];
     return attempts
-      .filter((att) => att.completed_at)
-      .sort((a, b) => new Date(b.completed_at) - new Date(a.completed_at))
+      .filter((att) => att.status === "submitted" || att.status === "auto_submitted")
+      .sort((a, b) => new Date(b.submitted_at) - new Date(a.submitted_at))
       .slice(0, 5)
       .map((att) => {
         const quiz = allQuizzes.find(
@@ -196,7 +196,7 @@ export const Home = () => {
             att.correct_answers || 0
           } correct answers`,
           status: "completed",
-          date: att.completed_at,
+          date: att.submitted_at,
           metadata: {
             score: att.score,
             duration: att.time_spent_seconds
