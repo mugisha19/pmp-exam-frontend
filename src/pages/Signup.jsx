@@ -26,9 +26,6 @@ const signupSchema = z.object({
     .regex(/[a-z]/, "Password must contain at least one lowercase letter")
     .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
     .regex(/[0-9]/, "Password must contain at least one number"),
-  agreeToTerms: z.boolean().refine((val) => val === true, {
-    message: "You must agree to the terms and conditions",
-  }),
 });
 
 export const Signup = () => {
@@ -41,7 +38,6 @@ export const Signup = () => {
       last_name: "",
       email: "",
       password: "",
-      agreeToTerms: false,
     },
   });
 
@@ -114,26 +110,6 @@ export const Signup = () => {
             />
             {passwordValue && <PasswordStrength password={passwordValue} />}
           </div>
-
-          <FormCheckbox
-            name="agreeToTerms"
-            control={control}
-            label={
-              <span>
-                I agree to the{" "}
-                <Link to="/terms" className="text-accent hover:text-accent/80">
-                  Terms of Service
-                </Link>{" "}
-                and{" "}
-                <Link
-                  to="/privacy"
-                  className="text-accent hover:text-accent/80"
-                >
-                  Privacy Policy
-                </Link>
-              </span>
-            }
-          />
 
           <Button
             type="submit"

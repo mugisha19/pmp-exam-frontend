@@ -129,8 +129,11 @@ export const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const [showSearchResults, setShowSearchResults] = useState(false);
-  const [activeTab, setActiveTab] = useState("upcoming"); // upcoming, in_progress, completed
+  const [activeTab, setActiveTab] = useState("upcoming");
   const [expandedQuiz, setExpandedQuiz] = useState(null);
+  const [showReminderModal, setShowReminderModal] = useState(false);
+  const [selectedQuiz, setSelectedQuiz] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(null);
   const scrollRef = useRef(null);
 
   // Debounce search query
@@ -221,6 +224,21 @@ export const Dashboard = () => {
   }, [allQuizzes]);
 
   const currentTabQuizzes = filteredQuizzesByStatus[activeTab] || [];
+
+  const handleDayClick = (dayInfo) => {
+    if (!dayInfo.isCurrentMonth) return;
+    const clickedDate = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), dayInfo.day);
+    setSelectedDate(clickedDate);
+    setShowReminderModal(true);
+  };
+
+  const handleScheduleReminder = () => {
+    if (!selectedQuiz || !selectedDate) return;
+    toast.success(`Reminder set for ${selectedDate.toLocaleDateString()}`);
+    setShowReminderModal(false);
+    setSelectedQuiz(null);
+    setSelectedDate(null);
+  };
 
   const handleSearch = (query) => {
     if (query.trim().length > 0) {
