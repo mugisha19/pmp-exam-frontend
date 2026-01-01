@@ -89,7 +89,10 @@ export const QuizTaking = () => {
         if (state.status === "auto_submitted") {
           showToast.info("Time's up!", "Quiz was auto-submitted.");
         } else {
-          showToast.info("Already Submitted", "This quiz has already been submitted");
+          showToast.info(
+            "Already Submitted",
+            "This quiz has already been submitted"
+          );
         }
         navigate(`/exams/${quizId}`);
         return;
@@ -603,7 +606,10 @@ export const QuizTaking = () => {
             } more question(s) to pause.`
         );
       } else {
-        showToast.error("Pause Not Available", "Pause not available at this time");
+        showToast.error(
+          "Pause Not Available",
+          "Pause not available at this time"
+        );
       }
       return;
     }
@@ -618,7 +624,10 @@ export const QuizTaking = () => {
       await loadSessionState();
     } catch (error) {
       console.error("Failed to pause:", error);
-      showToast.error("Pause Failed", error.response?.data?.detail || "Failed to pause quiz");
+      showToast.error(
+        "Pause Failed",
+        error.response?.data?.detail || "Failed to pause quiz"
+      );
     } finally {
       setIsPausing(false);
     }
@@ -648,7 +657,10 @@ export const QuizTaking = () => {
 
   const handleSubmitClick = () => {
     if (isWaitingForAutoSubmit) {
-      showToast.info("Auto-Submit in Progress", "Quiz is being auto-submitted. Please wait...");
+      showToast.info(
+        "Auto-Submit in Progress",
+        "Quiz is being auto-submitted. Please wait..."
+      );
       return;
     }
     setShowSubmitModal(true);
