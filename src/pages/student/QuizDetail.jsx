@@ -92,12 +92,11 @@ export const QuizDetail = () => {
         const detail = error.response.data?.detail;
         if (detail?.error === "active_quiz_exists") {
           setActiveQuizError(detail);
-          toast.error(detail.message || "You already have an active quiz");
-        } else {
-          toast.error(
-            "You already have an active quiz. Please complete it first."
-          );
         }
+        toast.error(
+          "Oops! You have another quiz in progress. Please finish or exit it first.",
+          { duration: 4000 }
+        );
       } else if (error.response?.status === 403) {
         toast.error(
           error.response.data?.detail ||
@@ -167,7 +166,7 @@ export const QuizDetail = () => {
   const attempts = attemptsData?.attempts || [];
   const totalAttempts = attempts.length;
   const bestScore =
-    attempts.length > 0 ? Math.max(...attempts.map((a) => a.score || 0)) : null;
+    attempts.length > 0 ? Math.round(Math.max(...attempts.map((a) => a.score || 0))) : null;
   const hasAttempted = totalAttempts > 0;
   const remainingAttempts = quiz.max_attempts
     ? quiz.max_attempts - totalAttempts
@@ -761,7 +760,7 @@ export const QuizDetail = () => {
                                 className={cn("text-lg font-bold", scoreColor)}
                               >
                                 {attempt.score !== null
-                                  ? `${attempt.score}%`
+                                  ? `${Math.round(attempt.score)}%`
                                   : "N/A"}
                               </span>
                               {attempt.passed === true && (

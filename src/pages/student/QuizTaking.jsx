@@ -41,7 +41,7 @@ import {
   navigateToQuestion,
   sendHeartbeat,
 } from "@/services/session.service";
-import toast from "react-hot-toast";
+import { showToast } from "@/utils/toast.utils";
 import { cn } from "@/utils/cn";
 import { Modal, ModalBody, ModalFooter } from "@/components/ui/Modal";
 
@@ -87,9 +87,9 @@ export const QuizTaking = () => {
         sessionStorage.removeItem("quiz_session_token");
         sessionStorage.removeItem("quiz_session_data");
         if (state.status === "auto_submitted") {
-          toast("Time's up! Quiz was auto-submitted.");
+          showToast.info("Time's up!", "Quiz was auto-submitted.");
         } else {
-          toast("This quiz has already been submitted");
+          showToast.info("Already Submitted", "This quiz has already been submitted");
         }
         navigate(`/exams/${quizId}`);
         return;
@@ -99,7 +99,7 @@ export const QuizTaking = () => {
       if (state.status === "auto_submitted" && state.result) {
         sessionStorage.removeItem("quiz_session_token");
         sessionStorage.removeItem("quiz_session_data");
-        toast("Time's up! Quiz was auto-submitted.");
+        showToast.info("Time's up!", "Quiz was auto-submitted.");
         navigate(`/exams/${quizId}`);
         return;
       }
@@ -180,7 +180,10 @@ export const QuizTaking = () => {
       }
     } catch (error) {
       console.error("Failed to load session:", error);
-      toast.error("Failed to load quiz session");
+      showToast.error(
+        "Session Error",
+        "Failed to load quiz session. Please try again."
+      );
       navigate(`/exams/${quizId}`);
     } finally {
       setLoading(false);
@@ -297,7 +300,7 @@ export const QuizTaking = () => {
         ) {
           sessionStorage.removeItem("quiz_session_token");
           sessionStorage.removeItem("quiz_session_data");
-          toast("Time's up! Quiz was auto-submitted.");
+          showToast.info("Time's up!", "Quiz was auto-submitted.");
           navigate(`/exams/${quizId}`);
           return;
         }
@@ -328,7 +331,7 @@ export const QuizTaking = () => {
         if (state.status === "auto_submitted" || state.status === "submitted") {
           sessionStorage.removeItem("quiz_session_token");
           sessionStorage.removeItem("quiz_session_data");
-          toast("Time's up! Quiz was auto-submitted.");
+          showToast.info("Time's up!", "Quiz was auto-submitted.");
           navigate(`/exams/${quizId}`);
           return;
         }
@@ -336,7 +339,7 @@ export const QuizTaking = () => {
         if (state.status === "expired" || !state.session_id) {
           sessionStorage.removeItem("quiz_session_token");
           sessionStorage.removeItem("quiz_session_data");
-          toast.error("Session expired. Quiz was auto-submitted.");
+          showToast.error("Session Expired", "Quiz was auto-submitted.");
           navigate(`/exams/${quizId}`);
           return;
         }
@@ -344,7 +347,7 @@ export const QuizTaking = () => {
         if (error.response?.status === 404 || error.response?.status === 410) {
           sessionStorage.removeItem("quiz_session_token");
           sessionStorage.removeItem("quiz_session_data");
-          toast("Time's up! Quiz was auto-submitted.");
+          showToast.info("Time's up!", "Quiz was auto-submitted.");
           navigate(`/exams/${quizId}`);
         } else {
           console.error("Failed to poll session status:", error);
@@ -396,7 +399,6 @@ export const QuizTaking = () => {
 
       if (response.auto_paused) {
         await loadSessionState();
-        toast.success(response.pause_message || "Auto-pause triggered");
         return { autoPaused: true };
       }
 
@@ -430,7 +432,7 @@ export const QuizTaking = () => {
         navigate(`/exams/${quizId}`);
         return { autoPaused: false };
       }
-      toast.error("Failed to save answer");
+      showToast.error("Save Failed", "Failed to save answer");
       return { autoPaused: false };
     } finally {
       setIsSaving(false);
@@ -443,7 +445,10 @@ export const QuizTaking = () => {
     }
 
     if (!sessionData || sessionData.pause_info?.is_paused) {
-      toast.error("Cannot flag questions while quiz is paused");
+      showToast.error(
+        "Action Not Allowed",
+        "Cannot flag questions while quiz is paused."
+      );
       return;
     }
 
@@ -465,7 +470,7 @@ export const QuizTaking = () => {
         navigate(`/exams/${quizId}`);
         return;
       }
-      toast.error("Failed to flag question");
+      showToast.error("Flag Failed", "Failed to flag question");
     }
   };
 
@@ -475,7 +480,10 @@ export const QuizTaking = () => {
     }
 
     if (!sessionData || sessionData.pause_info?.is_paused) {
-      toast.error("Cannot navigate while quiz is paused");
+      showToast.error(
+        "Action Not Allowed",
+        "Cannot navigate while quiz is paused."
+      );
       return;
     }
 
@@ -579,7 +587,7 @@ export const QuizTaking = () => {
         return;
       }
 
-      toast.error("Failed to navigate to question");
+      showToast.error("Navigation Failed", "Failed to navigate to question");
     }
   };
 
@@ -587,14 +595,15 @@ export const QuizTaking = () => {
     if (!sessionData.pause_info.can_pause_now) {
       if (sessionData.quiz_mode === "exam") {
         const nextPauseAt = sessionData.pause_info.next_pause_at_question;
-        toast.error(
+        showToast.error(
+          "Pause Not Available",
           `Pause is only available after answering ${sessionData.pause_info.pause_after_questions} questions. ` +
             `Answer ${
               nextPauseAt - (currentQuestionIndex + 1)
             } more question(s) to pause.`
         );
       } else {
-        toast.error("Pause not available at this time");
+        showToast.error("Pause Not Available", "Pause not available at this time");
       }
       return;
     }
@@ -602,11 +611,14 @@ export const QuizTaking = () => {
     setIsPausing(true);
     try {
       const response = await pauseQuiz(sessionToken);
-      toast.success("Quiz paused");
+      showToast.success(
+        "Quiz Paused",
+        "Take your time. Resume when you're ready."
+      );
       await loadSessionState();
     } catch (error) {
       console.error("Failed to pause:", error);
-      toast.error(error.response?.data?.detail || "Failed to pause quiz");
+      showToast.error("Pause Failed", error.response?.data?.detail || "Failed to pause quiz");
     } finally {
       setIsPausing(false);
     }
@@ -616,11 +628,14 @@ export const QuizTaking = () => {
     setIsResuming(true);
     try {
       await resumeQuiz(sessionToken);
-      toast.success("Quiz resumed");
+      showToast.success(
+        "Quiz Resumed",
+        "Good luck! Continue where you left off."
+      );
       await loadSessionState();
     } catch (error) {
       console.error("Failed to resume:", error);
-      toast.error("Failed to resume quiz");
+      showToast.error("Resume Failed", "Failed to resume quiz");
     } finally {
       setIsResuming(false);
     }
@@ -633,7 +648,7 @@ export const QuizTaking = () => {
 
   const handleSubmitClick = () => {
     if (isWaitingForAutoSubmit) {
-      toast("Quiz is being auto-submitted. Please wait...");
+      showToast.info("Auto-Submit in Progress", "Quiz is being auto-submitted. Please wait...");
       return;
     }
     setShowSubmitModal(true);
@@ -670,7 +685,10 @@ export const QuizTaking = () => {
         predicate: (query) => query.queryKey[0] === "all-quiz-attempts",
       });
 
-      toast.success("Quiz submitted successfully!");
+      showToast.success(
+        "Quiz Submitted!",
+        "Your answers have been saved successfully."
+      );
       navigate(`/exams/${quizId}`);
     } catch (error) {
       console.error("Failed to submit:", error);
@@ -691,11 +709,11 @@ export const QuizTaking = () => {
           predicate: (query) => query.queryKey[0] === "all-quiz-attempts",
         });
 
-        toast("Quiz has already been submitted");
+        showToast.info("Already Submitted", "Quiz has already been submitted");
         navigate(`/exams/${quizId}`);
         return;
       }
-      toast.error("Failed to submit quiz");
+      showToast.error("Submit Failed", "Failed to submit quiz");
     } finally {
       setIsSubmitting(false);
     }
@@ -1137,16 +1155,18 @@ export const QuizTaking = () => {
     );
   }
 
-  // Paused State
-  if (sessionData.pause_info?.is_paused) {
+  // Paused State - Show as Modal Overlay
+  const renderPauseModal = () => {
+    if (!sessionData.pause_info?.is_paused) return null;
+
     const isCountdownExpired =
       pauseTimeRemaining !== null && pauseTimeRemaining <= 0;
     const showResumeButton =
       sessionData.quiz_mode === "practice" || !isCountdownExpired;
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-6">
-        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-lg w-full text-center border border-gray-200">
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+        <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-lg w-full text-center border border-gray-200">
           <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-amber-100 to-orange-100 flex items-center justify-center">
             <Coffee className="w-12 h-12 text-amber-600" />
           </div>
@@ -1235,7 +1255,7 @@ export const QuizTaking = () => {
         </div>
       </div>
     );
-  }
+  };
 
   // Waiting for Auto-Submit State
   if (isWaitingForAutoSubmit) {
@@ -1274,6 +1294,8 @@ export const QuizTaking = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Pause Modal Overlay */}
+      {renderPauseModal()}
       {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

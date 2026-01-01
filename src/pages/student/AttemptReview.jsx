@@ -145,7 +145,7 @@ export const AttemptReview = () => {
                 <span className={`text-xl font-bold ${
                   attempt.passed ? "text-blue-700" : "text-red-700"
                 }`}>
-                  {attempt.score}%
+                  {Math.round(attempt.score)}%
                 </span>
               </div>
               <p className={`text-[10px] font-bold uppercase tracking-wide ${
