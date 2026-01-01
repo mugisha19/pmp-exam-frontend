@@ -656,12 +656,19 @@ export const QuizTaking = () => {
       sessionStorage.removeItem("quiz_session_token");
       sessionStorage.removeItem("quiz_session_data");
 
-      // Invalidate queries to refetch fresh data
+      // Invalidate all queries to refetch fresh data
       await queryClient.invalidateQueries({ queryKey: ["quiz", quizId] });
       await queryClient.invalidateQueries({
         queryKey: ["quiz-attempts", quizId],
       });
       await queryClient.invalidateQueries({ queryKey: ["quizzes"] });
+      await queryClient.invalidateQueries({
+        queryKey: ["all-quizzes-dashboard"],
+      });
+      // Invalidate all attempts queries (matches any query starting with "all-quiz-attempts")
+      await queryClient.invalidateQueries({
+        predicate: (query) => query.queryKey[0] === "all-quiz-attempts",
+      });
 
       toast.success("Quiz submitted successfully!");
       navigate(`/exams/${quizId}`);
@@ -677,6 +684,12 @@ export const QuizTaking = () => {
           queryKey: ["quiz-attempts", quizId],
         });
         await queryClient.invalidateQueries({ queryKey: ["quizzes"] });
+        await queryClient.invalidateQueries({
+          queryKey: ["all-quizzes-dashboard"],
+        });
+        await queryClient.invalidateQueries({
+          predicate: (query) => query.queryKey[0] === "all-quiz-attempts",
+        });
 
         toast("Quiz has already been submitted");
         navigate(`/exams/${quizId}`);

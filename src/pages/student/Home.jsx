@@ -35,7 +35,9 @@ export const Home = () => {
   const { data: allQuizzesData, isLoading: allQuizzesLoading } = useQuery({
     queryKey: ["all-quizzes-dashboard"],
     queryFn: () => getQuizzes({ limit: 100 }),
-    staleTime: 2 * 60 * 1000,
+    staleTime: 0,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: "always",
   });
 
   const allQuizzes = useMemo(
@@ -43,9 +45,9 @@ export const Home = () => {
     [allQuizzesData]
   );
 
-  // Fetch all quiz attempts
-  const { data: allAttemptsData } = useQuery({
-    queryKey: ["all-quiz-attempts", user?.user_id, allQuizzes.length],
+  // Fetch all quiz attempts - refetch when allQuizzes changes
+  const { data: allAttemptsData, refetch: refetchAttempts } = useQuery({
+    queryKey: ["all-quiz-attempts", user?.user_id, allQuizzes.map(q => q.quiz_id || q.id).join(",")],
     queryFn: async () => {
       try {
         if (allQuizzes.length === 0) return { attempts: [] };
@@ -69,7 +71,9 @@ export const Home = () => {
       }
     },
     enabled: !!user?.user_id && allQuizzes.length > 0,
-    staleTime: 2 * 60 * 1000,
+    staleTime: 0,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: "always",
   });
 
   // Fetch groups
@@ -81,7 +85,7 @@ export const Home = () => {
     const attempts = allAttemptsData?.attempts || [];
 
     const completedAttempts = attempts.filter(
-      (att) => att.status === "completed"
+      (att) => att.status === "submitted" || att.status === "auto_submitted"
     ).length;
 
     const totalSeconds = attempts.reduce(
@@ -91,7 +95,7 @@ export const Home = () => {
     const learningHours = Math.round(totalSeconds / 3600);
 
     const completedScores = attempts
-      .filter((att) => att.status === "completed" && att.score != null)
+      .filter((att) => (att.status === "submitted" || att.status === "auto_submitted") && att.score != null)
       .map((att) => att.score);
     const averageScore =
       completedScores.length > 0
@@ -104,7 +108,7 @@ export const Home = () => {
     const totalQuizzes = allQuizzes.length;
     const completedQuizIds = new Set(
       attempts
-        .filter((att) => att.status === "completed")
+        .filter((att) => att.status === "submitted" || att.status === "auto_submitted")
         .map((att) => att.quiz_id)
     );
     const completedQuizzes = completedQuizIds.size;
@@ -139,7 +143,7 @@ export const Home = () => {
     const attempts = allAttemptsData?.attempts || [];
     const completedQuizIds = new Set(
       attempts
-        .filter((att) => att.status === "completed")
+        .filter((att) => att.status === "submitted" || att.status === "auto_submitted")
         .map((att) => att.quiz_id)
     );
 

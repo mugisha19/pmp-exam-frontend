@@ -164,7 +164,7 @@ export const Dashboard = () => {
     const attempts = performanceData?.attempts || [];
     console.log('Dashboard - Performance attempts:', attempts);
     
-    const completedAttempts = attempts.filter(att => att.status === 'completed').length;
+    const completedAttempts = attempts.filter(att => att.status === 'submitted' || att.status === 'auto_submitted').length;
     
     // Calculate learning hours from time_spent_seconds
     const totalSeconds = attempts.reduce((sum, att) => sum + (att.time_spent_seconds || 0), 0);
@@ -180,7 +180,7 @@ export const Dashboard = () => {
     
     // Calculate progress percentage (unique quizzes completed / total available)
     const totalQuizzes = allQuizzes.length;
-    const completedQuizIds = new Set(attempts.filter(att => att.status === 'completed').map(att => att.quiz_id));
+    const completedQuizIds = new Set(attempts.filter(att => att.status === 'submitted' || att.status === 'auto_submitted').map(att => att.quiz_id));
     const completedQuizzes = completedQuizIds.size;
     const progressPercentage = totalQuizzes > 0 ? Math.round((completedQuizzes / totalQuizzes) * 100) : 0;
 
