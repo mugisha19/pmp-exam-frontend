@@ -23,6 +23,7 @@ import {
   User,
   HelpCircle,
   Trophy,
+  BarChart3,
 } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { SearchOverlay } from "./SearchOverlay";
@@ -108,6 +109,7 @@ export const TopNavbar = () => {
     { label: "Home", path: "/dashboard", icon: Home },
     { label: "Browse Exams", path: "/browse", icon: BookOpen },
     { label: "My Learning", path: "/my-learning", icon: TrendingUp },
+    { label: "Analytics", path: "/analytics", icon: BarChart3 },
     { label: "Groups", path: "/groups", icon: Users },
   ];
 

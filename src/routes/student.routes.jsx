@@ -16,6 +16,7 @@ import {
   Notifications,
   BrowseExams,
   LearningPaths,
+  Analytics,
 } from "@/pages/student";
 import QuizTaking from "@/pages/student/QuizTaking";
 import AttemptReview from "@/pages/student/AttemptReview";
@@ -32,6 +33,7 @@ export const studentRoutes = (
     <Route path="/browse" element={<BrowseExams />} />
     <Route path="/learning-paths" element={<LearningPaths />} />
     <Route path="/my-learning" element={<MyExams />} />
+    <Route path="/analytics" element={<Analytics />} />
     <Route path="/groups" element={<Groups />} />
     <Route path="/groups/:groupId" element={<GroupDetail />} />
     <Route path="/exams" element={<MyExams />} />
