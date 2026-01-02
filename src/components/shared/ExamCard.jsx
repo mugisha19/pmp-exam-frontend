@@ -16,6 +16,7 @@ import {
   Star,
   TrendingUp,
   ArrowRight,
+  XCircle,
 } from "lucide-react";
 import { cn } from "@/utils/cn";
 
@@ -38,6 +39,7 @@ export const ExamCard = ({
 }) => {
   const isCompleted = quiz.status === "completed";
   const isActive = quiz.is_available || quiz.status === "active";
+  const isCancelled = quiz.status === "cancelled";
   const isPremium = quiz.is_premium;
   const difficulty = quiz.difficulty || "medium";
 
@@ -133,13 +135,19 @@ export const ExamCard = ({
 
             {/* Badges */}
             <div className="flex items-center gap-2">
+              {isCancelled && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-red-50 text-red-700 text-xs font-semibold rounded-lg border border-red-200">
+                  <XCircle className="w-3 h-3" />
+                  Cancelled
+                </span>
+              )}
               {isCompleted && (
                 <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-teal-50 text-teal-700 text-xs font-semibold rounded-lg border border-teal-200">
                   <CheckCircle className="w-3 h-3" />
                   Completed
                 </span>
               )}
-              {isActive && !isCompleted && (
+              {isActive && !isCompleted && !isCancelled && (
                 <span
                   className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg border"
                   style={{
@@ -294,6 +302,11 @@ export const ExamCard = ({
             <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white/95 backdrop-blur-sm text-teal-700 rounded-lg text-xs font-semibold shadow-sm">
               <CheckCircle className="w-3.5 h-3.5" />
               Done
+            </div>
+          ) : isCancelled ? (
+            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white/95 backdrop-blur-sm text-red-700 rounded-lg text-xs font-semibold shadow-sm">
+              <XCircle className="w-3.5 h-3.5" />
+              Cancelled
             </div>
           ) : isActive ? (
             <div
