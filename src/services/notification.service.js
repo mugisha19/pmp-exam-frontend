@@ -16,8 +16,17 @@ import { NOTIFICATION_ENDPOINTS } from "@/constants/api.constants";
  */
 export const getNotifications = async (params = {}) => {
   try {
+    // Convert page/page_size to skip/limit if needed
+    const queryParams = { ...params };
+    if (params.page !== undefined && params.page_size !== undefined) {
+      queryParams.skip = (params.page - 1) * params.page_size;
+      queryParams.limit = params.page_size;
+      delete queryParams.page;
+      delete queryParams.page_size;
+    }
+    
     const response = await api.get(NOTIFICATION_ENDPOINTS.LIST_NOTIFICATIONS, {
-      params,
+      params: queryParams,
     });
     return response.data;
   } catch (error) {

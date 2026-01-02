@@ -177,9 +177,9 @@ export const StudentLayout = () => {
                     {user?.first_name} {user?.last_name}
                   </p>
                   <p className={cn(
-                    "text-[10px] capitalize font-medium uppercase tracking-wide transition-colors duration-200",
+                    "text-[10px] font-medium truncate transition-colors duration-200",
                     profileMenuOpen ? "text-white/80" : "text-gray-600 group-hover:text-white/80"
-                  )}>{user?.role}</p>
+                  )}>{user?.email}</p>
                 </div>
                 <ChevronDown className={cn(
                   "w-4 h-4 transition-all duration-200",

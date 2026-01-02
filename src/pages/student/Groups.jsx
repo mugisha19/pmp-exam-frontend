@@ -143,7 +143,10 @@ export const Groups = () => {
   const stats = useMemo(() => {
     const groups = myGroups || [];
     const activeGroups = groups.filter((g) => g.status === "active").length;
-    const totalQuizzes = groups.reduce((sum, g) => sum + (g.quiz_count || 0), 0);
+    const totalQuizzes = groups.reduce(
+      (sum, g) => sum + (g.quiz_count || 0),
+      0
+    );
     return {
       totalGroups: groups.length,
       activeGroups,
@@ -281,7 +284,10 @@ export const Groups = () => {
                   <div className="text-sm text-gray-600">Active</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-4xl font-bold" style={{ color: '#476072' }}>
+                  <div
+                    className="text-4xl font-bold"
+                    style={{ color: "#476072" }}
+                  >
                     {stats.totalQuizzes}
                   </div>
                   <div className="text-sm text-gray-600">Total Quizzes</div>
@@ -601,7 +607,12 @@ const GroupCardModern = ({ group, onJoin, onView, isLoading }) => {
       className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-xl hover:border-gray-300 transition-all duration-300 cursor-pointer group flex flex-col h-full"
     >
       {/* Header */}
-      <div className="h-24 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #476072 0%, #5a7a8f 100%)' }}>
+      <div
+        className="h-24 relative overflow-hidden"
+        style={{
+          background: "linear-gradient(135deg, #476072 0%, #5a7a8f 100%)",
+        }}
+      >
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 right-0 w-32 h-32 bg-white rounded-full -mr-16 -mt-16" />
           <div className="absolute bottom-0 left-0 w-24 h-24 bg-white rounded-full -ml-12 -mb-12" />
@@ -634,7 +645,10 @@ const GroupCardModern = ({ group, onJoin, onView, isLoading }) => {
 
         {group.isJoined && (
           <div className="absolute bottom-3 right-3">
-            <div className="flex items-center gap-1 px-2.5 py-1 text-white rounded-lg text-xs font-semibold shadow-sm" style={{ backgroundColor: '#476072' }}>
+            <div
+              className="flex items-center gap-1 px-2.5 py-1 text-white rounded-lg text-xs font-semibold shadow-sm"
+              style={{ backgroundColor: "#476072" }}
+            >
               <CheckCircle className="w-3 h-3" />
               Joined
             </div>
@@ -657,21 +671,33 @@ const GroupCardModern = ({ group, onJoin, onView, isLoading }) => {
         {/* Stats */}
         <div className="grid grid-cols-2 gap-2 mb-3">
           <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#F5F2F2' }}>
-              <Users className="w-4 h-4" style={{ color: '#476072' }} />
+            <div
+              className="w-8 h-8 rounded-lg flex items-center justify-center"
+              style={{ backgroundColor: "#F5F2F2" }}
+            >
+              <Users className="w-4 h-4" style={{ color: "#476072" }} />
             </div>
             <div>
-              <div className="text-[10px] text-gray-500 font-medium">Members</div>
-              <div className="font-bold text-sm text-gray-900">{memberCount}</div>
+              <div className="text-[10px] text-gray-500 font-medium">
+                Members
+              </div>
+              <div className="font-bold text-sm text-gray-900">
+                {memberCount}
+              </div>
             </div>
           </div>
 
           <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#F5F2F2' }}>
-              <BookOpen className="w-4 h-4" style={{ color: '#476072' }} />
+            <div
+              className="w-8 h-8 rounded-lg flex items-center justify-center"
+              style={{ backgroundColor: "#F5F2F2" }}
+            >
+              <BookOpen className="w-4 h-4" style={{ color: "#476072" }} />
             </div>
             <div>
-              <div className="text-[10px] text-gray-500 font-medium">Quizzes</div>
+              <div className="text-[10px] text-gray-500 font-medium">
+                Quizzes
+              </div>
               <div className="font-bold text-sm text-gray-900">{quizCount}</div>
             </div>
           </div>
@@ -685,7 +711,8 @@ const GroupCardModern = ({ group, onJoin, onView, isLoading }) => {
                 e.stopPropagation();
                 onView();
               }}
-              className="w-full py-2 font-semibold text-sm rounded-lg transition-all duration-200 flex items-center justify-center gap-2 border shadow-sm hover:shadow-md hover:scale-[1.02]" style={{ borderColor: '#476072', color: '#476072' }}
+              className="w-full py-2 font-semibold text-sm rounded-lg transition-all duration-200 flex items-center justify-center gap-2 border shadow-sm hover:shadow-md hover:scale-[1.02]"
+              style={{ borderColor: "#476072", color: "#476072" }}
             >
               View Group
               <ChevronRight className="w-4 h-4" />
@@ -698,7 +725,9 @@ const GroupCardModern = ({ group, onJoin, onView, isLoading }) => {
               }}
               disabled={isLoading}
               className="w-full py-2 text-white font-semibold text-sm rounded-lg transition-all duration-200 shadow-md hover:shadow-lg hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{ background: 'linear-gradient(135deg, #476072 0%, #5a7a8f 100%)' }}
+              style={{
+                background: "linear-gradient(135deg, #476072 0%, #5a7a8f 100%)",
+              }}
             >
               {isLoading ? "Joining..." : "Join Group"}
             </button>
@@ -721,11 +750,18 @@ const GroupListItem = ({ group, onJoin, onView, isLoading }) => {
       className="flex items-center gap-6 p-6 bg-white border border-gray-200 rounded-xl hover:shadow-lg hover:border-gray-300 transition-all duration-300 cursor-pointer group"
     >
       {/* Avatar */}
-      <div className="w-20 h-20 rounded-xl flex items-center justify-center text-white font-bold text-xl shrink-0 shadow-md relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #476072 0%, #5a7a8f 100%)' }}>
+      <div
+        className="w-20 h-20 rounded-xl flex items-center justify-center text-white font-bold text-xl shrink-0 shadow-md relative overflow-hidden"
+        style={{
+          background: "linear-gradient(135deg, #476072 0%, #5a7a8f 100%)",
+        }}
+      >
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 right-0 w-16 h-16 bg-white rounded-full -mr-8 -mt-8" />
         </div>
-        <span className="relative z-10">{group.name?.[0]?.toUpperCase() || "G"}</span>
+        <span className="relative z-10">
+          {group.name?.[0]?.toUpperCase() || "G"}
+        </span>
       </div>
 
       {/* Content */}
@@ -734,17 +770,32 @@ const GroupListItem = ({ group, onJoin, onView, isLoading }) => {
           <h3 className="text-lg font-bold text-gray-900 truncate group-hover:text-[#476072] transition-colors">
             {group.name}
           </h3>
-          <span className="px-2.5 py-1 text-xs font-semibold rounded-lg" style={{ backgroundColor: isPublic ? '#F5F2F2' : '#f3f4f6', color: isPublic ? '#476072' : '#6b7280' }}>
+          <span
+            className="px-2.5 py-1 text-xs font-semibold rounded-lg"
+            style={{
+              backgroundColor: isPublic ? "#F5F2F2" : "#f3f4f6",
+              color: isPublic ? "#476072" : "#6b7280",
+            }}
+          >
             {isPublic ? "Public" : "Private"}
           </span>
           {group.status === "active" && (
-            <span className="flex items-center gap-1.5 text-xs font-semibold" style={{ color: '#476072' }}>
-              <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: '#476072' }} />
+            <span
+              className="flex items-center gap-1.5 text-xs font-semibold"
+              style={{ color: "#476072" }}
+            >
+              <span
+                className="w-2 h-2 rounded-full animate-pulse"
+                style={{ backgroundColor: "#476072" }}
+              />
               Active
             </span>
           )}
           {group.isJoined && (
-            <span className="flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg" style={{ backgroundColor: '#F5F2F2', color: '#476072' }}>
+            <span
+              className="flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg"
+              style={{ backgroundColor: "#F5F2F2", color: "#476072" }}
+            >
               <CheckCircle className="w-3 h-3" />
               Joined
             </span>
@@ -757,14 +808,20 @@ const GroupListItem = ({ group, onJoin, onView, isLoading }) => {
 
         <div className="flex items-center gap-6 text-sm text-gray-600">
           <span className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#F5F2F2' }}>
-              <Users className="w-4 h-4" style={{ color: '#476072' }} />
+            <div
+              className="w-8 h-8 rounded-lg flex items-center justify-center"
+              style={{ backgroundColor: "#F5F2F2" }}
+            >
+              <Users className="w-4 h-4" style={{ color: "#476072" }} />
             </div>
             <span className="font-medium">{memberCount} members</span>
           </span>
           <span className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#F5F2F2' }}>
-              <BookOpen className="w-4 h-4" style={{ color: '#476072' }} />
+            <div
+              className="w-8 h-8 rounded-lg flex items-center justify-center"
+              style={{ backgroundColor: "#F5F2F2" }}
+            >
+              <BookOpen className="w-4 h-4" style={{ color: "#476072" }} />
             </div>
             <span className="font-medium">{quizCount} quizzes</span>
           </span>
@@ -780,14 +837,19 @@ const GroupListItem = ({ group, onJoin, onView, isLoading }) => {
           }}
           disabled={isLoading}
           className="px-8 py-3 text-white font-semibold text-sm rounded-lg transition-all duration-200 shrink-0 shadow-md hover:shadow-lg hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-          style={{ background: 'linear-gradient(135deg, #476072 0%, #5a7a8f 100%)' }}
+          style={{
+            background: "linear-gradient(135deg, #476072 0%, #5a7a8f 100%)",
+          }}
         >
           {isLoading ? "Joining..." : "Join Group"}
         </button>
       )}
 
       {group.isJoined && (
-        <ChevronRight className="w-5 h-5 shrink-0" style={{ color: '#476072' }} />
+        <ChevronRight
+          className="w-5 h-5 shrink-0"
+          style={{ color: "#476072" }}
+        />
       )}
     </div>
   );

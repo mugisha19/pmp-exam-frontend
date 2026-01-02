@@ -13,7 +13,6 @@ import {
   BookOpen,
   LogOut,
   TrendingUp,
-  Bell,
 } from "lucide-react";
 import { cn } from "@/utils/cn";
 
@@ -48,12 +47,6 @@ export const ProfileDropdown = ({ onClose }) => {
       path: "/achievements",
       icon: Trophy,
       description: "Badges and rewards",
-    },
-    {
-      label: "Notifications",
-      path: "/notifications",
-      icon: Bell,
-      description: "Manage notifications",
     },
   ];
 

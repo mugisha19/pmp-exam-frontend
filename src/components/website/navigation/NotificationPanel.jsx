@@ -5,7 +5,7 @@
 
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { X, Bell, Check, Trash2, Settings } from "lucide-react";
+import { X, Bell, Check, RefreshCw } from "lucide-react";
 import { cn } from "@/utils/cn";
 import {
   useNotifications,
@@ -18,7 +18,7 @@ export const NotificationPanel = ({ onClose }) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const { data: notificationsData, isLoading } = useNotifications({
+  const { data: notificationsData, isLoading, error, refetch } = useNotifications({
     page: 1,
     page_size: 50,
   });
@@ -26,7 +26,9 @@ export const NotificationPanel = ({ onClose }) => {
   const markAsReadMutation = useMarkAsReadMutation();
   const markAllAsReadMutation = useMarkAllAsReadMutation();
 
-  const notifications = notificationsData?.items || notificationsData || [];
+  const notifications = Array.isArray(notificationsData) 
+    ? notificationsData 
+    : (notificationsData?.items || []);
 
   const handleNotificationClick = (notification) => {
     if (!notification.is_read) {
@@ -47,109 +49,112 @@ export const NotificationPanel = ({ onClose }) => {
     markAllAsReadMutation.mutate();
   };
 
+  const handleRefresh = () => {
+    refetch();
+  };
+
   const getNotificationIcon = (type) => {
-    // Return appropriate icon based on notification type
     return "🔔";
   };
 
   return (
     <>
       {/* Backdrop */}
-      <div className="fixed inset-0 z-40 bg-black/20" onClick={onClose} />
+      <div className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm" onClick={onClose} />
 
       {/* Panel */}
-      <div className="fixed top-0 right-0 bottom-0 z-50 w-full sm:w-96 bg-white shadow-2xl">
+      <div className="fixed top-0 right-0 bottom-0 z-50 w-full sm:w-[340px] bg-white shadow-2xl">
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-5 border-b border-border-light">
-            <div>
-              <h2 className="text-xl font-bold text-text-primary">
-                Notifications
-              </h2>
-              <p className="text-sm text-text-tertiary">
-                {notifications.filter((n) => !n.is_read).length} unread
-              </p>
+          <div className="px-4 py-3 bg-gradient-to-r from-[#476072] to-[#5a7a8f] text-white">
+            <div className="flex items-center justify-between mb-2">
+              <div>
+                <h2 className="text-base font-bold">Notifications</h2>
+                <p className="text-[10px] text-white/80">
+                  {notifications.filter((n) => !n.is_read).length} unread
+                </p>
+              </div>
+              <button
+                onClick={onClose}
+                className="p-1 hover:bg-white/10 rounded transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-bg-secondary rounded-lg transition-colors"
-            >
-              <X className="w-5 h-5 text-text-tertiary" />
-            </button>
-          </div>
-
-          {/* Actions */}
-          <div className="flex items-center justify-between px-6 py-3 border-b border-border-light bg-bg-secondary">
-            <button
-              onClick={handleMarkAllRead}
-              className="flex items-center gap-2 text-sm font-medium text-primary-600 hover:text-primary-700"
-            >
-              <Check className="w-4 h-4" />
-              Mark all as read
-            </button>
-            <button
-              onClick={() => {
-                navigate("/notifications");
-                onClose();
-              }}
-              className="flex items-center gap-2 text-sm font-medium text-text-secondary hover:text-text-primary"
-            >
-              <Settings className="w-4 h-4" />
-              Settings
-            </button>
+            
+            {/* Action Buttons */}
+            <div className="flex gap-1.5">
+              <button
+                onClick={handleMarkAllRead}
+                disabled={notifications.filter((n) => !n.is_read).length === 0}
+                className="flex items-center gap-1 px-2 py-1 text-[10px] font-medium bg-white/10 hover:bg-white/20 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Check className="w-3 h-3" />
+                Mark all read
+              </button>
+              <button
+                onClick={handleRefresh}
+                className="flex items-center gap-1 px-2 py-1 text-[10px] font-medium bg-white/10 hover:bg-white/20 rounded transition-colors"
+              >
+                <RefreshCw className="w-3 h-3" />
+                Refresh
+              </button>
+            </div>
           </div>
 
           {/* Notifications List */}
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto bg-gray-50">
             {isLoading ? (
-              <div className="flex items-center justify-center h-32">
-                <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin" />
+              <div className="flex items-center justify-center h-24">
+                <div className="w-6 h-6 border-3 border-[#476072]/20 border-t-[#476072] rounded-full animate-spin" />
               </div>
             ) : notifications.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full px-6 text-center">
-                <Bell className="w-16 h-16 text-text-muted mb-4" />
-                <h3 className="text-lg font-semibold text-text-secondary mb-2">
+              <div className="flex flex-col items-center justify-center h-full px-4 text-center">
+                <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-2">
+                  <Bell className="w-6 h-6 text-gray-400" />
+                </div>
+                <h3 className="text-sm font-semibold text-gray-700 mb-1">
                   No notifications
                 </h3>
-                <p className="text-text-tertiary">
-                  You're all caught up! Check back later for updates.
+                <p className="text-gray-500 text-[10px]">
+                  You're all caught up!
                 </p>
               </div>
             ) : (
-              <div>
+              <div className="divide-y divide-gray-200">
                 {notifications.map((notification) => (
                   <button
                     key={notification.notification_id || notification.id}
                     onClick={() => handleNotificationClick(notification)}
                     className={cn(
-                      "w-full px-6 py-4 text-left border-b border-border-light hover:bg-bg-secondary transition-colors",
-                      !notification.is_read && "bg-primary-50/50"
+                      "w-full px-4 py-2.5 text-left hover:bg-gray-100 transition-colors",
+                      !notification.is_read ? "bg-blue-50" : "bg-white"
                     )}
                   >
-                    <div className="flex gap-3">
-                      <div className="flex-shrink-0 text-2xl">
+                    <div className="flex gap-2">
+                      <div className="flex-shrink-0 text-base">
                         {getNotificationIcon(notification.type)}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-2 mb-1">
+                        <div className="flex items-start justify-between gap-1.5 mb-0.5">
                           <h4
                             className={cn(
-                              "font-medium line-clamp-1",
+                              "font-semibold line-clamp-1 text-[11px]",
                               !notification.is_read
-                                ? "text-text-primary"
-                                : "text-text-secondary"
+                                ? "text-gray-900"
+                                : "text-gray-600"
                             )}
                           >
                             {notification.title || "New notification"}
                           </h4>
                           {!notification.is_read && (
-                            <div className="w-2 h-2 bg-primary-600 rounded-full flex-shrink-0 mt-1.5" />
+                            <div className="w-1.5 h-1.5 bg-[#476072] rounded-full flex-shrink-0 mt-0.5" />
                           )}
                         </div>
-                        <p className="text-sm text-text-tertiary line-clamp-2 mb-2">
+                        <p className="text-[10px] text-gray-600 line-clamp-2 mb-0.5">
                           {notification.message || notification.body}
                         </p>
-                        <p className="text-xs text-text-muted">
+                        <p className="text-[9px] text-gray-400">
                           {notification.created_at &&
                             formatDistanceToNow(
                               new Date(notification.created_at),
@@ -167,17 +172,13 @@ export const NotificationPanel = ({ onClose }) => {
           </div>
 
           {/* Footer */}
-          <div className="px-6 py-4 border-t border-border-light">
-            <button
-              onClick={() => {
-                navigate("/notifications");
-                onClose();
-              }}
-              className="w-full py-2.5 text-center text-sm font-medium text-primary-600 hover:text-primary-700 bg-primary-50 hover:bg-primary-100 rounded-lg transition-colors"
-            >
-              View all notifications
-            </button>
-          </div>
+          {notifications.length > 0 && (
+            <div className="px-4 py-1.5 border-t border-gray-200 bg-white">
+              <p className="text-[9px] text-center text-gray-500">
+                {notifications.length} notification{notifications.length !== 1 ? 's' : ''}
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </>

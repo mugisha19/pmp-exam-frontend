@@ -8,15 +8,16 @@ import toast from "react-hot-toast";
 import * as notificationService from "@/services/notification.service";
 import { queryKeys } from "@/lib/query-client";
 import { useAuthStore } from "@/stores/auth.store";
-import { TOKEN_KEYS, getStorageItem } from "@/constants/storage.constants";
+import { TOKEN_KEYS, getStorageItem, STORAGE_TYPE } from "@/constants/storage.constants";
 
 /**
  * Helper to check if user has a valid token
  * More reliable than just checking isAuthenticated from store
  */
 const hasValidToken = () => {
-  const token = getStorageItem(TOKEN_KEYS.ACCESS_TOKEN);
-  return !!token;
+  const tokenLocal = getStorageItem(TOKEN_KEYS.ACCESS_TOKEN, STORAGE_TYPE.LOCAL);
+  const tokenSession = getStorageItem(TOKEN_KEYS.ACCESS_TOKEN, STORAGE_TYPE.SESSION);
+  return !!(tokenLocal || tokenSession);
 };
 
 /**

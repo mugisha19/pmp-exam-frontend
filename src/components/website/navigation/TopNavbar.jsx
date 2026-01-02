@@ -15,7 +15,6 @@ import {
   GraduationCap,
   ChevronDown,
   Users,
-  Trophy,
   TrendingUp,
   Home,
   BookOpen,
@@ -23,7 +22,7 @@ import {
   LogOut,
   User,
   HelpCircle,
-  Sparkles,
+  Trophy,
 } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { SearchOverlay } from "./SearchOverlay";
@@ -187,20 +186,6 @@ export const TopNavbar = () => {
                 <Search className="w-5 h-5" />
               </button>
 
-              {/* Achievements */}
-              <Link
-                to="/achievements"
-                className="hidden md:flex items-center gap-1.5 px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-all group"
-              >
-                <div className="relative">
-                  <Trophy className="w-4 h-4 text-orange-500 group-hover:text-orange-600 transition-colors" />
-                  <Sparkles className="absolute -top-1 -right-1 w-2.5 h-2.5 text-yellow-400" />
-                </div>
-                <span className="hidden lg:inline text-sm font-medium">
-                  Achievements
-                </span>
-              </Link>
-
               {/* Notifications */}
               <div ref={notificationRef} className="relative">
                 <button
@@ -251,25 +236,24 @@ export const TopNavbar = () => {
                   {/* Avatar */}
                   <div className="relative">
                     <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white text-sm font-bold shadow-sm">
-                      {user?.name?.charAt(0)?.toUpperCase() || "U"}
+                      {user?.first_name?.charAt(0)?.toUpperCase() || "U"}
                     </div>
                     {/* Online indicator */}
                     <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full" />
                   </div>
 
-                  {/* User Info - Desktop */}
-                  <div className="hidden lg:flex flex-col items-start">
-                    <span className="text-sm font-semibold text-gray-900 leading-tight">
-                      {user?.name?.split(" ")[0] || "User"}
-                    </span>
-                    <span className="text-xs text-gray-500 capitalize leading-tight">
-                      {user?.role || "Student"}
+                  {/* User Info */}
+                  <div className="flex items-center max-w-[120px] sm:max-w-[150px]">
+                    <span className="text-sm font-semibold text-gray-900 leading-tight truncate">
+                      {user?.first_name && user?.last_name 
+                        ? `${user.first_name} ${user.last_name}` 
+                        : user?.first_name || "User"}
                     </span>
                   </div>
 
                   <ChevronDown
                     className={cn(
-                      "hidden lg:block w-4 h-4 text-gray-400 transition-transform duration-200",
+                      "w-4 h-4 text-gray-400 transition-transform duration-200",
                       profileOpen && "rotate-180"
                     )}
                   />

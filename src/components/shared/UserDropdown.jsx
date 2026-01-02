@@ -72,6 +72,14 @@ export const UserDropdown = ({ className }) => {
             src={user?.avatar_url || user?.profile_picture}
             size="sm"
           />
+          <span className="hidden sm:block text-sm font-medium text-gray-700 max-w-[120px] truncate">
+            {user?.first_name && user?.last_name
+              ? `${user.first_name} ${user.last_name}`
+              : user?.first_name ||
+                user?.last_name ||
+                user?.email?.split("@")[0] ||
+                "User"}
+          </span>
           <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
         </button>
       }
