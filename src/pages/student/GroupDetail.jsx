@@ -3,12 +3,11 @@ import { useQuery } from "@tanstack/react-query";
 import { getGroupById } from "@/services/group.service";
 import { getQuizzes } from "@/services/quiz.service";
 import { Spinner } from "@/components/ui";
+import { ExamCard } from "@/components/shared/ExamCard";
 import {
   ArrowLeft,
   Users,
   Calendar,
-  Clock,
-  Trophy,
   BookOpen,
   AlertCircle,
 } from "lucide-react";
@@ -150,38 +149,12 @@ export const GroupDetail = () => {
         ) : (
           <div className="space-y-4">
             {quizzes.map((quiz) => (
-              <div
+              <ExamCard
                 key={quiz.quiz_id}
+                quiz={quiz}
                 onClick={() => navigate(`/exams/${quiz.quiz_id}`)}
-                className="bg-gradient-to-br from-white to-gray-50/50 rounded-xl border-2 border-gray-100 shadow-md hover:shadow-xl hover:shadow-gray-200/50 p-6 hover:scale-[1.02] cursor-pointer transition-all duration-200 group"
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <h3 className="text-lg font-bold text-gray-900 group-hover:text-accent-primary transition-colors duration-200">{quiz.title}</h3>
-                </div>
-                
-                <div className="flex items-center gap-6 text-sm font-medium">
-                  <span className="flex items-center gap-2 text-gray-700">
-                    <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
-                      <BookOpen className="w-4 h-4 text-blue-600" />
-                    </div>
-                    {quiz.total_questions} questions
-                  </span>
-                  <span className="text-gray-300">•</span>
-                  <span className="flex items-center gap-2 text-gray-700">
-                    <div className="w-7 h-7 rounded-md flex items-center justify-center" style={{ backgroundColor: 'rgba(71, 96, 114, 0.1)' }}>
-                      <Clock className="w-3.5 h-3.5" style={{ color: '#476072' }} />
-                    </div>
-                    {quiz.time_limit_minutes || 0} min
-                  </span>
-                  <span className="text-gray-300">•</span>
-                  <span className="flex items-center gap-2 text-gray-700">
-                    <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
-                      <Trophy className="w-4 h-4 text-blue-600" />
-                    </div>
-                    {quiz.passing_score}% pass
-                  </span>
-                </div>
-              </div>
+                variant="list"
+              />
             ))}
           </div>
         )}
