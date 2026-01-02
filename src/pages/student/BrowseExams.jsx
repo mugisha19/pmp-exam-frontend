@@ -742,110 +742,107 @@ const BrowseExamCard = ({ quiz, bestScore, attemptCount, onClick }) => {
   return (
     <div
       onClick={onClick}
-      className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg hover:border-gray-300 transition-all duration-200 cursor-pointer group flex flex-col"
+      className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-xl hover:border-gray-300 transition-all duration-300 cursor-pointer group flex flex-col h-full"
     >
-      {/* Header */}
-      <div className="h-32 bg-linear-to-br from-emerald-500 to-teal-600 relative">
-        <div className="absolute inset-0 bg-black/10 group-hover:bg-black/5 transition-colors" />
+      {/* Header with gradient */}
+      <div className="h-24 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #476072 0%, #5a7a8f 100%)' }}>
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-white rounded-full -mr-16 -mt-16" />
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-white rounded-full -ml-12 -mb-12" />
+        </div>
 
         {/* Badges Row */}
-        <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
+        <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span
               className={cn(
-                "px-2 py-1 text-xs font-medium rounded-md capitalize",
+                "px-2.5 py-1 text-xs font-semibold rounded-lg capitalize",
                 getDifficultyColor(difficulty)
               )}
             >
               {difficulty}
             </span>
             {isPremium && (
-              <span className="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs font-medium rounded-md flex items-center gap-1">
+              <span className="px-2.5 py-1 bg-yellow-100 text-yellow-700 text-xs font-semibold rounded-lg flex items-center gap-1">
                 <Star className="w-3 h-3" />
                 Premium
               </span>
             )}
           </div>
           {isActive && (
-            <div className="flex items-center gap-1 px-2 py-1 bg-white/90 backdrop-blur-sm rounded-md text-xs font-medium text-emerald-600">
-              <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white/95 backdrop-blur-sm rounded-lg text-xs font-semibold shadow-lg" style={{ color: '#476072' }}>
+              <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: '#476072' }} />
               Active
             </div>
           )}
         </div>
 
-        {/* Quiz Type */}
-        {quiz.quiz_type && (
-          <div className="absolute bottom-3 left-3">
-            <span className="px-2 py-1 bg-white/80 backdrop-blur-sm text-xs font-medium text-gray-700 rounded-md capitalize">
-              {quiz.quiz_type.replace("_", " ")}
-            </span>
-          </div>
-        )}
-
         {/* Best Score */}
         {bestScore !== null && (
-          <div className="absolute bottom-3 right-3">
-            <div className="flex items-center gap-1 px-2 py-1 bg-white/90 backdrop-blur-sm rounded-md text-xs font-semibold text-gray-700">
-              <Trophy className="w-3 h-3 text-orange-500" />
-              {bestScore}%
+          <div className="absolute bottom-2 left-3">
+            <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg">
+              <Trophy className="w-4 h-4 text-amber-500" />
+              <div>
+                <div className="text-[10px] text-white/90 font-medium">Best</div>
+                <div className="text-base font-bold text-white">{Math.round(bestScore)}%</div>
+              </div>
             </div>
           </div>
         )}
       </div>
 
       {/* Content */}
-      <div className="p-5 flex flex-col flex-1">
-        <h3 className="font-semibold text-gray-900 mb-2 line-clamp-1 group-hover:text-emerald-600 transition-colors">
+      <div className="p-4 flex flex-col flex-1">
+        <h3 className="font-bold text-base text-gray-900 mb-2 line-clamp-2 group-hover:text-[#476072] transition-colors min-h-[2.5rem]">
           {quiz.title}
         </h3>
 
         {quiz.description && (
-          <p className="text-sm text-gray-600 line-clamp-2 mb-4">
-            {quiz.description}
-          </p>
+          <div
+            className="text-xs text-gray-600 line-clamp-2 mb-3 flex-1"
+            dangerouslySetInnerHTML={{ __html: quiz.description }}
+          />
         )}
 
         {/* Stats */}
-        <div className="flex items-center gap-3 mb-4">
-          <div className="flex items-center gap-1.5 text-sm">
-            <BookOpen className="w-4 h-4 text-gray-400" />
-            <span className="font-medium text-gray-900">
-              {quiz.total_questions || 0}
-            </span>
-            <span className="text-gray-500">Questions</span>
+        <div className="grid grid-cols-2 gap-2 mb-3">
+          <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#F5F2F2' }}>
+              <BookOpen className="w-4 h-4" style={{ color: '#476072' }} />
+            </div>
+            <div>
+              <div className="text-[10px] text-gray-500 font-medium">Questions</div>
+              <div className="font-bold text-sm text-gray-900">{quiz.total_questions || 0}</div>
+            </div>
           </div>
 
           {quiz.time_limit_minutes && (
-            <div className="flex items-center gap-1.5 text-sm">
-              <Clock className="w-4 h-4 text-gray-400" />
-              <span className="font-medium text-gray-900">
-                {quiz.time_limit_minutes}
-              </span>
-              <span className="text-gray-500">min</span>
-            </div>
-          )}
-
-          {attemptCount > 0 && (
-            <div className="flex items-center gap-1.5 text-sm">
-              <TrendingUp className="w-4 h-4 text-gray-400" />
-              <span className="font-medium text-gray-900">{attemptCount}</span>
-              <span className="text-gray-500">Attempts</span>
+            <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#F5F2F2' }}>
+                <Clock className="w-4 h-4" style={{ color: '#476072' }} />
+              </div>
+              <div>
+                <div className="text-[10px] text-gray-500 font-medium">Duration</div>
+                <div className="font-bold text-sm text-gray-900">{quiz.time_limit_minutes}m</div>
+              </div>
             </div>
           )}
         </div>
 
-        {/* Actions */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onClick();
-          }}
-          className="w-full py-2.5 bg-emerald-600 text-white font-medium text-sm rounded-lg hover:bg-emerald-700 transition-colors flex items-center justify-center gap-2 mt-auto"
-        >
-          {attemptCount > 0 ? "Continue Exam" : "Start Exam"}
-          <Play className="w-4 h-4" />
-        </button>
+        {/* Action Button */}
+        <div className="mt-auto">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onClick();
+            }}
+            className="w-full py-2 text-white font-semibold text-sm rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg hover:scale-[1.02]"
+            style={{ background: 'linear-gradient(135deg, #476072 0%, #5a7a8f 100%)' }}
+          >
+            {attemptCount > 0 ? "Continue Exam" : "Start Exam"}
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -871,66 +868,65 @@ const BrowseExamListItem = ({ quiz, bestScore, attemptCount, onClick }) => {
   return (
     <div
       onClick={onClick}
-      className="flex items-center gap-6 p-5 bg-white border border-gray-200 rounded-lg hover:shadow-md hover:border-gray-300 transition-all cursor-pointer"
+      className="flex items-center gap-6 p-6 bg-white border border-gray-200 rounded-xl hover:shadow-lg hover:border-gray-300 transition-all duration-300 cursor-pointer group"
     >
       {/* Avatar */}
-      <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white shrink-0">
-        <BookOpen className="w-7 h-7" />
+      <div className="w-20 h-20 rounded-xl flex items-center justify-center text-white shrink-0 shadow-md relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #476072 0%, #5a7a8f 100%)' }}>
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 right-0 w-16 h-16 bg-white rounded-full -mr-8 -mt-8" />
+        </div>
+        <BookOpen className="w-9 h-9 relative z-10" />
       </div>
 
       {/* Content */}
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-3 mb-1 flex-wrap">
-          <h3 className="text-lg font-semibold text-gray-900 truncate">
+        <div className="flex items-center gap-3 mb-2 flex-wrap">
+          <h3 className="text-lg font-bold text-gray-900 truncate group-hover:text-[#476072] transition-colors">
             {quiz.title}
           </h3>
           <span
             className={cn(
-              "px-2 py-0.5 text-xs font-medium rounded-full capitalize",
+              "px-2.5 py-1 text-xs font-semibold rounded-lg capitalize",
               getDifficultyColor(difficulty)
             )}
           >
             {difficulty}
           </span>
           {isPremium && (
-            <span className="flex items-center gap-1 px-2 py-0.5 bg-yellow-100 text-yellow-700 text-xs font-medium rounded-full">
+            <span className="flex items-center gap-1 px-2.5 py-1 bg-yellow-100 text-yellow-700 text-xs font-semibold rounded-lg">
               <Star className="w-3 h-3" />
               Premium
             </span>
           )}
           {isActive && (
-            <span className="flex items-center gap-1 text-xs text-emerald-600 font-medium">
-              <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+            <span className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg border" style={{ backgroundColor: '#F5F2F2', color: '#476072', borderColor: '#476072' }}>
+              <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: '#476072' }} />
               Active
             </span>
           )}
         </div>
 
-        <p className="text-sm text-gray-600 line-clamp-1 mb-2">
-          {quiz.description}
-        </p>
-
-        <div className="flex items-center gap-4 text-sm text-gray-500">
-          <span className="flex items-center gap-1">
-            <BookOpen className="w-4 h-4" />
-            {quiz.total_questions || 0} questions
+        <div className="flex items-center gap-6 text-sm text-gray-600">
+          <span className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#F5F2F2' }}>
+              <BookOpen className="w-4 h-4" style={{ color: '#476072' }} />
+            </div>
+            <span className="font-medium">{quiz.total_questions || 0} questions</span>
           </span>
           {quiz.time_limit_minutes && (
-            <span className="flex items-center gap-1">
-              <Clock className="w-4 h-4" />
-              {quiz.time_limit_minutes} min
-            </span>
-          )}
-          {attemptCount > 0 && (
-            <span className="flex items-center gap-1">
-              <TrendingUp className="w-4 h-4" />
-              {attemptCount} attempts
+            <span className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#F5F2F2' }}>
+                <Clock className="w-4 h-4" style={{ color: '#476072' }} />
+              </div>
+              <span className="font-medium">{quiz.time_limit_minutes} min</span>
             </span>
           )}
           {bestScore !== null && (
-            <span className="flex items-center gap-1 text-orange-600 font-semibold">
-              <Trophy className="w-4 h-4" />
-              Best: {bestScore}%
+            <span className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-amber-50">
+                <Trophy className="w-4 h-4 text-amber-500" />
+              </div>
+              <span className="font-bold" style={{ color: '#476072' }}>Best: {Math.round(bestScore)}%</span>
             </span>
           )}
         </div>
@@ -942,10 +938,11 @@ const BrowseExamListItem = ({ quiz, bestScore, attemptCount, onClick }) => {
           e.stopPropagation();
           onClick();
         }}
-        className="px-6 py-2.5 bg-emerald-600 text-white font-medium text-sm rounded-lg hover:bg-emerald-700 transition-colors shrink-0 flex items-center gap-2"
+        className="px-8 py-3 text-white font-semibold text-sm rounded-lg transition-all duration-200 shrink-0 shadow-md hover:shadow-lg hover:scale-105 flex items-center gap-2"
+        style={{ background: 'linear-gradient(135deg, #476072 0%, #5a7a8f 100%)' }}
       >
         {attemptCount > 0 ? "Continue" : "Start"}
-        <Play className="w-4 h-4" />
+        <ChevronRight className="w-4 h-4" />
       </button>
     </div>
   );

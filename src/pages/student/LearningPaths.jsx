@@ -18,7 +18,6 @@ export const LearningPaths = () => {
       id: 1,
       title: "Initiation",
       description: "Master project initiation concepts and processes",
-      progress: 80,
       quizzes: [
         { id: 1, title: "Project Charter", completed: true, score: 92 },
         {
@@ -35,7 +34,6 @@ export const LearningPaths = () => {
       id: 2,
       title: "Planning",
       description: "Learn comprehensive project planning techniques",
-      progress: 40,
       quizzes: [
         { id: 4, title: "Scope Management", completed: true, score: 85 },
         { id: 5, title: "Schedule Management", completed: false },
@@ -48,7 +46,6 @@ export const LearningPaths = () => {
       id: 3,
       title: "Executing",
       description: "Understand project execution and team management",
-      progress: 0,
       quizzes: [
         { id: 8, title: "Direct and Manage Work", completed: false },
         { id: 9, title: "Team Development", completed: false },
@@ -60,7 +57,6 @@ export const LearningPaths = () => {
       id: 4,
       title: "Monitoring & Controlling",
       description: "Track and control project performance",
-      progress: 0,
       quizzes: [
         { id: 11, title: "Change Control", completed: false },
         { id: 12, title: "Performance Monitoring", completed: false },
@@ -71,14 +67,16 @@ export const LearningPaths = () => {
       id: 5,
       title: "Closing",
       description: "Properly close projects and capture lessons learned",
-      progress: 0,
       quizzes: [
         { id: 13, title: "Administrative Closure", completed: false },
         { id: 14, title: "Lessons Learned", completed: false },
       ],
       unlocked: false,
     },
-  ];
+  ].map(path => ({
+    ...path,
+    progress: Math.round((path.quizzes.filter(q => q.completed).length / path.quizzes.length) * 100)
+  }));
 
   const [selectedPath, setSelectedPath] = useState(learningPaths[1]); // Planning phase
 
