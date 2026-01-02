@@ -226,7 +226,9 @@ export const Home = () => {
                 Welcome back
               </p>
               <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
-                {user?.name || "Student"}
+                {user?.first_name && user?.last_name
+                  ? `${user.first_name} ${user.last_name}`
+                  : user?.first_name || "Student"}
               </h1>
               <p className="text-lg text-gray-600 mb-6 max-w-xl">
                 Continue your PMP certification journey. Track your progress,

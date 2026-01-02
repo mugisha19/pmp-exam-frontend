@@ -163,16 +163,6 @@ export const ExamCard = ({
                   Active
                 </span>
               )}
-              <span
-                className={cn(
-                  "px-2 py-0.5 text-xs font-medium rounded-lg border",
-                  difficultyConfig.bg,
-                  difficultyConfig.text,
-                  difficultyConfig.border
-                )}
-              >
-                {difficultyConfig.label}
-              </span>
               {isPremium && (
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-100 text-amber-700 text-xs font-medium rounded-lg border border-amber-200">
                   <Star className="w-3 h-3" />
@@ -280,16 +270,6 @@ export const ExamCard = ({
         {/* Status Badges */}
         <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span
-              className={cn(
-                "px-2.5 py-1 text-xs font-semibold rounded-lg backdrop-blur-sm border",
-                difficultyConfig.bg,
-                difficultyConfig.text,
-                difficultyConfig.border
-              )}
-            >
-              {difficultyConfig.label}
-            </span>
             {isPremium && (
               <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-400/90 backdrop-blur-sm text-amber-900 text-xs font-semibold rounded-lg">
                 <Star className="w-3 h-3" />

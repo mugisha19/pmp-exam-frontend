@@ -457,6 +457,7 @@ export const QuizTaking = () => {
 
     const currentQ = sessionData.questions[currentQuestionIndex];
     const newFlagStatus = !currentQ.is_flagged;
+    const currentAnswer = selectedAnswer; // Preserve current answer
 
     try {
       await flagQuestion(
@@ -465,6 +466,9 @@ export const QuizTaking = () => {
         newFlagStatus
       );
       await loadSessionState();
+      
+      // Restore the selected answer after reloading state
+      setSelectedAnswer(currentAnswer);
     } catch (error) {
       console.error("Failed to flag question:", error);
       if (error.response?.status === 410) {
@@ -490,32 +494,7 @@ export const QuizTaking = () => {
       return;
     }
 
-    if (selectedAnswer) {
-      const saveResult = await handleSaveAnswer();
-
-      if (saveResult?.autoPaused) {
-        return;
-      }
-
-      await loadSessionState();
-
-      try {
-        const currentState = await getSessionState(sessionToken);
-        if (currentState.pause_info?.is_paused) {
-          return;
-        }
-      } catch (error) {
-        console.error(
-          "Failed to verify session state before navigation:",
-          error
-        );
-        if (error.response?.status === 400 || error.response?.status === 410) {
-          await loadSessionState();
-          return;
-        }
-      }
-    }
-
+    // Determine the new index first
     let newIndex;
     if (direction === "prev") {
       newIndex = Math.max(0, currentQuestionIndex - 1);
@@ -529,15 +508,60 @@ export const QuizTaking = () => {
       if (newIndex === currentQuestionIndex) {
         return;
       }
+      
+      // Prevent navigation to unanswered questions ahead of current position
+      if (newIndex > currentQuestionIndex) {
+        const targetQuestion = sessionData.questions[newIndex];
+        if (!targetQuestion.is_answered && !targetQuestion.is_flagged) {
+          showToast.error(
+            "Navigation Restricted",
+            "You can only navigate forward by answering questions in order. You can go back to review previous questions."
+          );
+          return;
+        }
+      }
     } else {
       return;
+    }
+
+    // Only save answer when going forward (Next button)
+    const isGoingForward = direction === "next";
+    
+    if (isGoingForward && selectedAnswer) {
+      const saveResult = await handleSaveAnswer();
+
+      if (saveResult?.autoPaused) {
+        return;
+      }
+
+      // Get fresh state after saving
+      const currentState = await getSessionState(sessionToken);
+      if (currentState.pause_info?.is_paused) {
+        setSessionData(currentState);
+        if (currentState.timing) {
+          setTimeRemaining(currentState.timing.time_remaining_seconds);
+        }
+        if (currentState.pause_info?.is_paused) {
+          setPauseTimeRemaining(currentState.pause_info.pause_remaining_seconds);
+        }
+        return;
+      }
+      setSessionData(currentState);
     }
 
     try {
       const latestState = await getSessionState(sessionToken);
 
       if (latestState.pause_info?.is_paused) {
-        await loadSessionState();
+        setSessionData(latestState);
+        if (latestState.timing) {
+          setTimeRemaining(latestState.timing.time_remaining_seconds);
+          setExamTimeElapsed(latestState.timing.time_elapsed_seconds || 0);
+          setPauseTimeElapsed(latestState.timing.pause_time_seconds || 0);
+        }
+        if (latestState.pause_info?.is_paused) {
+          setPauseTimeRemaining(latestState.pause_info.pause_remaining_seconds);
+        }
         return;
       }
 
@@ -554,7 +578,33 @@ export const QuizTaking = () => {
 
       if (!isWaitingForAutoSubmit) {
         await navigateToQuestion(sessionToken, newIndex + 1);
-        await loadSessionState();
+        // Get fresh state after navigation
+        const updatedState = await getSessionState(sessionToken);
+        setSessionData(updatedState);
+        
+        // Update timing from fresh state
+        if (updatedState.timing) {
+          setTimeRemaining(updatedState.timing.time_remaining_seconds);
+          setExamTimeElapsed(updatedState.timing.time_elapsed_seconds || 0);
+          setPauseTimeElapsed(updatedState.timing.pause_time_seconds || 0);
+        }
+        
+        // Set the selected answer and current index from the updated state
+        setCurrentQuestionIndex(newIndex);
+        const newQ = updatedState.questions[newIndex];
+        setSelectedAnswer(newQ?.user_answer || null);
+
+        const isLastQuestion = newIndex === updatedState.questions.length - 1;
+        if (!isLastQuestion) {
+          setLastQuestionAnswerSaved(false);
+        } else {
+          if (newQ?.user_answer) {
+            setLastQuestionAnswerSaved(true);
+          } else {
+            setLastQuestionAnswerSaved(false);
+          }
+        }
+        return;
       }
 
       setCurrentQuestionIndex(newIndex);
@@ -1612,11 +1662,14 @@ export const QuizTaking = () => {
                       q.quiz_question_id === currentQ?.quiz_question_id;
                     const isFlagged = q.is_flagged;
                     const isAnswered = q.is_answered;
+                    const isAhead = idx > currentQuestionIndex;
+                    const isDisabled = isAhead && !isAnswered && !isFlagged;
 
                     return (
                       <button
                         key={q.quiz_question_id}
                         onClick={() => handleNavigate(idx + 1)}
+                        disabled={isDisabled}
                         className={cn(
                           "relative w-full aspect-square rounded-lg font-semibold text-sm transition-all duration-200",
                           isCurrent
@@ -1625,6 +1678,8 @@ export const QuizTaking = () => {
                             ? "bg-orange-100 text-orange-700 hover:bg-orange-200 ring-2 ring-orange-300"
                             : isAnswered
                             ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
+                            : isDisabled
+                            ? "bg-gray-100 text-gray-400 cursor-not-allowed opacity-50"
                             : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                         )}
                       >

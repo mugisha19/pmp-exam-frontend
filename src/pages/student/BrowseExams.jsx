@@ -235,61 +235,6 @@ export const BrowseExams = () => {
                 Discover practice exams, mock tests, and quizzes to help you
                 prepare for your PMP certification and beyond.
               </p>
-              <div className="flex flex-wrap gap-4">
-                <button
-                  onClick={() => handleTabChange("all")}
-                  className={cn(
-                    "inline-flex items-center gap-2 px-6 py-3 font-semibold rounded-lg transition-colors",
-                    activeTab === "all"
-                      ? "bg-emerald-600 text-white hover:bg-emerald-700"
-                      : "border border-gray-300 text-gray-700 hover:bg-gray-50"
-                  )}
-                >
-                  <BookOpen className="w-5 h-5" />
-                  All Exams
-                </button>
-                <button
-                  onClick={() => handleTabChange("active")}
-                  className={cn(
-                    "inline-flex items-center gap-2 px-6 py-3 font-semibold rounded-lg transition-colors",
-                    activeTab === "active"
-                      ? "bg-emerald-600 text-white hover:bg-emerald-700"
-                      : "border border-gray-300 text-gray-700 hover:bg-gray-50"
-                  )}
-                >
-                  <Zap className="w-5 h-5" />
-                  Active Now
-                  {stats.active > 0 && (
-                    <span className="ml-1 px-2 py-0.5 text-xs bg-white/20 rounded-full">
-                      {stats.active}
-                    </span>
-                  )}
-                </button>
-                <button
-                  onClick={() => handleTabChange("free")}
-                  className={cn(
-                    "inline-flex items-center gap-2 px-6 py-3 font-semibold rounded-lg transition-colors",
-                    activeTab === "free"
-                      ? "bg-emerald-600 text-white hover:bg-emerald-700"
-                      : "border border-gray-300 text-gray-700 hover:bg-gray-50"
-                  )}
-                >
-                  <Star className="w-5 h-5" />
-                  Free
-                </button>
-                <button
-                  onClick={() => handleTabChange("group")}
-                  className={cn(
-                    "inline-flex items-center gap-2 px-6 py-3 font-semibold rounded-lg transition-colors",
-                    activeTab === "group"
-                      ? "bg-emerald-600 text-white hover:bg-emerald-700"
-                      : "border border-gray-300 text-gray-700 hover:bg-gray-50"
-                  )}
-                >
-                  <Users className="w-5 h-5" />
-                  Group
-                </button>
-              </div>
             </div>
 
             {/* Quick Stats */}
@@ -369,7 +314,6 @@ export const BrowseExams = () => {
                 <option value="popular">Most Popular</option>
                 <option value="newest">Newest First</option>
                 <option value="title">Title A-Z</option>
-                <option value="difficulty">Difficulty</option>
               </select>
 
               <div className="flex items-center p-1 bg-gray-100 rounded-lg">
@@ -403,40 +347,6 @@ export const BrowseExams = () => {
           {showFilters && (
             <div className="mt-4 pt-4 border-t border-gray-200">
               <div className="flex flex-wrap items-center gap-6">
-                {/* Difficulty Filter */}
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-gray-700">
-                    Difficulty:
-                  </span>
-                  <div className="flex gap-2">
-                    {[
-                      { value: "all", label: "All" },
-                      { value: "easy", label: "Easy" },
-                      { value: "medium", label: "Medium" },
-                      { value: "hard", label: "Hard" },
-                    ].map((option) => (
-                      <button
-                        key={option.value}
-                        onClick={() => setDifficultyFilter(option.value)}
-                        className={cn(
-                          "px-3 py-1.5 text-sm font-medium rounded-full transition-colors",
-                          difficultyFilter === option.value
-                            ? option.value === "easy"
-                              ? "bg-green-100 text-green-700"
-                              : option.value === "medium"
-                              ? "bg-orange-100 text-orange-700"
-                              : option.value === "hard"
-                              ? "bg-red-100 text-red-700"
-                              : "bg-emerald-100 text-emerald-700"
-                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                        )}
-                      >
-                        {option.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
                 {/* Status Filter */}
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium text-gray-700">
@@ -454,34 +364,6 @@ export const BrowseExams = () => {
                         className={cn(
                           "px-3 py-1.5 text-sm font-medium rounded-full transition-colors",
                           statusFilter === option.value
-                            ? "bg-emerald-100 text-emerald-700"
-                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                        )}
-                      >
-                        {option.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Type Filter */}
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-gray-700">
-                    Type:
-                  </span>
-                  <div className="flex gap-2">
-                    {[
-                      { value: "all", label: "All" },
-                      { value: "practice", label: "Practice" },
-                      { value: "mock", label: "Mock Exam" },
-                      { value: "quick", label: "Quick Quiz" },
-                    ].map((option) => (
-                      <button
-                        key={option.value}
-                        onClick={() => setTypeFilter(option.value)}
-                        className={cn(
-                          "px-3 py-1.5 text-sm font-medium rounded-full transition-colors",
-                          typeFilter === option.value
                             ? "bg-emerald-100 text-emerald-700"
                             : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                         )}
