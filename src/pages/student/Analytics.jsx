@@ -10,6 +10,7 @@ import { analyticsService } from "@/services/analytics.service";
 import { LineChartComponent } from "@/components/charts/LineChartComponent";
 import { BarChartComponent } from "@/components/charts/BarChartComponent";
 import { PieChartComponent } from "@/components/charts/PieChartComponent";
+import { RadarChartComponent } from "@/components/charts/RadarChartComponent";
 import {
   TrendingUp,
   Target,
@@ -62,9 +63,17 @@ export const Analytics = () => {
   });
 
   // Fetch group comparison
-  const { data: groupComparisonData } = useQuery({
+  const { data: groupComparisonData, isLoading: groupComparisonLoading } = useQuery({
     queryKey: ["student-group-comparison", user?.user_id],
-    queryFn: () => analyticsService.getStudentGroupComparison(user?.user_id),
+    queryFn: async () => {
+      try {
+        const data = await analyticsService.getStudentGroupComparison(user?.user_id);
+        return data;
+      } catch (error) {
+        console.error('Group comparison error:', error);
+        return null;
+      }
+    },
     enabled: !!user?.user_id,
   });
 
@@ -84,7 +93,7 @@ export const Analytics = () => {
   const topicChartData = useMemo(() => {
     if (!topicData?.topics) return [];
     return topicData.topics.slice(0, 8).map((topic) => ({
-      name: topic.name?.substring(0, 20) || "Topic",
+      name: topic.topic_name || topic.name || topic.topic || "Unknown Topic",
       mastery: Math.round(topic.accuracy || 0),
     }));
   }, [topicData]);
@@ -337,27 +346,110 @@ export const Analytics = () => {
         <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-xl font-bold text-gray-900">Topic Mastery</h2>
+              <h2 className="text-xl font-bold text-gray-900">Topic Mastery Overview</h2>
               <p className="text-sm text-gray-500 mt-1">
-                Your mastery level across different topics
+                Your performance across different knowledge areas
               </p>
             </div>
             <Target className="w-6 h-6 text-blue-600" />
           </div>
-          {topicChartData.length > 0 ? (
-            <BarChartComponent
-              data={topicChartData}
-              dataKey="mastery"
-              xAxisKey="name"
-              color="#3b82f6"
-              height={300}
-              showGrid={true}
-            />
+
+          {topicData?.topics && topicData.topics.length > 0 ? (
+            <div className="space-y-6">
+              {/* Mastery Legend */}
+              <div className="flex flex-wrap gap-4 p-4 bg-gray-50 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 rounded bg-emerald-500" />
+                  <span className="text-sm text-gray-700">Expert (80-100%)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 rounded bg-blue-500" />
+                  <span className="text-sm text-gray-700">Proficient (60-79%)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 rounded bg-yellow-500" />
+                  <span className="text-sm text-gray-700">Developing (40-59%)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 rounded bg-red-500" />
+                  <span className="text-sm text-gray-700">Needs Work (&lt;40%)</span>
+                </div>
+              </div>
+
+              {/* Horizontal Bar Chart Visualization */}
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">Topic Mastery Comparison</h3>
+                {topicChartData.length > 0 ? (
+                  <BarChartComponent
+                    data={topicChartData}
+                    dataKey="mastery"
+                    xAxisKey="name"
+                    color="#3b82f6"
+                    height={400}
+                    showGrid={true}
+                  />
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <p>Not enough data to display chart</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Horizontal Progress Bars */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-900">Detailed Topic Breakdown</h3>
+                {topicData.topics.slice(0, 10).map((topic, index) => {
+                  const mastery = Math.round(topic.accuracy || 0);
+                  const getMasteryColor = (score) => {
+                    if (score >= 80) return { bg: 'bg-emerald-500', text: 'text-emerald-600', light: 'bg-emerald-100' };
+                    if (score >= 60) return { bg: 'bg-blue-500', text: 'text-blue-600', light: 'bg-blue-100' };
+                    if (score >= 40) return { bg: 'bg-yellow-500', text: 'text-yellow-600', light: 'bg-yellow-100' };
+                    return { bg: 'bg-red-500', text: 'text-red-600', light: 'bg-red-100' };
+                  };
+                  const getMasteryLabel = (score) => {
+                    if (score >= 80) return 'Expert';
+                    if (score >= 60) return 'Proficient';
+                    if (score >= 40) return 'Developing';
+                    return 'Needs Work';
+                  };
+                  const colors = getMasteryColor(mastery);
+                  const label = getMasteryLabel(mastery);
+
+                  return (
+                    <div key={index} className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex-1 min-w-0 pr-4">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-base font-bold text-gray-900">{topic.topic_name || topic.name || topic.topic || 'Unknown Topic'}</span>
+                            <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${colors.light} ${colors.text}`}>
+                              {label}
+                            </span>
+                          </div>
+                          <p className="text-xs text-gray-500">
+                            {topic.correct_answers || 0} correct out of {topic.total_questions || 0} questions
+                          </p>
+                        </div>
+                        <div className="text-right flex-shrink-0">
+                          <div className={`text-2xl font-bold ${colors.text}`}>{mastery}%</div>
+                        </div>
+                      </div>
+                      <div className="relative h-3 bg-gray-200 rounded-full overflow-hidden">
+                        <div
+                          className={`absolute top-0 left-0 h-full ${colors.bg} rounded-full transition-all duration-500`}
+                          style={{ width: `${mastery}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           ) : (
             <div className="flex items-center justify-center h-[300px] text-gray-400">
               <div className="text-center">
                 <BookOpen className="w-12 h-12 mx-auto mb-2 opacity-50" />
                 <p>No topic data available yet</p>
+                <p className="text-sm mt-2">Complete some quizzes to see your topic mastery</p>
               </div>
             </div>
           )}
@@ -368,9 +460,14 @@ export const Analytics = () => {
           {/* Top Topics */}
           <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-900">
-                Strongest Topics
-              </h2>
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">
+                  Strongest Topics
+                </h2>
+                <p className="text-sm text-gray-500 mt-1">
+                  Topics where you excel the most
+                </p>
+              </div>
               <Trophy className="w-6 h-6 text-yellow-500" />
             </div>
             <div className="space-y-3">
@@ -378,28 +475,30 @@ export const Analytics = () => {
                 strongestTopics.map((topic, index) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between p-3 bg-emerald-50 rounded-lg"
+                    className="flex items-center justify-between p-4 bg-emerald-50 rounded-lg border border-emerald-100"
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center">
-                        <span className="text-sm font-bold text-emerald-600">
+                    <div className="flex items-center gap-3 flex-1">
+                      <div className="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                        <span className="text-sm font-bold text-white">
                           #{index + 1}
                         </span>
                       </div>
-                      <div>
-                        <p className="font-medium text-gray-900">
-                          {topic.name}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-gray-900 text-base">
+                          {topic.topic_name || topic.name || 'Unknown Topic'}
                         </p>
-                        <p className="text-xs text-gray-500">
-                          {topic.total_questions} questions
-                        </p>
+                        <div className="flex items-center gap-3 mt-1 text-xs text-gray-600">
+                          <span>{topic.correct_answers || 0}/{topic.total_questions || 0} correct</span>
+                          <span>•</span>
+                          <span>{topic.total_questions || 0} questions attempted</span>
+                        </div>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="text-lg font-bold text-emerald-600">
+                    <div className="text-right ml-4 flex-shrink-0">
+                      <div className="text-2xl font-bold text-emerald-600">
                         {Math.round(topic.accuracy || 0)}%
                       </div>
-                      <div className="text-xs text-gray-500">accuracy</div>
+                      <div className="text-xs text-emerald-600 font-medium">accuracy</div>
                     </div>
                   </div>
                 ))
@@ -415,9 +514,14 @@ export const Analytics = () => {
           {/* Weakest Topics */}
           <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-900">
-                Areas to Improve
-              </h2>
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">
+                  Areas to Improve
+                </h2>
+                <p className="text-sm text-gray-500 mt-1">
+                  Topics that need more practice
+                </p>
+              </div>
               <Target className="w-6 h-6 text-red-500" />
             </div>
             <div className="space-y-3">
@@ -425,28 +529,30 @@ export const Analytics = () => {
                 weakestTopics.map((topic, index) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between p-3 bg-orange-50 rounded-lg"
+                    className="flex items-center justify-between p-4 bg-orange-50 rounded-lg border border-orange-100"
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center">
-                        <span className="text-sm font-bold text-orange-600">
+                    <div className="flex items-center gap-3 flex-1">
+                      <div className="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center flex-shrink-0">
+                        <span className="text-sm font-bold text-white">
                           #{index + 1}
                         </span>
                       </div>
-                      <div>
-                        <p className="font-medium text-gray-900">
-                          {topic.name}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-gray-900 text-base">
+                          {topic.topic_name || topic.name || 'Unknown Topic'}
                         </p>
-                        <p className="text-xs text-gray-500">
-                          {topic.total_questions} questions
-                        </p>
+                        <div className="flex items-center gap-3 mt-1 text-xs text-gray-600">
+                          <span>{topic.correct_answers || 0}/{topic.total_questions || 0} correct</span>
+                          <span>•</span>
+                          <span>{topic.total_questions || 0} questions attempted</span>
+                        </div>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="text-lg font-bold text-orange-600">
+                    <div className="text-right ml-4 flex-shrink-0">
+                      <div className="text-2xl font-bold text-orange-600">
                         {Math.round(topic.accuracy || 0)}%
                       </div>
-                      <div className="text-xs text-gray-500">accuracy</div>
+                      <div className="text-xs text-orange-600 font-medium">accuracy</div>
                     </div>
                   </div>
                 ))
@@ -461,7 +567,7 @@ export const Analytics = () => {
         </div>
 
         {/* Group Comparison */}
-        {groupComparisonData && (
+        {groupComparisonData && groupComparisonData.total_students > 0 && (
           <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
             <div className="flex items-center justify-between mb-6">
               <div>
