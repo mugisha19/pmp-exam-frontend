@@ -143,10 +143,7 @@ export const Groups = () => {
   const stats = useMemo(() => {
     const groups = myGroups || [];
     const activeGroups = groups.filter((g) => g.status === "active").length;
-    const totalQuizzes = groups.reduce(
-      (sum, g) => sum + (g.quiz_count || 0),
-      0
-    );
+    const totalQuizzes = groups.reduce((sum, g) => sum + (g.quiz_count || 0), 0);
     return {
       totalGroups: groups.length,
       activeGroups,
@@ -284,7 +281,7 @@ export const Groups = () => {
                   <div className="text-sm text-gray-600">Active</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-4xl font-bold text-orange-500">
+                  <div className="text-4xl font-bold" style={{ color: '#476072' }}>
                     {stats.totalQuizzes}
                   </div>
                   <div className="text-sm text-gray-600">Total Quizzes</div>
