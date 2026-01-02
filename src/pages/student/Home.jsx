@@ -183,7 +183,9 @@ export const Home = () => {
   const recentActivity = useMemo(() => {
     const attempts = allAttemptsData?.attempts || [];
     return attempts
-      .filter((att) => att.status === "submitted" || att.status === "auto_submitted")
+      .filter(
+        (att) => att.status === "submitted" || att.status === "auto_submitted"
+      )
       .sort((a, b) => new Date(b.submitted_at) - new Date(a.submitted_at))
       .slice(0, 5)
       .map((att) => {

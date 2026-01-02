@@ -466,7 +466,7 @@ export const QuizTaking = () => {
         newFlagStatus
       );
       await loadSessionState();
-      
+
       // Restore the selected answer after reloading state
       setSelectedAnswer(currentAnswer);
     } catch (error) {
@@ -508,7 +508,7 @@ export const QuizTaking = () => {
       if (newIndex === currentQuestionIndex) {
         return;
       }
-      
+
       // Prevent navigation to unanswered questions ahead of current position
       if (newIndex > currentQuestionIndex) {
         const targetQuestion = sessionData.questions[newIndex];
@@ -526,7 +526,7 @@ export const QuizTaking = () => {
 
     // Only save answer when going forward (Next button)
     const isGoingForward = direction === "next";
-    
+
     if (isGoingForward && selectedAnswer) {
       const saveResult = await handleSaveAnswer();
 
@@ -542,7 +542,9 @@ export const QuizTaking = () => {
           setTimeRemaining(currentState.timing.time_remaining_seconds);
         }
         if (currentState.pause_info?.is_paused) {
-          setPauseTimeRemaining(currentState.pause_info.pause_remaining_seconds);
+          setPauseTimeRemaining(
+            currentState.pause_info.pause_remaining_seconds
+          );
         }
         return;
       }
@@ -581,14 +583,14 @@ export const QuizTaking = () => {
         // Get fresh state after navigation
         const updatedState = await getSessionState(sessionToken);
         setSessionData(updatedState);
-        
+
         // Update timing from fresh state
         if (updatedState.timing) {
           setTimeRemaining(updatedState.timing.time_remaining_seconds);
           setExamTimeElapsed(updatedState.timing.time_elapsed_seconds || 0);
           setPauseTimeElapsed(updatedState.timing.pause_time_seconds || 0);
         }
-        
+
         // Set the selected answer and current index from the updated state
         setCurrentQuestionIndex(newIndex);
         const newQ = updatedState.questions[newIndex];
