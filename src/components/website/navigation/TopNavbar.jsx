@@ -245,8 +245,8 @@ export const TopNavbar = () => {
                   {/* User Info */}
                   <div className="flex items-center max-w-[120px] sm:max-w-[150px]">
                     <span className="text-sm font-semibold text-gray-900 leading-tight truncate">
-                      {user?.first_name && user?.last_name 
-                        ? `${user.first_name} ${user.last_name}` 
+                      {user?.first_name && user?.last_name
+                        ? `${user.first_name} ${user.last_name}`
                         : user?.first_name || "User"}
                     </span>
                   </div>
