@@ -107,7 +107,6 @@ export const TopNavbar = () => {
 
   const mainNavItems = [
     { label: "Home", path: "/dashboard", icon: Home },
-    { label: "Browse Exams", path: "/browse", icon: BookOpen },
     { label: "My Learning", path: "/my-learning", icon: TrendingUp },
     { label: "Analytics", path: "/analytics", icon: BarChart3 },
     { label: "Reminders", path: "/reminders", icon: Bell },

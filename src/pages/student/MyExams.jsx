@@ -74,6 +74,8 @@ export const MyExams = () => {
       return attemptInfo && attemptInfo.attempts > 0;
     }).length;
 
+    const freeExams = allQuizzes.filter((q) => !q.is_premium).length;
+
     // Calculate average score from attempts
     let totalScore = 0;
     let scoreCount = 0;
@@ -238,7 +240,7 @@ export const MyExams = () => {
                 <div className="text-4xl font-bold text-emerald-600">
                   {stats.active}
                 </div>
-                <div className="text-sm text-gray-600">In Progress</div>
+                <div className="text-sm text-gray-600">Active Now</div>
               </div>
               <div className="text-center">
                 <div className="text-4xl font-bold text-orange-500">
@@ -536,17 +538,105 @@ export const MyExams = () => {
                   to achieve your goals.
                 </p>
               </div>
-              <button
-                onClick={() => navigate("/browse")}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-white text-emerald-600 font-semibold rounded-lg hover:bg-gray-50 transition-colors shrink-0"
-              >
-                Browse More Exams
-                <ArrowRight className="w-5 h-5 text-emerald-600" />
-              </button>
+              <div className="text-center px-6 py-3 bg-white/10 rounded-lg">
+                <div className="text-2xl font-bold text-white">
+                  {stats.avgScore}%
+                </div>
+                <div className="text-xs text-white/80">Average Score</div>
+              </div>
             </div>
           </div>
         </section>
       )}
+
+      {/* Available Right Now Section */}
+      {stats.active > 0 && (
+        <section className="bg-gray-50 border-y border-gray-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div className="flex items-center gap-3 mb-6">
+              <Play className="w-6 h-6 text-emerald-600" />
+              <h2 className="text-2xl font-bold text-gray-900">
+                Available Right Now
+              </h2>
+            </div>
+            <p className="text-gray-600 mb-6">
+              These exams are currently active and ready for you to take
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {filteredAndSortedQuizzes
+                .filter((q) => q.is_available || q.status === "active")
+                .slice(0, 4)
+                .map((quiz) => {
+                  const quizId = quiz.quiz_id || quiz.id;
+                  return (
+                    <div
+                      key={quizId}
+                      onClick={() => handleStartQuiz(quizId)}
+                      className="flex items-center gap-4 p-4 bg-white border border-gray-200 rounded-lg cursor-pointer hover:shadow-md hover:border-gray-300 transition-all"
+                    >
+                      <div className="w-12 h-12 rounded-lg bg-emerald-100 flex items-center justify-center shrink-0">
+                        <Play className="w-5 h-5 text-emerald-600" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-medium text-gray-900 truncate text-sm">
+                          {quiz.title}
+                        </h3>
+                        <p className="text-xs text-gray-500">
+                          {quiz.total_questions || 0} questions
+                        </p>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-gray-400 shrink-0" />
+                    </div>
+                  );
+                })}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* About Section */}
+      <section className="border-t border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <BookOpen className="w-6 h-6 text-emerald-600" />
+              </div>
+              <h3 className="font-semibold text-gray-900 mb-2">
+                Comprehensive Exams
+              </h3>
+              <p className="text-sm text-gray-600">
+                Practice with exam-style questions covering all PMP knowledge
+                areas and domains.
+              </p>
+            </div>
+            <div className="text-center">
+              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <TrendingUp className="w-6 h-6 text-orange-600" />
+              </div>
+              <h3 className="font-semibold text-gray-900 mb-2">
+                Track Progress
+              </h3>
+              <p className="text-sm text-gray-600">
+                Monitor your scores, identify weak areas, and track improvement
+                over time.
+              </p>
+            </div>
+            <div className="text-center">
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <Trophy className="w-6 h-6 text-blue-600" />
+              </div>
+              <h3 className="font-semibold text-gray-900 mb-2">
+                Achieve Success
+              </h3>
+              <p className="text-sm text-gray-600">
+                Build confidence and prepare effectively for your certification
+                exam.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 };

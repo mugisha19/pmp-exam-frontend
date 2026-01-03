@@ -14,7 +14,6 @@ import {
   QuizDetail,
   Profile,
   Notifications,
-  BrowseExams,
   LearningPaths,
   Analytics,
   Reminders,
@@ -31,7 +30,6 @@ export const studentRoutes = (
     }
   >
     <Route path="/dashboard" element={<Home />} />
-    <Route path="/browse" element={<BrowseExams />} />
     <Route path="/learning-paths" element={<LearningPaths />} />
     <Route path="/my-learning" element={<MyExams />} />
     <Route path="/analytics" element={<Analytics />} />
