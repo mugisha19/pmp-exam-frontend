@@ -445,7 +445,7 @@ export const QuizDetail = () => {
       </section>
 
       {/* Mobile CTA */}
-      <div className="lg:hidden sticky top-0 z-10 bg-white border-b border-gray-200 px-4 py-3">
+      <div className="lg:hidden sticky top-16 z-10 bg-white border-b border-gray-200 px-4 py-3">
         <div className="flex items-center justify-between gap-4">
           <div>
             {hasAttempted && bestScore !== null && (
@@ -835,7 +835,7 @@ export const QuizDetail = () => {
 
           {/* Right Sidebar - Desktop Only */}
           <div className="hidden lg:block w-80 shrink-0">
-            <div className="sticky top-8 space-y-6">
+            <div className="sticky top-20 space-y-6">
               {/* Progress Card */}
               {hasAttempted && (
                 <div className="bg-white border border-gray-200 rounded-lg p-5">

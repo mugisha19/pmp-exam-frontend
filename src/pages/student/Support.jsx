@@ -282,7 +282,7 @@ export const Support = () => {
               className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="sticky top-0 bg-white border-b border-gray-200 p-6">
+              <div className="sticky top-16 bg-white border-b border-gray-200 p-6">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <h2 className="text-2xl font-bold text-gray-900 mb-2">
