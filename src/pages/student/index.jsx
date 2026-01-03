@@ -14,3 +14,4 @@ export { default as LearningPaths } from "./LearningPaths";
 export { default as Achievements } from "./Achievements";
 export { default as Resources } from "./Resources";
 export { default as Analytics } from "./Analytics";
+export { default as Reminders } from "./Reminders";

@@ -43,6 +43,12 @@ export const STUDENT_NAV_ITEMS = [
     path: "/my-learning",
     icon: TrendingUp,
   },
+  {
+    id: "reminders",
+    label: "Reminders",
+    path: "/reminders",
+    icon: Bell,
+  },
 ];
 
 export const INSTRUCTOR_NAV_ITEMS = [

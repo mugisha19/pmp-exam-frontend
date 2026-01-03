@@ -110,6 +110,7 @@ export const TopNavbar = () => {
     { label: "Browse Exams", path: "/browse", icon: BookOpen },
     { label: "My Learning", path: "/my-learning", icon: TrendingUp },
     { label: "Analytics", path: "/analytics", icon: BarChart3 },
+    { label: "Reminders", path: "/reminders", icon: Bell },
     { label: "Groups", path: "/groups", icon: Users },
   ];
 
@@ -168,26 +169,6 @@ export const TopNavbar = () => {
 
             {/* Right Section: Actions */}
             <div className="flex items-center gap-2">
-              {/* Search Button */}
-              <button
-                onClick={() => setSearchOpen(true)}
-                className="hidden sm:flex items-center gap-2 px-3 py-2 text-gray-500 hover:text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-lg transition-all duration-200 border border-gray-200"
-              >
-                <Search className="w-4 h-4" />
-                <span className="text-sm text-gray-400">Search...</span>
-                <kbd className="hidden md:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-medium text-gray-400 bg-white border border-gray-200 rounded shadow-sm">
-                  <span className="text-xs">⌘</span>K
-                </kbd>
-              </button>
-
-              {/* Mobile Search Button */}
-              <button
-                onClick={() => setSearchOpen(true)}
-                className="sm:hidden p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all"
-              >
-                <Search className="w-5 h-5" />
-              </button>
-
               {/* Notifications */}
               <div ref={notificationRef} className="relative">
                 <button
