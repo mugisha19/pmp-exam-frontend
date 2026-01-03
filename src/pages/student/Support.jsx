@@ -25,6 +25,7 @@ export const Support = () => {
   });
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [statusFilter, setStatusFilter] = useState("all");
 
   const { data: ticketsData, isLoading } = useQuery({
     queryKey: ["support-tickets"],
@@ -204,7 +205,20 @@ export const Support = () => {
 
           {/* My Tickets */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 h-[500px] flex flex-col">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">My Tickets</h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-gray-900">My Tickets</h2>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#476072] focus:border-[#476072] outline-none"
+              >
+                <option value="all">All Status</option>
+                <option value="open">Open</option>
+                <option value="in_progress">In Progress</option>
+                <option value="resolved">Resolved</option>
+                <option value="closed">Closed</option>
+              </select>
+            </div>
 
             {isLoading ? (
               <div className="flex items-center justify-center flex-1">
@@ -222,7 +236,9 @@ export const Support = () => {
               </div>
             ) : (
               <div className="space-y-3 overflow-y-auto flex-1">
-                {ticketsData?.tickets?.map((ticket) => (
+                {ticketsData?.tickets
+                  ?.filter((ticket) => statusFilter === "all" || ticket.status === statusFilter)
+                  ?.map((ticket) => (
                   <div
                     key={ticket.ticket_id}
                     onClick={() => openTicketModal(ticket)}
