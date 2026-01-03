@@ -51,11 +51,11 @@ export const QuizTaking = () => {
   const { quizId } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  
+
   // Use ref for session token to prevent re-renders from triggering navigation
   const sessionTokenRef = useRef(sessionStorage.getItem("quiz_session_token"));
   const sessionToken = sessionTokenRef.current;
-  
+
   // Track if quiz has been submitted (to prevent effects from running)
   const isQuizSubmittedRef = useRef(false);
 
@@ -89,7 +89,7 @@ export const QuizTaking = () => {
     if (isQuizSubmittedRef.current) {
       return;
     }
-    
+
     if (!sessionToken) {
       navigate(`/exams/${quizId}`);
       return;
@@ -103,7 +103,7 @@ export const QuizTaking = () => {
         isQuizSubmittedRef.current = true;
         sessionStorage.removeItem("quiz_session_token");
         sessionStorage.removeItem("quiz_session_data");
-        
+
         // Try to show feedback modal if we have an attempt_id
         const attemptId = state.result?.attempt_id || state.attempt_id;
         if (attemptId) {
@@ -114,7 +114,7 @@ export const QuizTaking = () => {
           setShowFeedbackModal(true);
           return;
         }
-        
+
         // No attempt_id, navigate to quiz detail
         if (state.status === "auto_submitted") {
           showToast.info("Time's up!", "Quiz was auto-submitted.");
@@ -307,7 +307,7 @@ export const QuizTaking = () => {
         clearInterval(heartbeat);
         return;
       }
-      
+
       try {
         const response = await sendHeartbeat(sessionToken);
 
@@ -332,11 +332,11 @@ export const QuizTaking = () => {
           // Mark as submitted to prevent other effects from running
           isQuizSubmittedRef.current = true;
           clearInterval(heartbeat);
-          
+
           sessionStorage.removeItem("quiz_session_token");
           sessionStorage.removeItem("quiz_session_data");
           showToast.info("Time's up!", "Quiz was auto-submitted.");
-          
+
           // Try to get attempt_id from the response
           if (response.attempt_id) {
             setSubmittedAttemptId(response.attempt_id);
@@ -373,28 +373,34 @@ export const QuizTaking = () => {
         clearInterval(pollInterval);
         return;
       }
-      
+
       try {
         const state = await getSessionState(sessionToken);
 
         if (state.status === "auto_submitted" || state.status === "submitted") {
           isQuizSubmittedRef.current = true;
-          
+
           sessionStorage.removeItem("quiz_session_token");
           sessionStorage.removeItem("quiz_session_data");
-          
+
           // Invalidate queries
           await queryClient.invalidateQueries({ queryKey: ["quiz", quizId] });
-          await queryClient.invalidateQueries({ queryKey: ["quiz-attempts", quizId] });
+          await queryClient.invalidateQueries({
+            queryKey: ["quiz-attempts", quizId],
+          });
           await queryClient.invalidateQueries({ queryKey: ["quizzes"] });
-          await queryClient.invalidateQueries({ queryKey: ["all-quizzes-dashboard"] });
-          await queryClient.invalidateQueries({ predicate: (query) => query.queryKey[0] === "all-quiz-attempts" });
-          
+          await queryClient.invalidateQueries({
+            queryKey: ["all-quizzes-dashboard"],
+          });
+          await queryClient.invalidateQueries({
+            predicate: (query) => query.queryKey[0] === "all-quiz-attempts",
+          });
+
           showToast.info("Time's up!", "Quiz was auto-submitted.");
-          
+
           // Try to get attempt_id from various places in the response
           const attemptId = state.result?.attempt_id || state.attempt_id;
-          
+
           if (attemptId) {
             setSubmittedAttemptId(attemptId);
             setIsWaitingForAutoSubmit(false);
@@ -415,7 +421,7 @@ export const QuizTaking = () => {
           sessionStorage.removeItem("quiz_session_token");
           sessionStorage.removeItem("quiz_session_data");
           showToast.error("Session Expired", "Quiz was auto-submitted.");
-          
+
           // Try to get attempt_id even from expired state
           const attemptId = state.result?.attempt_id || state.attempt_id;
           if (attemptId) {
@@ -816,11 +822,14 @@ export const QuizTaking = () => {
       }
 
       const result = await submitQuiz(sessionToken);
-      
+
       sessionStorage.removeItem("quiz_session_token");
       sessionStorage.removeItem("quiz_session_data");
 
-      showToast.success("Quiz Submitted!", "Your answers have been saved successfully.");
+      showToast.success(
+        "Quiz Submitted!",
+        "Your answers have been saved successfully."
+      );
 
       if (result?.attempt_id) {
         setSubmittedAttemptId(result.attempt_id);
@@ -828,7 +837,7 @@ export const QuizTaking = () => {
         setIsSubmitting(false);
         return;
       }
-      
+
       navigate(`/exams/${quizId}`);
     } catch (error) {
       console.error("Failed to submit:", error);
@@ -863,13 +872,19 @@ export const QuizTaking = () => {
     setIsSubmittingFeedback(true);
     try {
       await submitFeedback(submittedAttemptId, rating, comment);
-      
+
       await queryClient.invalidateQueries({ queryKey: ["quiz", quizId] });
-      await queryClient.invalidateQueries({ queryKey: ["quiz-attempts", quizId] });
+      await queryClient.invalidateQueries({
+        queryKey: ["quiz-attempts", quizId],
+      });
       await queryClient.invalidateQueries({ queryKey: ["quizzes"] });
-      await queryClient.invalidateQueries({ queryKey: ["all-quizzes-dashboard"] });
-      await queryClient.invalidateQueries({ predicate: (query) => query.queryKey[0] === "all-quiz-attempts" });
-      
+      await queryClient.invalidateQueries({
+        queryKey: ["all-quizzes-dashboard"],
+      });
+      await queryClient.invalidateQueries({
+        predicate: (query) => query.queryKey[0] === "all-quiz-attempts",
+      });
+
       showToast.success("Thank you!", "Your feedback has been submitted.");
       setShowFeedbackModal(false);
       navigate(`/exams/${quizId}`);
@@ -886,8 +901,10 @@ export const QuizTaking = () => {
     queryClient.invalidateQueries({ queryKey: ["quiz-attempts", quizId] });
     queryClient.invalidateQueries({ queryKey: ["quizzes"] });
     queryClient.invalidateQueries({ queryKey: ["all-quizzes-dashboard"] });
-    queryClient.invalidateQueries({ predicate: (query) => query.queryKey[0] === "all-quiz-attempts" });
-    
+    queryClient.invalidateQueries({
+      predicate: (query) => query.queryKey[0] === "all-quiz-attempts",
+    });
+
     setShowFeedbackModal(false);
     navigate(`/exams/${quizId}`);
   };
@@ -1480,7 +1497,7 @@ export const QuizTaking = () => {
     100;
 
   return (
-      <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50">
       {/* Pause Modal Overlay */}
       {renderPauseModal()}
       {/* Header */}
