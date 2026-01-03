@@ -114,8 +114,8 @@ export const TopNavbar = () => {
   const mainNavItems = [
     { label: "Home", path: "/dashboard", icon: Home },
     { label: "My Learning", path: "/my-learning", icon: TrendingUp },
-    { label: "Analytics", path: "/analytics", icon: BarChart3 },
     { label: "Groups", path: "/groups", icon: Users },
+    { label: "Analytics", path: "/analytics", icon: BarChart3 },
   ];
 
   return (
