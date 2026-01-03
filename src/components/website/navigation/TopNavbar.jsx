@@ -25,12 +25,14 @@ import {
   Trophy,
   BarChart3,
   Calendar,
+  FileText,
 } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { SearchOverlay } from "./SearchOverlay";
 import { NotificationPanel } from "./NotificationPanel";
 import { ReminderPanel } from "./ReminderPanel";
 import { ProfileDropdown } from "./ProfileDropdown";
+import { NotesPanel } from "@/components/ui/NotesPanel";
 
 export const TopNavbar = () => {
   const location = useLocation();
@@ -40,6 +42,7 @@ export const TopNavbar = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [reminderOpen, setReminderOpen] = useState(false);
+  const [notesOpen, setNotesOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef(null);
   const notificationRef = useRef(null);
@@ -170,10 +173,30 @@ export const TopNavbar = () => {
 
             {/* Right Section: Actions */}
             <div className="flex items-center gap-2">
+              {/* Notes */}
+              <button
+                onClick={() => {
+                  setNotesOpen(!notesOpen);
+                  setReminderOpen(false);
+                  setNotificationsOpen(false);
+                  setProfileOpen(false);
+                }}
+                title="My Notes"
+                className={cn(
+                  "relative p-2 rounded-lg transition-all duration-200",
+                  notesOpen
+                    ? "text-emerald-600 bg-emerald-50"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                )}
+              >
+                <FileText className="w-5 h-5" />
+              </button>
+
               {/* Reminders */}
               <button
                 onClick={() => {
                   setReminderOpen(!reminderOpen);
+                  setNotesOpen(false);
                   setNotificationsOpen(false);
                   setProfileOpen(false);
                 }}
@@ -193,6 +216,7 @@ export const TopNavbar = () => {
                 <button
                   onClick={() => {
                     setNotificationsOpen(!notificationsOpen);
+                    setNotesOpen(false);
                     setReminderOpen(false);
                     setProfileOpen(false);
                   }}
@@ -228,6 +252,7 @@ export const TopNavbar = () => {
                 <button
                   onClick={() => {
                     setProfileOpen(!profileOpen);
+                    setNotesOpen(false);
                     setNotificationsOpen(false);
                     setReminderOpen(false);
                   }}
@@ -355,6 +380,9 @@ export const TopNavbar = () => {
 
       {/* Reminder Panel */}
       {reminderOpen && <ReminderPanel onClose={() => setReminderOpen(false)} />}
+
+      {/* Notes Panel */}
+      <NotesPanel isOpen={notesOpen} onClose={() => setNotesOpen(false)} />
 
       {/* Spacer to prevent content from going under fixed navbar */}
       <div className="h-16" />
