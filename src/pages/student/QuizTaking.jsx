@@ -9,7 +9,7 @@
  * - Answer formats: Matches backend expectations exactly
  */
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -44,12 +44,20 @@ import {
 import { showToast } from "@/utils/toast.utils";
 import { cn } from "@/utils/cn";
 import { Modal, ModalBody, ModalFooter } from "@/components/ui/Modal";
+import { FeedbackModal } from "@/components/ui/FeedbackModal";
+import { submitFeedback } from "@/services/feedback.service";
 
 export const QuizTaking = () => {
   const { quizId } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const sessionToken = sessionStorage.getItem("quiz_session_token");
+  
+  // Use ref for session token to prevent re-renders from triggering navigation
+  const sessionTokenRef = useRef(sessionStorage.getItem("quiz_session_token"));
+  const sessionToken = sessionTokenRef.current;
+  
+  // Track if quiz has been submitted (to prevent effects from running)
+  const isQuizSubmittedRef = useRef(false);
 
   // Session state
   const [sessionData, setSessionData] = useState(null);
@@ -71,9 +79,17 @@ export const QuizTaking = () => {
   const [isWaitingForAutoSubmit, setIsWaitingForAutoSubmit] = useState(false);
   const [lastQuestionAnswerSaved, setLastQuestionAnswerSaved] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
+  const [submittedAttemptId, setSubmittedAttemptId] = useState(null);
 
   // Load session state from backend
   const loadSessionState = useCallback(async () => {
+    // Skip if quiz has been submitted (showing feedback modal)
+    if (isQuizSubmittedRef.current) {
+      return;
+    }
+    
     if (!sessionToken) {
       navigate(`/exams/${quizId}`);
       return;
@@ -84,8 +100,22 @@ export const QuizTaking = () => {
 
       // Handle submitted/auto-submitted sessions
       if (state.status === "submitted" || state.status === "auto_submitted") {
+        isQuizSubmittedRef.current = true;
         sessionStorage.removeItem("quiz_session_token");
         sessionStorage.removeItem("quiz_session_data");
+        
+        // Try to show feedback modal if we have an attempt_id
+        const attemptId = state.result?.attempt_id || state.attempt_id;
+        if (attemptId) {
+          if (state.status === "auto_submitted") {
+            showToast.info("Time's up!", "Quiz was auto-submitted.");
+          }
+          setSubmittedAttemptId(attemptId);
+          setShowFeedbackModal(true);
+          return;
+        }
+        
+        // No attempt_id, navigate to quiz detail
         if (state.status === "auto_submitted") {
           showToast.info("Time's up!", "Quiz was auto-submitted.");
         } else {
@@ -94,15 +124,6 @@ export const QuizTaking = () => {
             "This quiz has already been submitted"
           );
         }
-        navigate(`/exams/${quizId}`);
-        return;
-      }
-
-      // Handle auto-submitted from backend (with result)
-      if (state.status === "auto_submitted" && state.result) {
-        sessionStorage.removeItem("quiz_session_token");
-        sessionStorage.removeItem("quiz_session_data");
-        showToast.info("Time's up!", "Quiz was auto-submitted.");
         navigate(`/exams/${quizId}`);
         return;
       }
@@ -278,8 +299,15 @@ export const QuizTaking = () => {
   useEffect(() => {
     if (!sessionToken || !sessionData) return;
     if (sessionData.pause_info?.is_paused) return;
+    if (isQuizSubmittedRef.current) return;
 
     const heartbeat = setInterval(async () => {
+      // Skip heartbeat if quiz has been submitted
+      if (isQuizSubmittedRef.current) {
+        clearInterval(heartbeat);
+        return;
+      }
+      
       try {
         const response = await sendHeartbeat(sessionToken);
 
@@ -301,10 +329,22 @@ export const QuizTaking = () => {
           response.status === "auto_submitted" ||
           response.status === "expired"
         ) {
+          // Mark as submitted to prevent other effects from running
+          isQuizSubmittedRef.current = true;
+          clearInterval(heartbeat);
+          
           sessionStorage.removeItem("quiz_session_token");
           sessionStorage.removeItem("quiz_session_data");
           showToast.info("Time's up!", "Quiz was auto-submitted.");
-          navigate(`/exams/${quizId}`);
+          
+          // Try to get attempt_id from the response
+          if (response.attempt_id) {
+            setSubmittedAttemptId(response.attempt_id);
+            setShowFeedbackModal(true);
+          } else {
+            // Set waiting for auto-submit to trigger polling which should get the attempt_id
+            setIsWaitingForAutoSubmit(true);
+          }
           return;
         }
 
@@ -326,31 +366,75 @@ export const QuizTaking = () => {
   // Poll for auto-submit
   useEffect(() => {
     if (!isWaitingForAutoSubmit || !sessionToken) return;
+    if (isQuizSubmittedRef.current) return;
 
     const pollInterval = setInterval(async () => {
+      if (isQuizSubmittedRef.current) {
+        clearInterval(pollInterval);
+        return;
+      }
+      
       try {
         const state = await getSessionState(sessionToken);
 
         if (state.status === "auto_submitted" || state.status === "submitted") {
+          isQuizSubmittedRef.current = true;
+          
           sessionStorage.removeItem("quiz_session_token");
           sessionStorage.removeItem("quiz_session_data");
+          
+          // Invalidate queries
+          await queryClient.invalidateQueries({ queryKey: ["quiz", quizId] });
+          await queryClient.invalidateQueries({ queryKey: ["quiz-attempts", quizId] });
+          await queryClient.invalidateQueries({ queryKey: ["quizzes"] });
+          await queryClient.invalidateQueries({ queryKey: ["all-quizzes-dashboard"] });
+          await queryClient.invalidateQueries({ predicate: (query) => query.queryKey[0] === "all-quiz-attempts" });
+          
           showToast.info("Time's up!", "Quiz was auto-submitted.");
-          navigate(`/exams/${quizId}`);
+          
+          // Try to get attempt_id from various places in the response
+          const attemptId = state.result?.attempt_id || state.attempt_id;
+          
+          if (attemptId) {
+            setSubmittedAttemptId(attemptId);
+            setIsWaitingForAutoSubmit(false);
+            setShowFeedbackModal(true);
+            clearInterval(pollInterval);
+          } else {
+            // Even without attempt_id, navigate to quiz detail
+            // User can provide feedback from there if needed
+            clearInterval(pollInterval);
+            navigate(`/exams/${quizId}`);
+          }
           return;
         }
 
         if (state.status === "expired" || !state.session_id) {
+          isQuizSubmittedRef.current = true;
+          clearInterval(pollInterval);
           sessionStorage.removeItem("quiz_session_token");
           sessionStorage.removeItem("quiz_session_data");
           showToast.error("Session Expired", "Quiz was auto-submitted.");
-          navigate(`/exams/${quizId}`);
+          
+          // Try to get attempt_id even from expired state
+          const attemptId = state.result?.attempt_id || state.attempt_id;
+          if (attemptId) {
+            setSubmittedAttemptId(attemptId);
+            setIsWaitingForAutoSubmit(false);
+            setShowFeedbackModal(true);
+          } else {
+            navigate(`/exams/${quizId}`);
+          }
           return;
         }
       } catch (error) {
         if (error.response?.status === 404 || error.response?.status === 410) {
+          isQuizSubmittedRef.current = true;
+          clearInterval(pollInterval);
           sessionStorage.removeItem("quiz_session_token");
           sessionStorage.removeItem("quiz_session_data");
           showToast.info("Time's up!", "Quiz was auto-submitted.");
+          // For 404/410 errors, we don't have the attempt_id, so navigate
           navigate(`/exams/${quizId}`);
         } else {
           console.error("Failed to poll session status:", error);
@@ -359,7 +443,7 @@ export const QuizTaking = () => {
     }, 2000);
 
     return () => clearInterval(pollInterval);
-  }, [isWaitingForAutoSubmit, sessionToken, quizId, navigate]);
+  }, [isWaitingForAutoSubmit, sessionToken, quizId, navigate, queryClient]);
 
   const handleAnswerChange = (answer) => {
     if (isWaitingForAutoSubmit || sessionData?.pause_info?.is_paused) {
@@ -731,28 +815,20 @@ export const QuizTaking = () => {
         }
       }
 
-      await submitQuiz(sessionToken);
+      const result = await submitQuiz(sessionToken);
+      
       sessionStorage.removeItem("quiz_session_token");
       sessionStorage.removeItem("quiz_session_data");
 
-      // Invalidate all queries to refetch fresh data
-      await queryClient.invalidateQueries({ queryKey: ["quiz", quizId] });
-      await queryClient.invalidateQueries({
-        queryKey: ["quiz-attempts", quizId],
-      });
-      await queryClient.invalidateQueries({ queryKey: ["quizzes"] });
-      await queryClient.invalidateQueries({
-        queryKey: ["all-quizzes-dashboard"],
-      });
-      // Invalidate all attempts queries (matches any query starting with "all-quiz-attempts")
-      await queryClient.invalidateQueries({
-        predicate: (query) => query.queryKey[0] === "all-quiz-attempts",
-      });
+      showToast.success("Quiz Submitted!", "Your answers have been saved successfully.");
 
-      showToast.success(
-        "Quiz Submitted!",
-        "Your answers have been saved successfully."
-      );
+      if (result?.attempt_id) {
+        setSubmittedAttemptId(result.attempt_id);
+        setShowFeedbackModal(true);
+        setIsSubmitting(false);
+        return;
+      }
+      
       navigate(`/exams/${quizId}`);
     } catch (error) {
       console.error("Failed to submit:", error);
@@ -781,6 +857,39 @@ export const QuizTaking = () => {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleFeedbackSubmit = async (rating, comment) => {
+    setIsSubmittingFeedback(true);
+    try {
+      await submitFeedback(submittedAttemptId, rating, comment);
+      
+      await queryClient.invalidateQueries({ queryKey: ["quiz", quizId] });
+      await queryClient.invalidateQueries({ queryKey: ["quiz-attempts", quizId] });
+      await queryClient.invalidateQueries({ queryKey: ["quizzes"] });
+      await queryClient.invalidateQueries({ queryKey: ["all-quizzes-dashboard"] });
+      await queryClient.invalidateQueries({ predicate: (query) => query.queryKey[0] === "all-quiz-attempts" });
+      
+      showToast.success("Thank you!", "Your feedback has been submitted.");
+      setShowFeedbackModal(false);
+      navigate(`/exams/${quizId}`);
+    } catch (error) {
+      console.error("Failed to submit feedback:", error);
+      showToast.error("Feedback Failed", "Failed to submit feedback");
+    } finally {
+      setIsSubmittingFeedback(false);
+    }
+  };
+
+  const handleFeedbackSkip = () => {
+    queryClient.invalidateQueries({ queryKey: ["quiz", quizId] });
+    queryClient.invalidateQueries({ queryKey: ["quiz-attempts", quizId] });
+    queryClient.invalidateQueries({ queryKey: ["quizzes"] });
+    queryClient.invalidateQueries({ queryKey: ["all-quizzes-dashboard"] });
+    queryClient.invalidateQueries({ predicate: (query) => query.queryKey[0] === "all-quiz-attempts" });
+    
+    setShowFeedbackModal(false);
+    navigate(`/exams/${quizId}`);
   };
 
   const formatTime = (seconds) => {
@@ -1181,6 +1290,20 @@ export const QuizTaking = () => {
     }
   };
 
+  // Show feedback modal after submission - must be checked before other early returns
+  if (showFeedbackModal) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <FeedbackModal
+          isOpen={showFeedbackModal}
+          onClose={handleFeedbackSkip}
+          onSubmit={handleFeedbackSubmit}
+          isSubmitting={isSubmittingFeedback}
+        />
+      </div>
+    );
+  }
+
   // Loading State
   if (loading) {
     return (
@@ -1321,8 +1444,8 @@ export const QuizTaking = () => {
     );
   };
 
-  // Waiting for Auto-Submit State
-  if (isWaitingForAutoSubmit) {
+  // Waiting for Auto-Submit State - Show feedback modal instead
+  if (isWaitingForAutoSubmit && !showFeedbackModal) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-6">
         <div className="bg-white rounded-2xl shadow-xl p-8 max-w-lg w-full text-center border border-gray-200">
@@ -1357,7 +1480,7 @@ export const QuizTaking = () => {
     100;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50">
       {/* Pause Modal Overlay */}
       {renderPauseModal()}
       {/* Header */}

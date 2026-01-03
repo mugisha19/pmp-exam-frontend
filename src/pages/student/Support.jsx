@@ -1,8 +1,3 @@
-/**
- * Support Page
- * Submit and view support tickets
- */
-
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supportService } from "@/services/support.service";
@@ -237,38 +232,41 @@ export const Support = () => {
             ) : (
               <div className="space-y-3 overflow-y-auto flex-1">
                 {ticketsData?.tickets
-                  ?.filter((ticket) => statusFilter === "all" || ticket.status === statusFilter)
+                  ?.filter(
+                    (ticket) =>
+                      statusFilter === "all" || ticket.status === statusFilter
+                  )
                   ?.map((ticket) => (
-                  <div
-                    key={ticket.ticket_id}
-                    onClick={() => openTicketModal(ticket)}
-                    className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all cursor-pointer hover:border-[#476072]"
-                  >
-                    <div className="flex items-start justify-between mb-2">
-                      <h3 className="font-semibold text-gray-900 line-clamp-1 flex-1">
-                        {ticket.subject}
-                      </h3>
-                      <span
-                        className={cn(
-                          "px-2 py-1 rounded-full text-xs font-medium border flex items-center gap-1 ml-2",
-                          getStatusColor(ticket.status)
-                        )}
-                      >
-                        {getStatusIcon(ticket.status)}
-                        {ticket.status.replace("_", " ").toUpperCase()}
-                      </span>
+                    <div
+                      key={ticket.ticket_id}
+                      onClick={() => openTicketModal(ticket)}
+                      className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all cursor-pointer hover:border-[#476072]"
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <h3 className="font-semibold text-gray-900 line-clamp-1 flex-1">
+                          {ticket.subject}
+                        </h3>
+                        <span
+                          className={cn(
+                            "px-2 py-1 rounded-full text-xs font-medium border flex items-center gap-1 ml-2",
+                            getStatusColor(ticket.status)
+                          )}
+                        >
+                          {getStatusIcon(ticket.status)}
+                          {ticket.status.replace("_", " ").toUpperCase()}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-600 line-clamp-2 mb-3">
+                        {ticket.description}
+                      </p>
+                      <div className="flex items-center text-xs text-gray-500">
+                        <Clock className="w-3 h-3" />
+                        <span className="ml-1">
+                          {new Date(ticket.created_at).toLocaleDateString()}
+                        </span>
+                      </div>
                     </div>
-                    <p className="text-sm text-gray-600 line-clamp-2 mb-3">
-                      {ticket.description}
-                    </p>
-                    <div className="flex items-center text-xs text-gray-500">
-                      <Clock className="w-3 h-3" />
-                      <span className="ml-1">
-                        {new Date(ticket.created_at).toLocaleDateString()}
-                      </span>
-                    </div>
-                  </div>
-                ))}
+                  ))}
               </div>
             )}
           </div>
