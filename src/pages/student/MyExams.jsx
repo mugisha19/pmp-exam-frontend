@@ -9,6 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getQuizzes } from "@/services/quiz.service";
 import { useQuizAttemptsBatch } from "@/hooks/queries/useQuizAttemptsBatch";
 import { ExamCard } from "@/components/shared/ExamCard";
+import { ReminderPanel } from "@/components/website/navigation/ReminderPanel";
 import {
   BookOpen,
   Clock,
@@ -35,6 +36,8 @@ export const MyExams = () => {
   const [sortBy, setSortBy] = useState("date");
   const [viewMode, setViewMode] = useState("grid");
   const [showFilters, setShowFilters] = useState(false);
+  const [reminderOpen, setReminderOpen] = useState(false);
+  const [selectedQuizId, setSelectedQuizId] = useState(null);
 
   // Fetch available quizzes
   const { data: quizzesData, isLoading: loadingQuizzes } = useQuery({
@@ -159,6 +162,11 @@ export const MyExams = () => {
 
   const handleStartQuiz = (quizId) => {
     navigate(`/exams/${quizId}`);
+  };
+
+  const handleSetReminder = (quizId) => {
+    setSelectedQuizId(quizId);
+    setReminderOpen(true);
   };
 
   return (
@@ -496,6 +504,7 @@ export const MyExams = () => {
                   bestScore={bestScore}
                   attemptCount={attemptCount}
                   onClick={() => handleStartQuiz(quizId)}
+                  onSetReminder={handleSetReminder}
                   variant="grid"
                 />
               );
@@ -516,6 +525,7 @@ export const MyExams = () => {
                   bestScore={bestScore}
                   attemptCount={attemptCount}
                   onClick={() => handleStartQuiz(quizId)}
+                  onSetReminder={handleSetReminder}
                   variant="list"
                 />
               );
@@ -637,6 +647,17 @@ export const MyExams = () => {
           </div>
         </div>
       </section>
+
+      {/* Reminder Panel */}
+      {reminderOpen && (
+        <ReminderPanel
+          onClose={() => {
+            setReminderOpen(false);
+            setSelectedQuizId(null);
+          }}
+          preselectedQuizId={selectedQuizId}
+        />
+      )}
     </div>
   );
 };

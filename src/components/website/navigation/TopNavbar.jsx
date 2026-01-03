@@ -24,10 +24,12 @@ import {
   HelpCircle,
   Trophy,
   BarChart3,
+  Calendar,
 } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { SearchOverlay } from "./SearchOverlay";
 import { NotificationPanel } from "./NotificationPanel";
+import { ReminderPanel } from "./ReminderPanel";
 import { ProfileDropdown } from "./ProfileDropdown";
 
 export const TopNavbar = () => {
@@ -37,6 +39,7 @@ export const TopNavbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [reminderOpen, setReminderOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef(null);
   const notificationRef = useRef(null);
@@ -109,7 +112,6 @@ export const TopNavbar = () => {
     { label: "Home", path: "/dashboard", icon: Home },
     { label: "My Learning", path: "/my-learning", icon: TrendingUp },
     { label: "Analytics", path: "/analytics", icon: BarChart3 },
-    { label: "Reminders", path: "/reminders", icon: Bell },
     { label: "Groups", path: "/groups", icon: Users },
   ];
 
@@ -168,13 +170,33 @@ export const TopNavbar = () => {
 
             {/* Right Section: Actions */}
             <div className="flex items-center gap-2">
+              {/* Reminders */}
+              <button
+                onClick={() => {
+                  setReminderOpen(!reminderOpen);
+                  setNotificationsOpen(false);
+                  setProfileOpen(false);
+                }}
+                title="Reminders"
+                className={cn(
+                  "relative p-2 rounded-lg transition-all duration-200",
+                  reminderOpen
+                    ? "text-emerald-600 bg-emerald-50"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                )}
+              >
+                <Calendar className="w-5 h-5" />
+              </button>
+
               {/* Notifications */}
               <div ref={notificationRef} className="relative">
                 <button
                   onClick={() => {
                     setNotificationsOpen(!notificationsOpen);
+                    setReminderOpen(false);
                     setProfileOpen(false);
                   }}
+                  title="Notifications"
                   className={cn(
                     "relative p-2 rounded-lg transition-all duration-200",
                     notificationsOpen
@@ -207,6 +229,7 @@ export const TopNavbar = () => {
                   onClick={() => {
                     setProfileOpen(!profileOpen);
                     setNotificationsOpen(false);
+                    setReminderOpen(false);
                   }}
                   className={cn(
                     "flex items-center gap-3 pl-1 pr-3 py-1 rounded-full transition-all duration-200",
@@ -339,6 +362,9 @@ export const TopNavbar = () => {
 
       {/* Search Overlay */}
       {searchOpen && <SearchOverlay onClose={() => setSearchOpen(false)} />}
+
+      {/* Reminder Panel */}
+      {reminderOpen && <ReminderPanel onClose={() => setReminderOpen(false)} />}
 
       {/* Spacer to prevent content from going under fixed navbar */}
       <div className="h-16" />

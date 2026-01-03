@@ -17,6 +17,7 @@ import {
   TrendingUp,
   ArrowRight,
   XCircle,
+  Calendar,
 } from "lucide-react";
 import { cn } from "@/utils/cn";
 
@@ -36,6 +37,7 @@ export const ExamCard = ({
   onClick,
   variant = "grid",
   className,
+  onSetReminder,
 }) => {
   const isCompleted = quiz.status === "completed";
   const isActive = quiz.is_available || quiz.status === "active";
@@ -422,13 +424,26 @@ export const ExamCard = ({
         </div>
 
         {/* Action Button */}
-        <div className="mt-auto">
+        <div className="mt-auto flex gap-2">
+          {onSetReminder && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onSetReminder(quiz.quiz_id || quiz.id);
+              }}
+              className="p-3 rounded-xl font-semibold text-sm transition-all duration-200 border shadow-sm hover:shadow-md"
+              style={{ borderColor: COLORS.primary, color: COLORS.primary }}
+              title="Set Reminder"
+            >
+              <Calendar className="w-4 h-4" />
+            </button>
+          )}
           <button
             onClick={(e) => {
               e.stopPropagation();
               onClick();
             }}
-            className="w-full py-3 rounded-xl font-semibold text-sm text-white transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg hover:opacity-90 group-hover:scale-[1.02]"
+            className="flex-1 py-3 rounded-xl font-semibold text-sm text-white transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg hover:opacity-90 group-hover:scale-[1.02]"
             style={{
               background: `linear-gradient(135deg, ${COLORS.primary} 0%, ${COLORS.primaryLight} 100%)`,
             }}
