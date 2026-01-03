@@ -36,9 +36,6 @@ function App() {
             {/* Admin routes */}
             {adminRoutes}
 
-            {/* Role-based dashboard redirect */}
-            <Route path="/dashboard" element={<RoleBasedRedirect />} />
-
             {/* Default redirect to dashboard */}
             <Route path="/" element={<RoleBasedRedirect />} />
 

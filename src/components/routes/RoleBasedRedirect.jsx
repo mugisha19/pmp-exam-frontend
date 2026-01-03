@@ -11,6 +11,8 @@ import { Spinner } from "@/components/ui";
 
 export const RoleBasedRedirect = () => {
   const { user, isAuthenticated, isLoading } = useAuthStore();
+  
+  console.log("[RoleBasedRedirect] Triggered", { isLoading, isAuthenticated, user: user?.role });
 
   // Wait for auth to initialize
   if (isLoading) {

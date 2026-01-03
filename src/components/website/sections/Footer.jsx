@@ -38,6 +38,7 @@ export const Footer = () => {
       title: "Account",
       links: [
         { label: "Profile", path: "/profile" },
+        { label: "Support", path: "/support" },
       ],
     },
   ];
@@ -110,6 +111,7 @@ export const Footer = () => {
                     <li key={link.path}>
                       <Link
                         to={link.path}
+                        onClick={() => console.log("[Footer] Navigating to:", link.path)}
                         className="text-text-tertiary hover:text-primary-600 text-sm transition-colors duration-200"
                       >
                         {link.label}

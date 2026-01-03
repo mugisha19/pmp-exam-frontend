@@ -17,6 +17,7 @@ import {
   LearningPaths,
   Analytics,
   Reminders,
+  Support,
 } from "@/pages/student";
 import QuizTaking from "@/pages/student/QuizTaking";
 import AttemptReview from "@/pages/student/AttemptReview";
@@ -34,6 +35,15 @@ export const studentRoutes = (
     <Route path="/my-learning" element={<MyExams />} />
     <Route path="/analytics" element={<Analytics />} />
     <Route path="/reminders" element={<Reminders />} />
+    <Route 
+      path="/support" 
+      element={
+        <>
+          {console.log("[Route] /support matched")}
+          <Support />
+        </>
+      } 
+    />
     <Route path="/groups" element={<Groups />} />
     <Route path="/groups/:groupId" element={<GroupDetail />} />
     <Route path="/exams" element={<MyExams />} />
