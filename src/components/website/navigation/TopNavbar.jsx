@@ -322,16 +322,6 @@ export const TopNavbar = () => {
               );
             })}
 
-            {/* Mobile Achievements Link */}
-            <Link
-              to="/achievements"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all"
-            >
-              <Trophy className="w-5 h-5 text-orange-500" />
-              Achievements
-            </Link>
-
             {/* Mobile Divider */}
             <div className="my-2 border-t border-gray-100" />
 

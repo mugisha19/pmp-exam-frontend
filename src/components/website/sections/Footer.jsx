@@ -32,14 +32,12 @@ export const Footer = () => {
       title: "Community",
       links: [
         { label: "Study Groups", path: "/groups" },
-        { label: "Achievements", path: "/achievements" },
       ],
     },
     {
       title: "Account",
       links: [
         { label: "Profile", path: "/profile" },
-        { label: "Notifications", path: "/notifications" },
       ],
     },
   ];

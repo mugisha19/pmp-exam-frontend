@@ -9,7 +9,6 @@ import { useLogoutMutation } from "@/hooks/queries/useAuthQueries";
 import {
   User,
   Settings,
-  Trophy,
   BookOpen,
   LogOut,
   TrendingUp,
@@ -41,12 +40,6 @@ export const ProfileDropdown = ({ onClose }) => {
       path: "/my-learning",
       icon: BookOpen,
       description: "Progress and attempts",
-    },
-    {
-      label: "Achievements",
-      path: "/achievements",
-      icon: Trophy,
-      description: "Badges and rewards",
     },
   ];
 
