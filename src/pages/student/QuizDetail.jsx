@@ -166,7 +166,9 @@ export const QuizDetail = () => {
   const attempts = attemptsData?.attempts || [];
   const totalAttempts = attempts.length;
   const bestScore =
-    attempts.length > 0 ? Math.round(Math.max(...attempts.map((a) => a.score || 0))) : null;
+    attempts.length > 0
+      ? Math.round(Math.max(...attempts.map((a) => a.score || 0)))
+      : null;
   const hasAttempted = totalAttempts > 0;
   const remainingAttempts = quiz.max_attempts
     ? quiz.max_attempts - totalAttempts

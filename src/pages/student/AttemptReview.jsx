@@ -49,7 +49,8 @@ export const AttemptReview = () => {
             {error ? "Failed to load attempt" : "No attempt data found"}
           </h2>
           <p className="text-sm text-gray-600 mb-4">
-            {error?.message || "This attempt may not exist or you don't have access to it."}
+            {error?.message ||
+              "This attempt may not exist or you don't have access to it."}
           </p>
           <button
             onClick={() => navigate(`/exams/${quizId}`)}
@@ -152,7 +153,10 @@ export const AttemptReview = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <div className="bg-white rounded-lg border border-gray-200 p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ background: "#476072" }}>
+              <div
+                className="w-10 h-10 rounded-lg flex items-center justify-center"
+                style={{ background: "#476072" }}
+              >
                 <Target className="w-5 h-5 text-white" />
               </div>
               <div>
@@ -227,10 +231,13 @@ export const AttemptReview = () => {
                   isPassed ? "text-green-900" : "text-red-900"
                 }`}
               >
-                {isPassed ? "Congratulations! You passed!" : "You did not pass this time"}
+                {isPassed
+                  ? "Congratulations! You passed!"
+                  : "You did not pass this time"}
               </p>
               <p className="text-sm text-gray-700">
-                You scored {score}% and the passing score is {attempt.passing_score}%.
+                You scored {score}% and the passing score is{" "}
+                {attempt.passing_score}%.
                 {!isPassed && " Keep practicing and try again!"}
               </p>
             </div>
@@ -304,7 +311,9 @@ export const AttemptReview = () => {
                     </div>
                     <div
                       className="text-sm text-gray-900 font-medium"
-                      dangerouslySetInnerHTML={{ __html: question.question_text }}
+                      dangerouslySetInnerHTML={{
+                        __html: question.question_text,
+                      }}
                     />
                   </div>
                 </div>
@@ -316,19 +325,31 @@ export const AttemptReview = () => {
                       {(() => {
                         const leftItems = options.left_items || [];
                         const rightItems = options.right_items || [];
-                        const userPairs = Array.isArray(userAnswer) ? userAnswer : [];
-                        const correctPairs = Array.isArray(correctAnswer) ? correctAnswer : [];
+                        const userPairs = Array.isArray(userAnswer)
+                          ? userAnswer
+                          : [];
+                        const correctPairs = Array.isArray(correctAnswer)
+                          ? correctAnswer
+                          : [];
 
                         return (
                           <>
                             {userPairs.length > 0 && (
                               <div className="mb-3">
-                                <p className="text-xs font-semibold text-gray-700 mb-2">Your Matches:</p>
+                                <p className="text-xs font-semibold text-gray-700 mb-2">
+                                  Your Matches:
+                                </p>
                                 {userPairs.map((pair, idx) => {
-                                  const left = leftItems.find((l) => l.id === pair.left_id);
-                                  const right = rightItems.find((r) => r.id === pair.right_id);
+                                  const left = leftItems.find(
+                                    (l) => l.id === pair.left_id
+                                  );
+                                  const right = rightItems.find(
+                                    (r) => r.id === pair.right_id
+                                  );
                                   const isCorrectPair = correctPairs.some(
-                                    (cp) => cp.left_id === pair.left_id && cp.right_id === pair.right_id
+                                    (cp) =>
+                                      cp.left_id === pair.left_id &&
+                                      cp.right_id === pair.right_id
                                   );
                                   return (
                                     <div
@@ -344,9 +365,13 @@ export const AttemptReview = () => {
                                       ) : (
                                         <XCircle className="w-4 h-4 text-red-600" />
                                       )}
-                                      <span className="text-sm text-gray-900">{left?.text || "—"}</span>
+                                      <span className="text-sm text-gray-900">
+                                        {left?.text || "—"}
+                                      </span>
                                       <span className="text-gray-500">→</span>
-                                      <span className="text-sm text-gray-900">{right?.text || "—"}</span>
+                                      <span className="text-sm text-gray-900">
+                                        {right?.text || "—"}
+                                      </span>
                                     </div>
                                   );
                                 })}
@@ -354,19 +379,29 @@ export const AttemptReview = () => {
                             )}
                             {!isCorrect && (
                               <div>
-                                <p className="text-xs font-semibold text-gray-700 mb-2">Correct Matches:</p>
+                                <p className="text-xs font-semibold text-gray-700 mb-2">
+                                  Correct Matches:
+                                </p>
                                 {correctPairs.map((pair, idx) => {
-                                  const left = leftItems.find((l) => l.id === pair.left_id);
-                                  const right = rightItems.find((r) => r.id === pair.right_id);
+                                  const left = leftItems.find(
+                                    (l) => l.id === pair.left_id
+                                  );
+                                  const right = rightItems.find(
+                                    (r) => r.id === pair.right_id
+                                  );
                                   return (
                                     <div
                                       key={idx}
                                       className="p-3 rounded-lg border border-green-200 bg-green-50 flex items-center gap-2 mb-2"
                                     >
                                       <CheckCircle className="w-4 h-4 text-green-600" />
-                                      <span className="text-sm text-gray-900">{left?.text || "—"}</span>
+                                      <span className="text-sm text-gray-900">
+                                        {left?.text || "—"}
+                                      </span>
                                       <span className="text-gray-500">→</span>
-                                      <span className="text-sm text-gray-900">{right?.text || "—"}</span>
+                                      <span className="text-sm text-gray-900">
+                                        {right?.text || "—"}
+                                      </span>
                                     </div>
                                   );
                                 })}
@@ -387,7 +422,9 @@ export const AttemptReview = () => {
                             } else if (typeof userAnswer === "object") {
                               userAnswers =
                                 userAnswer.selected_option_ids ||
-                                (userAnswer.selected_option_id ? [userAnswer.selected_option_id] : []);
+                                (userAnswer.selected_option_id
+                                  ? [userAnswer.selected_option_id]
+                                  : []);
                             } else {
                               userAnswers = [userAnswer];
                             }
@@ -400,14 +437,17 @@ export const AttemptReview = () => {
                             } else if (typeof correctAnswer === "object") {
                               correctAnswers =
                                 correctAnswer.correct_option_ids ||
-                                (correctAnswer.correct_option_id ? [correctAnswer.correct_option_id] : []);
+                                (correctAnswer.correct_option_id
+                                  ? [correctAnswer.correct_option_id]
+                                  : []);
                             } else {
                               correctAnswers = [correctAnswer];
                             }
                           }
 
                           const isUserAnswer =
-                            userAnswers.includes(option.id) || userAnswers.includes(String(option.id));
+                            userAnswers.includes(option.id) ||
+                            userAnswers.includes(String(option.id));
                           const isCorrectOption =
                             correctAnswers.includes(option.id) ||
                             correctAnswers.includes(String(option.id)) ||
@@ -422,7 +462,9 @@ export const AttemptReview = () => {
                           if (isUserAnswer && isCorrectOption) {
                             bgColor = "bg-green-50";
                             borderColor = "border-green-200";
-                            icon = <CheckCircle className="w-5 h-5 text-green-600" />;
+                            icon = (
+                              <CheckCircle className="w-5 h-5 text-green-600" />
+                            );
                           } else if (isUserAnswer && !isCorrectOption) {
                             bgColor = "bg-red-50";
                             borderColor = "border-red-200";
@@ -430,7 +472,9 @@ export const AttemptReview = () => {
                           } else if (!isUserAnswer && isCorrectOption) {
                             bgColor = "bg-green-50";
                             borderColor = "border-green-200";
-                            icon = <CheckCircle className="w-5 h-5 text-green-600" />;
+                            icon = (
+                              <CheckCircle className="w-5 h-5 text-green-600" />
+                            );
                           }
 
                           return (
@@ -444,13 +488,19 @@ export const AttemptReview = () => {
                                   {option.option_text || option.text}
                                 </span>
                                 {isUserAnswer && isCorrectOption && (
-                                  <span className="text-xs font-semibold text-green-700">Your Answer</span>
+                                  <span className="text-xs font-semibold text-green-700">
+                                    Your Answer
+                                  </span>
                                 )}
                                 {isUserAnswer && !isCorrectOption && (
-                                  <span className="text-xs font-semibold text-red-700">Your Answer</span>
+                                  <span className="text-xs font-semibold text-red-700">
+                                    Your Answer
+                                  </span>
                                 )}
                                 {!isUserAnswer && isCorrectOption && (
-                                  <span className="text-xs font-semibold text-green-700">Correct</span>
+                                  <span className="text-xs font-semibold text-green-700">
+                                    Correct
+                                  </span>
                                 )}
                               </div>
                             </div>
@@ -462,8 +512,14 @@ export const AttemptReview = () => {
 
                 {/* Explanation */}
                 {!isCorrect && question.explanation && (
-                  <div className="p-3 rounded-lg border border-blue-200" style={{ background: "#476072" + "10" }}>
-                    <p className="text-xs font-semibold mb-1" style={{ color: "#476072" }}>
+                  <div
+                    className="p-3 rounded-lg border border-blue-200"
+                    style={{ background: "#476072" + "10" }}
+                  >
+                    <p
+                      className="text-xs font-semibold mb-1"
+                      style={{ color: "#476072" }}
+                    >
                       💡 Explanation
                     </p>
                     <div

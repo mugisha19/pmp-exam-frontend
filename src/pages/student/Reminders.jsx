@@ -3,7 +3,19 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { reminderService } from "@/services/reminder.service";
 import { getQuizzes } from "@/services/quiz.service";
-import { Bell, Plus, Trash2, Clock, Calendar, CheckCircle, XCircle, AlertCircle, X, Edit, Info } from "lucide-react";
+import {
+  Bell,
+  Plus,
+  Trash2,
+  Clock,
+  Calendar,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  X,
+  Edit,
+  Info,
+} from "lucide-react";
 import { cn } from "@/utils/cn";
 import { showToast } from "@/utils/toast.utils";
 
@@ -24,7 +36,8 @@ export const Reminders = () => {
 
   const { data: reminders = [], isLoading } = useQuery({
     queryKey: ["reminders", filter],
-    queryFn: () => reminderService.getReminders(filter === "all" ? null : filter),
+    queryFn: () =>
+      reminderService.getReminders(filter === "all" ? null : filter),
   });
 
   const { data: quizzes = [] } = useQuery({
@@ -35,7 +48,7 @@ export const Reminders = () => {
 
   // Get selected quiz info
   const selectedQuiz = useMemo(() => {
-    return quizzes.find(q => q.quiz_id === formData.quiz_id);
+    return quizzes.find((q) => q.quiz_id === formData.quiz_id);
   }, [quizzes, formData.quiz_id]);
 
   // Determine if selected quiz is scheduled
@@ -67,13 +80,17 @@ export const Reminders = () => {
     onError: (error) => {
       console.error("❌ Create reminder error:", error);
       console.error("❌ Error response:", error.response?.data);
-      const errorMsg = error.response?.data?.detail || error.response?.data?.message || "Failed to create reminder";
+      const errorMsg =
+        error.response?.data?.detail ||
+        error.response?.data?.message ||
+        "Failed to create reminder";
       showToast.error("Error", errorMsg);
     },
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ reminderId, data }) => reminderService.updateReminder(reminderId, data),
+    mutationFn: ({ reminderId, data }) =>
+      reminderService.updateReminder(reminderId, data),
     onSuccess: () => {
       queryClient.invalidateQueries(["reminders"]);
       setShowModal(false);
@@ -115,7 +132,9 @@ export const Reminders = () => {
         quiz_id: reminder.real_quiz_id || "",
         title: reminder.title || "",
         message: reminder.message || "",
-        scheduled_time: reminder.scheduled_time ? new Date(reminder.scheduled_time).toISOString().slice(0, 16) : "",
+        scheduled_time: reminder.scheduled_time
+          ? new Date(reminder.scheduled_time).toISOString().slice(0, 16)
+          : "",
         default_option: reminder.default_option || "",
         reminder_type: reminder.reminder_type || "general",
       });
@@ -127,14 +146,18 @@ export const Reminders = () => {
 
   // Handle quiz selection change
   const handleQuizChange = (quizId) => {
-    const quiz = quizzes.find(q => q.quiz_id === quizId);
+    const quiz = quizzes.find((q) => q.quiz_id === quizId);
     const isScheduled = quiz?.scheduling_enabled && quiz?.starts_at;
-    
-    setFormData(prev => ({
+
+    setFormData((prev) => ({
       ...prev,
       quiz_id: quizId,
       title: quizId ? "" : prev.title, // Clear title when quiz is selected (backend generates it)
-      reminder_type: quizId ? (isScheduled ? "quiz_scheduled" : "quiz_non_scheduled") : "general",
+      reminder_type: quizId
+        ? isScheduled
+          ? "quiz_scheduled"
+          : "quiz_non_scheduled"
+        : "general",
       default_option: "", // Reset default_option when quiz changes
       scheduled_time: "", // Reset scheduled_time when quiz changes
     }));
@@ -142,7 +165,7 @@ export const Reminders = () => {
 
   // Handle default option change for scheduled quizzes
   const handleDefaultOptionChange = (option) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       default_option: option,
       // Clear scheduled_time if a preset option is selected (backend will calculate it)
@@ -152,11 +175,14 @@ export const Reminders = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     // Validation based on reminder type
     if (formData.reminder_type === "general") {
       if (!formData.scheduled_time) {
-        showToast.error("Validation Error", "Please select a reminder date and time");
+        showToast.error(
+          "Validation Error",
+          "Please select a reminder date and time"
+        );
         return;
       }
     } else {
@@ -165,29 +191,38 @@ export const Reminders = () => {
         showToast.error("Validation Error", "Please select a quiz");
         return;
       }
-      
+
       // For scheduled quizzes, either default_option (not custom) or scheduled_time is required
       if (isScheduledQuiz) {
         if (!formData.default_option && !formData.scheduled_time) {
-          showToast.error("Validation Error", "Please select a preset reminder time or enter a custom time");
+          showToast.error(
+            "Validation Error",
+            "Please select a preset reminder time or enter a custom time"
+          );
           return;
         }
         if (formData.default_option === "custom" && !formData.scheduled_time) {
-          showToast.error("Validation Error", "Please enter a custom reminder time");
+          showToast.error(
+            "Validation Error",
+            "Please enter a custom reminder time"
+          );
           return;
         }
       } else {
         // Non-scheduled quiz: scheduled_time is always required
         if (!formData.scheduled_time) {
-          showToast.error("Validation Error", "Please select a reminder date and time");
+          showToast.error(
+            "Validation Error",
+            "Please select a reminder date and time"
+          );
           return;
         }
       }
     }
 
     // Get the selected quiz to use its title
-    const selectedQuiz = quizzes.find(q => q.quiz_id === formData.quiz_id);
-    
+    const selectedQuiz = quizzes.find((q) => q.quiz_id === formData.quiz_id);
+
     // Build the title - for quiz reminders use quiz title, for general use the form title
     let title;
     if (selectedQuiz) {
@@ -200,11 +235,13 @@ export const Reminders = () => {
       }
       title = formData.title.trim();
     }
-    
+
     // Determine reminder_type
     let reminderType = formData.reminder_type;
     if (formData.quiz_id && selectedQuiz) {
-      reminderType = selectedQuiz.scheduling_enabled ? "quiz_scheduled" : "quiz_non_scheduled";
+      reminderType = selectedQuiz.scheduling_enabled
+        ? "quiz_scheduled"
+        : "quiz_non_scheduled";
     }
 
     // Build reminder data according to backend requirements
@@ -212,7 +249,7 @@ export const Reminders = () => {
       reminder_type: reminderType,
       title: title,
       message: formData.message.trim() || null,
-      extra_data: {}
+      extra_data: {},
     };
 
     // Add quiz-specific fields
@@ -221,14 +258,20 @@ export const Reminders = () => {
     }
 
     // Handle scheduled_time and default_option based on quiz type
-    if (reminderType === "quiz_scheduled" && formData.default_option && formData.default_option !== "custom") {
+    if (
+      reminderType === "quiz_scheduled" &&
+      formData.default_option &&
+      formData.default_option !== "custom"
+    ) {
       // For scheduled quizzes with preset option, let backend calculate scheduled_time
       reminderData.default_option = formData.default_option;
       // Don't send scheduled_time - backend will calculate it from starts_at
     } else {
       // For all other cases, scheduled_time is required
       if (formData.scheduled_time) {
-        reminderData.scheduled_time = new Date(formData.scheduled_time).toISOString();
+        reminderData.scheduled_time = new Date(
+          formData.scheduled_time
+        ).toISOString();
       }
       // If custom option was selected, include it
       if (formData.default_option === "custom") {
@@ -237,7 +280,10 @@ export const Reminders = () => {
     }
 
     if (editingReminder) {
-      updateMutation.mutate({ reminderId: editingReminder.reminder_id, data: reminderData });
+      updateMutation.mutate({
+        reminderId: editingReminder.reminder_id,
+        data: reminderData,
+      });
     } else {
       createMutation.mutate(reminderData);
     }
@@ -341,8 +387,12 @@ export const Reminders = () => {
         {reminders.length === 0 ? (
           <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
             <Bell className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-gray-900 mb-2">No reminders yet</h3>
-            <p className="text-gray-600 mb-6">Create your first reminder to stay on track</p>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">
+              No reminders yet
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Create your first reminder to stay on track
+            </p>
             <button
               onClick={() => handleOpenModal()}
               className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -366,7 +416,9 @@ export const Reminders = () => {
                         {reminder.title}
                       </h3>
                       {reminder.message && (
-                        <p className="text-gray-600 text-sm mb-3">{reminder.message}</p>
+                        <p className="text-gray-600 text-sm mb-3">
+                          {reminder.message}
+                        </p>
                       )}
                       <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
                         <div className="flex items-center gap-1">
@@ -376,7 +428,9 @@ export const Reminders = () => {
                         {reminder.default_option && (
                           <div className="flex items-center gap-1">
                             <AlertCircle className="w-4 h-4" />
-                            <span>{reminder.default_option.replace(/_/g, " ")}</span>
+                            <span>
+                              {reminder.default_option.replace(/_/g, " ")}
+                            </span>
                           </div>
                         )}
                         <span
@@ -399,7 +453,9 @@ export const Reminders = () => {
                         <Edit className="w-5 h-5" />
                       </button>
                       <button
-                        onClick={() => deleteMutation.mutate(reminder.reminder_id)}
+                        onClick={() =>
+                          deleteMutation.mutate(reminder.reminder_id)
+                        }
                         disabled={deleteMutation.isPending}
                         className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
                       >
@@ -449,7 +505,8 @@ export const Reminders = () => {
                   <option value="">No Quiz - General Reminder</option>
                   {quizzes.map((quiz) => (
                     <option key={quiz.quiz_id} value={quiz.quiz_id}>
-                      {quiz.title} {quiz.scheduling_enabled ? "(Scheduled)" : ""}
+                      {quiz.title}{" "}
+                      {quiz.scheduling_enabled ? "(Scheduled)" : ""}
                     </option>
                   ))}
                 </select>
@@ -459,10 +516,14 @@ export const Reminders = () => {
                     {isScheduledQuiz ? (
                       <span>
                         Scheduled quiz - starts at{" "}
-                        <strong>{new Date(selectedQuiz.starts_at).toLocaleString()}</strong>
+                        <strong>
+                          {new Date(selectedQuiz.starts_at).toLocaleString()}
+                        </strong>
                       </span>
                     ) : (
-                      <span>Non-scheduled quiz - set your own reminder time</span>
+                      <span>
+                        Non-scheduled quiz - set your own reminder time
+                      </span>
                     )}
                   </div>
                 )}
@@ -482,7 +543,9 @@ export const Reminders = () => {
                   <input
                     type="text"
                     value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, title: e.target.value })
+                    }
                     placeholder="Enter reminder title..."
                     className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                     required
@@ -510,7 +573,8 @@ export const Reminders = () => {
                     <option value="custom">Custom Time</option>
                   </select>
                   <p className="mt-1 text-xs text-gray-500">
-                    Select when you want to be reminded relative to the quiz start time
+                    Select when you want to be reminded relative to the quiz
+                    start time
                   </p>
                 </div>
               )}
@@ -519,24 +583,35 @@ export const Reminders = () => {
               {needsScheduledTime && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {isScheduledQuiz && formData.default_option === "custom" 
-                      ? "Custom Reminder Date & Time" 
-                      : "Reminder Date & Time"} <span className="text-red-500">*</span>
+                    {isScheduledQuiz && formData.default_option === "custom"
+                      ? "Custom Reminder Date & Time"
+                      : "Reminder Date & Time"}{" "}
+                    <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="datetime-local"
                     value={formData.scheduled_time}
-                    onChange={(e) => setFormData({ ...formData, scheduled_time: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        scheduled_time: e.target.value,
+                      })
+                    }
                     min={new Date().toISOString().slice(0, 16)}
-                    max={isScheduledQuiz && selectedQuiz?.starts_at 
-                      ? new Date(selectedQuiz.starts_at).toISOString().slice(0, 16) 
-                      : undefined}
+                    max={
+                      isScheduledQuiz && selectedQuiz?.starts_at
+                        ? new Date(selectedQuiz.starts_at)
+                            .toISOString()
+                            .slice(0, 16)
+                        : undefined
+                    }
                     className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                     required={needsScheduledTime}
                   />
                   {isScheduledQuiz && selectedQuiz?.starts_at && (
                     <p className="mt-1 text-xs text-gray-500">
-                      Must be before quiz starts at {new Date(selectedQuiz.starts_at).toLocaleString()}
+                      Must be before quiz starts at{" "}
+                      {new Date(selectedQuiz.starts_at).toLocaleString()}
                     </p>
                   )}
                 </div>
@@ -549,7 +624,9 @@ export const Reminders = () => {
                 </label>
                 <textarea
                   value={formData.message}
-                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, message: e.target.value })
+                  }
                   rows={3}
                   placeholder="Add a personal reminder message..."
                   className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
@@ -560,7 +637,9 @@ export const Reminders = () => {
               <div className="flex items-center gap-3 pt-4">
                 <button
                   type="submit"
-                  disabled={createMutation.isPending || updateMutation.isPending}
+                  disabled={
+                    createMutation.isPending || updateMutation.isPending
+                  }
                   className="flex-1 px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {createMutation.isPending || updateMutation.isPending ? (
@@ -568,8 +647,10 @@ export const Reminders = () => {
                       <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                       {editingReminder ? "Updating..." : "Creating..."}
                     </span>
+                  ) : editingReminder ? (
+                    "Update Reminder"
                   ) : (
-                    editingReminder ? "Update Reminder" : "Create Reminder"
+                    "Create Reminder"
                   )}
                 </button>
                 <button

@@ -1689,11 +1689,14 @@ export const QuizTaking = () => {
                   <div className="mb-4">
                     <button
                       onClick={() => setShowAnswer(!showAnswer)}
-                      disabled={sessionData.pause_info?.is_paused || isWaitingForAutoSubmit}
+                      disabled={
+                        sessionData.pause_info?.is_paused ||
+                        isWaitingForAutoSubmit
+                      }
                       className="flex items-center gap-2 px-4 py-2 bg-[#476072] text-white rounded-lg hover:bg-[#3a4d5c] disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
                     >
                       <Target className="w-4 h-4" />
-                      {showAnswer ? 'Hide Answer' : 'Show Answer'}
+                      {showAnswer ? "Hide Answer" : "Show Answer"}
                     </button>
                   </div>
                 )}
@@ -1704,85 +1707,148 @@ export const QuizTaking = () => {
                     <div className="flex items-start gap-3">
                       <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
                       <div className="flex-1">
-                        <h4 className="font-semibold text-emerald-900 mb-2">Correct Answer:</h4>
-                        {currentQ?.question_type === 'multiple_choice' && (
+                        <h4 className="font-semibold text-emerald-900 mb-2">
+                          Correct Answer:
+                        </h4>
+                        {currentQ?.question_type === "multiple_choice" && (
                           <div>
                             <p className="text-emerald-800 font-medium mb-2">
-                              {currentQ.options.find(opt => opt.is_correct)?.text || 'Answer not available'}
+                              {currentQ.options.find((opt) => opt.is_correct)
+                                ?.text || "Answer not available"}
                             </p>
-                            {currentQ.options.find(opt => opt.is_correct)?.explanation && (
+                            {currentQ.options.find((opt) => opt.is_correct)
+                              ?.explanation && (
                               <div className="mt-3 pt-3 border-t border-emerald-200">
                                 <p className="text-sm text-emerald-700">
-                                  <span className="font-semibold">Explanation: </span>
-                                  {currentQ.options.find(opt => opt.is_correct)?.explanation}
+                                  <span className="font-semibold">
+                                    Explanation:{" "}
+                                  </span>
+                                  {
+                                    currentQ.options.find(
+                                      (opt) => opt.is_correct
+                                    )?.explanation
+                                  }
                                 </p>
                               </div>
                             )}
                           </div>
                         )}
-                        {currentQ?.question_type === 'multiple_response' && (
+                        {currentQ?.question_type === "multiple_response" && (
                           <div>
                             <ul className="list-disc list-inside space-y-1 text-emerald-800 mb-2">
-                              {currentQ.options.filter(opt => opt.is_correct).map(opt => (
-                                <li key={opt.id} className="font-medium">{opt.text}</li>
-                              ))}
-                            </ul>
-                            {currentQ.options.filter(opt => opt.is_correct).some(opt => opt.explanation) && (
-                              <div className="mt-3 pt-3 border-t border-emerald-200">
-                                <p className="text-sm font-semibold text-emerald-700 mb-2">Explanations:</p>
-                                {currentQ.options.filter(opt => opt.is_correct && opt.explanation).map(opt => (
-                                  <div key={opt.id} className="text-sm text-emerald-700 mb-2">
-                                    <span className="font-semibold">{opt.text}: </span>
-                                    {opt.explanation}
-                                  </div>
+                              {currentQ.options
+                                .filter((opt) => opt.is_correct)
+                                .map((opt) => (
+                                  <li key={opt.id} className="font-medium">
+                                    {opt.text}
+                                  </li>
                                 ))}
+                            </ul>
+                            {currentQ.options
+                              .filter((opt) => opt.is_correct)
+                              .some((opt) => opt.explanation) && (
+                              <div className="mt-3 pt-3 border-t border-emerald-200">
+                                <p className="text-sm font-semibold text-emerald-700 mb-2">
+                                  Explanations:
+                                </p>
+                                {currentQ.options
+                                  .filter(
+                                    (opt) => opt.is_correct && opt.explanation
+                                  )
+                                  .map((opt) => (
+                                    <div
+                                      key={opt.id}
+                                      className="text-sm text-emerald-700 mb-2"
+                                    >
+                                      <span className="font-semibold">
+                                        {opt.text}:{" "}
+                                      </span>
+                                      {opt.explanation}
+                                    </div>
+                                  ))}
                               </div>
                             )}
                           </div>
                         )}
-                        {currentQ?.question_type === 'true_false' && (
+                        {currentQ?.question_type === "true_false" && (
                           <div>
                             <p className="text-emerald-800 font-semibold mb-2">
-                              {currentQ.options.find(opt => opt.is_correct)?.text || 'Answer not available'}
+                              {currentQ.options.find((opt) => opt.is_correct)
+                                ?.text || "Answer not available"}
                             </p>
-                            {currentQ.options.find(opt => opt.is_correct)?.explanation && (
+                            {currentQ.options.find((opt) => opt.is_correct)
+                              ?.explanation && (
                               <div className="mt-3 pt-3 border-t border-emerald-200">
                                 <p className="text-sm text-emerald-700">
-                                  <span className="font-semibold">Explanation: </span>
-                                  {currentQ.options.find(opt => opt.is_correct)?.explanation}
+                                  <span className="font-semibold">
+                                    Explanation:{" "}
+                                  </span>
+                                  {
+                                    currentQ.options.find(
+                                      (opt) => opt.is_correct
+                                    )?.explanation
+                                  }
                                 </p>
                               </div>
                             )}
                           </div>
                         )}
-                        {currentQ?.question_type === 'matching' && (
+                        {currentQ?.question_type === "matching" && (
                           <div>
                             <div className="space-y-2 mb-2">
-                              {currentQ.options.correct_matches?.map((pair, idx) => {
-                                const leftItem = currentQ.options.left_items.find(l => l.id === pair.left_id);
-                                const rightItem = currentQ.options.right_items.find(r => r.id === pair.right_id);
-                                return (
-                                  <div key={idx} className="flex items-center gap-2 text-emerald-800 font-medium">
-                                    <span>{leftItem?.text}</span>
-                                    <span>→</span>
-                                    <span>{rightItem?.text}</span>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                            {currentQ.options.correct_matches?.some(pair => pair.explanation) && (
-                              <div className="mt-3 pt-3 border-t border-emerald-200">
-                                <p className="text-sm font-semibold text-emerald-700 mb-2">Explanations:</p>
-                                {currentQ.options.correct_matches.filter(pair => pair.explanation).map((pair, idx) => {
-                                  const leftItem = currentQ.options.left_items.find(l => l.id === pair.left_id);
-                                  const rightItem = currentQ.options.right_items.find(r => r.id === pair.right_id);
+                              {currentQ.options.correct_matches?.map(
+                                (pair, idx) => {
+                                  const leftItem =
+                                    currentQ.options.left_items.find(
+                                      (l) => l.id === pair.left_id
+                                    );
+                                  const rightItem =
+                                    currentQ.options.right_items.find(
+                                      (r) => r.id === pair.right_id
+                                    );
                                   return (
-                                    <div key={idx} className="text-sm text-emerald-700 mb-2">
-                                      <span className="font-semibold">{leftItem?.text} → {rightItem?.text}: </span>
-                                      {pair.explanation}
+                                    <div
+                                      key={idx}
+                                      className="flex items-center gap-2 text-emerald-800 font-medium"
+                                    >
+                                      <span>{leftItem?.text}</span>
+                                      <span>→</span>
+                                      <span>{rightItem?.text}</span>
                                     </div>
                                   );
-                                })}
+                                }
+                              )}
+                            </div>
+                            {currentQ.options.correct_matches?.some(
+                              (pair) => pair.explanation
+                            ) && (
+                              <div className="mt-3 pt-3 border-t border-emerald-200">
+                                <p className="text-sm font-semibold text-emerald-700 mb-2">
+                                  Explanations:
+                                </p>
+                                {currentQ.options.correct_matches
+                                  .filter((pair) => pair.explanation)
+                                  .map((pair, idx) => {
+                                    const leftItem =
+                                      currentQ.options.left_items.find(
+                                        (l) => l.id === pair.left_id
+                                      );
+                                    const rightItem =
+                                      currentQ.options.right_items.find(
+                                        (r) => r.id === pair.right_id
+                                      );
+                                    return (
+                                      <div
+                                        key={idx}
+                                        className="text-sm text-emerald-700 mb-2"
+                                      >
+                                        <span className="font-semibold">
+                                          {leftItem?.text} → {rightItem?.text}:{" "}
+                                        </span>
+                                        {pair.explanation}
+                                      </div>
+                                    );
+                                  })}
                               </div>
                             )}
                           </div>
