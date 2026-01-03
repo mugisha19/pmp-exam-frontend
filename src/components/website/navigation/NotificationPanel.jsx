@@ -36,8 +36,14 @@ export const NotificationPanel = ({ onClose }) => {
         notification.notification_id || notification.id
       );
     }
-    // Navigate based on notification type
-    if (notification.related_entity_type === "quiz") {
+    // Navigate based on link field or fallback to entity type
+    if (notification.link) {
+      // Transform backend routes to frontend routes
+      let frontendLink = notification.link;
+      frontendLink = frontendLink.replace(/\/quizzes\//g, '/exams/');
+      frontendLink = frontendLink.replace(/\/groups\//g, '/groups/');
+      navigate(frontendLink);
+    } else if (notification.related_entity_type === "quiz") {
       navigate(`/exams/${notification.related_entity_id}`);
     } else if (notification.related_entity_type === "group") {
       navigate(`/groups/${notification.related_entity_id}`);
