@@ -3,8 +3,8 @@
  * View exam details, statistics, leaderboard, and attempts
  */
 
-import { useState, useRef, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useState, useMemo, useRef, useEffect } from "react";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   ArrowLeft,
@@ -89,7 +89,9 @@ export default function ExamDetails() {
   const { examId } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState("overview");
+  const [searchParams] = useSearchParams();
+  const tabFromUrl = searchParams.get('tab');
+  const [activeTab, setActiveTab] = useState(tabFromUrl || "overview");
   const [expandedUserId, setExpandedUserId] = useState(null);
   const [statusDialog, setStatusDialog] = useState({ isOpen: false, status: null });
   const [deleteDialog, setDeleteDialog] = useState(false);
@@ -238,13 +240,6 @@ export default function ExamDetails() {
 
   const individualAttemptsColumns = [
     {
-      key: "attempt_number",
-      header: "#",
-      render: (_, attempt) => (
-        <span className="font-semibold text-gray-900">#{attempt.attempt_number}</span>
-      ),
-    },
-    {
       key: "started_at",
       header: "Started",
       render: (_, attempt) => (
@@ -294,24 +289,40 @@ export default function ExamDetails() {
       ),
     },
     {
-      key: "actions",
-      header: "",
+      key: "feedback",
+      header: "Feedback",
       render: (_, attempt) => (
-        attempt.status === "submitted" && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              navigate(`/admin/exams/${examId}/attempt/${attempt.attempt_id}`);
-            }}
-          >
-            Review
-          </Button>
+        attempt.feedback ? (
+          <Badge variant="info" size="sm">
+            Yes
+          </Badge>
+        ) : (
+          <span className="text-xs text-gray-400">No</span>
         )
       ),
     },
+    {
+      key: "actions",
+      header: "Actions",
+      render: (_, attempt) => (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={(e) => {
+            e.stopPropagation();
+            navigate(`/admin/exams/${examId}/attempt/${attempt.attempt_id}`);
+          }}
+        >
+          Review
+        </Button>
+      ),
+    },
   ];
+
+  // Add onRowClick to navigate to attempt details
+  const handleAttemptRowClick = (attempt) => {
+    navigate(`/admin/exams/${examId}/attempt/${attempt.attempt_id}`);
+  };
 
   if (loadingExam) {
     return (
@@ -703,6 +714,7 @@ export default function ExamDetails() {
                         columns={individualAttemptsColumns}
                         data={userAttempt.attempts}
                         paginated={false}
+                        onRowClick={handleAttemptRowClick}
                       />
                     </div>
                   )}

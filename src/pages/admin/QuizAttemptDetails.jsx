@@ -394,7 +394,7 @@ export const QuizAttemptDetails = () => {
             leftIcon={<ArrowLeft className="w-4 h-4" />}
             onClick={() => {
               if (examId) {
-                navigate(`/admin/exams/${examId}`);
+                navigate(`/admin/exams/${examId}?tab=attempts`);
               } else if (groupId && quizId) {
                 navigate(`/admin/groups/${groupId}/quiz/${quizId}`);
               } else {
@@ -454,6 +454,23 @@ export const QuizAttemptDetails = () => {
             </Badge>
           </div>
         </div>
+
+        {/* Student Feedback */}
+        {attemptData?.feedback && (
+          <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="flex items-start gap-3">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-blue-900 mb-1">Student Feedback</p>
+                <p className="text-sm text-gray-700 whitespace-pre-wrap">{attemptData.feedback}</p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Pass/Fail Explanation */}
         <div className={`mt-4 p-4 rounded-lg border ${

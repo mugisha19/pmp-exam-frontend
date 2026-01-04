@@ -181,22 +181,14 @@ export default function ExamManagement() {
         ),
       },
       {
-        key: "status",
-        header: "Status",
-        sortable: true,
-        render: (_, exam) => {
-          const statusColors = {
-            active: "success",
-            draft: "secondary",
-            completed: "default",
-            cancelled: "danger",
-          };
-          return (
-            <Badge variant={statusColors[exam?.status] || "default"}>
-              {exam?.status || "draft"}
-            </Badge>
-          );
-        },
+        key: "attempts",
+        header: "Attempts",
+        render: (_, exam) => (
+          <div className="flex items-center gap-2">
+            <BarChart3 className="w-4 h-4 text-gray-400" />
+            <span className="font-medium">{exam?.total_attempts || 0}</span>
+          </div>
+        ),
       },
     ],
     []
