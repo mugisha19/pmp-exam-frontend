@@ -233,7 +233,8 @@ export const Support = () => {
                   </p>
                 </div>
               </div>
-            ) : (() => {
+            ) : (
+              (() => {
                 const filteredTickets = ticketsData?.tickets?.filter(
                   (ticket) =>
                     statusFilter === "all" || ticket.status === statusFilter
@@ -283,7 +284,8 @@ export const Support = () => {
                     ))}
                   </div>
                 );
-              })()}
+              })()
+            )}
           </div>
         </div>
 
