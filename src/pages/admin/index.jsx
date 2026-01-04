@@ -26,6 +26,8 @@ export { Analytics as AnalyticsPage } from "./Analytics";
 export { Settings as SystemSettingsPage } from "./Settings";
 export { Notifications as NotificationsPage } from "./Notifications";
 export { Profile as AdminProfilePage } from "./Profile";
+export { SupportTickets as AdminSupportTicketsPage } from "./SupportTickets";
+export { SupportTicketDetails as AdminSupportTicketDetailsPage } from "./SupportTicketDetails";
 
 // Placeholder Pages - To be implemented
 export const AdminInstructorsPage = () => (

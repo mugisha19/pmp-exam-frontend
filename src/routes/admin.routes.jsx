@@ -31,6 +31,8 @@ import {
   NotificationsPage,
   SystemSettingsPage,
   AdminProfilePage,
+  AdminSupportTicketsPage,
+  AdminSupportTicketDetailsPage,
 } from "@/pages/admin";
 
 export const adminRoutes = (
@@ -74,6 +76,8 @@ export const adminRoutes = (
     />
     <Route path="analytics" element={<AnalyticsPage />} />
     <Route path="notifications" element={<NotificationsPage />} />
+    <Route path="support" element={<AdminSupportTicketsPage />} />
+    <Route path="support/:ticketId" element={<AdminSupportTicketDetailsPage />} />
     <Route path="settings" element={<SystemSettingsPage />} />
     <Route path="profile" element={<AdminProfilePage />} />
     <Route path="system" element={<SystemSettingsPage />} />

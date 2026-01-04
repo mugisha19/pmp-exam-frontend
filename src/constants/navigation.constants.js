@@ -176,6 +176,12 @@ export const ADMIN_NAV_ITEMS = [
     icon: BarChart3,
   },
   {
+    id: "support",
+    label: "Support Tickets",
+    path: "/admin/support",
+    icon: MessageSquare,
+  },
+  {
     id: "notifications",
     label: "Notifications",
     path: "/admin/notifications",

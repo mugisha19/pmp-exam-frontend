@@ -282,7 +282,7 @@ export const Support = () => {
               className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="sticky top-16 bg-white border-b border-gray-200 p-6">
+              <div className="sticky top-0 z-10 bg-white border-b border-gray-200 p-6 shadow-sm">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <h2 className="text-2xl font-bold text-gray-900 mb-2">
@@ -348,12 +348,6 @@ export const Support = () => {
 
                 <div className="mt-6 pt-6 border-t border-gray-200">
                   <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <span className="text-gray-500">Ticket ID:</span>
-                      <p className="font-mono text-gray-900">
-                        {selectedTicket.ticket_id}
-                      </p>
-                    </div>
                     {selectedTicket.updated_at && (
                       <div>
                         <span className="text-gray-500">Last Updated:</span>
