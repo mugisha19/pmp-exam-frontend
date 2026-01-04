@@ -128,28 +128,16 @@ export const ADMIN_NAV_ITEMS = [
     icon: LayoutDashboard,
   },
   {
-    id: "users",
-    label: "User Management",
-    path: "/admin/users",
-    icon: Users,
-  },
-  {
-    id: "exams",
-    label: "Exams",
-    path: "/admin/exams",
-    icon: BookOpen,
+    id: "courses-domains",
+    label: "Courses & Domains",
+    path: "/admin/courses-domains",
+    icon: FolderTree,
   },
   {
     id: "topics",
     label: "Topics",
     path: "/admin/topics",
     icon: BookMarked,
-  },
-  {
-    id: "courses-domains",
-    label: "Courses & Domains",
-    path: "/admin/courses-domains",
-    icon: FolderTree,
   },
   {
     id: "questions",
@@ -170,6 +158,18 @@ export const ADMIN_NAV_ITEMS = [
     icon: Users,
   },
   {
+    id: "exams",
+    label: "Exams",
+    path: "/admin/exams",
+    icon: BookOpen,
+  },
+  {
+    id: "users",
+    label: "User Management",
+    path: "/admin/users",
+    icon: Users,
+  },
+  {
     id: "analytics",
     label: "Analytics",
     path: "/admin/analytics",
@@ -180,18 +180,6 @@ export const ADMIN_NAV_ITEMS = [
     label: "Support Tickets",
     path: "/admin/support",
     icon: MessageSquare,
-  },
-  {
-    id: "notifications",
-    label: "Notifications",
-    path: "/admin/notifications",
-    icon: Bell,
-  },
-  {
-    id: "system",
-    label: "System Settings",
-    path: "/admin/system",
-    icon: Settings,
   },
 ];
 
