@@ -16,6 +16,8 @@ import {
   Clock,
   Trophy,
   BarChart3,
+  ChevronDown,
+  ChevronRight,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 
@@ -37,7 +39,8 @@ export default function ExamManagement() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [page, setPage] = useState(1);
-  const pageSize = 10;
+  const pageSize = 50;
+  const [expandedGroups, setExpandedGroups] = useState(new Set());
 
   // Modal states
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -50,8 +53,12 @@ export default function ExamManagement() {
       limit: pageSize,
     };
 
+    if (statusFilter !== "all") {
+      params.status = statusFilter;
+    }
+
     return params;
-  }, [page, pageSize]);
+  }, [page, pageSize, statusFilter]);
 
   // Fetch exams
   const { data: examsData, isLoading, refetch } = useQuery({
@@ -71,24 +78,33 @@ export default function ExamManagement() {
     },
   });
 
-  const exams = useMemo(() => {
-    let data = examsData?.quizzes || [];
+  const exams = examsData?.quizzes || [];
+  const totalCount = examsData?.total || 0;
 
-    // Apply filters
-    if (searchQuery) {
-      data = data.filter((exam) =>
-        exam.title.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
+  // Group exams by group_name
+  const groupedExams = useMemo(() => {
+    const groups = {};
+    exams.forEach(exam => {
+      const groupName = exam.group_name || "No Group";
+      if (!groups[groupName]) {
+        groups[groupName] = [];
+      }
+      groups[groupName].push(exam);
+    });
+    return groups;
+  }, [exams]);
 
-    if (statusFilter !== "all") {
-      data = data.filter((exam) => exam.status === statusFilter);
-    }
-
-    return data;
-  }, [examsData, searchQuery, statusFilter]);
-
-  const totalCount = exams.length;
+  const toggleGroup = (groupName) => {
+    setExpandedGroups(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(groupName)) {
+        newSet.delete(groupName);
+      } else {
+        newSet.add(groupName);
+      }
+      return newSet;
+    });
+  };
 
   // CRUD handlers
   const handleViewExam = useCallback(
@@ -134,19 +150,6 @@ export default function ExamManagement() {
           <span className="font-medium text-gray-900">
             {exam?.title}
           </span>
-        ),
-      },
-      {
-        key: "group_name",
-        header: "Group Name",
-        sortable: true,
-        render: (_, exam) => (
-          <div className="flex items-center gap-2">
-            <Users className="w-4 h-4 text-gray-400" />
-            <span className="text-sm text-gray-700">
-              {exam?.group_name || "N/A"}
-            </span>
-          </div>
         ),
       },
       {
@@ -197,8 +200,6 @@ export default function ExamManagement() {
   // Filters UI
   const filtersUI = (
     <div className="flex flex-col sm:flex-row gap-4 mb-6">
-    
-
       <Select
         value={statusFilter}
         onChange={(e) => {
@@ -216,8 +217,6 @@ export default function ExamManagement() {
     </div>
   );
 
-
-
   return (
     <div className="p-6">
       <PageHeader
@@ -227,19 +226,49 @@ export default function ExamManagement() {
 
       {filtersUI}
 
-      <DataTable
-        data={exams}
-        columns={columns}
-        loading={isLoading}
-        rowKey="quiz_id"
-        paginated={true}
-        pageSize={pageSize}
-        currentPage={page}
-        totalPages={Math.ceil(totalCount / pageSize)}
-        onPageChange={setPage}
-        emptyMessage="No exams found"
-        onRowClick={(exam) => handleViewExam(exam)}
-      />
+      {isLoading ? (
+        <div className="text-center py-8">Loading...</div>
+      ) : (
+        <div className="space-y-4">
+          {Object.entries(groupedExams).map(([groupName, groupExams]) => {
+            const isExpanded = expandedGroups.has(groupName);
+            return (
+              <div key={groupName} className="border border-gray-200 rounded-lg">
+                <button
+                  onClick={() => toggleGroup(groupName)}
+                  className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    {isExpanded ? (
+                      <ChevronDown className="w-5 h-5 text-gray-500" />
+                    ) : (
+                      <ChevronRight className="w-5 h-5 text-gray-500" />
+                    )}
+                    <Users className="w-5 h-5 text-blue-600" />
+                    <span className="font-semibold text-gray-900">{groupName}</span>
+                    <Badge variant="default" size="sm">
+                      {groupExams.length} {groupExams.length === 1 ? 'exam' : 'exams'}
+                    </Badge>
+                  </div>
+                </button>
+                {isExpanded && (
+                  <div className="border-t border-gray-200">
+                    <DataTable
+                      data={groupExams}
+                      columns={columns}
+                      loading={false}
+                      rowKey="quiz_id"
+                      paginated={false}
+                      emptyMessage="No exams in this group"
+                      onRowClick={(exam) => handleViewExam(exam)}
+                    />
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Delete Confirmation Dialog */}
       <ConfirmDialog
