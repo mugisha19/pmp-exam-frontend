@@ -51,11 +51,19 @@ export const Home = () => {
     queryKey: ["student-performance-home", user?.user_id],
     queryFn: async () => {
       try {
-        const response = await analyticsService.getStudentPerformance(user?.user_id, "all");
+        const response = await analyticsService.getStudentPerformance(
+          user?.user_id,
+          "all"
+        );
         return response;
       } catch (error) {
         console.error("Error fetching student performance:", error);
-        return { attempts: [], total_attempts: 0, average_score: 0, total_passed: 0 };
+        return {
+          attempts: [],
+          total_attempts: 0,
+          average_score: 0,
+          total_passed: 0,
+        };
       }
     },
     enabled: !!user?.user_id,

@@ -61,7 +61,10 @@ export const BrowseExams = () => {
     queryKey: ["student-performance-browse", user?.user_id],
     queryFn: async () => {
       try {
-        const response = await analyticsService.getStudentPerformance(user?.user_id, "all");
+        const response = await analyticsService.getStudentPerformance(
+          user?.user_id,
+          "all"
+        );
         // Convert attempts array to a map by quiz_id
         const attemptsMap = {};
         (response.attempts || []).forEach((att) => {

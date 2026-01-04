@@ -203,7 +203,7 @@ export const Dashboard = () => {
   const [dateRange, setDateRange] = useState("30");
   const [showDateDropdown, setShowDateDropdown] = useState(false);
   const [attemptsData, setAttemptsData] = useState([]);
-  
+
   const { stats, recentUsers, recentGroups, activity, queries } =
     useAdminDashboardData();
 
@@ -214,20 +214,24 @@ export const Dashboard = () => {
   }, [dateRange]);
 
   // Fetch analytics data
-  const { data: analytics, isLoading: analyticsLoading } = useAnalyticsDashboard(days);
+  const { data: analytics, isLoading: analyticsLoading } =
+    useAnalyticsDashboard(days);
 
   // Fetch attempts by day
   useEffect(() => {
     const fetchAttempts = async () => {
       try {
         const result = await analyticsService.getAttemptsByDay(days);
-        const formatted = result.data.map(item => ({
-          name: new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-          value: item.attempts
+        const formatted = result.data.map((item) => ({
+          name: new Date(item.date).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+          }),
+          value: item.attempts,
         }));
         setAttemptsData(formatted);
       } catch (error) {
-        console.error('Failed to fetch attempts:', error);
+        console.error("Failed to fetch attempts:", error);
         setAttemptsData([]);
       }
     };
@@ -241,7 +245,8 @@ export const Dashboard = () => {
     { value: "90", label: "Last 90 days" },
   ];
 
-  const selectedRangeLabel = DATE_RANGES.find((r) => r.value === dateRange)?.label || "Last 30 days";
+  const selectedRangeLabel =
+    DATE_RANGES.find((r) => r.value === dateRange)?.label || "Last 30 days";
 
   // Analytics stats
   const analyticsStats = useMemo(() => {
@@ -253,7 +258,12 @@ export const Dashboard = () => {
         activeUsers: analytics.active_users || 0,
       };
     }
-    return { newUsers: 0, quizzesCompleted: 0, averageScore: 0, activeUsers: 0 };
+    return {
+      newUsers: 0,
+      quizzesCompleted: 0,
+      averageScore: 0,
+      activeUsers: 0,
+    };
   }, [analytics]);
 
   // Top performers
@@ -262,7 +272,10 @@ export const Dashboard = () => {
       return analytics.top_performers.map((p) => ({
         id: p.id,
         user: {
-          name: p.first_name && p.last_name ? `${p.first_name} ${p.last_name}` : `User ${p.user_id?.slice(0, 8) || "Unknown"}`,
+          name:
+            p.first_name && p.last_name
+              ? `${p.first_name} ${p.last_name}`
+              : `User ${p.user_id?.slice(0, 8) || "Unknown"}`,
           email: p.email || "",
           avatar: p.avatar,
         },
@@ -278,7 +291,10 @@ export const Dashboard = () => {
   const topicPerformanceData = useMemo(() => {
     if (analytics?.topic_performance?.length > 0) {
       return analytics.topic_performance.map((t) => ({
-        name: t.topic_name?.length > 15 ? t.topic_name.substring(0, 15) + "..." : t.topic_name,
+        name:
+          t.topic_name?.length > 15
+            ? t.topic_name.substring(0, 15) + "..."
+            : t.topic_name,
         value: t.accuracy || 0,
         fullName: t.topic_name,
         questions: t.total_questions,
@@ -291,7 +307,10 @@ export const Dashboard = () => {
   const strengthsData = useMemo(() => {
     if (analytics?.strengths?.length > 0) {
       return analytics.strengths.map((t) => ({
-        name: t.topic_name?.length > 20 ? t.topic_name.substring(0, 20) + "..." : t.topic_name,
+        name:
+          t.topic_name?.length > 20
+            ? t.topic_name.substring(0, 20) + "..."
+            : t.topic_name,
         value: t.accuracy || 0,
         fullName: t.topic_name,
         questions: t.total_questions,
@@ -304,7 +323,10 @@ export const Dashboard = () => {
   const needsImprovementData = useMemo(() => {
     if (analytics?.needs_improvement?.length > 0) {
       return analytics.needs_improvement.map((t) => ({
-        name: t.topic_name?.length > 20 ? t.topic_name.substring(0, 20) + "..." : t.topic_name,
+        name:
+          t.topic_name?.length > 20
+            ? t.topic_name.substring(0, 20) + "..."
+            : t.topic_name,
         value: t.accuracy || 0,
         fullName: t.topic_name,
         questions: t.total_questions,
@@ -317,7 +339,10 @@ export const Dashboard = () => {
   const groupPerformanceData = useMemo(() => {
     if (analytics?.group_performance?.length > 0) {
       return analytics.group_performance.map((g) => ({
-        name: g.group_name?.length > 15 ? g.group_name.substring(0, 15) + "..." : (g.group_name || "Unknown"),
+        name:
+          g.group_name?.length > 15
+            ? g.group_name.substring(0, 15) + "..."
+            : g.group_name || "Unknown",
         value: g.average_score || 0,
         fullName: g.group_name || "Unknown Group",
         attempts: g.total_attempts,
@@ -333,12 +358,32 @@ export const Dashboard = () => {
       key: "user",
       label: "User",
       render: (_, row) => (
-        <UserCell name={row.user?.name || "Unknown"} email={row.user?.email || ""} avatar={row.user?.avatar} />
+        <UserCell
+          name={row.user?.name || "Unknown"}
+          email={row.user?.email || ""}
+          avatar={row.user?.avatar}
+        />
       ),
     },
-    { key: "quizzes_taken", label: "Quizzes", render: (value) => <span className="font-medium">{value}</span> },
-    { key: "avg_score", label: "Avg Score", render: (value) => <span className="font-medium">{value?.toFixed(1)}%</span> },
-    { key: "best_score", label: "Best", render: (value) => <span className="font-medium text-blue-600">{value?.toFixed(1)}%</span> },
+    {
+      key: "quizzes_taken",
+      label: "Quizzes",
+      render: (value) => <span className="font-medium">{value}</span>,
+    },
+    {
+      key: "avg_score",
+      label: "Avg Score",
+      render: (value) => (
+        <span className="font-medium">{value?.toFixed(1)}%</span>
+      ),
+    },
+    {
+      key: "best_score",
+      label: "Best",
+      render: (value) => (
+        <span className="font-medium text-blue-600">{value?.toFixed(1)}%</span>
+      ),
+    },
   ];
 
   // Stats cards configuration matching the screenshot style
@@ -376,19 +421,21 @@ export const Dashboard = () => {
   // Generate activity from recent users and groups
   const displayActivity = useMemo(() => {
     const activities = [];
-    
+
     // Add recent users
     if (recentUsers?.length > 0) {
       recentUsers.slice(0, 3).forEach((user) => {
         activities.push({
           type: "user_created",
-          title: `${user.first_name || ""} ${user.last_name || ""}`.trim() || user.email,
+          title:
+            `${user.first_name || ""} ${user.last_name || ""}`.trim() ||
+            user.email,
           subtitle: user.email,
           timestamp: user.created_at,
         });
       });
     }
-    
+
     // Add recent groups
     if (recentGroups?.length > 0) {
       recentGroups.slice(0, 2).forEach((group) => {
@@ -400,9 +447,11 @@ export const Dashboard = () => {
         });
       });
     }
-    
+
     // Sort by timestamp (most recent first) and limit to 4
-    return activities.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 4);
+    return activities
+      .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+      .slice(0, 4);
   }, [recentUsers, recentGroups]);
 
   return (
@@ -429,7 +478,9 @@ export const Dashboard = () => {
 
       {/* Analytics Section */}
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-gray-900">Analytics Overview</h2>
+        <h2 className="text-lg font-semibold text-gray-900">
+          Analytics Overview
+        </h2>
         <div className="relative">
           <button
             onClick={() => setShowDateDropdown(!showDateDropdown)}
@@ -437,17 +488,31 @@ export const Dashboard = () => {
           >
             <Calendar className="w-4 h-4" />
             {selectedRangeLabel}
-            <ChevronDown className={`w-4 h-4 transition-transform ${showDateDropdown ? "rotate-180" : ""}`} />
+            <ChevronDown
+              className={`w-4 h-4 transition-transform ${
+                showDateDropdown ? "rotate-180" : ""
+              }`}
+            />
           </button>
           {showDateDropdown && (
             <>
-              <div className="fixed inset-0 z-10" onClick={() => setShowDateDropdown(false)} />
+              <div
+                className="fixed inset-0 z-10"
+                onClick={() => setShowDateDropdown(false)}
+              />
               <div className="absolute right-0 mt-2 w-40 bg-white border rounded-lg shadow-xl z-20 py-1">
                 {DATE_RANGES.map((range) => (
                   <button
                     key={range.value}
-                    onClick={() => { setDateRange(range.value); setShowDateDropdown(false); }}
-                    className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-100 ${dateRange === range.value ? "text-blue-600 bg-blue-50" : ""}`}
+                    onClick={() => {
+                      setDateRange(range.value);
+                      setShowDateDropdown(false);
+                    }}
+                    className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-100 ${
+                      dateRange === range.value
+                        ? "text-blue-600 bg-blue-50"
+                        : ""
+                    }`}
                   >
                     {range.label}
                   </button>
@@ -461,10 +526,20 @@ export const Dashboard = () => {
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <LineChartComponent title="Quiz Attempts by Day" data={attemptsData} color="#3b82f6" height={280} />
+          <LineChartComponent
+            title="Quiz Attempts by Day"
+            data={attemptsData}
+            color="#3b82f6"
+            height={280}
+          />
         </div>
         <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <BarChartComponent title="Quiz Attempts" data={attemptsData} color="#10b981" height={280} />
+          <BarChartComponent
+            title="Quiz Attempts"
+            data={attemptsData}
+            color="#10b981"
+            height={280}
+          />
         </div>
       </div>
 
@@ -480,9 +555,9 @@ export const Dashboard = () => {
           </CardHeader>
           <CardContent>
             {strengthsData.length > 0 ? (
-              <BarChartComponent 
-                data={strengthsData} 
-                color="#22c55e" 
+              <BarChartComponent
+                data={strengthsData}
+                color="#22c55e"
                 height={220}
               />
             ) : (
@@ -503,9 +578,9 @@ export const Dashboard = () => {
           </CardHeader>
           <CardContent>
             {needsImprovementData.length > 0 ? (
-              <BarChartComponent 
-                data={needsImprovementData} 
-                color="#f97316" 
+              <BarChartComponent
+                data={needsImprovementData}
+                color="#f97316"
                 height={220}
               />
             ) : (
@@ -529,9 +604,9 @@ export const Dashboard = () => {
           </CardHeader>
           <CardContent>
             {groupPerformanceData.length > 0 ? (
-              <BarChartComponent 
-                data={groupPerformanceData} 
-                color="#8b5cf6" 
+              <BarChartComponent
+                data={groupPerformanceData}
+                color="#8b5cf6"
                 height={220}
               />
             ) : (
@@ -552,9 +627,9 @@ export const Dashboard = () => {
           </CardHeader>
           <CardContent>
             {topicPerformanceData.length > 0 ? (
-              <BarChartComponent 
-                data={topicPerformanceData} 
-                color="#3b82f6" 
+              <BarChartComponent
+                data={topicPerformanceData}
+                color="#3b82f6"
                 height={220}
               />
             ) : (
@@ -570,10 +645,17 @@ export const Dashboard = () => {
       {topPerformers.length > 0 && (
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle className="text-base font-semibold">Top Performers</CardTitle>
+            <CardTitle className="text-base font-semibold">
+              Top Performers
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <DataTable columns={performersColumns} data={topPerformers} isLoading={analyticsLoading} emptyMessage="No data" />
+            <DataTable
+              columns={performersColumns}
+              data={topPerformers}
+              isLoading={analyticsLoading}
+              emptyMessage="No data"
+            />
           </CardContent>
         </Card>
       )}
@@ -597,7 +679,8 @@ export const Dashboard = () => {
             </Button>
           </CardHeader>
           <CardContent className="pt-0">
-            {(queries.recentUsers?.isLoading || queries.recentGroups?.isLoading) ? (
+            {queries.recentUsers?.isLoading ||
+            queries.recentGroups?.isLoading ? (
               <div className="space-y-3">
                 {[...Array(4)].map((_, i) => (
                   <div
