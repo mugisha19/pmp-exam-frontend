@@ -33,6 +33,39 @@ export const analyticsService = {
       params: groupId ? { group_id: groupId } : {}
     });
     return response.data;
+  },
+
+  getAttemptsByDay: async (days = 7) => {
+    const response = await api.get(`${ANALYTICS_BASE_URL}/admin/attempts-by-day`, {
+      params: { days }
+    });
+    return response.data;
+  },
+
+  getDashboard: async ({ days = 30 } = {}) => {
+    const response = await api.get(`${ANALYTICS_BASE_URL}/admin/dashboard`, {
+      params: { days }
+    });
+    return response.data;
+  },
+
+  getPlatformStats: async () => {
+    const response = await api.get(`${ANALYTICS_BASE_URL}/admin/platform-overview`);
+    return response.data;
+  },
+
+  getTopPerformers: async ({ limit = 10 } = {}) => {
+    const response = await api.get(`${ANALYTICS_BASE_URL}/admin/top-performers`, {
+      params: { limit }
+    });
+    return response.data;
+  },
+
+  getMostActiveGroups: async ({ limit = 10 } = {}) => {
+    const response = await api.get(`${ANALYTICS_BASE_URL}/admin/active-groups`, {
+      params: { limit }
+    });
+    return response.data;
   }
 };
 

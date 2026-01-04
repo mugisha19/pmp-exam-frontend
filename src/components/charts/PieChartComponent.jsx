@@ -31,16 +31,16 @@ export function PieChartComponent({
   innerRadius = 60,
   outerRadius = 100,
 }) {
-  // Generate sample data if no data provided
-  const chartData =
-    data.length > 0
-      ? data
-      : [
-          { name: "Excellent (90-100%)", value: 30 },
-          { name: "Good (70-89%)", value: 40 },
-          { name: "Average (50-69%)", value: 20 },
-          { name: "Poor (<50%)", value: 10 },
-        ];
+  if (!data || data.length === 0) {
+    return (
+      <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">{title}</h3>
+        <div className="flex items-center justify-center" style={{ height }}>
+          <p className="text-gray-500 text-sm">No data available</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
@@ -48,7 +48,7 @@ export function PieChartComponent({
       <ResponsiveContainer width="100%" height={height}>
         <PieChart>
           <Pie
-            data={chartData}
+            data={data}
             cx="50%"
             cy="50%"
             innerRadius={innerRadius}
@@ -59,7 +59,7 @@ export function PieChartComponent({
             label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
             labelLine={false}
           >
-            {chartData.map((entry, index) => (
+            {data.map((entry, index) => (
               <Cell
                 key={`cell-${index}`}
                 fill={COLORS[index % COLORS.length]}

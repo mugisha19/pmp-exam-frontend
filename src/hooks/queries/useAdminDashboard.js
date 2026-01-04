@@ -19,25 +19,22 @@ export const useAdminDashboardStats = (options = {}) => {
     queryFn: async () => {
       // Fetch data in parallel
       const [usersData, groupsData] = await Promise.all([
-        userService.getUsers({ limit: 1 }), // Just to get total count
+        userService.getUsers({ limit: 1000 }),
         groupService.getGroups({ limit: 1, status: "active" }),
       ]);
 
-      // Extract counts - adjust based on actual API response structure
-      const totalUsers = usersData?.total || usersData?.items?.length || 0;
-      const totalGroups = groupsData?.total || groupsData?.items?.length || 0;
+      const users = usersData?.users || [];
+      const totalUsers = usersData?.total || users.length || 0;
+      const totalGroups = groupsData?.total || 0;
 
-      // Calculate role-based counts if available
-      const instructorCount = usersData?.role_counts?.instructor || 0;
-      const studentCount =
-        usersData?.role_counts?.student || totalUsers - instructorCount;
+      const instructorCount = users.filter(u => u.role === "instructor").length;
+      const studentCount = users.filter(u => u.role === "student").length;
 
       return {
         totalUsers,
         totalInstructors: instructorCount,
         totalStudents: studentCount,
         activeGroups: totalGroups,
-        activeQuizzes: 0, // Will be populated when quiz stats are available
       };
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -62,7 +59,7 @@ export const useRecentUsers = (limit = 5, options = {}) => {
         sort: "-created_at", // Most recent first
       }),
     staleTime: 2 * 60 * 1000, // 2 minutes
-    select: (data) => data?.items || data || [],
+    select: (data) => data?.users || data?.items || data || [],
     onError: (error) => {
       console.error("Failed to fetch recent users:", error);
     },
@@ -83,7 +80,7 @@ export const useRecentGroups = (limit = 5, options = {}) => {
         sort: "-created_at", // Most recent first
       }),
     staleTime: 2 * 60 * 1000, // 2 minutes
-    select: (data) => data?.items || data || [],
+    select: (data) => data?.groups || data?.items || data || [],
     onError: (error) => {
       console.error("Failed to fetch recent groups:", error);
     },

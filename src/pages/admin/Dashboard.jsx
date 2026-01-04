@@ -3,7 +3,7 @@
  * Main dashboard for administrators with stats, recent activity, and quick actions
  */
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Users,
@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { useAdminDashboardData } from "@/hooks/queries/useAdminDashboard";
 import { useAnalyticsDashboard } from "@/hooks/queries/useAnalyticsQueries";
+import analyticsService from "@/services/analytics.service";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { RoleBadge } from "@/components/shared/RoleBadge";
@@ -201,6 +202,7 @@ export const Dashboard = () => {
   const navigate = useNavigate();
   const [dateRange, setDateRange] = useState("30");
   const [showDateDropdown, setShowDateDropdown] = useState(false);
+  const [attemptsData, setAttemptsData] = useState([]);
   
   const { stats, recentUsers, recentGroups, activity, queries } =
     useAdminDashboardData();
@@ -213,6 +215,24 @@ export const Dashboard = () => {
 
   // Fetch analytics data
   const { data: analytics, isLoading: analyticsLoading } = useAnalyticsDashboard(days);
+
+  // Fetch attempts by day
+  useEffect(() => {
+    const fetchAttempts = async () => {
+      try {
+        const result = await analyticsService.getAttemptsByDay(days);
+        const formatted = result.data.map(item => ({
+          name: new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+          value: item.attempts
+        }));
+        setAttemptsData(formatted);
+      } catch (error) {
+        console.error('Failed to fetch attempts:', error);
+        setAttemptsData([]);
+      }
+    };
+    fetchAttempts();
+  }, [days]);
 
   // Date range options
   const DATE_RANGES = [
@@ -249,6 +269,60 @@ export const Dashboard = () => {
         quizzes_taken: p.quizzes_taken || 0,
         avg_score: p.avg_score || 0,
         best_score: p.best_score || 0,
+      }));
+    }
+    return [];
+  }, [analytics]);
+
+  // Topic performance data for charts
+  const topicPerformanceData = useMemo(() => {
+    if (analytics?.topic_performance?.length > 0) {
+      return analytics.topic_performance.map((t) => ({
+        name: t.topic_name?.length > 15 ? t.topic_name.substring(0, 15) + "..." : t.topic_name,
+        value: t.accuracy || 0,
+        fullName: t.topic_name,
+        questions: t.total_questions,
+      }));
+    }
+    return [];
+  }, [analytics]);
+
+  // Strengths data (topics with high accuracy)
+  const strengthsData = useMemo(() => {
+    if (analytics?.strengths?.length > 0) {
+      return analytics.strengths.map((t) => ({
+        name: t.topic_name?.length > 20 ? t.topic_name.substring(0, 20) + "..." : t.topic_name,
+        value: t.accuracy || 0,
+        fullName: t.topic_name,
+        questions: t.total_questions,
+      }));
+    }
+    return [];
+  }, [analytics]);
+
+  // Areas to improve (topics with low accuracy)
+  const needsImprovementData = useMemo(() => {
+    if (analytics?.needs_improvement?.length > 0) {
+      return analytics.needs_improvement.map((t) => ({
+        name: t.topic_name?.length > 20 ? t.topic_name.substring(0, 20) + "..." : t.topic_name,
+        value: t.accuracy || 0,
+        fullName: t.topic_name,
+        questions: t.total_questions,
+      }));
+    }
+    return [];
+  }, [analytics]);
+
+  // Group performance data
+  const groupPerformanceData = useMemo(() => {
+    if (analytics?.group_performance?.length > 0) {
+      return analytics.group_performance.map((g) => ({
+        name: g.group_name?.length > 15 ? g.group_name.substring(0, 15) + "..." : (g.group_name || "Unknown"),
+        value: g.average_score || 0,
+        fullName: g.group_name || "Unknown Group",
+        attempts: g.total_attempts,
+        members: g.active_members,
+        passRate: g.pass_rate,
       }));
     }
     return [];
@@ -299,21 +373,37 @@ export const Dashboard = () => {
     },
   ];
 
-  // Generate activity from recent users/groups if no activity data
-  const generatedActivity = [];
-  if (recentUsers?.length > 0) {
-    recentUsers.slice(0, 4).forEach((user) => {
-      generatedActivity.push({
-        type: "user_created",
-        title:
-          `${user.first_name || ""} ${user.last_name || ""}`.trim() ||
-          user.email,
-        subtitle: user.email,
-        timestamp: user.created_at,
+  // Generate activity from recent users and groups
+  const displayActivity = useMemo(() => {
+    const activities = [];
+    
+    // Add recent users
+    if (recentUsers?.length > 0) {
+      recentUsers.slice(0, 3).forEach((user) => {
+        activities.push({
+          type: "user_created",
+          title: `${user.first_name || ""} ${user.last_name || ""}`.trim() || user.email,
+          subtitle: user.email,
+          timestamp: user.created_at,
+        });
       });
-    });
-  }
-  const displayActivity = activity?.length > 0 ? activity : generatedActivity;
+    }
+    
+    // Add recent groups
+    if (recentGroups?.length > 0) {
+      recentGroups.slice(0, 2).forEach((group) => {
+        activities.push({
+          type: "group_created",
+          title: group.name,
+          subtitle: group.description || "No description",
+          timestamp: group.created_at,
+        });
+      });
+    }
+    
+    // Sort by timestamp (most recent first) and limit to 4
+    return activities.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 4);
+  }, [recentUsers, recentGroups]);
 
   return (
     <div className="space-y-6">
@@ -324,9 +414,9 @@ export const Dashboard = () => {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {statsCards.map((card, index) => (
+        {statsCards.map((card) => (
           <DashboardStatsCard
-            key={index}
+            key={card.title}
             icon={card.icon}
             iconBg={card.iconBg}
             title={card.title}
@@ -370,10 +460,110 @@ export const Dashboard = () => {
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <LineChartComponent title="User Registrations" color="#3b82f6" height={280} />
-        <BarChartComponent title="Quiz Completions" color="#10b981" height={280} />
-        <PieChartComponent title="Score Distribution" height={280} />
-        <AreaChartComponent title="Domain Performance" height={280} horizontal={true} />
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <LineChartComponent title="Quiz Attempts by Day" data={attemptsData} color="#3b82f6" height={280} />
+        </div>
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <BarChartComponent title="Quiz Attempts" data={attemptsData} color="#10b981" height={280} />
+        </div>
+      </div>
+
+      {/* Topic Performance & Strengths/Weaknesses */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        {/* Excellent Performance - Strengths */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base font-semibold flex items-center gap-2">
+              <CheckCircle className="w-4 h-4 text-green-500" />
+              Excellent Performance (Strengths)
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {strengthsData.length > 0 ? (
+              <BarChartComponent 
+                data={strengthsData} 
+                color="#22c55e" 
+                height={220}
+              />
+            ) : (
+              <div className="flex items-center justify-center h-[220px] text-gray-500 text-sm">
+                No topic data available
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Areas to Improve */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base font-semibold flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 text-orange-500" />
+              Areas to Improve
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {needsImprovementData.length > 0 ? (
+              <BarChartComponent 
+                data={needsImprovementData} 
+                color="#f97316" 
+                height={220}
+              />
+            ) : (
+              <div className="flex items-center justify-center h-[220px] text-gray-500 text-sm">
+                No improvement areas identified
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Group Performance & Topic Overview */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        {/* Group Performance */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base font-semibold flex items-center gap-2">
+              <UsersRound className="w-4 h-4 text-purple-500" />
+              Group Performance
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {groupPerformanceData.length > 0 ? (
+              <BarChartComponent 
+                data={groupPerformanceData} 
+                color="#8b5cf6" 
+                height={220}
+              />
+            ) : (
+              <div className="flex items-center justify-center h-[220px] text-gray-500 text-sm">
+                No group data available
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Topic Performance Overview */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base font-semibold flex items-center gap-2">
+              <BookOpen className="w-4 h-4 text-blue-500" />
+              Topic Performance Overview
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {topicPerformanceData.length > 0 ? (
+              <BarChartComponent 
+                data={topicPerformanceData} 
+                color="#3b82f6" 
+                height={220}
+              />
+            ) : (
+              <div className="flex items-center justify-center h-[220px] text-gray-500 text-sm">
+                No topic data available
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
 
       {/* Top Performers */}
@@ -407,7 +597,7 @@ export const Dashboard = () => {
             </Button>
           </CardHeader>
           <CardContent className="pt-0">
-            {queries.recentUsers?.isLoading ? (
+            {(queries.recentUsers?.isLoading || queries.recentGroups?.isLoading) ? (
               <div className="space-y-3">
                 {[...Array(4)].map((_, i) => (
                   <div
@@ -425,12 +615,12 @@ export const Dashboard = () => {
               </div>
             ) : displayActivity?.length > 0 ? (
               <div className="divide-y divide-gray-100">
-                {displayActivity.slice(0, 4).map((item, index) => {
+                {displayActivity.map((item, index) => {
                   const config =
                     activityConfig[item.type] || activityConfig.default;
                   return (
                     <ActivityItem
-                      key={index}
+                      key={`${item.type}-${item.timestamp}-${index}`}
                       icon={config.icon}
                       iconColor={config.color}
                       title={item.title || item.message}
@@ -510,7 +700,7 @@ export const Dashboard = () => {
                   <tbody className="divide-y divide-gray-50">
                     {recentUsers.slice(0, 5).map((user) => (
                       <tr
-                        key={user.id}
+                        key={user.user_id || user.id}
                         className="hover:bg-gray-50 cursor-pointer transition-colors"
                         onClick={() => navigate(`/admin/users/${user.id}`)}
                       >
@@ -652,7 +842,7 @@ export const Dashboard = () => {
                 <tbody className="divide-y divide-gray-50">
                   {recentGroups.slice(0, 5).map((group) => (
                     <tr
-                      key={group.id}
+                      key={group.group_id || group.id}
                       className="hover:bg-gray-50 cursor-pointer transition-colors"
                       onClick={() => navigate(`/admin/groups/${group.id}`)}
                     >

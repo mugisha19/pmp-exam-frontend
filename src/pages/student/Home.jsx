@@ -7,7 +7,8 @@ import { useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuthStore } from "@/stores/auth.store";
 import { useQuery } from "@tanstack/react-query";
-import { getQuizzes, getQuizAttempts } from "@/services/quiz.service";
+import { getQuizzes } from "@/services/quiz.service";
+import { analyticsService } from "@/services/analytics.service";
 import { useMyGroups } from "@/hooks/queries/useGroupQueries";
 import {
   Play,
@@ -45,36 +46,19 @@ export const Home = () => {
     [allQuizzesData]
   );
 
-  // Fetch all quiz attempts - refetch when allQuizzes changes
+  // Fetch all quiz attempts using analytics service
   const { data: allAttemptsData, refetch: refetchAttempts } = useQuery({
-    queryKey: [
-      "all-quiz-attempts",
-      user?.user_id,
-      allQuizzes.map((q) => q.quiz_id || q.id).join(","),
-    ],
+    queryKey: ["student-performance-home", user?.user_id],
     queryFn: async () => {
       try {
-        if (allQuizzes.length === 0) return { attempts: [] };
-
-        const attemptsPromises = allQuizzes.map(async (quiz) => {
-          try {
-            const response = await getQuizAttempts(quiz.quiz_id || quiz.id);
-            return response.attempts || [];
-          } catch {
-            return [];
-          }
-        });
-
-        const attemptsArrays = await Promise.all(attemptsPromises);
-        const allAttempts = attemptsArrays.flat();
-
-        return { attempts: allAttempts };
+        const response = await analyticsService.getStudentPerformance(user?.user_id, "all");
+        return response;
       } catch (error) {
-        console.error("Error fetching attempts:", error);
-        return { attempts: [] };
+        console.error("Error fetching student performance:", error);
+        return { attempts: [], total_attempts: 0, average_score: 0, total_passed: 0 };
       }
     },
-    enabled: !!user?.user_id && allQuizzes.length > 0,
+    enabled: !!user?.user_id,
     staleTime: 0,
     refetchOnMount: "always",
     refetchOnWindowFocus: "always",
@@ -87,40 +71,18 @@ export const Home = () => {
   // Calculate statistics
   const dashboardStats = useMemo(() => {
     const attempts = allAttemptsData?.attempts || [];
+    const totalAttempts = allAttemptsData?.total_attempts || attempts.length;
+    const averageScore = Math.round(allAttemptsData?.average_score || 0);
 
-    const completedAttempts = attempts.filter(
-      (att) => att.status === "submitted" || att.status === "auto_submitted"
-    ).length;
-
-    const totalSeconds = attempts.reduce(
-      (sum, att) => sum + (att.time_spent_seconds || 0),
+    // Calculate learning hours from time_spent_minutes
+    const totalMinutes = attempts.reduce(
+      (sum, att) => sum + (att.time_spent_minutes || 0),
       0
     );
-    const learningHours = Math.round(totalSeconds / 3600);
-
-    const completedScores = attempts
-      .filter(
-        (att) =>
-          (att.status === "submitted" || att.status === "auto_submitted") &&
-          att.score != null
-      )
-      .map((att) => att.score);
-    const averageScore =
-      completedScores.length > 0
-        ? Math.round(
-            completedScores.reduce((sum, score) => sum + score, 0) /
-              completedScores.length
-          )
-        : 0;
+    const learningHours = Math.round(totalMinutes / 60);
 
     const totalQuizzes = allQuizzes.length;
-    const completedQuizIds = new Set(
-      attempts
-        .filter(
-          (att) => att.status === "submitted" || att.status === "auto_submitted"
-        )
-        .map((att) => att.quiz_id)
-    );
+    const completedQuizIds = new Set(attempts.map((att) => att.quiz_id));
     const completedQuizzes = completedQuizIds.size;
 
     return {

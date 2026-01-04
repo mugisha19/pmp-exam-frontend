@@ -6,7 +6,8 @@
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { getQuizzes, getQuizAttempts } from "@/services/quiz.service";
+import { getQuizzes } from "@/services/quiz.service";
+import { analyticsService } from "@/services/analytics.service";
 import { useAuthStore } from "@/stores/auth.store";
 import { ExamCard } from "@/components/shared/ExamCard";
 import {
@@ -55,28 +56,27 @@ export const BrowseExams = () => {
 
   const allQuizzes = quizzesData?.quizzes || quizzesData?.items || [];
 
-  // Fetch all attempts
+  // Fetch all attempts using analytics service
   const { data: attemptsData } = useQuery({
-    queryKey: ["browse-attempts", user?.user_id],
+    queryKey: ["student-performance-browse", user?.user_id],
     queryFn: async () => {
-      const attemptsPromises = allQuizzes.slice(0, 20).map(async (quiz) => {
-        try {
-          const response = await getQuizAttempts(quiz.quiz_id || quiz.id);
-          return {
-            quizId: quiz.quiz_id || quiz.id,
-            attempts: response.attempts || [],
-          };
-        } catch (error) {
-          return { quizId: quiz.quiz_id || quiz.id, attempts: [] };
-        }
-      });
-      const results = await Promise.all(attemptsPromises);
-      return results.reduce((acc, { quizId, attempts }) => {
-        acc[quizId] = attempts;
-        return acc;
-      }, {});
+      try {
+        const response = await analyticsService.getStudentPerformance(user?.user_id, "all");
+        // Convert attempts array to a map by quiz_id
+        const attemptsMap = {};
+        (response.attempts || []).forEach((att) => {
+          if (!attemptsMap[att.quiz_id]) {
+            attemptsMap[att.quiz_id] = [];
+          }
+          attemptsMap[att.quiz_id].push(att);
+        });
+        return attemptsMap;
+      } catch (error) {
+        console.error("Error fetching attempts:", error);
+        return {};
+      }
     },
-    enabled: !!user?.user_id && allQuizzes.length > 0,
+    enabled: !!user?.user_id,
   });
 
   // Calculate stats

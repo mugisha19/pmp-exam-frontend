@@ -27,16 +27,16 @@ export function AreaChartComponent({
   showLegend = false,
   horizontal = true,
 }) {
-  // Generate sample data if no data provided (domain performance)
-  const chartData =
-    data.length > 0
-      ? data
-      : [
-          { name: "Process", value: 85 },
-          { name: "People", value: 72 },
-          { name: "Business Environment", value: 68 },
-          { name: "Business Analysis", value: 58 },
-        ];
+  if (!data || data.length === 0) {
+    return (
+      <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">{title}</h3>
+        <div className="flex items-center justify-center" style={{ height }}>
+          <p className="text-gray-500 text-sm">No data available</p>
+        </div>
+      </div>
+    );
+  }
 
   if (horizontal) {
     return (
@@ -44,7 +44,7 @@ export function AreaChartComponent({
         <h3 className="text-lg font-semibold text-gray-900 mb-4">{title}</h3>
         <ResponsiveContainer width="100%" height={height}>
           <BarChart
-            data={chartData}
+            data={data}
             layout="vertical"
             margin={{ top: 5, right: 30, left: 80, bottom: 5 }}
           >
@@ -83,7 +83,7 @@ export function AreaChartComponent({
             />
             {showLegend && <Legend />}
             <Bar dataKey={dataKey} radius={[0, 4, 4, 0]}>
-              {chartData.map((entry, index) => (
+              {data.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
                   fill={COLORS[index % COLORS.length]}
@@ -101,7 +101,7 @@ export function AreaChartComponent({
       <h3 className="text-lg font-semibold text-gray-900 mb-4">{title}</h3>
       <ResponsiveContainer width="100%" height={height}>
         <BarChart
-          data={chartData}
+          data={data}
           margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
         >
           {showGrid && <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />}
@@ -129,7 +129,7 @@ export function AreaChartComponent({
           />
           {showLegend && <Legend />}
           <Bar dataKey={dataKey} radius={[4, 4, 0, 0]}>
-            {chartData.map((entry, index) => (
+            {data.map((entry, index) => (
               <Cell
                 key={`cell-${index}`}
                 fill={COLORS[index % COLORS.length]}

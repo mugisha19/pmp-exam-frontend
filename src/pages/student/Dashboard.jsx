@@ -35,7 +35,7 @@ import { useRecentGroups, useAvailableQuizzes } from "@/hooks/queries/useStudent
 import { useMyGroups } from "@/hooks/queries/useGroupQueries";
 import { useQuery } from "@tanstack/react-query";
 import { getGroups } from "@/services/group.service";
-import { getQuizzes, getQuizAttempts } from "@/services/quiz.service";
+import { getQuizzes } from "@/services/quiz.service";
 import api from "@/services/api";
 import { analyticsService } from "@/services/analytics.service";
 import { SearchBar } from "@/components/shared/SearchBar";
@@ -68,32 +68,20 @@ export const Dashboard = () => {
 
   const allQuizzes = allQuizzesData?.quizzes || allQuizzesData?.items || [];
 
-  // Fetch all quiz attempts for the user
+  // Fetch all quiz attempts for the user using analytics service
   const { data: allAttemptsData } = useQuery({
-    queryKey: ["all-quiz-attempts", user?.user_id, allQuizzes.length],
+    queryKey: ["student-performance", user?.user_id],
     queryFn: async () => {
       try {
-        if (allQuizzes.length === 0) return { attempts: [] };
-        
-        const attemptsPromises = allQuizzes.map(async (quiz) => {
-          try {
-            const response = await getQuizAttempts(quiz.quiz_id || quiz.id);
-            return response.attempts || [];
-          } catch (error) {
-            return [];
-          }
-        });
-        
-        const attemptsArrays = await Promise.all(attemptsPromises);
-        const allAttempts = attemptsArrays.flat();
-        
-        return { attempts: allAttempts };
+        const response = await analyticsService.getStudentPerformance(user?.user_id, "all");
+        console.log("[Dashboard] Student performance data:", response);
+        return response;
       } catch (error) {
-        console.error("Error fetching attempts:", error);
-        return { attempts: [] };
+        console.error("Error fetching student performance:", error);
+        return { attempts: [], total_attempts: 0, average_score: 0, total_passed: 0 };
       }
     },
-    enabled: !!user?.user_id && allQuizzes.length > 0,
+    enabled: !!user?.user_id,
     staleTime: 2 * 60 * 1000,
   });
 
@@ -164,37 +152,33 @@ export const Dashboard = () => {
     const attempts = performanceData?.attempts || [];
     console.log('Dashboard - Performance attempts:', attempts);
     
-    const completedAttempts = attempts.filter(att => att.status === 'submitted' || att.status === 'auto_submitted').length;
+    // From analytics service, we get: total_attempts, average_score, total_passed, pass_rate
+    const totalAttempts = performanceData?.total_attempts || attempts.length;
+    const averageScore = Math.round(performanceData?.average_score || 0);
+    const totalPassed = performanceData?.total_passed || 0;
     
-    // Calculate learning hours from time_spent_seconds
-    const totalSeconds = attempts.reduce((sum, att) => sum + (att.time_spent_seconds || 0), 0);
-    const learningHours = Math.round(totalSeconds / 3600);
-    
-    // Calculate average score from completed attempts
-    const completedScores = attempts
-      .filter(att => att.status === 'completed' && att.score != null)
-      .map(att => att.score);
-    const averageScore = completedScores.length > 0
-      ? Math.round(completedScores.reduce((sum, score) => sum + score, 0) / completedScores.length)
-      : 0;
+    // Calculate learning hours from time_spent_minutes (analytics returns minutes)
+    const totalMinutes = attempts.reduce((sum, att) => sum + (att.time_spent_minutes || 0), 0);
+    const learningHours = Math.round(totalMinutes / 60);
     
     // Calculate progress percentage (unique quizzes completed / total available)
     const totalQuizzes = allQuizzes.length;
-    const completedQuizIds = new Set(attempts.filter(att => att.status === 'submitted' || att.status === 'auto_submitted').map(att => att.quiz_id));
+    const completedQuizIds = new Set(attempts.map(att => att.quiz_id));
     const completedQuizzes = completedQuizIds.size;
     const progressPercentage = totalQuizzes > 0 ? Math.round((completedQuizzes / totalQuizzes) * 100) : 0;
 
     console.log('Dashboard stats:', {
-      completedAttempts,
+      completedAttempts: totalAttempts,
       learningHours,
       averageScore,
       progressPercentage,
       totalQuizzes,
       completedQuizzes,
+      totalPassed,
     });
 
     return {
-      completedAttempts,
+      completedAttempts: totalAttempts,
       learningHours,
       averageScore,
       progressPercentage,

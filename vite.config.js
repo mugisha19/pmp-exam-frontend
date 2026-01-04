@@ -27,7 +27,7 @@ export default defineConfig({
 
     proxy: {
       "/api/v1/statistics": {
-        target: "http://localhost:8003",
+        target: "http://localhost:8005",
         changeOrigin: true,
         secure: false,
       },

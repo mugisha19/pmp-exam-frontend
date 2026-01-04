@@ -24,57 +24,58 @@ export function LineChartComponent({
   showGrid = true,
   showLegend = false,
 }) {
-  // Generate sample data if no data provided
-  const chartData =
-    data.length > 0
-      ? data
-      : [
-          { name: "Mon", value: 12 },
-          { name: "Tue", value: 19 },
-          { name: "Wed", value: 15 },
-          { name: "Thu", value: 25 },
-          { name: "Fri", value: 22 },
-          { name: "Sat", value: 30 },
-          { name: "Sun", value: 28 },
-        ];
+  if (!data || data.length === 0) {
+    return (
+      <div>
+        {title && <h3 className="text-sm font-semibold text-gray-900 mb-4">{title}</h3>}
+        <div className="flex items-center justify-center" style={{ height }}>
+          <p className="text-gray-500 text-sm">No data available</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <ResponsiveContainer width="100%" height={height}>
-      <LineChart
-        data={chartData}
-        margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
-      >
-        {showGrid && <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />}
-        <XAxis
-          dataKey={xAxisKey}
-          tick={{ fill: "#6b7280", fontSize: 12 }}
-          axisLine={{ stroke: "#d1d5db" }}
-          tickLine={{ stroke: "#d1d5db" }}
-        />
-        <YAxis
-          tick={{ fill: "#6b7280", fontSize: 12 }}
-          axisLine={{ stroke: "#d1d5db" }}
-          tickLine={{ stroke: "#d1d5db" }}
-        />
-        <Tooltip
-          contentStyle={{
-            backgroundColor: "#fff",
-            border: "1px solid #e5e7eb",
-            borderRadius: "8px",
-            boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-          }}
-        />
-        {showLegend && <Legend />}
-        <Line
-          type="monotone"
-          dataKey={dataKey}
-          stroke={color}
-          strokeWidth={2}
-          dot={{ fill: color, strokeWidth: 2, r: 4 }}
-          activeDot={{ r: 6, fill: color }}
-        />
-      </LineChart>
-    </ResponsiveContainer>
+    <div>
+      {title && <h3 className="text-sm font-semibold text-gray-900 mb-4">{title}</h3>}
+      <ResponsiveContainer width="100%" height={height}>
+        <LineChart
+          data={data}
+          margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+        >
+          {showGrid && <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />}
+          <XAxis
+            dataKey={xAxisKey}
+            tick={{ fill: "#6b7280", fontSize: 12 }}
+            axisLine={{ stroke: "#d1d5db" }}
+            tickLine={{ stroke: "#d1d5db" }}
+          />
+          <YAxis
+            tick={{ fill: "#6b7280", fontSize: 12 }}
+            axisLine={{ stroke: "#d1d5db" }}
+            tickLine={{ stroke: "#d1d5db" }}
+          />
+          <Tooltip
+            contentStyle={{
+              backgroundColor: "#fff",
+              border: "1px solid #e5e7eb",
+              borderRadius: "8px",
+              boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+            }}
+            formatter={(value) => [value, "Users"]}
+          />
+          {showLegend && <Legend />}
+          <Line
+            type="monotone"
+            dataKey={dataKey}
+            stroke={color}
+            strokeWidth={2}
+            dot={{ fill: color, strokeWidth: 2, r: 4 }}
+            activeDot={{ r: 6, fill: color }}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
   );
 }
 
