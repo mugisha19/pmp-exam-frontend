@@ -170,12 +170,6 @@ export const ADMIN_NAV_ITEMS = [
     icon: Users,
   },
   {
-    id: "analytics",
-    label: "Analytics",
-    path: "/admin/analytics",
-    icon: BarChart3,
-  },
-  {
     id: "support",
     label: "Support Tickets",
     path: "/admin/support",

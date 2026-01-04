@@ -3,6 +3,7 @@
  * Main dashboard for administrators with stats, recent activity, and quick actions
  */
 
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Users,
@@ -15,13 +16,26 @@ import {
   Activity,
   TrendingUp,
   ArrowUpRight,
+  CheckCircle,
+  Calendar,
+  ChevronDown,
 } from "lucide-react";
 import { useAdminDashboardData } from "@/hooks/queries/useAdminDashboard";
+import { useAnalyticsDashboard } from "@/hooks/queries/useAnalyticsQueries";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { RoleBadge } from "@/components/shared/RoleBadge";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { EmptyState } from "@/components/shared/EmptyState";
+import { StatsCard } from "@/components/shared/StatsCard";
+import { DataTable } from "@/components/shared/DataTable";
+import { UserCell } from "@/components/shared/UserCell";
+import {
+  LineChartComponent,
+  BarChartComponent,
+  PieChartComponent,
+  AreaChartComponent,
+} from "@/components/charts";
 import { cn } from "@/utils/cn";
 
 /**
@@ -185,8 +199,73 @@ const ActivityItem = ({
 
 export const Dashboard = () => {
   const navigate = useNavigate();
+  const [dateRange, setDateRange] = useState("30");
+  const [showDateDropdown, setShowDateDropdown] = useState(false);
+  
   const { stats, recentUsers, recentGroups, activity, queries } =
     useAdminDashboardData();
+
+  // Calculate days for analytics API
+  const days = useMemo(() => {
+    if (dateRange === "custom") return 30;
+    return parseInt(dateRange);
+  }, [dateRange]);
+
+  // Fetch analytics data
+  const { data: analytics, isLoading: analyticsLoading } = useAnalyticsDashboard(days);
+
+  // Date range options
+  const DATE_RANGES = [
+    { value: "7", label: "Last 7 days" },
+    { value: "30", label: "Last 30 days" },
+    { value: "90", label: "Last 90 days" },
+  ];
+
+  const selectedRangeLabel = DATE_RANGES.find((r) => r.value === dateRange)?.label || "Last 30 days";
+
+  // Analytics stats
+  const analyticsStats = useMemo(() => {
+    if (analytics) {
+      return {
+        newUsers: analytics.new_users || 0,
+        quizzesCompleted: analytics.quizzes_completed || 0,
+        averageScore: analytics.average_score || 0,
+        activeUsers: analytics.active_users || 0,
+      };
+    }
+    return { newUsers: 0, quizzesCompleted: 0, averageScore: 0, activeUsers: 0 };
+  }, [analytics]);
+
+  // Top performers
+  const topPerformers = useMemo(() => {
+    if (analytics?.top_performers?.length > 0) {
+      return analytics.top_performers.map((p) => ({
+        id: p.id,
+        user: {
+          name: p.first_name && p.last_name ? `${p.first_name} ${p.last_name}` : `User ${p.user_id?.slice(0, 8) || "Unknown"}`,
+          email: p.email || "",
+          avatar: p.avatar,
+        },
+        quizzes_taken: p.quizzes_taken || 0,
+        avg_score: p.avg_score || 0,
+        best_score: p.best_score || 0,
+      }));
+    }
+    return [];
+  }, [analytics]);
+
+  const performersColumns = [
+    {
+      key: "user",
+      label: "User",
+      render: (_, row) => (
+        <UserCell name={row.user?.name || "Unknown"} email={row.user?.email || ""} avatar={row.user?.avatar} />
+      ),
+    },
+    { key: "quizzes_taken", label: "Quizzes", render: (value) => <span className="font-medium">{value}</span> },
+    { key: "avg_score", label: "Avg Score", render: (value) => <span className="font-medium">{value?.toFixed(1)}%</span> },
+    { key: "best_score", label: "Best", render: (value) => <span className="font-medium text-blue-600">{value?.toFixed(1)}%</span> },
+  ];
 
   // Stats cards configuration matching the screenshot style
   const statsCards = [
@@ -258,7 +337,58 @@ export const Dashboard = () => {
         ))}
       </div>
 
-      {/* Main Content Grid */}
+      {/* Analytics Section */}
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-semibold text-gray-900">Analytics Overview</h2>
+        <div className="relative">
+          <button
+            onClick={() => setShowDateDropdown(!showDateDropdown)}
+            className="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm hover:bg-gray-50"
+          >
+            <Calendar className="w-4 h-4" />
+            {selectedRangeLabel}
+            <ChevronDown className={`w-4 h-4 transition-transform ${showDateDropdown ? "rotate-180" : ""}`} />
+          </button>
+          {showDateDropdown && (
+            <>
+              <div className="fixed inset-0 z-10" onClick={() => setShowDateDropdown(false)} />
+              <div className="absolute right-0 mt-2 w-40 bg-white border rounded-lg shadow-xl z-20 py-1">
+                {DATE_RANGES.map((range) => (
+                  <button
+                    key={range.value}
+                    onClick={() => { setDateRange(range.value); setShowDateDropdown(false); }}
+                    className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-100 ${dateRange === range.value ? "text-blue-600 bg-blue-50" : ""}`}
+                  >
+                    {range.label}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <LineChartComponent title="User Registrations" color="#3b82f6" height={280} />
+        <BarChartComponent title="Quiz Completions" color="#10b981" height={280} />
+        <PieChartComponent title="Score Distribution" height={280} />
+        <AreaChartComponent title="Domain Performance" height={280} horizontal={true} />
+      </div>
+
+      {/* Top Performers */}
+      {topPerformers.length > 0 && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="text-base font-semibold">Top Performers</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <DataTable columns={performersColumns} data={topPerformers} isLoading={analyticsLoading} emptyMessage="No data" />
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Recent Activity & Users */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
         {/* Recent Activity */}
         <Card className="lg:col-span-2">
