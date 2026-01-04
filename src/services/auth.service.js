@@ -203,10 +203,14 @@ export const logout = async (logoutAll = false) => {
       ? AUTH_ENDPOINTS.LOGOUT_ALL
       : AUTH_ENDPOINTS.LOGOUT;
 
-    // Call logout endpoint (may fail if token is invalid, that's ok)
-    await api.post(endpoint).catch(() => {
-      // Ignore errors, we're logging out anyway
-    });
+    const refreshToken = getStorageItem(TOKEN_KEYS.REFRESH_TOKEN);
+
+    // Call logout endpoint with refresh token if available
+    if (refreshToken && !logoutAll) {
+      await api.post(endpoint, { refresh_token: refreshToken }).catch(() => {});
+    } else if (logoutAll) {
+      await api.post(endpoint).catch(() => {});
+    }
   } finally {
     // Always clear local auth data
     clearAuthToken();

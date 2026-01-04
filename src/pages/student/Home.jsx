@@ -98,7 +98,7 @@ export const Home = () => {
       completedQuizzes,
       averageScore,
       learningHours,
-      completedAttempts,
+      completedAttempts: totalAttempts,
     };
   }, [allAttemptsData, allQuizzes]);
 
