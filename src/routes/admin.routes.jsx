@@ -10,6 +10,7 @@ import AdminLayout from "@/components/layouts/AdminLayout";
 import {
   AdminDashboard,
   UserManagementPage,
+  UserDetailsPage,
   AdminInstructorsPage,
   AdminStudentsPage,
   AdminExamManagementPage,
@@ -44,6 +45,7 @@ export const adminRoutes = (
     <Route index element={<Navigate to="dashboard" replace />} />
     <Route path="dashboard" element={<AdminDashboard />} />
     <Route path="users" element={<UserManagementPage />} />
+    <Route path="users/:userId" element={<UserDetailsPage />} />
     <Route path="instructors" element={<AdminInstructorsPage />} />
     <Route path="students" element={<AdminStudentsPage />} />
     <Route path="exams" element={<AdminExamManagementPage />} />

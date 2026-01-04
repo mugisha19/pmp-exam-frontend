@@ -6,6 +6,7 @@
 // Implemented Pages
 export { Dashboard as AdminDashboard } from "./Dashboard";
 export { UserManagement as UserManagementPage } from "./UserManagement";
+export { UserDetails as UserDetailsPage } from "./UserDetails";
 export { default as AdminGroupsPage } from "./GroupManagement";
 export { GroupDetails as AdminGroupDetailsPage } from "./GroupDetails";
 export { default as QuizAttemptDetails } from "./QuizAttemptDetails";

@@ -4,6 +4,7 @@
  */
 
 import { useState, useMemo, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Plus,
   Search,
@@ -58,6 +59,8 @@ const STATUS_FILTER_OPTIONS = [
 ];
 
 export const UserManagement = () => {
+  const navigate = useNavigate();
+  
   // Pagination state
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -426,6 +429,7 @@ export const UserManagement = () => {
               data={users}
               rowKey="user_id"
               paginated={false}
+              onRowClick={(user) => navigate(`/admin/users/${user.user_id}`)}
             />
           )}
         </CardContent>
