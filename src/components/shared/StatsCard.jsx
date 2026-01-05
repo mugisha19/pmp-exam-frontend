@@ -61,27 +61,27 @@ export const StatsCard = ({
   return (
     <Card hover className={className}>
       <CardContent padding="md">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-3">
           <div className="flex-1 min-w-0">
-            <p className="text-sm text-gray-500 mb-1">{title}</p>
-            <p className="text-2xl font-bold text-gray-900 truncate">{value}</p>
+            <p className="text-xs sm:text-sm text-gray-500 mb-1 truncate">{title}</p>
+            <p className="text-xl sm:text-2xl font-bold text-gray-900 truncate">{value}</p>
 
             {(trend !== undefined || trendLabel || subtitle) && (
-              <div className="flex items-center gap-2 mt-2">
+              <div className="flex items-center gap-2 mt-2 flex-wrap">
                 {trend !== undefined && (
                   <div
                     className={cn("flex items-center gap-1", getTrendColor())}
                     style={(trendDirection === "up" || trend > 0) ? { color: '#476072' } : {}}
                   >
                     {getTrendIcon()}
-                    <span className="text-sm font-medium">
+                    <span className="text-xs sm:text-sm font-medium">
                       {trend > 0 ? "+" : ""}
                       {trend}%
                     </span>
                   </div>
                 )}
                 {(trendLabel || subtitle) && (
-                  <span className="text-xs text-gray-400">
+                  <span className="text-xs text-gray-400 truncate">
                     {trendLabel || subtitle}
                   </span>
                 )}
@@ -90,8 +90,8 @@ export const StatsCard = ({
           </div>
 
           {Icon && (
-            <div className={cn("p-3 rounded-xl flex-shrink-0", iconBgColor)}>
-              <Icon className={cn("w-6 h-6", iconColor)} />
+            <div className={cn("p-2 sm:p-3 rounded-lg sm:rounded-xl flex-shrink-0", iconBgColor)}>
+              <Icon className={cn("w-5 h-5 sm:w-6 sm:h-6", iconColor)} />
             </div>
           )}
         </div>

@@ -260,26 +260,24 @@ export const DataTable = ({
         />
         {/* Always show pagination controls */}
         {paginated && (
-          <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-500">Rows per page:</span>
-                <select
-                  value={pageSize}
-                  onChange={(e) => handlePageSizeChange(e.target.value)}
-                  className="px-2 py-1 text-sm border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  {PAGE_SIZE_OPTIONS.map((size) => (
-                    <option key={size} value={size}>
-                      {size}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <span className="text-sm text-gray-500">
-                Showing 0 of 0 results
-              </span>
+          <div className="flex flex-col xs:flex-row items-start xs:items-center justify-between gap-3 px-3 sm:px-6 py-3 sm:py-4 border-t border-gray-200">
+            <div className="flex items-center gap-2">
+              <span className="text-xs sm:text-sm text-gray-500">Rows:</span>
+              <select
+                value={pageSize}
+                onChange={(e) => handlePageSizeChange(e.target.value)}
+                className="px-2 py-1 text-xs sm:text-sm border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                {PAGE_SIZE_OPTIONS.map((size) => (
+                  <option key={size} value={size}>
+                    {size}
+                  </option>
+                ))}
+              </select>
             </div>
+            <span className="text-xs sm:text-sm text-gray-500">
+              0 of 0
+            </span>
           </div>
         )}
       </Card>
@@ -288,7 +286,50 @@ export const DataTable = ({
 
   return (
     <div className={cn("overflow-visible", className)}>
-      <div className="overflow-x-auto overflow-y-visible">
+      {/* Mobile: Card view, Desktop: Table view */}
+      <div className="block sm:hidden">
+        {/* Mobile Card View */}
+        <div className="space-y-3">
+          {displayData.map((row, rowIndex) => (
+            <div
+              key={row[rowKey] || rowIndex}
+              onClick={() => onRowClick?.(row)}
+              className={cn(
+                "bg-white border border-gray-200 rounded-lg p-4 transition-colors",
+                onRowClick && "cursor-pointer active:bg-gray-50",
+                isRowSelected(row) && "bg-blue-50 border-blue-200"
+              )}
+            >
+              {selectable && (
+                <div className="mb-3 pb-3 border-b border-gray-100">
+                  <input
+                    type="checkbox"
+                    checked={isRowSelected(row)}
+                    onChange={(e) => handleSelectRow(row, e)}
+                    onClick={(e) => e.stopPropagation()}
+                    className="w-4 h-4 rounded border-gray-300 bg-white text-blue-600 focus:ring-blue-500"
+                  />
+                </div>
+              )}
+              <div className="space-y-2">
+                {columns.map((column) => (
+                  <div key={column.key} className="flex justify-between items-start gap-2">
+                    <span className="text-xs font-medium text-gray-500 uppercase">
+                      {typeof column.header === "function" ? column.header() : column.header || column.label}
+                    </span>
+                    <div className="text-sm text-gray-900 text-right flex-1">
+                      {column.render ? column.render(row[column.key], row) : row[column.key]}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Desktop Table View */}
+      <div className="hidden sm:block overflow-x-auto overflow-y-visible">
         <table className="w-full min-w-full table-auto">
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
@@ -387,14 +428,14 @@ export const DataTable = ({
 
       {/* Pagination - Always show when paginated is true */}
       {paginated && (
-        <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200">
-          <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 px-3 sm:px-6 py-3 sm:py-4 border-t border-gray-200 bg-white">
+          <div className="flex flex-col xs:flex-row items-start xs:items-center gap-2 xs:gap-4 w-full sm:w-auto">
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-500">Rows per page:</span>
+              <span className="text-xs sm:text-sm text-gray-500 whitespace-nowrap">Rows:</span>
               <select
                 value={pageSize}
                 onChange={(e) => handlePageSizeChange(e.target.value)}
-                className="px-2 py-1 text-sm border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-2 py-1.5 text-xs sm:text-sm border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 {PAGE_SIZE_OPTIONS.map((size) => (
                   <option key={size} value={size}>
@@ -403,23 +444,22 @@ export const DataTable = ({
                 ))}
               </select>
             </div>
-            <span className="text-sm text-gray-500">
-              Showing {startItem} to {endItem} of {totalCount} results
+            <span className="text-xs sm:text-sm text-gray-500">
+              {startItem}-{endItem} of {totalCount}
             </span>
           </div>
           
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2 w-full sm:w-auto justify-between sm:justify-end">
             <button
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
-              className="px-3 py-1.5 text-sm bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-2 sm:px-3 py-1.5 text-xs sm:text-sm bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              Previous
+              Prev
             </button>
             <div className="flex items-center gap-1">
               {Array.from({ length: totalPages }, (_, i) => i + 1)
                 .filter((page) => {
-                  // Show first, last, current, and neighbors
                   return (
                     page === 1 ||
                     page === totalPages ||
@@ -427,19 +467,18 @@ export const DataTable = ({
                   );
                 })
                 .map((page, index, array) => {
-                  // Add ellipsis
                   const prevPage = array[index - 1];
                   const showEllipsis = prevPage && page - prevPage > 1;
 
                   return (
                     <div key={page} className="flex items-center gap-1">
                       {showEllipsis && (
-                        <span className="px-2 text-gray-400">...</span>
+                        <span className="px-1 text-gray-400 text-xs">...</span>
                       )}
                       <button
                         onClick={() => handlePageChange(page)}
                         className={cn(
-                          "px-3 py-1.5 text-sm rounded-lg transition-colors",
+                          "px-2 sm:px-3 py-1.5 text-xs sm:text-sm rounded-lg transition-colors min-w-[32px]",
                           currentPage === page
                             ? "bg-blue-600 text-white"
                             : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
@@ -454,7 +493,7 @@ export const DataTable = ({
             <button
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="px-3 py-1.5 text-sm bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-2 sm:px-3 py-1.5 text-xs sm:text-sm bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               Next
             </button>

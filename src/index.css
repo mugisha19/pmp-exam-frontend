@@ -196,6 +196,60 @@ a {
   display: none;
 }
 
+/* Responsive utilities */
+.container-responsive {
+  @apply px-4 sm:px-6 lg:px-8;
+}
+
+.text-responsive-xs {
+  @apply text-xs sm:text-sm;
+}
+
+.text-responsive-sm {
+  @apply text-sm sm:text-base;
+}
+
+.text-responsive-base {
+  @apply text-base sm:text-lg;
+}
+
+.text-responsive-lg {
+  @apply text-lg sm:text-xl lg:text-2xl;
+}
+
+.text-responsive-xl {
+  @apply text-xl sm:text-2xl lg:text-3xl;
+}
+
+.text-responsive-2xl {
+  @apply text-2xl sm:text-3xl lg:text-4xl;
+}
+
+.grid-responsive {
+  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4;
+}
+
+.flex-responsive {
+  @apply flex flex-col sm:flex-row gap-4;
+}
+
+/* Mobile-first spacing */
+.section-padding {
+  @apply py-8 sm:py-12 lg:py-16;
+}
+
+.card-padding {
+  @apply p-4 sm:p-6;
+}
+
+/* Touch-friendly buttons */
+@media (max-width: 768px) {
+  button, a[role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
 /* Toast Animations */
 @keyframes slide-in {
   0% {

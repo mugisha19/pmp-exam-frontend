@@ -7,9 +7,9 @@ import { cn } from "@/utils/cn";
 
 const paddingStyles = {
   none: "",
-  sm: "p-4",
-  md: "p-6",
-  lg: "p-8",
+  sm: "p-3 sm:p-4",
+  md: "p-4 sm:p-6",
+  lg: "p-6 sm:p-8",
 };
 
 export const Card = ({
@@ -25,7 +25,7 @@ export const Card = ({
   return (
     <div
       className={cn(
-        "bg-white backdrop-blur-sm rounded-2xl border border-gray-200 shadow-sm",
+        "bg-white backdrop-blur-sm rounded-xl sm:rounded-2xl border border-gray-200 shadow-sm",
         paddingStyles[padding],
         hover &&
           "transition-all duration-200 hover:bg-gray-50 hover:border-gray-300",

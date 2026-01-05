@@ -191,22 +191,22 @@ export const Home = () => {
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
       <section className="bg-gray-50 border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 sm:gap-8">
             <div className="flex-1">
-              <p className="text-emerald-600 font-semibold mb-2">
+              <p className="text-emerald-600 font-semibold mb-2 text-sm sm:text-base">
                 Welcome back
               </p>
-              <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-3 sm:mb-4">
                 {user?.first_name && user?.last_name
                   ? `${user.first_name} ${user.last_name}`
                   : user?.first_name || "Student"}
               </h1>
-              <p className="text-lg text-gray-600 mb-6 max-w-xl">
+              <p className="text-base sm:text-lg text-gray-600 mb-4 sm:mb-6 max-w-xl">
                 Continue your PMP certification journey. Track your progress,
                 join study groups, and ace your exams.
               </p>
-              <div className="flex flex-wrap gap-4">
+              <div className="flex flex-col xs:flex-row flex-wrap gap-3 sm:gap-4">
                 {activeQuizzes.length > 0 && (
                   <button
                     onClick={() =>
@@ -216,41 +216,41 @@ export const Home = () => {
                         }`
                       )
                     }
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-700 transition-colors"
+                    className="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-700 transition-colors text-sm sm:text-base"
                   >
-                    <Play className="w-5 h-5 text-white" />
+                    <Play className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                     Start Practice Exam
                   </button>
                 )}
                 <button
                   onClick={() => navigate("/groups")}
-                  className="inline-flex items-center gap-2 px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
+                  className="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors text-sm sm:text-base"
                 >
-                  <Users className="w-5 h-5" />
+                  <Users className="w-4 h-4 sm:w-5 sm:h-5" />
                   Browse Groups
                 </button>
               </div>
             </div>
 
             {/* Quick Stats */}
-            <div className="flex flex-wrap gap-8 lg:gap-12">
+            <div className="flex flex-wrap gap-6 sm:gap-8 lg:gap-12 justify-center lg:justify-end">
               <div className="text-center">
-                <div className="text-4xl font-bold text-gray-900">
+                <div className="text-3xl sm:text-4xl font-bold text-gray-900">
                   {dashboardStats.totalQuizzes}
                 </div>
-                <div className="text-sm text-gray-600">Available Exams</div>
+                <div className="text-xs sm:text-sm text-gray-600">Available Exams</div>
               </div>
               <div className="text-center">
-                <div className="text-4xl font-bold text-green-600">
+                <div className="text-3xl sm:text-4xl font-bold text-green-600">
                   {dashboardStats.completedQuizzes}
                 </div>
-                <div className="text-sm text-gray-600">Completed</div>
+                <div className="text-xs sm:text-sm text-gray-600">Completed</div>
               </div>
               <div className="text-center">
-                <div className="text-4xl font-bold text-emerald-600">
+                <div className="text-3xl sm:text-4xl font-bold text-emerald-600">
                   {dashboardStats.averageScore}%
                 </div>
-                <div className="text-sm text-gray-600">Avg Score</div>
+                <div className="text-xs sm:text-sm text-gray-600">Avg Score</div>
               </div>
             </div>
           </div>
@@ -258,17 +258,17 @@ export const Home = () => {
       </section>
 
       {/* Progress Overview Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">Your Progress</h2>
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <div className="flex flex-col md:flex-row md:items-center gap-8">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Your Progress</h2>
+        <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
+          <div className="flex flex-col md:flex-row md:items-center gap-6 sm:gap-8">
             {/* Progress Bar */}
             <div className="flex-1">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-gray-700">
+                <span className="text-xs sm:text-sm font-medium text-gray-700">
                   Overall Completion
                 </span>
-                <span className="text-sm font-semibold text-emerald-600">
+                <span className="text-xs sm:text-sm font-semibold text-emerald-600">
                   {dashboardStats.totalQuizzes > 0
                     ? Math.round(
                         (dashboardStats.completedQuizzes /
@@ -279,7 +279,7 @@ export const Home = () => {
                   %
                 </span>
               </div>
-              <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+              <div className="h-2.5 sm:h-3 bg-gray-200 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-emerald-500 rounded-full transition-all duration-500"
                   style={{
@@ -295,31 +295,31 @@ export const Home = () => {
                   }}
                 />
               </div>
-              <p className="text-sm text-gray-600 mt-2">
+              <p className="text-xs sm:text-sm text-gray-600 mt-2">
                 {dashboardStats.completedQuizzes} of{" "}
                 {dashboardStats.totalQuizzes} exams completed
               </p>
             </div>
 
             {/* Stats */}
-            <div className="flex gap-8">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                  <Clock className="w-5 h-5 text-blue-600" />
+            <div className="flex gap-6 sm:gap-8">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                  <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
                 </div>
                 <div>
-                  <div className="text-lg font-bold text-gray-900">
+                  <div className="text-base sm:text-lg font-bold text-gray-900">
                     {dashboardStats.learningHours}h
                   </div>
                   <div className="text-xs text-gray-600">Study Time</div>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
-                  <BarChart3 className="w-5 h-5 text-orange-600" />
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-orange-100 flex items-center justify-center">
+                  <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 text-orange-600" />
                 </div>
                 <div>
-                  <div className="text-lg font-bold text-gray-900">
+                  <div className="text-base sm:text-lg font-bold text-gray-900">
                     {dashboardStats.completedAttempts}
                   </div>
                   <div className="text-xs text-gray-600">Total Attempts</div>
@@ -333,25 +333,25 @@ export const Home = () => {
       {/* Continue Learning Section */}
       {inProgressQuizzes.length > 0 && (
         <section className="bg-emerald-50 border-y border-emerald-100">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div className="flex items-center gap-3 mb-6">
-              <Zap className="w-6 h-6 text-emerald-600" />
-              <h2 className="text-2xl font-bold text-gray-900">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+            <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+              <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600" />
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
                 Continue Where You Left Off
               </h2>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {inProgressQuizzes.map((quiz) => (
                 <div
                   key={quiz.quiz_id || quiz.id}
                   onClick={() => navigate(`/exams/${quiz.quiz_id || quiz.id}`)}
-                  className="flex items-center justify-between bg-white rounded-lg p-5 border border-emerald-200 cursor-pointer hover:border-emerald-400 transition-colors"
+                  className="flex flex-col xs:flex-row items-start xs:items-center justify-between bg-white rounded-lg p-4 sm:p-5 border border-emerald-200 cursor-pointer hover:border-emerald-400 transition-colors gap-3 xs:gap-4"
                 >
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900 mb-1">
+                  <div className="flex-1 min-w-0 w-full xs:w-auto">
+                    <h3 className="font-semibold text-gray-900 mb-1 text-sm sm:text-base">
                       {quiz.title}
                     </h3>
-                    <div className="flex items-center gap-4 text-sm text-gray-600">
+                    <div className="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm text-gray-600">
                       {quiz.question_count > 0 && (
                         <span>{quiz.question_count} questions</span>
                       )}
@@ -360,7 +360,7 @@ export const Home = () => {
                       )}
                     </div>
                   </div>
-                  <button className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors">
+                  <button className="flex items-center justify-center gap-2 px-4 py-2 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors text-sm w-full xs:w-auto">
                     <Play className="w-4 h-4 text-white" />
                     Continue
                   </button>
@@ -373,36 +373,36 @@ export const Home = () => {
 
       {/* Recommended Exams Section */}
       {recommendedQuizzes.length > 0 && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="flex items-center justify-between mb-6">
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+          <div className="flex flex-col xs:flex-row items-start xs:items-center justify-between mb-4 sm:mb-6 gap-3">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-1">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">
                 Recommended Exams
               </h2>
-              <p className="text-gray-600">Based on your learning progress</p>
+              <p className="text-sm sm:text-base text-gray-600">Based on your learning progress</p>
             </div>
             <Link
               to="/my-learning"
-              className="text-emerald-600 hover:text-emerald-700 font-medium flex items-center gap-1"
+              className="text-emerald-600 hover:text-emerald-700 font-medium flex items-center gap-1 text-sm sm:text-base"
             >
               View all <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
-          <div className="space-y-3">
+          <div className="space-y-2 sm:space-y-3">
             {recommendedQuizzes.slice(0, 5).map((quiz, index) => (
               <div
                 key={quiz.quiz_id || quiz.id}
                 onClick={() => navigate(`/exams/${quiz.quiz_id || quiz.id}`)}
-                className="flex items-center gap-4 p-4 bg-white border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+                className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-white border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
               >
-                <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gray-100 text-gray-600 font-semibold">
+                <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gray-100 text-gray-600 font-semibold text-sm sm:text-base flex-shrink-0">
                   {index + 1}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-medium text-gray-900 truncate">
+                  <h3 className="font-medium text-gray-900 truncate text-sm sm:text-base">
                     {quiz.title}
                   </h3>
-                  <div className="flex items-center gap-3 text-sm text-gray-500">
+                  <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-gray-500">
                     {quiz.question_count > 0 && (
                       <span>{quiz.question_count} questions</span>
                     )}
@@ -411,7 +411,7 @@ export const Home = () => {
                     )}
                   </div>
                 </div>
-                <ChevronRight className="w-5 h-5 text-gray-400" />
+                <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 flex-shrink-0" />
               </div>
             ))}
           </div>
@@ -420,49 +420,49 @@ export const Home = () => {
 
       {/* Two Column Layout: Groups & Activity */}
       <section className="bg-gray-50 border-y border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
             {/* Study Groups */}
             <div>
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                  <Users className="w-6 h-6 text-emerald-600" />
-                  <h2 className="text-2xl font-bold text-gray-900">
+              <div className="flex items-center justify-between mb-4 sm:mb-6">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <Users className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600" />
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
                     Study Groups
                   </h2>
                 </div>
                 <Link
                   to="/groups"
-                  className="text-emerald-600 hover:text-emerald-700 font-medium text-sm"
+                  className="text-emerald-600 hover:text-emerald-700 font-medium text-xs sm:text-sm"
                 >
                   View all
                 </Link>
               </div>
 
               {myGroups.length > 0 ? (
-                <div className="space-y-3">
+                <div className="space-y-2 sm:space-y-3">
                   {myGroups.slice(0, 4).map((group) => (
                     <div
                       key={group.group_id || group.id}
                       onClick={() =>
                         navigate(`/groups/${group.group_id || group.id}`)
                       }
-                      className="flex items-center gap-4 p-4 bg-white border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+                      className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-white border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
                     >
-                      <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-emerald-100 text-emerald-700 font-bold text-lg">
+                      <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-emerald-100 text-emerald-700 font-bold text-base sm:text-lg flex-shrink-0">
                         {group.name?.[0]?.toUpperCase() || "G"}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-medium text-gray-900 truncate">
+                        <h3 className="font-medium text-gray-900 truncate text-sm sm:text-base">
                           {group.name}
                         </h3>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-xs sm:text-sm text-gray-500">
                           {group.member_count || 0} members
                         </p>
                       </div>
                       <span
                         className={cn(
-                          "text-xs px-2 py-1 rounded-full",
+                          "text-xs px-2 py-1 rounded-full flex-shrink-0",
                           group.is_private
                             ? "bg-gray-100 text-gray-600"
                             : "bg-green-100 text-green-700"
@@ -474,14 +474,14 @@ export const Home = () => {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-8 bg-white border border-gray-200 rounded-lg">
-                  <Users className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                  <p className="text-gray-600 mb-3">
+                <div className="text-center py-6 sm:py-8 bg-white border border-gray-200 rounded-lg">
+                  <Users className="w-10 h-10 sm:w-12 sm:h-12 text-gray-300 mx-auto mb-3" />
+                  <p className="text-sm sm:text-base text-gray-600 mb-3">
                     You haven't joined any groups yet
                   </p>
                   <button
                     onClick={() => navigate("/groups")}
-                    className="text-primary-600 hover:text-primary-700 font-medium"
+                    className="text-primary-600 hover:text-primary-700 font-medium text-sm sm:text-base"
                   >
                     Browse Groups →
                   </button>
@@ -491,23 +491,23 @@ export const Home = () => {
 
             {/* Recent Activity */}
             <div>
-              <div className="flex items-center gap-3 mb-6">
-                <TrendingUp className="w-6 h-6 text-emerald-600" />
-                <h2 className="text-2xl font-bold text-gray-900">
+              <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+                <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600" />
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
                   Recent Activity
                 </h2>
               </div>
 
               {recentActivity.length > 0 ? (
-                <div className="space-y-3">
+                <div className="space-y-2 sm:space-y-3">
                   {recentActivity.slice(0, 4).map((activity, index) => (
                     <div
                       key={index}
-                      className="flex items-start gap-4 p-4 bg-white border border-gray-200 rounded-lg"
+                      className="flex items-start gap-3 sm:gap-4 p-3 sm:p-4 bg-white border border-gray-200 rounded-lg"
                     >
                       <div
                         className={cn(
-                          "flex items-center justify-center w-10 h-10 rounded-full shrink-0",
+                          "flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full shrink-0",
                           activity.metadata?.score >= 80
                             ? "bg-green-100"
                             : activity.metadata?.score >= 60
@@ -517,7 +517,7 @@ export const Home = () => {
                       >
                         <Trophy
                           className={cn(
-                            "w-5 h-5",
+                            "w-4 h-4 sm:w-5 sm:h-5",
                             activity.metadata?.score >= 80
                               ? "text-green-600"
                               : activity.metadata?.score >= 60
@@ -527,10 +527,10 @@ export const Home = () => {
                         />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-gray-900 truncate">
+                        <h4 className="font-medium text-gray-900 truncate text-sm sm:text-base">
                           {activity.title}
                         </h4>
-                        <p className="text-sm text-gray-600 mb-1">
+                        <p className="text-xs sm:text-sm text-gray-600 mb-1">
                           {activity.description}
                         </p>
                         <p className="text-xs text-gray-400">
@@ -539,7 +539,7 @@ export const Home = () => {
                       </div>
                       <div
                         className={cn(
-                          "text-lg font-bold",
+                          "text-base sm:text-lg font-bold flex-shrink-0",
                           activity.metadata?.score >= 80
                             ? "text-green-600"
                             : activity.metadata?.score >= 60
@@ -553,10 +553,10 @@ export const Home = () => {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-8 bg-white border border-gray-200 rounded-lg">
-                  <Calendar className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                  <p className="text-gray-600">No recent activity yet</p>
-                  <p className="text-sm text-gray-500 mt-1">
+                <div className="text-center py-6 sm:py-8 bg-white border border-gray-200 rounded-lg">
+                  <Calendar className="w-10 h-10 sm:w-12 sm:h-12 text-gray-300 mx-auto mb-3" />
+                  <p className="text-sm sm:text-base text-gray-600">No recent activity yet</p>
+                  <p className="text-xs sm:text-sm text-gray-500 mt-1">
                     Complete your first exam to see activity here
                   </p>
                 </div>
@@ -568,20 +568,20 @@ export const Home = () => {
 
       {/* Active Exams Banner */}
       {activeQuizzes.length > 0 && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="bg-emerald-600 rounded-xl p-8 text-white">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+          <div className="bg-emerald-600 rounded-xl p-6 sm:p-8 text-white">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 sm:gap-6">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
                   <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
-                  <span className="text-sm font-medium text-white opacity-90">
+                  <span className="text-xs sm:text-sm font-medium text-white opacity-90">
                     Active Now
                   </span>
                 </div>
-                <h2 className="text-2xl font-bold mb-2 text-white">
+                <h2 className="text-xl sm:text-2xl font-bold mb-2 text-white">
                   {activeQuizzes.length} Exams Available
                 </h2>
-                <p className="text-white opacity-90">
+                <p className="text-sm sm:text-base text-white opacity-90">
                   Practice exams ready for you to take right now
                 </p>
               </div>
@@ -593,10 +593,10 @@ export const Home = () => {
                     }`
                   )
                 }
-                className="inline-flex items-center gap-2 px-6 py-3 bg-white text-emerald-600 font-semibold rounded-lg hover:bg-gray-50 transition-colors shrink-0"
+                className="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-white text-emerald-600 font-semibold rounded-lg hover:bg-gray-50 transition-colors shrink-0 text-sm sm:text-base w-full md:w-auto"
               >
                 Start Now
-                <ArrowRight className="w-5 h-5 text-emerald-600" />
+                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600" />
               </button>
             </div>
           </div>
@@ -605,33 +605,33 @@ export const Home = () => {
 
       {/* About Section */}
       <section className="border-t border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
           <div className="text-center max-w-3xl mx-auto">
-            <Award className="w-12 h-12 text-emerald-600 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            <Award className="w-10 h-10 sm:w-12 sm:h-12 text-emerald-600 mx-auto mb-4" />
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">
               About PMP Exam Platform
             </h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">
               Our platform is designed to help you prepare for your PMP
               certification exam with confidence. Practice with real exam-style
               questions, track your progress, and study with peers in groups.
             </p>
-            <div className="flex flex-wrap justify-center gap-8 text-center">
+            <div className="flex flex-wrap justify-center gap-6 sm:gap-8 text-center">
               <div>
-                <div className="text-3xl font-bold text-emerald-600">
+                <div className="text-2xl sm:text-3xl font-bold text-emerald-600">
                   {dashboardStats.totalQuizzes}+
                 </div>
-                <div className="text-sm text-gray-600">Practice Exams</div>
+                <div className="text-xs sm:text-sm text-gray-600">Practice Exams</div>
               </div>
               <div>
-                <div className="text-3xl font-bold text-emerald-600">
+                <div className="text-2xl sm:text-3xl font-bold text-emerald-600">
                   {myGroups.length}
                 </div>
-                <div className="text-sm text-gray-600">Study Groups</div>
+                <div className="text-xs sm:text-sm text-gray-600">Study Groups</div>
               </div>
               <div>
-                <div className="text-3xl font-bold text-emerald-600">24/7</div>
-                <div className="text-sm text-gray-600">Available</div>
+                <div className="text-2xl sm:text-3xl font-bold text-emerald-600">24/7</div>
+                <div className="text-xs sm:text-sm text-gray-600">Available</div>
               </div>
             </div>
           </div>

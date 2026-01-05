@@ -49,7 +49,7 @@ export const DashboardLayout = ({
         <DashboardHeader title={title} subtitle={subtitle} />
 
         {/* Content Area */}
-        <main className="p-4 lg:p-6">
+        <main className="p-3 sm:p-4 md:p-5 lg:p-6">
           <div className="max-w-7xl mx-auto">{children}</div>
         </main>
       </div>
