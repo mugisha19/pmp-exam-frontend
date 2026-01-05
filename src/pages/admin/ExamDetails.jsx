@@ -26,6 +26,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
+import { useAuthStore } from "@/stores/auth.store";
 import { Spinner } from "@/components/ui";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { Button } from "@/components/ui/Button";
@@ -89,6 +90,7 @@ export default function ExamDetails() {
   const { examId } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { user } = useAuthStore();
   const [searchParams] = useSearchParams();
   const tabFromUrl = searchParams.get('tab');
   const [activeTab, setActiveTab] = useState(tabFromUrl || "overview");
@@ -139,7 +141,7 @@ export default function ExamDetails() {
     mutationFn: () => deleteQuiz(examId),
     onSuccess: () => {
       toast.success("Exam deleted successfully");
-      navigate("/admin/exams");
+      navigate("/exams");
     },
     onError: (error) => {
       toast.error(error?.message || "Failed to delete exam");
@@ -310,7 +312,7 @@ export default function ExamDetails() {
           size="sm"
           onClick={(e) => {
             e.stopPropagation();
-            navigate(`/admin/exams/${examId}/attempt/${attempt.attempt_id}`);
+            navigate(`/exams/${examId}/attempt/${attempt.attempt_id}`);
           }}
         >
           Review
@@ -321,7 +323,7 @@ export default function ExamDetails() {
 
   // Add onRowClick to navigate to attempt details
   const handleAttemptRowClick = (attempt) => {
-    navigate(`/admin/exams/${examId}/attempt/${attempt.attempt_id}`);
+    navigate(`/exams/${examId}/attempt/${attempt.attempt_id}`);
   };
 
   if (loadingExam) {
@@ -337,7 +339,7 @@ export default function ExamDetails() {
       <div className="p-6">
         <div className="text-center py-12">
           <p className="text-gray-500">Exam not found</p>
-          <Button onClick={() => navigate("/admin/exams")} className="mt-4">
+          <Button onClick={() => navigate("/exams")} className="mt-4">
             Back to Exams
           </Button>
         </div>
@@ -387,73 +389,77 @@ export default function ExamDetails() {
           <div className="flex gap-2">
             <Button
               variant="secondary"
-              onClick={() => navigate("/admin/exams")}
+              onClick={() => navigate("/exams")}
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Exams
             </Button>
-            <Button
-              variant="outline"
-              onClick={() => navigate(`/admin/exams/${examId}/edit`)}
-            >
-              <Edit2 className="w-4 h-4 mr-2" />
-              Edit
-            </Button>
-            <div className="relative inline-block" ref={statusDropdownRef}>
-              <Button
-                variant="outline"
-                disabled={statusMutation.isPending}
-                onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
-              >
-                Mark as
-                <ChevronDown
-                  className={`w-4 h-4 ml-2 transition-transform ${
-                    isStatusDropdownOpen ? "rotate-180" : ""
-                  }`}
-                />
-              </Button>
-              {isStatusDropdownOpen && (
-                <div className="absolute right-0 z-50 mt-1.5 min-w-[300px] bg-white rounded-lg shadow-lg border border-gray-200/80 py-1 animate-in fade-in slide-in-from-top-1 duration-150">
-                  {statusOptions.map((option) => {
-                    const Icon = option.icon;
-                    return (
-                      <button
-                        key={option.value}
-                        onClick={() => handleStatusSelect(option.value)}
-                        disabled={
-                          exam.status === option.value ||
-                          statusMutation.isPending
-                        }
-                        className={`w-full flex items-start gap-3 px-4 py-3 text-left text-sm transition-colors ${
-                          exam.status === option.value ||
-                          statusMutation.isPending
-                            ? "text-gray-400 cursor-not-allowed opacity-50"
-                            : "text-gray-700 hover:bg-gray-100"
-                        }`}
-                      >
-                        {Icon && (
-                          <Icon className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                        )}
-                        <div className="flex flex-col flex-1">
-                          <span className="font-medium">{option.label}</span>
-                          <span className="text-xs text-gray-500 mt-0.5">
-                            {option.description}
-                          </span>
-                        </div>
-                      </button>
-                    );
-                  })}
+            {user?.role === "admin" && (
+              <>
+                <Button
+                  variant="outline"
+                  onClick={() => navigate(`/exams/${examId}/edit`)}
+                >
+                  <Edit2 className="w-4 h-4 mr-2" />
+                  Edit
+                </Button>
+                <div className="relative inline-block" ref={statusDropdownRef}>
+                  <Button
+                    variant="outline"
+                    disabled={statusMutation.isPending}
+                    onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
+                  >
+                    Mark as
+                    <ChevronDown
+                      className={`w-4 h-4 ml-2 transition-transform ${
+                        isStatusDropdownOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  </Button>
+                  {isStatusDropdownOpen && (
+                    <div className="absolute right-0 z-50 mt-1.5 min-w-[300px] bg-white rounded-lg shadow-lg border border-gray-200/80 py-1 animate-in fade-in slide-in-from-top-1 duration-150">
+                      {statusOptions.map((option) => {
+                        const Icon = option.icon;
+                        return (
+                          <button
+                            key={option.value}
+                            onClick={() => handleStatusSelect(option.value)}
+                            disabled={
+                              exam.status === option.value ||
+                              statusMutation.isPending
+                            }
+                            className={`w-full flex items-start gap-3 px-4 py-3 text-left text-sm transition-colors ${
+                              exam.status === option.value ||
+                              statusMutation.isPending
+                                ? "text-gray-400 cursor-not-allowed opacity-50"
+                                : "text-gray-700 hover:bg-gray-100"
+                            }`}
+                          >
+                            {Icon && (
+                              <Icon className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                            )}
+                            <div className="flex flex-col flex-1">
+                              <span className="font-medium">{option.label}</span>
+                              <span className="text-xs text-gray-500 mt-0.5">
+                                {option.description}
+                              </span>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-            {(attemptsData?.total_attempts || 0) === 0 && (
-              <Button
-                variant="danger"
-                onClick={handleDelete}
-              >
-                <Trash2 className="w-4 h-4 mr-2" />
-                Delete
-              </Button>
+                {(attemptsData?.total_attempts || 0) === 0 && (
+                  <Button
+                    variant="danger"
+                    onClick={handleDelete}
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Delete
+                  </Button>
+                )}
+              </>
             )}
           </div>
         }
@@ -641,7 +647,6 @@ export default function ExamDetails() {
               columns={leaderboardColumns}
               data={leaderboard.leaderboard}
               paginated={true}
-              pageSize={10}
             />
           ) : (
             <EmptyState
@@ -713,7 +718,7 @@ export default function ExamDetails() {
                       <DataTable
                         columns={individualAttemptsColumns}
                         data={userAttempt.attempts}
-                        paginated={false}
+                        paginated={true}
                         onRowClick={handleAttemptRowClick}
                       />
                     </div>

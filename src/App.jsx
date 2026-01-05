@@ -6,8 +6,7 @@ import Toaster from "@/components/ui/Toaster";
 import { InitializeAuth } from "@/components/InitializeAuth";
 import { authRoutes } from "@/routes/auth.routes";
 import { studentRoutes } from "@/routes/student.routes";
-import { instructorRoutes } from "@/routes/instructor.routes";
-import { adminRoutes } from "@/routes/admin.routes";
+import { managementRoutes } from "@/routes/management.routes";
 import Unauthorized from "@/pages/Unauthorized";
 import { JoinGroup } from "@/pages/student";
 import { RoleBasedRedirect } from "@/components/routes/RoleBasedRedirect";
@@ -30,11 +29,8 @@ function App() {
             {/* Student routes */}
             {studentRoutes}
 
-            {/* Instructor routes */}
-            {instructorRoutes}
-
-            {/* Admin routes */}
-            {adminRoutes}
+            {/* Management routes (admin & instructor) */}
+            {managementRoutes}
 
             {/* Default redirect to dashboard */}
             <Route path="/" element={<RoleBasedRedirect />} />

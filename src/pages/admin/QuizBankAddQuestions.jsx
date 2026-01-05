@@ -177,7 +177,7 @@ export default function QuizBankAddQuestions() {
       toast.success(
         `Successfully added ${selectedQuestions.length} question(s) to quiz bank`
       );
-      navigate(`/admin/quiz-banks/${quizBankId}`);
+      navigate(`/quiz-banks/${quizBankId}`);
     } catch (error) {
       const message =
         typeof error === "object"
@@ -325,7 +325,7 @@ export default function QuizBankAddQuestions() {
           title="Quiz bank not found"
           description="The quiz bank you're looking for doesn't exist."
           actionLabel="Go Back"
-          onAction={() => navigate("/admin/quiz-banks")}
+          onAction={() => navigate("/quiz-banks")}
         />
       </div>
     );
@@ -526,7 +526,7 @@ export default function QuizBankAddQuestions() {
             variant="ghost"
             size="sm"
             leftIcon={<ArrowLeft className="w-4 h-4" />}
-            onClick={() => navigate(`/admin/quiz-banks/${quizBankId}`)}
+            onClick={() => navigate(`/quiz-banks/${quizBankId}`)}
           >
             Back to Quiz Bank
           </Button>

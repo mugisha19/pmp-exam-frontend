@@ -26,15 +26,15 @@ import {
 
 export const STUDENT_NAV_ITEMS = [
   {
-    id: "dashboard",
+    id: "home",
     label: "Home",
-    path: "/dashboard",
+    path: "/home",
     icon: LayoutDashboard,
   },
   {
-    id: "groups",
+    id: "my-groups",
     label: "Groups",
-    path: "/groups",
+    path: "/my-groups",
     icon: Users,
   },
   {
@@ -44,9 +44,9 @@ export const STUDENT_NAV_ITEMS = [
     icon: TrendingUp,
   },
   {
-    id: "reminders",
+    id: "my-reminders",
     label: "Reminders",
-    path: "/reminders",
+    path: "/my-reminders",
     icon: Bell,
   },
 ];
@@ -124,65 +124,84 @@ export const ADMIN_NAV_ITEMS = [
   {
     id: "dashboard",
     label: "Dashboard",
-    path: "/admin/dashboard",
+    path: "/dashboard",
     icon: LayoutDashboard,
+    allowedRoles: ["admin", "instructor"],
   },
   {
     id: "courses-domains",
     label: "Courses & Domains",
-    path: "/admin/courses-domains",
+    path: "/courses-domains",
     icon: FolderTree,
+    allowedRoles: ["admin"], // Admin only
   },
   {
     id: "topics",
     label: "Topics",
-    path: "/admin/topics",
+    path: "/topics",
     icon: BookMarked,
+    allowedRoles: ["admin"], // Admin only
   },
   {
     id: "questions",
     label: "Questions",
-    path: "/admin/questions",
+    path: "/questions",
     icon: FileQuestion,
+    allowedRoles: ["admin", "instructor"],
   },
   {
     id: "quiz-banks",
     label: "Quiz Banks",
-    path: "/admin/quiz-banks",
+    path: "/quiz-banks",
     icon: FileText,
+    allowedRoles: ["admin", "instructor"],
   },
   {
     id: "groups",
     label: "Groups",
-    path: "/admin/groups",
+    path: "/groups",
     icon: Users,
+    allowedRoles: ["admin", "instructor"],
   },
   {
     id: "exams",
     label: "Exams",
-    path: "/admin/exams",
+    path: "/exams",
     icon: BookOpen,
+    allowedRoles: ["admin", "instructor"],
   },
   {
     id: "users",
     label: "User Management",
-    path: "/admin/users",
+    path: "/users",
     icon: Users,
+    allowedRoles: ["admin"], // Admin only
   },
   {
     id: "support",
     label: "Support Tickets",
-    path: "/admin/support",
+    path: "/support",
     icon: MessageSquare,
+    allowedRoles: ["admin"], // Admin only
   },
 ];
 
+/**
+ * Get navigation items by role
+ * @param {string} role - User role
+ * @returns {Array} Navigation items
+ */
 export const getNavigationByRole = (role) => {
-  switch (role?.toLowerCase()) {
+  const roleLower = role?.toLowerCase();
+  
+  switch (roleLower) {
     case "admin":
       return ADMIN_NAV_ITEMS;
     case "instructor":
-      return INSTRUCTOR_NAV_ITEMS;
+      // Instructor uses admin nav but filtered by allowedRoles
+      return ADMIN_NAV_ITEMS.filter(
+        (item) => !item.allowedRoles || item.allowedRoles.includes("instructor")
+      );
     case "student":
       return STUDENT_NAV_ITEMS;
     default:

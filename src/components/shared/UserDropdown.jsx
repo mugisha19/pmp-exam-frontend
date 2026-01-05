@@ -15,9 +15,9 @@ import { Dropdown } from "../ui/Dropdown";
 const getProfilePath = (role) => {
   switch (role?.toLowerCase()) {
     case "admin":
-      return "/admin/profile";
+      return "/profile";
     case "instructor":
-      return "/instructor/profile";
+      return "/profile";
     default:
       return "/profile";
   }
@@ -27,9 +27,9 @@ const getProfilePath = (role) => {
 const getSettingsPath = (role) => {
   switch (role?.toLowerCase()) {
     case "admin":
-      return "/admin/settings";
+      return "/settings";
     case "instructor":
-      return "/instructor/settings";
+      return "/settings";
     default:
       return "/settings";
   }

@@ -117,7 +117,7 @@ export const QuestionEdit = () => {
         data,
       });
       toast.success("Question updated successfully");
-      navigate(`/admin/questions/${questionId}`);
+      navigate(`/questions/${questionId}`);
     } catch (error) {
       toast.error(error.message || "Failed to update question");
     }

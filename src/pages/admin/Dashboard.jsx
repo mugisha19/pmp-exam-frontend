@@ -393,28 +393,28 @@ export const Dashboard = () => {
       value: stats?.totalUsers || 0,
       icon: Users,
       iconBg: "bg-blue-50 text-blue-600",
-      onClick: () => navigate("/admin/users"),
+      onClick: () => navigate("/users"),
     },
     {
       title: "Instructors",
       value: stats?.totalInstructors || 0,
       icon: GraduationCap,
       iconBg: "bg-emerald-50 text-emerald-600",
-      onClick: () => navigate("/admin/users?role=instructor"),
+      onClick: () => navigate("/users?role=instructor"),
     },
     {
       title: "Students",
       value: stats?.totalStudents || 0,
       icon: BookOpen,
       iconBg: "bg-cyan-50 text-cyan-600",
-      onClick: () => navigate("/admin/users?role=student"),
+      onClick: () => navigate("/users?role=student"),
     },
     {
       title: "Active Groups",
       value: stats?.activeGroups || 0,
       icon: UsersRound,
       iconBg: "bg-orange-50 text-orange-600",
-      onClick: () => navigate("/admin/groups"),
+      onClick: () => navigate("/groups"),
     },
   ];
 
@@ -655,6 +655,7 @@ export const Dashboard = () => {
               data={topPerformers}
               isLoading={analyticsLoading}
               emptyMessage="No data"
+              paginated={true}
             />
           </CardContent>
         </Card>
@@ -673,7 +674,7 @@ export const Dashboard = () => {
               variant="ghost"
               size="sm"
               className="text-blue-600 hover:text-blue-700 text-sm font-medium"
-              onClick={() => navigate("/admin/users")}
+              onClick={() => navigate("/users")}
             >
               See All
             </Button>
@@ -739,7 +740,7 @@ export const Dashboard = () => {
               variant="ghost"
               size="sm"
               className="text-blue-600 hover:text-blue-700 text-sm font-medium"
-              onClick={() => navigate("/admin/users")}
+              onClick={() => navigate("/users")}
             >
               See All
             </Button>
@@ -785,7 +786,7 @@ export const Dashboard = () => {
                       <tr
                         key={user.user_id || user.id}
                         className="hover:bg-gray-50 cursor-pointer transition-colors"
-                        onClick={() => navigate(`/admin/users/${user.id}`)}
+                        onClick={() => navigate(`/users/${user.id}`)}
                       >
                         <td className="py-3 px-2">
                           <div className="flex items-center gap-3">
@@ -849,7 +850,7 @@ export const Dashboard = () => {
             variant="ghost"
             size="sm"
             className="text-blue-600 hover:text-blue-700 text-sm font-medium"
-            onClick={() => navigate("/admin/groups")}
+            onClick={() => navigate("/groups")}
           >
             See All
           </Button>
@@ -927,7 +928,7 @@ export const Dashboard = () => {
                     <tr
                       key={group.group_id || group.id}
                       className="hover:bg-gray-50 cursor-pointer transition-colors"
-                      onClick={() => navigate(`/admin/groups/${group.id}`)}
+                      onClick={() => navigate(`/groups/${group.id}`)}
                     >
                       <td className="py-3 px-2">
                         <div className="flex items-center gap-3">
@@ -976,7 +977,7 @@ export const Dashboard = () => {
               title="No groups yet"
               description="Groups will appear here once they are created."
               actionLabel="Create Group"
-              onAction={() => navigate("/admin/groups")}
+              onAction={() => navigate("/groups")}
             />
           )}
         </CardContent>

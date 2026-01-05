@@ -464,7 +464,7 @@ export default function CourseDomainManagement() {
                 columns={courseColumns}
                 loading={coursesLoading}
                 rowKey="course_id"
-                paginated={false}
+                paginated={true}
                 emptyMessage="No courses found"
               />
             </CardContent>
@@ -532,7 +532,7 @@ export default function CourseDomainManagement() {
                 columns={domainColumns}
                 loading={domainsLoading}
                 rowKey="domain_id"
-                paginated={false}
+                paginated={true}
                 emptyMessage="No domains found"
               />
             </CardContent>

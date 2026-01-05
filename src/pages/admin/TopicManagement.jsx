@@ -113,11 +113,11 @@ export default function TopicManagement() {
   }, []);
 
   const handleViewTopic = useCallback((topic) => {
-    navigate(`/admin/topics/${topic.topic_id}`);
+    navigate(`/topics/${topic.topic_id}`);
   }, [navigate]);
 
   const handleEditTopic = useCallback((topic) => {
-    navigate(`/admin/topics/${topic.topic_id}`);
+    navigate(`/topics/${topic.topic_id}`);
   }, [navigate]);
 
   const handleDeleteTopic = useCallback((topic) => {
@@ -374,7 +374,7 @@ export default function TopicManagement() {
               size="sm"
               onClick={() => {
                 const topic = getSelectedTopic();
-                if (topic) navigate(`/admin/topics/${topic.topic_id}`);
+                if (topic) navigate(`/topics/${topic.topic_id}`);
               }}
             >
               <Eye className="w-4 h-4 mr-1" />
@@ -385,7 +385,7 @@ export default function TopicManagement() {
               size="sm"
               onClick={() => {
                 const topic = getSelectedTopic();
-                if (topic) navigate(`/admin/topics/${topic.topic_id}`);
+                if (topic) navigate(`/topics/${topic.topic_id}`);
               }}
             >
               <Edit2 className="w-4 h-4 mr-1" />
@@ -434,10 +434,10 @@ export default function TopicManagement() {
         columns={columns}
         loading={isLoading}
         rowKey="topic_id"
-        paginated={false}
+        paginated={true}
         emptyMessage="No topics found"
         onRowClick={(topic) => {
-          navigate(`/admin/topics/${topic.topic_id}`);
+          navigate(`/topics/${topic.topic_id}`);
         }}
       />
 

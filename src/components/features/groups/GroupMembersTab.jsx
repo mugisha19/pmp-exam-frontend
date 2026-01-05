@@ -5,6 +5,7 @@
 
 import { useState, useEffect } from "react";
 import { UserMinus, Users } from "lucide-react";
+import { useAuthStore } from "@/stores/auth.store";
 import {
   useGroupMembers,
   useRemoveMemberMutation,
@@ -43,6 +44,7 @@ const getRoleBadgeVariant = (role) => {
 };
 
 export const GroupMembersTab = ({ groupId }) => {
+  const { user } = useAuthStore();
   const [removeDialogOpen, setRemoveDialogOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
 
@@ -140,6 +142,7 @@ export const GroupMembersTab = ({ groupId }) => {
         const isOwner =
           member.group_role === "owner" || member.role === "owner";
         if (isOwner) return null;
+        if (user?.role !== "admin") return null;
 
         return (
           <Button
@@ -180,8 +183,6 @@ export const GroupMembersTab = ({ groupId }) => {
         emptyMessage="No members"
         emptyDescription="This group doesn't have any members yet."
         emptyIcon={Users}
-        paginated={true}
-        pageSize={10}
         sortable={true}
       />
 

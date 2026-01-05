@@ -34,28 +34,28 @@ const QUICK_ACTIONS = [
   {
     label: "Create Question",
     icon: HelpCircle,
-    href: "/instructor/questions/new",
+    href: "/questions/new",
     color: "text-blue-400",
     bgColor: "bg-blue-500/10",
   },
   {
     label: "Create Quiz Bank",
     icon: Library,
-    href: "/instructor/quiz-banks/new",
+    href: "/quiz-banks/new",
     color: "text-teal-600",
     bgColor: "bg-teal-500/10",
   },
   {
     label: "Create Quiz",
     icon: FileText,
-    href: "/instructor/quizzes/new",
+    href: "/exams/new",
     color: "text-emerald-400",
     bgColor: "bg-emerald-500/10",
   },
   {
     label: "Create Group",
     icon: Users,
-    href: "/instructor/groups",
+    href: "/groups",
     color: "text-amber-400",
     bgColor: "bg-amber-500/10",
   },
@@ -239,7 +239,7 @@ export function Dashboard() {
               My Active Quizzes
             </h2>
             <Link
-              to="/instructor/quizzes"
+              to="/exams"
               className="text-sm text-blue-400 hover:text-blue-300 flex items-center gap-1"
             >
               View all
@@ -258,7 +258,7 @@ export function Dashboard() {
               icon={FileText}
               message="No active quizzes"
               action={
-                <Link to="/instructor/quizzes/new">
+                <Link to="/exams/new">
                   <Button size="sm">
                     <Plus className="w-4 h-4 mr-2" />
                     Create Quiz
@@ -282,7 +282,7 @@ export function Dashboard() {
               Recent Student Activity
             </h2>
             <Link
-              to="/instructor/analytics"
+              to="/analytics"
               className="text-sm text-blue-400 hover:text-blue-300 flex items-center gap-1"
             >
               View all
@@ -324,7 +324,7 @@ function ActiveQuizItem({ quiz }) {
 
   return (
     <Link
-      to={`/instructor/quizzes/${quiz.id}`}
+      to={`/exams/${quiz.id}`}
       className="block p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors"
     >
       <div className="flex items-start justify-between gap-3 mb-2">

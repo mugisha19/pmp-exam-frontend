@@ -25,6 +25,7 @@ import { Badge } from "@/components/ui/Badge";
 import { DataTable } from "@/components/shared/DataTable";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { PageHeader } from "@/components/shared/PageHeader";
+import { useAuthStore } from "@/stores/auth.store";
 import {
   useQuestions,
   useDeleteQuestionMutation,
@@ -63,6 +64,7 @@ const DOMAIN_OPTIONS = [
 
 export default function QuestionManagement() {
   const navigate = useNavigate();
+  const { user } = useAuthStore();
 
   // Filter states
   const [searchQuery, setSearchQuery] = useState("");
@@ -72,8 +74,8 @@ export default function QuestionManagement() {
   const [questionType, setQuestionType] = useState("");
   const [status, setStatus] = useState("");
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
   const [showFilters, setShowFilters] = useState(true);
-  const pageSize = 20;
 
   // Selection state
   const [selectedQuestions, setSelectedQuestions] = useState([]);
@@ -104,7 +106,7 @@ export default function QuestionManagement() {
     if (searchQuery) params.search = searchQuery;
 
     return params;
-  }, [searchQuery, topicId, domain, difficulty, questionType, status, page]);
+  }, [searchQuery, topicId, domain, difficulty, questionType, status, page, pageSize]);
 
   // Fetch questions
   const { data: questionsData, isLoading, refetch } = useQuestions(queryParams);
@@ -141,14 +143,14 @@ export default function QuestionManagement() {
 
   const handleViewQuestion = useCallback(
     (question) => {
-      navigate(`/admin/questions/${question.question_id}`);
+      navigate(`/questions/${question.question_id}`);
     },
     [navigate]
   );
 
   const handleEditQuestion = useCallback(
     (question) => {
-      navigate(`/admin/questions/${question.question_id}`);
+      navigate(`/questions/${question.question_id}`);
     },
     [navigate]
   );
@@ -549,10 +551,12 @@ export default function QuestionManagement() {
         title="Question Bank Management"
         subtitle="Manage questions organized by topics for PMP exam preparation"
         actions={
-          <Button onClick={handleCreateQuestion} size="lg">
-            <Plus className="w-5 h-5 mr-2" />
-            Create Question
-          </Button>
+          user?.role === "admin" && (
+            <Button onClick={handleCreateQuestion} size="lg">
+              <Plus className="w-5 h-5 mr-2" />
+              Create Question
+            </Button>
+          )
         }
       />
 
@@ -571,10 +575,15 @@ export default function QuestionManagement() {
         pageSize={pageSize}
         currentPage={page}
         totalPages={Math.ceil(totalCount / pageSize)}
+        totalCount={totalCount}
         onPageChange={setPage}
+        onPageSizeChange={(size) => {
+          setPageSize(size);
+          setPage(1);
+        }}
         emptyMessage="No questions found. Create your first question to get started."
         onRowClick={(question) => {
-          navigate(`/admin/questions/${question.question_id}`);
+          navigate(`/questions/${question.question_id}`);
         }}
       />
 

@@ -1,11 +1,14 @@
 /**
  * Admin Routes Configuration
- * Routes accessible to admins only
+ * Routes accessible to admins and instructors (with restrictions)
  * Uses AdminLayout as parent with nested child routes
+ * 
+ * Instructor restrictions:
+ * - Cannot access: users, instructors, students, topics, courses-domains, support
  */
 
 import { Route, Navigate } from "react-router-dom";
-import { RoleRoute } from "@/components/routes";
+import { RoleRoute, AdminOnlyRoute } from "@/components/routes";
 import AdminLayout from "@/components/layouts/AdminLayout";
 import {
   AdminDashboard,
@@ -39,27 +42,37 @@ export const adminRoutes = (
   <Route
     path="/admin"
     element={
-      <RoleRoute allowedRoles={["admin"]}>
+      <RoleRoute allowedRoles={["admin", "instructor"]}>
         <AdminLayout />
       </RoleRoute>
     }
   >
     <Route index element={<Navigate to="dashboard" replace />} />
     <Route path="dashboard" element={<AdminDashboard />} />
-    <Route path="users" element={<UserManagementPage />} />
-    <Route path="users/:userId" element={<UserDetailsPage />} />
-    <Route path="instructors" element={<AdminInstructorsPage />} />
-    <Route path="students" element={<AdminStudentsPage />} />
+    
+    {/* Admin-only routes - User Management */}
+    <Route path="users" element={<AdminOnlyRoute><UserManagementPage /></AdminOnlyRoute>} />
+    <Route path="users/:userId" element={<AdminOnlyRoute><UserDetailsPage /></AdminOnlyRoute>} />
+    <Route path="instructors" element={<AdminOnlyRoute><AdminInstructorsPage /></AdminOnlyRoute>} />
+    <Route path="students" element={<AdminOnlyRoute><AdminStudentsPage /></AdminOnlyRoute>} />
+    
+    {/* Shared routes - Exams */}
     <Route path="exams" element={<AdminExamManagementPage />} />
     <Route path="exams/:examId" element={<AdminExamDetailsPage />} />
     <Route path="exams/:examId/edit" element={<AdminExamEditPage />} />
     <Route path="exams/:examId/attempt/:attemptId" element={<QuizAttemptDetails />} />
+    
+    {/* Shared routes - Groups */}
     <Route path="groups" element={<AdminGroupsPage />} />
     <Route path="groups/:groupId" element={<AdminGroupDetailsPage />} />
     <Route path="groups/:groupId/quiz/:quizId/attempt/:attemptId" element={<QuizAttemptDetails />} />
-    <Route path="topics" element={<AdminTopicsPage />} />
-    <Route path="topics/:topicId" element={<AdminTopicDetailsPage />} />
-    <Route path="courses-domains" element={<AdminCourseDomainPage />} />
+    
+    {/* Admin-only routes - Topics & Courses */}
+    <Route path="topics" element={<AdminOnlyRoute><AdminTopicsPage /></AdminOnlyRoute>} />
+    <Route path="topics/:topicId" element={<AdminOnlyRoute><AdminTopicDetailsPage /></AdminOnlyRoute>} />
+    <Route path="courses-domains" element={<AdminOnlyRoute><AdminCourseDomainPage /></AdminOnlyRoute>} />
+    
+    {/* Shared routes - Questions & Quiz Banks */}
     <Route path="questions" element={<AdminQuestionsPage />} />
     <Route
       path="questions/:questionId"
@@ -74,12 +87,18 @@ export const adminRoutes = (
       path="quiz-banks/:quizBankId"
       element={<AdminQuizBankDetailsPage />}
     />
+    
+    {/* Shared routes - Analytics & Notifications */}
     <Route path="analytics" element={<AnalyticsPage />} />
     <Route path="notifications" element={<NotificationsPage />} />
-    <Route path="support" element={<AdminSupportTicketsPage />} />
-    <Route path="support/:ticketId" element={<AdminSupportTicketDetailsPage />} />
+    
+    {/* Admin-only routes - Support */}
+    <Route path="support" element={<AdminOnlyRoute><AdminSupportTicketsPage /></AdminOnlyRoute>} />
+    <Route path="support/:ticketId" element={<AdminOnlyRoute><AdminSupportTicketDetailsPage /></AdminOnlyRoute>} />
+    
+    {/* Shared routes - Settings & Profile */}
     <Route path="settings" element={<SystemSettingsPage />} />
     <Route path="profile" element={<AdminProfilePage />} />
-    <Route path="system" element={<SystemSettingsPage />} />
+    <Route path="system" element={<AdminOnlyRoute><SystemSettingsPage /></AdminOnlyRoute>} />
   </Route>
 );

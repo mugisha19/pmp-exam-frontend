@@ -109,14 +109,14 @@ export default function ExamManagement() {
   // CRUD handlers
   const handleViewExam = useCallback(
     (exam) => {
-      navigate(`/admin/exams/${exam.quiz_id}`);
+      navigate(`/exams/${exam.quiz_id}`);
     },
     [navigate]
   );
 
   const handleViewStats = useCallback(
     (exam) => {
-      navigate(`/admin/exams/${exam.quiz_id}/stats`);
+      navigate(`/exams/${exam.quiz_id}/stats`);
     },
     [navigate]
   );
@@ -258,7 +258,7 @@ export default function ExamManagement() {
                       columns={columns}
                       loading={false}
                       rowKey="quiz_id"
-                      paginated={false}
+                      paginated={true}
                       emptyMessage="No exams in this group"
                       onRowClick={(exam) => handleViewExam(exam)}
                     />

@@ -297,6 +297,7 @@ export function Analytics() {
             data={topPerformers}
             isLoading={isLoading}
             emptyMessage="No performance data available"
+            paginated={true}
           />
         </div>
 
@@ -310,6 +311,7 @@ export function Analytics() {
             data={activeGroups}
             isLoading={isLoading}
             emptyMessage="No group activity data available"
+            paginated={true}
           />
         </div>
       </div>

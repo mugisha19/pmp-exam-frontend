@@ -184,9 +184,9 @@ export const SupportTickets = () => {
               columns={columns}
               data={tickets}
               rowKey="ticket_id"
-              paginated={false}
+              paginated={true}
               onRowClick={(ticket) =>
-                navigate(`/admin/support/${ticket.ticket_id}`)
+                navigate(`/support/${ticket.ticket_id}`)
               }
             />
           )}

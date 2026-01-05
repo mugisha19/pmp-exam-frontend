@@ -1,6 +1,13 @@
 /**
  * Student Routes Configuration
  * Routes accessible to students - Using website layout
+ * 
+ * Student-specific paths to avoid conflict with management routes:
+ * - /home - Student home
+ * - /my-learning - Student exams/learning
+ * - /my-groups - Student groups
+ * - /my-analytics - Student analytics
+ * - /my-reminders - Student reminders
  */
 
 import { Route } from "react-router-dom";
@@ -25,35 +32,24 @@ import AttemptReview from "@/pages/student/AttemptReview";
 export const studentRoutes = (
   <Route
     element={
-      <RoleRoute allowedRoles={["student", "instructor", "admin"]}>
+      <RoleRoute allowedRoles={["student"]}>
         <StudentWebsiteLayout />
       </RoleRoute>
     }
   >
-    <Route path="/dashboard" element={<Home />} />
+    <Route path="/home" element={<Home />} />
     <Route path="/learning-paths" element={<LearningPaths />} />
     <Route path="/my-learning" element={<MyExams />} />
-    <Route path="/analytics" element={<Analytics />} />
-    <Route path="/reminders" element={<Reminders />} />
-    <Route 
-      path="/support" 
-      element={
-        <>
-          {console.log("[Route] /support matched")}
-          <Support />
-        </>
-      } 
-    />
-    <Route path="/groups" element={<Groups />} />
-    <Route path="/groups/:groupId" element={<GroupDetail />} />
-    <Route path="/exams" element={<MyExams />} />
-    <Route path="/exams/:quizId" element={<QuizDetail />} />
-    <Route path="/exams/:quizId/take" element={<QuizTaking />} />
-    <Route
-      path="/exams/:quizId/attempts/:attemptId"
-      element={<AttemptReview />}
-    />
-    <Route path="/notifications" element={<Notifications />} />
-    <Route path="/profile" element={<Profile />} />
+    <Route path="/my-analytics" element={<Analytics />} />
+    <Route path="/my-reminders" element={<Reminders />} />
+    <Route path="/my-support" element={<Support />} />
+    <Route path="/my-groups" element={<Groups />} />
+    <Route path="/my-groups/:groupId" element={<GroupDetail />} />
+    <Route path="/my-exams" element={<MyExams />} />
+    <Route path="/my-exams/:quizId" element={<QuizDetail />} />
+    <Route path="/my-exams/:quizId/take" element={<QuizTaking />} />
+    <Route path="/my-exams/:quizId/attempts/:attemptId" element={<AttemptReview />} />
+    <Route path="/my-notifications" element={<Notifications />} />
+    <Route path="/my-profile" element={<Profile />} />
   </Route>
 );

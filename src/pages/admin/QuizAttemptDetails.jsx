@@ -394,9 +394,9 @@ export const QuizAttemptDetails = () => {
             leftIcon={<ArrowLeft className="w-4 h-4" />}
             onClick={() => {
               if (examId) {
-                navigate(`/admin/exams/${examId}?tab=attempts`);
+                navigate(`/exams/${examId}?tab=attempts`);
               } else if (groupId && quizId) {
-                navigate(`/admin/groups/${groupId}/quiz/${quizId}`);
+                navigate(`/groups/${groupId}/quiz/${quizId}`);
               } else {
                 navigate(-1);
               }

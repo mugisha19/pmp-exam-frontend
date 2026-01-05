@@ -66,7 +66,7 @@ export default function ExamEdit() {
     onSuccess: () => {
       queryClient.invalidateQueries(["exam", examId]);
       toast.success("Exam updated successfully");
-      navigate(`/admin/exams/${examId}`);
+      navigate(`/exams/${examId}`);
     },
     onError: (error) => {
       toast.error(error?.message || "Failed to update exam");
@@ -147,7 +147,7 @@ export default function ExamEdit() {
       <div className="p-6">
         <div className="text-center py-12">
           <p className="text-gray-500">Exam not found</p>
-          <Button onClick={() => navigate("/admin/exams")} className="mt-4">
+          <Button onClick={() => navigate("/exams")} className="mt-4">
             Back to Exams
           </Button>
         </div>
@@ -163,7 +163,7 @@ export default function ExamEdit() {
         actions={
           <Button
             variant="secondary"
-            onClick={() => navigate(`/admin/exams/${examId}`)}
+            onClick={() => navigate(`/exams/${examId}`)}
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Exam
@@ -427,7 +427,7 @@ export default function ExamEdit() {
             <Button
               type="button"
               variant="secondary"
-              onClick={() => navigate(`/admin/exams/${examId}`)}
+              onClick={() => navigate(`/exams/${examId}`)}
             >
               Cancel
             </Button>

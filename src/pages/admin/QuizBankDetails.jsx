@@ -21,6 +21,7 @@ import {
   useDeleteQuizBankMutation,
 } from "@/hooks/queries/useQuizBankQueries";
 import { queryKeys } from "@/lib/query-client";
+import { useAuthStore } from "@/stores/auth.store";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { Card, CardContent } from "@/components/ui/Card";
@@ -66,6 +67,7 @@ export const QuizBankDetails = () => {
   const { quizBankId } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { user } = useAuthStore();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
   const [isAddQuestionsModalOpen, setIsAddQuestionsModalOpen] = useState(false);
@@ -112,7 +114,7 @@ export const QuizBankDetails = () => {
 
       await deleteQuizBankMutation.mutateAsync(quizBankId);
       // Navigate immediately to prevent further queries
-      navigate("/admin/quiz-banks");
+      navigate("/quiz-banks");
     } catch (error) {
       const message =
         typeof error === "object"
@@ -141,7 +143,7 @@ export const QuizBankDetails = () => {
           variant="ghost"
           size="sm"
           leftIcon={<ArrowLeft className="w-4 h-4" />}
-          onClick={() => navigate("/admin/quiz-banks")}
+          onClick={() => navigate("/quiz-banks")}
         >
           Back to Quiz Banks
         </Button>
@@ -150,7 +152,7 @@ export const QuizBankDetails = () => {
           title="Error loading quiz bank"
           description={error?.message || "Failed to load quiz bank details"}
           actionLabel="Go Back"
-          onAction={() => navigate("/admin/quiz-banks")}
+          onAction={() => navigate("/quiz-banks")}
         />
       </div>
     );
@@ -164,7 +166,7 @@ export const QuizBankDetails = () => {
           variant="ghost"
           size="sm"
           leftIcon={<ArrowLeft className="w-4 h-4" />}
-          onClick={() => navigate("/admin/quiz-banks")}
+          onClick={() => navigate("/quiz-banks")}
         >
           Back to Quiz Banks
         </Button>
@@ -173,7 +175,7 @@ export const QuizBankDetails = () => {
           title="Quiz bank not found"
           description="The quiz bank you're looking for doesn't exist or has been deleted."
           actionLabel="Go Back"
-          onAction={() => navigate("/admin/quiz-banks")}
+          onAction={() => navigate("/quiz-banks")}
         />
       </div>
     );
@@ -228,37 +230,41 @@ export const QuizBankDetails = () => {
         subtitle={quizBank.description || "No description provided"}
         actions={
           <div className="flex items-center gap-2">
-            <Button
-              variant="primary"
-              size="sm"
-              leftIcon={<Send className="w-4 h-4" />}
-              onClick={() => setIsPublishModalOpen(true)}
-              disabled={!questions || questions.length === 0}
-            >
-              Publish Quiz
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              leftIcon={<Edit2 className="w-4 h-4" />}
-              onClick={() => setIsEditModalOpen(true)}
-            >
-              Edit Details
-            </Button>
-            <Button
-              variant="danger"
-              size="sm"
-              leftIcon={<Trash2 className="w-4 h-4" />}
-              onClick={() => setIsDeleteDialogOpen(true)}
-              disabled={deleteQuizBankMutation.isPending}
-            >
-              Delete
-            </Button>
+            {user?.role === "admin" && (
+              <>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  leftIcon={<Send className="w-4 h-4" />}
+                  onClick={() => setIsPublishModalOpen(true)}
+                  disabled={!questions || questions.length === 0}
+                >
+                  Publish Quiz
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  leftIcon={<Edit2 className="w-4 h-4" />}
+                  onClick={() => setIsEditModalOpen(true)}
+                >
+                  Edit Details
+                </Button>
+                <Button
+                  variant="danger"
+                  size="sm"
+                  leftIcon={<Trash2 className="w-4 h-4" />}
+                  onClick={() => setIsDeleteDialogOpen(true)}
+                  disabled={deleteQuizBankMutation.isPending}
+                >
+                  Delete
+                </Button>
+              </>
+            )}
             <Button
               variant="ghost"
               size="sm"
               leftIcon={<ArrowLeft className="w-4 h-4" />}
-              onClick={() => navigate("/admin/quiz-banks")}
+              onClick={() => navigate("/quiz-banks")}
             >
               Back to Quiz Banks
             </Button>
@@ -294,13 +300,15 @@ export const QuizBankDetails = () => {
                 {questions.length} question(s) in this quiz bank
               </p>
             </div>
-            <Button
-              size="sm"
-              leftIcon={<Plus className="w-4 h-4" />}
-              onClick={() => setIsAddQuestionsModalOpen(true)}
-            >
-              Add Questions
-            </Button>
+            {user?.role === "admin" && (
+              <Button
+                size="sm"
+                leftIcon={<Plus className="w-4 h-4" />}
+                onClick={() => setIsAddQuestionsModalOpen(true)}
+              >
+                Add Questions
+              </Button>
+            )}
           </div>
 
           {questionsLoading ? (
@@ -313,11 +321,11 @@ export const QuizBankDetails = () => {
             <EmptyState
               icon={FileQuestion}
               title="No questions yet"
-              description="Add questions to this quiz bank to get started"
-              actionLabel="Add Questions"
-              onAction={() =>
-                navigate(`/admin/quiz-banks/${quizBankId}/add-questions`)
-              }
+              description={user?.role === "admin" ? "Add questions to this quiz bank to get started" : "This quiz bank has no questions yet"}
+              actionLabel={user?.role === "admin" ? "Add Questions" : undefined}
+              onAction={user?.role === "admin" ? () =>
+                navigate(`/quiz-banks/${quizBankId}/add-questions`)
+              : undefined}
             />
           ) : (
             <DataTable
@@ -325,8 +333,9 @@ export const QuizBankDetails = () => {
               columns={questionColumns}
               rowKey="question_id"
               emptyMessage="No questions found"
+              paginated={true}
               onRowClick={(question) => {
-                navigate(`/admin/questions/${question.question_id}`);
+                navigate(`/questions/${question.question_id}`);
               }}
             />
           )}

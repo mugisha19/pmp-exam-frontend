@@ -114,7 +114,7 @@ export const GroupQuizzesTab = ({ groupId }) => {
     console.log('Quiz clicked:', quiz);
     const quizId = quiz.quiz_id || quiz.id;
     console.log('Quiz ID:', quizId);
-    navigate(`/admin/exams/${quizId}`);
+    navigate(`/exams/${quizId}`);
   };
 
   // Table columns

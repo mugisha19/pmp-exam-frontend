@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useMutation } from "@tanstack/react-query";
+import { useAuthStore } from "@/stores/auth.store";
 
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -49,13 +50,14 @@ const STATUS_OPTIONS = [
 
 export default function GroupManagement() {
   const navigate = useNavigate();
+  const { user } = useAuthStore();
 
   // Filter states
   const [searchQuery, setSearchQuery] = useState("");
   const [groupType, setGroupType] = useState("");
   const [status, setStatus] = useState("");
   const [page, setPage] = useState(1);
-  const pageSize = 10;
+  const [pageSize, setPageSize] = useState(5);
 
   // Selection state
   const [selectedGroups, setSelectedGroups] = useState([]);
@@ -181,7 +183,7 @@ export default function GroupManagement() {
   }, []);
 
   const handleViewMembers = useCallback((group) => {
-    navigate(`/admin/groups/${group.group_id}`);
+    navigate(`/groups/${group.group_id}`);
   }, [navigate]);
 
   const handleDeleteGroup = useCallback((group) => {
@@ -231,7 +233,7 @@ export default function GroupManagement() {
 
   const handleViewGroup = useCallback(
     (group) => {
-      navigate(`/admin/groups/${group.group_id}`);
+      navigate(`/groups/${group.group_id}`);
     },
     [navigate]
   );
@@ -431,7 +433,7 @@ export default function GroupManagement() {
               size="sm"
               onClick={() => {
                 const group = getSelectedGroup();
-                if (group) navigate(`/admin/groups/${group.group_id}`);
+                if (group) navigate(`/groups/${group.group_id}`);
               }}
             >
               <Eye className="w-4 h-4 mr-1" />
@@ -442,7 +444,7 @@ export default function GroupManagement() {
               size="sm"
               onClick={() => {
                 const group = getSelectedGroup();
-                if (group) navigate(`/admin/groups/${group.group_id}`);
+                if (group) navigate(`/groups/${group.group_id}`);
               }}
             >
               <Edit2 className="w-4 h-4 mr-1" />
@@ -453,7 +455,7 @@ export default function GroupManagement() {
               size="sm"
               onClick={() => {
                 const group = getSelectedGroup();
-                if (group) navigate(`/admin/groups/${group.group_id}`);
+                if (group) navigate(`/groups/${group.group_id}`);
               }}
             >
               <Users className="w-4 h-4 mr-1" />
@@ -497,10 +499,12 @@ export default function GroupManagement() {
         title="Group Management"
         subtitle="Manage groups and their members"
         actions={
-          <Button onClick={handleCreateGroup}>
-            <Plus className="w-4 h-4 mr-2" />
-            Create Group
-          </Button>
+          user?.role === "admin" && (
+            <Button onClick={handleCreateGroup}>
+              <Plus className="w-4 h-4 mr-2" />
+              Create Group
+            </Button>
+          )
         }
       />
 
@@ -517,10 +521,15 @@ export default function GroupManagement() {
         pageSize={pageSize}
         currentPage={page}
         totalPages={Math.ceil(totalCount / pageSize)}
+        totalCount={totalCount}
         onPageChange={setPage}
+        onPageSizeChange={(size) => {
+          setPageSize(size);
+          setPage(1);
+        }}
         emptyMessage="No groups found"
         onRowClick={(group) => {
-          navigate(`/admin/groups/${group.group_id}`);
+          navigate(`/groups/${group.group_id}`);
         }}
       />
 

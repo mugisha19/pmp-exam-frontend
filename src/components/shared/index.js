@@ -52,3 +52,6 @@ export { default as ViewToggle } from "./ViewToggle";
 export { default as CountdownTimer } from "./CountdownTimer";
 export { default as AttemptBadge } from "./AttemptBadge";
 export { default as ActivityStats } from "./ActivityStats";
+
+// Role-based access components
+export { RoleGuard } from "./RoleGuard";

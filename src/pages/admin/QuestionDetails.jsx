@@ -19,6 +19,7 @@ import {
   useQuestion,
   useDeleteQuestionMutation,
 } from "@/hooks/queries/useQuestionQueries";
+import { useAuthStore } from "@/stores/auth.store";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { EmptyState } from "@/components/shared/EmptyState";
@@ -79,7 +80,7 @@ const renderOptions = (question) => {
                 <span className="font-medium text-gray-700">
                   {String.fromCharCode(65 + index)}.
                 </span>{" "}
-                {item}
+                {typeof item === 'object' ? item.text : item}
               </div>
             ))}
           </div>
@@ -93,7 +94,7 @@ const renderOptions = (question) => {
                 className="p-3 bg-gray-50 rounded-lg border border-gray-200"
               >
                 <span className="font-medium text-gray-700">{index + 1}.</span>{" "}
-                {item}
+                {typeof item === 'object' ? item.text : item}
               </div>
             ))}
           </div>
@@ -101,17 +102,28 @@ const renderOptions = (question) => {
         <div>
           <h4 className="font-semibold text-gray-900 mb-3">Correct Matches</h4>
           <div className="space-y-2">
-            {matchingOptions.correct_matches?.map((match, index) => (
-              <div
-                key={index}
-                className="p-3 bg-green-50 rounded-lg border border-green-200"
-              >
-                <span className="font-medium text-green-700">
-                  {String.fromCharCode(65 + match.left)} matches with{" "}
-                  {match.right + 1}
-                </span>
-              </div>
-            ))}
+            {matchingOptions.correct_matches?.map((match, index) => {
+              const leftItem = matchingOptions.left_items?.find(
+                (item) => item.id === match.left_id
+              );
+              const rightItem = matchingOptions.right_items?.find(
+                (item) => item.id === match.right_id
+              );
+              return (
+                <div
+                  key={index}
+                  className="p-3 bg-green-50 rounded-lg border border-green-200 flex items-center gap-2"
+                >
+                  <span className="font-medium text-green-700">
+                    {leftItem?.text || match.left_id}
+                  </span>
+                  <span className="text-green-600">→</span>
+                  <span className="font-medium text-green-700">
+                    {rightItem?.text || match.right_id}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -171,6 +183,7 @@ const renderOptions = (question) => {
 export const QuestionDetails = () => {
   const { questionId } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuthStore();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
@@ -189,7 +202,7 @@ export const QuestionDetails = () => {
     try {
       await deleteQuestionMutation.mutateAsync(questionId);
       toast.success("Question deleted successfully");
-      navigate("/admin/questions");
+      navigate("/questions");
     } catch (error) {
       toast.error(error.message || "Failed to delete question");
     }
@@ -273,22 +286,26 @@ export const QuestionDetails = () => {
         subtitle={`View and manage question information`}
         actions={
           <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              leftIcon={<Edit2 className="w-4 h-4" />}
-              onClick={() => setIsEditModalOpen(true)}
-            >
-              Edit Question
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              leftIcon={<Trash2 className="w-4 h-4" />}
-              onClick={() => setIsDeleteDialogOpen(true)}
-            >
-              Delete
-            </Button>
+            {user?.role === "admin" && (
+              <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  leftIcon={<Edit2 className="w-4 h-4" />}
+                  onClick={() => setIsEditModalOpen(true)}
+                >
+                  Edit Question
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  leftIcon={<Trash2 className="w-4 h-4" />}
+                  onClick={() => setIsDeleteDialogOpen(true)}
+                >
+                  Delete
+                </Button>
+              </>
+            )}
             <Button
               variant="ghost"
               size="sm"

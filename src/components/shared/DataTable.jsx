@@ -1,14 +1,17 @@
 /**
  * DataTable Component
  * Reusable table with sorting, pagination, selection, and loading states
+ * Supports both client-side and server-side pagination
  */
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { cn } from "@/utils/cn";
 import { ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react";
 import { Card } from "../ui/Card";
 import { Skeleton } from "../ui/Skeleton";
 import EmptyState from "./EmptyState";
+
+const PAGE_SIZE_OPTIONS = [5, 10, 50, 100];
 
 export const DataTable = ({
   columns = [],
@@ -21,7 +24,13 @@ export const DataTable = ({
   onRowClick,
   sortable = true,
   paginated = true,
-  pageSize = 10,
+  pageSize: initialPageSize = 5,
+  // Server-side pagination props
+  currentPage: externalCurrentPage,
+  totalPages: externalTotalPages,
+  totalCount: externalTotalCount,
+  onPageChange: externalOnPageChange,
+  onPageSizeChange: externalOnPageSizeChange,
   // Selection props
   selectable = false,
   selectedRows = [],
@@ -31,14 +40,29 @@ export const DataTable = ({
 }) => {
   const [sortColumn, setSortColumn] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [internalCurrentPage, setInternalCurrentPage] = useState(1);
+  const [internalPageSize, setInternalPageSize] = useState(initialPageSize);
+
+  // Determine if using server-side pagination
+  const isServerSide = externalOnPageChange !== undefined;
+  
+  // Use external or internal pagination state
+  const currentPage = isServerSide ? externalCurrentPage : internalCurrentPage;
+  const pageSize = internalPageSize;
+
+  // Reset page when data changes (for client-side)
+  useEffect(() => {
+    if (!isServerSide) {
+      setInternalCurrentPage(1);
+    }
+  }, [data, isServerSide]);
 
   // Ensure data is always an array
   const safeData = Array.isArray(data) ? data : [];
 
-  // Sorting logic
+  // Sorting logic (only for client-side)
   const sortedData = useMemo(() => {
-    if (!sortColumn || !sortable) return safeData;
+    if (!sortColumn || !sortable || isServerSide) return safeData;
 
     return [...safeData].sort((a, b) => {
       const aValue = a[sortColumn];
@@ -49,18 +73,30 @@ export const DataTable = ({
       const comparison = aValue < bValue ? -1 : 1;
       return sortDirection === "asc" ? comparison : -comparison;
     });
-  }, [safeData, sortColumn, sortDirection, sortable]);
+  }, [safeData, sortColumn, sortDirection, sortable, isServerSide]);
 
-  // Pagination logic
+  // Pagination logic (only for client-side)
   const paginatedData = useMemo(() => {
-    if (!paginated) return sortedData;
+    if (!paginated || isServerSide) return sortedData;
 
-    const startIndex = (currentPage - 1) * pageSize;
+    const startIndex = (internalCurrentPage - 1) * pageSize;
     const endIndex = startIndex + pageSize;
     return sortedData.slice(startIndex, endIndex);
-  }, [sortedData, currentPage, pageSize, paginated]);
+  }, [sortedData, internalCurrentPage, pageSize, paginated, isServerSide]);
 
-  const totalPages = Math.ceil(sortedData.length / pageSize);
+  // Calculate total pages
+  const totalPages = isServerSide 
+    ? externalTotalPages 
+    : Math.max(1, Math.ceil(sortedData.length / pageSize));
+
+  // Calculate total count for display
+  const totalCount = isServerSide 
+    ? (externalTotalCount || (externalTotalPages * pageSize))
+    : sortedData.length;
+
+  // Calculate display range
+  const startItem = totalCount === 0 ? 0 : (currentPage - 1) * pageSize + 1;
+  const endItem = Math.min(currentPage * pageSize, totalCount);
 
   const handleSort = (columnKey) => {
     if (!sortable) return;
@@ -74,8 +110,28 @@ export const DataTable = ({
   };
 
   const handlePageChange = (page) => {
-    setCurrentPage(Math.max(1, Math.min(page, totalPages)));
+    const newPage = Math.max(1, Math.min(page, totalPages));
+    if (isServerSide) {
+      externalOnPageChange(newPage);
+    } else {
+      setInternalCurrentPage(newPage);
+    }
   };
+
+  const handlePageSizeChange = (newSize) => {
+    const size = parseInt(newSize, 10);
+    setInternalPageSize(size);
+    
+    if (isServerSide && externalOnPageSizeChange) {
+      externalOnPageSizeChange(size);
+    } else {
+      // Reset to page 1 when changing page size
+      setInternalCurrentPage(1);
+    }
+  };
+
+  // Get data to display
+  const displayData = isServerSide ? safeData : paginatedData;
 
   // Selection handlers
   const isRowSelected = (row) => {
@@ -84,13 +140,13 @@ export const DataTable = ({
   };
 
   const isAllSelected = () => {
-    if (paginatedData.length === 0) return false;
-    return paginatedData.every((row) => selectedRows.includes(row[rowKey]));
+    if (displayData.length === 0) return false;
+    return displayData.every((row) => selectedRows.includes(row[rowKey]));
   };
 
   const isSomeSelected = () => {
     return (
-      paginatedData.some((row) => selectedRows.includes(row[rowKey])) &&
+      displayData.some((row) => selectedRows.includes(row[rowKey])) &&
       !isAllSelected()
     );
   };
@@ -100,13 +156,13 @@ export const DataTable = ({
 
     if (isAllSelected()) {
       // Deselect all on current page
-      const currentPageKeys = paginatedData.map((row) => row[rowKey]);
+      const currentPageKeys = displayData.map((row) => row[rowKey]);
       onSelectionChange(
         selectedRows.filter((key) => !currentPageKeys.includes(key))
       );
     } else {
       // Select all on current page
-      const currentPageKeys = paginatedData.map((row) => row[rowKey]);
+      const currentPageKeys = displayData.map((row) => row[rowKey]);
       const newSelection = [...new Set([...selectedRows, ...currentPageKeys])];
       onSelectionChange(newSelection);
     }
@@ -164,7 +220,7 @@ export const DataTable = ({
               </tr>
             </thead>
             <tbody>
-              {Array.from({ length: 5 }).map((_, rowIndex) => (
+              {Array.from({ length: Math.min(pageSize, 5) }).map((_, rowIndex) => (
                 <tr key={rowIndex} className="border-b border-gray-200">
                   {selectable && (
                     <td className="px-4 py-4">
@@ -181,11 +237,18 @@ export const DataTable = ({
             </tbody>
           </table>
         </div>
+        {/* Pagination skeleton */}
+        {paginated && (
+          <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200">
+            <Skeleton width={200} height={20} />
+            <Skeleton width={300} height={32} />
+          </div>
+        )}
       </Card>
     );
   }
 
-  // Empty state
+  // Empty state - still show pagination controls
   if (!data || data.length === 0) {
     return (
       <Card className={className}>
@@ -195,6 +258,30 @@ export const DataTable = ({
           icon={emptyIcon}
           action={emptyAction}
         />
+        {/* Always show pagination controls */}
+        {paginated && (
+          <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-500">Rows per page:</span>
+                <select
+                  value={pageSize}
+                  onChange={(e) => handlePageSizeChange(e.target.value)}
+                  className="px-2 py-1 text-sm border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  {PAGE_SIZE_OPTIONS.map((size) => (
+                    <option key={size} value={size}>
+                      {size}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <span className="text-sm text-gray-500">
+                Showing 0 of 0 results
+              </span>
+            </div>
+          </div>
+        )}
       </Card>
     );
   }
@@ -252,7 +339,7 @@ export const DataTable = ({
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {paginatedData.map((row, rowIndex) => (
+            {displayData.map((row, rowIndex) => (
               <tr
                 key={row[rowKey] || rowIndex}
                 onClick={() => onRowClick?.(row)}
@@ -298,14 +385,29 @@ export const DataTable = ({
         </table>
       </div>
 
-      {/* Pagination */}
-      {paginated && totalPages > 1 && (
+      {/* Pagination - Always show when paginated is true */}
+      {paginated && (
         <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200">
-          <div className="text-sm text-gray-500">
-            Showing {(currentPage - 1) * pageSize + 1} to{" "}
-            {Math.min(currentPage * pageSize, sortedData.length)} of{" "}
-            {sortedData.length} results
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-500">Rows per page:</span>
+              <select
+                value={pageSize}
+                onChange={(e) => handlePageSizeChange(e.target.value)}
+                className="px-2 py-1 text-sm border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                {PAGE_SIZE_OPTIONS.map((size) => (
+                  <option key={size} value={size}>
+                    {size}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <span className="text-sm text-gray-500">
+              Showing {startItem} to {endItem} of {totalCount} results
+            </span>
           </div>
+          
           <div className="flex items-center gap-2">
             <button
               onClick={() => handlePageChange(currentPage - 1)}

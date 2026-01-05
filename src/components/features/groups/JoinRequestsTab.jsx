@@ -185,7 +185,6 @@ export const JoinRequestsTab = ({ groupId }) => {
         emptyDescription="There are no pending join requests for this group."
         emptyIcon={UserPlus}
         paginated={true}
-        pageSize={10}
         sortable={true}
       />
 

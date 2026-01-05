@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import { useAuthStore } from "@/stores/auth.store";
 import { useGroup } from "@/hooks/queries/useGroupQueries";
 import { useUser } from "@/hooks/queries/useUserQueries";
 import * as groupService from "@/services/group.service";
@@ -70,6 +71,7 @@ export const GroupDetails = () => {
   const { groupId } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { user } = useAuthStore();
   const [activeTab, setActiveTab] = useState("members");
   const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
@@ -244,7 +246,7 @@ export const GroupDetails = () => {
           variant="ghost"
           size="sm"
           leftIcon={<ArrowLeft className="w-4 h-4" />}
-          onClick={() => navigate("/admin/groups")}
+          onClick={() => navigate("/groups")}
         >
           Back to Groups
         </Button>
@@ -256,7 +258,7 @@ export const GroupDetails = () => {
             "An error occurred while loading the group details."
           }
           actionLabel="Go Back"
-          onAction={() => navigate("/admin/groups")}
+          onAction={() => navigate("/groups")}
         />
       </div>
     );
@@ -270,7 +272,7 @@ export const GroupDetails = () => {
           variant="ghost"
           size="sm"
           leftIcon={<ArrowLeft className="w-4 h-4" />}
-          onClick={() => navigate("/admin/groups")}
+          onClick={() => navigate("/groups")}
         >
           Back to Groups
         </Button>
@@ -279,7 +281,7 @@ export const GroupDetails = () => {
           title="Group not found"
           description="The group you're looking for doesn't exist or has been deleted."
           actionLabel="Go Back"
-          onAction={() => navigate("/admin/groups")}
+          onAction={() => navigate("/groups")}
         />
       </div>
     );
@@ -297,83 +299,85 @@ export const GroupDetails = () => {
         }
         subtitle={group.description || "No description provided"}
         actions={
-          <div className="flex items-center gap-2">
-            <Button
-              variant="primary"
-              size="sm"
-              leftIcon={<UserPlus className="w-4 h-4" />}
-              onClick={() => setIsAddMemberModalOpen(true)}
-            >
-              Add Member
-            </Button>
-            {isPrivateGroup && (
+          user?.role === "admin" && (
+            <div className="flex items-center gap-2">
               <Button
                 variant="primary"
                 size="sm"
-                leftIcon={<Copy className="w-4 h-4" />}
-                onClick={handleCopyInviteLink}
-                loading={generateInviteMutation.isPending}
+                leftIcon={<UserPlus className="w-4 h-4" />}
+                onClick={() => setIsAddMemberModalOpen(true)}
               >
-                Copy Invite Link
+                Add Member
               </Button>
-            )}
-            <div className="relative inline-block" ref={statusDropdownRef}>
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={statusMutation.isPending}
-                onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
-              >
-                Mark as
-                <ChevronDown
-                  className={`w-4 h-4 ml-2 transition-transform ${
-                    isStatusDropdownOpen ? "rotate-180" : ""
-                  }`}
-                />
-              </Button>
-              {isStatusDropdownOpen && (
-                <div className="absolute right-0 z-50 mt-1.5 min-w-[300px] bg-white rounded-lg shadow-lg border border-gray-200/80 py-1 animate-in fade-in slide-in-from-top-1 duration-150">
-                  {statusOptions.map((option) => {
-                    const Icon = option.icon;
-                    return (
-                      <button
-                        key={option.value}
-                        onClick={() => handleStatusSelect(option.value)}
-                        disabled={
-                          group.status === option.value ||
-                          statusMutation.isPending
-                        }
-                        className={`w-full flex items-start gap-3 px-4 py-3 text-left text-sm transition-colors ${
-                          group.status === option.value ||
-                          statusMutation.isPending
-                            ? "text-gray-400 cursor-not-allowed opacity-50"
-                            : "text-gray-700 hover:bg-gray-100"
-                        }`}
-                      >
-                        {Icon && (
-                          <Icon className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                        )}
-                        <div className="flex flex-col flex-1">
-                          <span className="font-medium">{option.label}</span>
-                          <span className="text-xs text-gray-500 mt-0.5">
-                            {option.description}
-                          </span>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
+              {isPrivateGroup && (
+                <Button
+                  variant="primary"
+                  size="sm"
+                  leftIcon={<Copy className="w-4 h-4" />}
+                  onClick={handleCopyInviteLink}
+                  loading={generateInviteMutation.isPending}
+                >
+                  Copy Invite Link
+                </Button>
               )}
+              <div className="relative inline-block" ref={statusDropdownRef}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={statusMutation.isPending}
+                  onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
+                >
+                  Mark as
+                  <ChevronDown
+                    className={`w-4 h-4 ml-2 transition-transform ${
+                      isStatusDropdownOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </Button>
+                {isStatusDropdownOpen && (
+                  <div className="absolute right-0 z-50 mt-1.5 min-w-[300px] bg-white rounded-lg shadow-lg border border-gray-200/80 py-1 animate-in fade-in slide-in-from-top-1 duration-150">
+                    {statusOptions.map((option) => {
+                      const Icon = option.icon;
+                      return (
+                        <button
+                          key={option.value}
+                          onClick={() => handleStatusSelect(option.value)}
+                          disabled={
+                            group.status === option.value ||
+                            statusMutation.isPending
+                          }
+                          className={`w-full flex items-start gap-3 px-4 py-3 text-left text-sm transition-colors ${
+                            group.status === option.value ||
+                            statusMutation.isPending
+                              ? "text-gray-400 cursor-not-allowed opacity-50"
+                              : "text-gray-700 hover:bg-gray-100"
+                          }`}
+                        >
+                          {Icon && (
+                            <Icon className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                          )}
+                          <div className="flex flex-col flex-1">
+                            <span className="font-medium">{option.label}</span>
+                            <span className="text-xs text-gray-500 mt-0.5">
+                              {option.description}
+                            </span>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                leftIcon={<ArrowLeft className="w-4 h-4" />}
+                onClick={() => navigate("/groups")}
+              >
+                Back to Groups
+              </Button>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              leftIcon={<ArrowLeft className="w-4 h-4" />}
-              onClick={() => navigate("/admin/groups")}
-            >
-              Back to Groups
-            </Button>
-          </div>
+          )
         }
       />
 
@@ -488,7 +492,7 @@ export const GroupDetails = () => {
               Quizzes
             </div>
           </TabsTrigger>
-          {isPrivateGroup && (
+          {user?.role === "admin" && isPrivateGroup && (
             <TabsTrigger value="requests">
               <div className="flex items-center gap-2">
                 <UserPlus className="w-4 h-4" />

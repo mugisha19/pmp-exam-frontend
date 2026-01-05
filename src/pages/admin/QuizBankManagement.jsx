@@ -18,6 +18,7 @@ import {
   Send,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
+import { useAuthStore } from "@/stores/auth.store";
 
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -50,11 +51,12 @@ const formatDate = (dateStr) => {
 
 export default function QuizBankManagement() {
   const navigate = useNavigate();
+  const { user } = useAuthStore();
 
   // Filter states
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(1);
-  const pageSize = 10;
+  const [pageSize, setPageSize] = useState(5);
 
   // Selection state
   const [selectedQuizBanks, setSelectedQuizBanks] = useState([]);
@@ -121,7 +123,7 @@ export default function QuizBankManagement() {
   }, []);
 
   const handleEditQuizBank = useCallback((quizBank) => {
-    navigate(`/admin/quiz-banks/${quizBank.quiz_bank_id}`);
+    navigate(`/quiz-banks/${quizBank.quiz_bank_id}`);
   }, [navigate]);
 
   const handlePublishQuizBank = useCallback((quizBank) => {
@@ -178,7 +180,7 @@ export default function QuizBankManagement() {
 
   const handleViewQuizBank = useCallback(
     (quizBank) => {
-      navigate(`/admin/quiz-banks/${quizBank.quiz_bank_id}`);
+      navigate(`/quiz-banks/${quizBank.quiz_bank_id}`);
     },
     [navigate]
   );
@@ -337,10 +339,12 @@ export default function QuizBankManagement() {
         title="Quiz Bank Management"
         subtitle="Manage quiz bank templates and their questions"
         actions={
-          <Button onClick={handleCreateQuizBank}>
-            <Plus className="w-4 h-4 mr-2" />
-            Create Quiz Bank
-          </Button>
+          user?.role === "admin" && (
+            <Button onClick={handleCreateQuizBank}>
+              <Plus className="w-4 h-4 mr-2" />
+              Create Quiz Bank
+            </Button>
+          )
         }
       />
 
@@ -357,10 +361,15 @@ export default function QuizBankManagement() {
         pageSize={pageSize}
         currentPage={page}
         totalPages={Math.ceil(totalCount / pageSize)}
+        totalCount={totalCount}
         onPageChange={setPage}
+        onPageSizeChange={(size) => {
+          setPageSize(size);
+          setPage(1);
+        }}
         emptyMessage="No quiz banks found"
         onRowClick={(quizBank) => {
-          navigate(`/admin/quiz-banks/${quizBank.quiz_bank_id}`);
+          navigate(`/quiz-banks/${quizBank.quiz_bank_id}`);
         }}
       />
 

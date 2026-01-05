@@ -76,7 +76,7 @@ export const TopicDetails = () => {
     try {
       await deleteTopicMutation.mutateAsync(topicId);
       toast.success("Topic deleted successfully");
-      navigate("/admin/topics");
+      navigate("/topics");
     } catch (error) {
       toast.error(error.message || "Failed to delete topic");
     }
@@ -173,7 +173,7 @@ export const TopicDetails = () => {
               variant="ghost"
               size="sm"
               leftIcon={<ArrowLeft className="w-4 h-4" />}
-              onClick={() => navigate("/admin/topics")}
+              onClick={() => navigate("/topics")}
             >
               Go Back
             </Button>
