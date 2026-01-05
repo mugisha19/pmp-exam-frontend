@@ -31,7 +31,7 @@ export const Footer = () => {
     {
       title: "Community",
       links: [
-        { label: "Study Groups", path: "/groups" },
+        { label: "Study Groups", path: "/my-groups" },
       ],
     },
     {
@@ -62,11 +62,11 @@ export const Footer = () => {
                 to="/dashboard"
                 className="flex items-center gap-3 group mb-4"
               >
-                <div className="flex items-center justify-center w-12 h-12 bg-gradient-emerald rounded-xl shadow-lg group-hover:shadow-glow transition-all duration-300">
+                <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300">
                   <GraduationCap className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold bg-gradient-emerald bg-clip-text text-transparent">
+                  <h2 className="text-2xl font-bold bg-gradient-to-r from-primary-500 to-secondary-500 bg-clip-text text-transparent">
                     PMP Portal
                   </h2>
                   <p className="text-xs text-text-tertiary font-medium">

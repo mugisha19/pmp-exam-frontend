@@ -22,7 +22,7 @@ export const CTASection = ({
           className={cn(
             "relative overflow-hidden rounded-3xl px-8 py-16 lg:px-16 lg:py-20",
             variant === "gradient" &&
-              "bg-gradient-to-br from-primary-600 via-primary-500 to-accent-teal",
+              "bg-gradient-to-br from-primary-600 via-primary-500 to-secondary-500",
             variant === "solid" && "bg-primary-600",
             variant === "outlined" && "bg-white border-2 border-primary-200"
           )}
@@ -65,7 +65,7 @@ export const CTASection = ({
                   className={cn(
                     "inline-flex items-center gap-2 px-8 py-4 font-semibold rounded-xl transition-all duration-300 hover:scale-105",
                     variant === "outlined"
-                      ? "bg-gradient-emerald text-white shadow-lg hover:shadow-glow"
+                      ? "bg-gradient-to-r from-primary-500 to-secondary-500 text-white shadow-lg hover:shadow-xl"
                       : "bg-white text-primary-600 shadow-lg hover:shadow-xl"
                   )}
                 >

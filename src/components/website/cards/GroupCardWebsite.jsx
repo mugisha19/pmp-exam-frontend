@@ -16,14 +16,14 @@ export const GroupCardWebsite = ({ group, className }) => {
 
   return (
     <Link
-      to={`/groups/${groupId}`}
+      to={`/my-groups/${groupId}`}
       className={cn(
         "group bg-white rounded-xl overflow-hidden shadow-sm border border-border-light hover:shadow-lg transition-all duration-300 hover:-translate-y-1",
         className
       )}
     >
       {/* Cover Image/Header */}
-      <div className="relative h-32 bg-gradient-to-br from-accent-teal to-primary-600 overflow-hidden">
+      <div className="relative h-32 bg-gradient-to-br from-secondary-500 to-primary-600 overflow-hidden">
         <div className="absolute inset-0 bg-black/10 group-hover:bg-black/5 transition-colors" />
 
         {/* Privacy Badge */}

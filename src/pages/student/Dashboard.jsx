@@ -591,7 +591,7 @@ export const Dashboard = () => {
                         )
                       }
                       className="text-xs font-medium transition-colors duration-200 hover:underline"
-                      style={{ color: "#476072" }}
+                      style={{ color: "#FF5100" }}
                     >
                       View All
                     </button>
@@ -620,11 +620,11 @@ export const Dashboard = () => {
                     <button
                       onClick={() =>
                         navigate(
-                          `/groups?search=${encodeURIComponent(searchQuery)}`
+                          `/my-groups?search=${encodeURIComponent(searchQuery)}`
                         )
                       }
                       className="text-xs font-medium transition-colors duration-200 hover:underline"
-                      style={{ color: "#476072" }}
+                      style={{ color: "#FF5100" }}
                     >
                       View All
                     </button>
@@ -638,8 +638,8 @@ export const Dashboard = () => {
                           key={groupId}
                           group={group}
                           isJoined={isJoined}
-                          onView={(id) => navigate(`/groups/${id}`)}
-                          onJoin={(id) => navigate(`/groups/${id}`)}
+                          onView={(id) => navigate(`/my-groups/${id}`)}
+                          onJoin={(id) => navigate(`/my-groups/${id}`)}
                         />
                       );
                     })}
@@ -664,7 +664,7 @@ export const Dashboard = () => {
                   setShowSearchResults(false);
                 }}
                 className="px-4 py-2 text-white text-sm font-medium rounded-lg hover:shadow-sm transition-all duration-200"
-                style={{ backgroundColor: "#476072" }}
+                style={{ backgroundColor: "#FF5100" }}
               >
                 Clear Search
               </button>
@@ -686,11 +686,11 @@ export const Dashboard = () => {
               <div className="flex items-center justify-between mb-3">
                 <div
                   className="w-10 h-10 rounded-lg flex items-center justify-center shadow-sm"
-                  style={{ backgroundColor: "#476072" }}
+                  style={{ backgroundColor: "#FF5100" }}
                 >
                   <CheckCircle2 className="w-5 h-5 text-white" />
                 </div>
-                <TrendingUp className="w-4 h-4" style={{ color: "#476072" }} />
+                <TrendingUp className="w-4 h-4" style={{ color: "#FF5100" }} />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-1">
                 {dashboardStats.completedAttempts}
@@ -708,11 +708,11 @@ export const Dashboard = () => {
               <div className="flex items-center justify-between mb-3">
                 <div
                   className="w-10 h-10 rounded-lg flex items-center justify-center shadow-sm"
-                  style={{ backgroundColor: "#476072" }}
+                  style={{ backgroundColor: "#FF5100" }}
                 >
                   <Clock className="w-5 h-5 text-white" />
                 </div>
-                <TrendingUp className="w-4 h-4" style={{ color: "#476072" }} />
+                <TrendingUp className="w-4 h-4" style={{ color: "#FF5100" }} />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-1">
                 {dashboardStats.learningHours}h
@@ -730,11 +730,11 @@ export const Dashboard = () => {
               <div className="flex items-center justify-between mb-3">
                 <div
                   className="w-10 h-10 rounded-lg flex items-center justify-center shadow-sm"
-                  style={{ backgroundColor: "#476072" }}
+                  style={{ backgroundColor: "#FF5100" }}
                 >
                   <Award className="w-5 h-5 text-white" />
                 </div>
-                <TrendingUp className="w-4 h-4" style={{ color: "#476072" }} />
+                <TrendingUp className="w-4 h-4" style={{ color: "#FF5100" }} />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-1">
                 {dashboardStats.averageScore > 0
@@ -752,11 +752,11 @@ export const Dashboard = () => {
               <div className="flex items-center justify-between mb-3">
                 <div
                   className="w-10 h-10 rounded-lg flex items-center justify-center shadow-sm"
-                  style={{ backgroundColor: "#476072" }}
+                  style={{ backgroundColor: "#FF5100" }}
                 >
                   <TrendingUp className="w-5 h-5 text-white" />
                 </div>
-                <TrendingUp className="w-4 h-4" style={{ color: "#476072" }} />
+                <TrendingUp className="w-4 h-4" style={{ color: "#FF5100" }} />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-1">
                 {dashboardStats.progressPercentage}%
@@ -775,14 +775,14 @@ export const Dashboard = () => {
               style={{ borderColor: "rgba(71, 96, 114, 0.2)" }}
             >
               <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                <TrendingUp className="w-4 h-4" style={{ color: "#476072" }} />
+                <TrendingUp className="w-4 h-4" style={{ color: "#FF5100" }} />
                 Score Trend (Last 10 Attempts)
               </h3>
               {performanceTrendData.length > 0 ? (
                 <LineChartComponent
                   data={performanceTrendData}
                   dataKey="score"
-                  color="#476072"
+                  color="#FF5100"
                   height={180}
                   showGrid={true}
                 />
@@ -799,14 +799,14 @@ export const Dashboard = () => {
               style={{ borderColor: "rgba(71, 96, 114, 0.2)" }}
             >
               <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                <Calendar className="w-4 h-4" style={{ color: "#476072" }} />
+                <Calendar className="w-4 h-4" style={{ color: "#FF5100" }} />
                 Activity (Last 7 Days)
               </h3>
               {attemptFrequencyData.length > 0 ? (
                 <BarChartComponent
                   data={attemptFrequencyData}
                   dataKey="value"
-                  color="#476072"
+                  color="#FF5100"
                   height={180}
                   showGrid={true}
                 />
@@ -823,14 +823,14 @@ export const Dashboard = () => {
               style={{ borderColor: "rgba(71, 96, 114, 0.2)" }}
             >
               <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                <Trophy className="w-4 h-4" style={{ color: "#476072" }} />
+                <Trophy className="w-4 h-4" style={{ color: "#FF5100" }} />
                 Topic Mastery
               </h3>
               {topicMasteryData.length > 0 ? (
                 <BarChartComponent
                   data={topicMasteryData}
                   dataKey="score"
-                  color="#476072"
+                  color="#FF5100"
                   height={180}
                   showGrid={true}
                 />
@@ -847,14 +847,14 @@ export const Dashboard = () => {
               style={{ borderColor: "rgba(71, 96, 114, 0.2)" }}
             >
               <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                <BookOpen className="w-4 h-4" style={{ color: "#476072" }} />
+                <BookOpen className="w-4 h-4" style={{ color: "#FF5100" }} />
                 Quiz Scores
               </h3>
               {quizComparisonData.length > 0 ? (
                 <BarChartComponent
                   data={quizComparisonData}
                   dataKey="score"
-                  color="#476072"
+                  color="#FF5100"
                   height={180}
                   showGrid={true}
                 />
@@ -891,7 +891,7 @@ export const Dashboard = () => {
                                 <div className="flex items-center gap-2 mb-2">
                                   <span
                                     className="font-semibold text-xs"
-                                    style={{ color: "#476072" }}
+                                    style={{ color: "#FF5100" }}
                                   >
                                     {quiz.title}
                                   </span>
@@ -921,7 +921,7 @@ export const Dashboard = () => {
                                     )
                                   }
                                   className="px-3 py-1.5 text-white text-xs font-medium rounded-lg transition-all shadow-sm"
-                                  style={{ backgroundColor: "#476072" }}
+                                  style={{ backgroundColor: "#FF5100" }}
                                 >
                                   JOIN
                                 </button>
@@ -951,7 +951,7 @@ export const Dashboard = () => {
                                 <div className="flex items-center gap-2 mb-2">
                                   <span
                                     className="font-semibold text-xs"
-                                    style={{ color: "#476072" }}
+                                    style={{ color: "#FF5100" }}
                                   >
                                     {quiz.title}
                                   </span>
@@ -978,7 +978,7 @@ export const Dashboard = () => {
                                   navigate(`/exams/${quiz.quiz_id || quiz.id}`)
                                 }
                                 className="px-3 py-1.5 text-white text-xs font-medium rounded-lg transition-all shadow-sm"
-                                style={{ backgroundColor: "#476072" }}
+                                style={{ backgroundColor: "#FF5100" }}
                               >
                                 ADD REMINDER
                               </button>
@@ -1009,7 +1009,7 @@ export const Dashboard = () => {
                           <div className="flex items-center gap-2 mb-1.5">
                             <span
                               className="font-semibold text-xs"
-                              style={{ color: "#476072" }}
+                              style={{ color: "#FF5100" }}
                             >
                               {quiz.title}
                             </span>
@@ -1091,7 +1091,7 @@ export const Dashboard = () => {
                           : "text-gray-400"
                       )}
                       style={
-                        dayInfo.isToday ? { backgroundColor: "#476072" } : {}
+                        dayInfo.isToday ? { backgroundColor: "#FF5100" } : {}
                       }
                     >
                       {dayInfo.day}
@@ -1130,10 +1130,10 @@ export const Dashboard = () => {
                         </p>
                         <button
                           onClick={() =>
-                            navigate(`/groups/${group.group_id || group.id}`)
+                            navigate(`/my-groups/${group.group_id || group.id}`)
                           }
                           className="w-full px-3 py-1.5 text-white text-xs font-medium rounded-lg transition-all shadow-sm"
-                          style={{ backgroundColor: "#476072" }}
+                          style={{ backgroundColor: "#FF5100" }}
                         >
                           VIEW COURSEWARE
                         </button>
@@ -1204,7 +1204,7 @@ export const Dashboard = () => {
                         navigate(`/exams/${quiz.quiz_id || quiz.id}`)
                       }
                       className="w-full px-3 py-1.5 text-white text-xs font-medium rounded-lg transition-all shadow-sm"
-                      style={{ backgroundColor: "#476072" }}
+                      style={{ backgroundColor: "#FF5100" }}
                     >
                       Learn more
                     </button>
@@ -1276,7 +1276,7 @@ export const Dashboard = () => {
                 disabled={!selectedQuiz}
                 className="flex-1 px-4 py-2 text-white rounded-lg font-medium disabled:bg-gray-300 disabled:cursor-not-allowed"
                 style={{
-                  backgroundColor: selectedQuiz ? "#476072" : undefined,
+                  backgroundColor: selectedQuiz ? "#FF5100" : undefined,
                 }}
               >
                 Set Reminder
@@ -1290,3 +1290,6 @@ export const Dashboard = () => {
 };
 
 export default Dashboard;
+
+
+

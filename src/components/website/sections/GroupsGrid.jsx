@@ -30,7 +30,7 @@ export const GroupsGrid = ({
           </h2>
           {showViewAll && groups.length > maxItems && (
             <Link
-              to="/groups"
+              to="/my-groups"
               className="text-primary-600 hover:text-primary-700 font-medium text-sm transition-colors"
             >
               View all →
@@ -49,7 +49,7 @@ export const GroupsGrid = ({
           return (
             <Link
               key={groupId}
-              to={`/groups/${groupId}`}
+              to={`/my-groups/${groupId}`}
               className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1"
             >
               {/* Cover Image */}

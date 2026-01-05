@@ -228,7 +228,7 @@ export const BrowseExams = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
             <div className="flex-1">
-              <p className="text-emerald-600 font-semibold mb-2">
+              <p className="text-[#FF5100] font-semibold mb-2">
                 Exam Catalog
               </p>
               <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
@@ -249,7 +249,7 @@ export const BrowseExams = () => {
                 <div className="text-sm text-gray-600">Total Exams</div>
               </div>
               <div className="text-center">
-                <div className="text-4xl font-bold text-emerald-600">
+                <div className="text-4xl font-bold text-[#FF5100]">
                   {stats.active}
                 </div>
                 <div className="text-sm text-gray-600">Active Now</div>
@@ -277,7 +277,7 @@ export const BrowseExams = () => {
                 placeholder="Search exams..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none transition-all"
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:border-[#FF5100] focus:ring-2 focus:ring-[rgba(255,81,0,0.2)] focus:outline-none transition-all"
               />
               {searchQuery && (
                 <button
@@ -296,14 +296,14 @@ export const BrowseExams = () => {
                 className={cn(
                   "inline-flex items-center gap-2 px-4 py-2.5 border rounded-lg font-medium text-sm transition-colors",
                   showFilters || activeFiltersCount > 0
-                    ? "border-emerald-500 text-emerald-600 bg-emerald-50"
+                    ? "border-[#FF5100] text-[#FF5100] bg-[rgba(255,81,0,0.1)]"
                     : "border-gray-300 text-gray-700 hover:bg-gray-50"
                 )}
               >
                 <Filter className="w-4 h-4" />
                 Filters
                 {activeFiltersCount > 0 && (
-                  <span className="px-1.5 py-0.5 text-xs bg-emerald-600 text-white rounded-full">
+                  <span className="px-1.5 py-0.5 text-xs bg-[#FF5100] text-white rounded-full">
                     {activeFiltersCount}
                   </span>
                 )}
@@ -312,7 +312,7 @@ export const BrowseExams = () => {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none"
+                className="px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 focus:border-[#6EC1E4] focus:ring-2 focus:ring-[#6EC1E4]/20 focus:outline-none"
               >
                 <option value="popular">Most Popular</option>
                 <option value="newest">Newest First</option>
@@ -367,7 +367,7 @@ export const BrowseExams = () => {
                         className={cn(
                           "px-3 py-1.5 text-sm font-medium rounded-full transition-colors",
                           statusFilter === option.value
-                            ? "bg-emerald-100 text-emerald-700"
+                            ? "bg-[rgba(110,193,228,0.15)] text-[#5AAFD0]"
                             : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                         )}
                       >
@@ -407,7 +407,7 @@ export const BrowseExams = () => {
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
             <div className="flex flex-col items-center gap-4">
-              <div className="w-12 h-12 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin" />
+              <div className="w-12 h-12 border-4 border-[rgba(255,81,0,0.2)] border-t-[#FF5100] rounded-full animate-spin" />
               <p className="text-sm text-gray-500 font-medium">
                 Loading exams...
               </p>
@@ -427,7 +427,7 @@ export const BrowseExams = () => {
             {(activeFiltersCount > 0 || searchQuery) && (
               <button
                 onClick={handleClearFilters}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-700 transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-[#FF5100] text-white font-semibold rounded-lg hover:bg-[#E64800] transition-colors"
               >
                 Clear All Filters
               </button>
@@ -485,7 +485,7 @@ export const BrowseExams = () => {
         <section className="bg-gray-50 border-y border-gray-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <div className="flex items-center gap-3 mb-6">
-              <Zap className="w-6 h-6 text-emerald-600" />
+              <Zap className="w-6 h-6 text-[#FF5100]" />
               <h2 className="text-2xl font-bold text-gray-900">
                 Available Right Now
               </h2>
@@ -505,8 +505,8 @@ export const BrowseExams = () => {
                       onClick={() => handleViewExam(quizId)}
                       className="flex items-center gap-4 p-4 bg-white border border-gray-200 rounded-lg cursor-pointer hover:shadow-md hover:border-gray-300 transition-all"
                     >
-                      <div className="w-12 h-12 rounded-lg bg-emerald-100 flex items-center justify-center shrink-0">
-                        <Play className="w-5 h-5 text-emerald-600" />
+                      <div className="w-12 h-12 rounded-lg bg-[rgba(255,81,0,0.1)] flex items-center justify-center shrink-0">
+                        <Play className="w-5 h-5 text-[#FF5100]" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className="font-medium text-gray-900 truncate text-sm">
@@ -527,7 +527,7 @@ export const BrowseExams = () => {
 
       {/* CTA Banner */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="bg-emerald-600 rounded-xl p-8 text-white">
+        <div className="bg-[#FF5100] rounded-xl p-8 text-white">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
@@ -553,10 +553,10 @@ export const BrowseExams = () => {
               </div>
               <button
                 onClick={() => navigate("/my-learning")}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-white text-emerald-600 font-semibold rounded-lg hover:bg-gray-50 transition-colors shrink-0"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-white text-[#6EC1E4] font-semibold rounded-lg hover:bg-gray-50 transition-colors shrink-0"
               >
                 My Learning
-                <ArrowRight className="w-5 h-5 text-emerald-600" />
+                <ArrowRight className="w-5 h-5 text-[#6EC1E4]" />
               </button>
             </div>
           </div>
@@ -568,8 +568,8 @@ export const BrowseExams = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <BookOpen className="w-6 h-6 text-emerald-600" />
+              <div className="w-12 h-12 bg-[rgba(110,193,228,0.2)] rounded-lg flex items-center justify-center mx-auto mb-4">
+                <BookOpen className="w-6 h-6 text-[#6EC1E4]" />
               </div>
               <h3 className="font-semibold text-gray-900 mb-2">
                 Comprehensive Exams
@@ -611,3 +611,6 @@ export const BrowseExams = () => {
 };
 
 export default BrowseExams;
+
+
+

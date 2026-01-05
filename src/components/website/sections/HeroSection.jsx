@@ -75,7 +75,7 @@ export const HeroSection = ({
                 <Link
                   to={primaryCTA.path || "#"}
                   onClick={primaryCTA.onClick}
-                  className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-emerald text-white font-semibold rounded-xl shadow-lg hover:shadow-glow transition-all duration-300 hover:scale-105"
+                  className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-primary-500 to-secondary-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                 >
                   {primaryCTA.label}
                   <ArrowRight className="w-5 h-5" />

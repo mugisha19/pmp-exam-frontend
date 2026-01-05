@@ -71,7 +71,7 @@ export const SearchBar = ({
     if (suggestion.type === "quiz") {
       window.location.href = `/exams/${suggestion.id}`;
     } else if (suggestion.type === "group") {
-      window.location.href = `/groups/${suggestion.id}`;
+      window.location.href = `/my-groups/${suggestion.id}`;
     }
   };
 

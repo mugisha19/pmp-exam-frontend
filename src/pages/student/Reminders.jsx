@@ -292,7 +292,7 @@ export const Reminders = () => {
   const getStatusIcon = (status) => {
     switch (status) {
       case "sent":
-        return <CheckCircle className="w-5 h-5 text-green-600" />;
+        return <CheckCircle className="w-5 h-5 text-[#6EC1E4]" />;
       case "failed":
         return <XCircle className="w-5 h-5 text-red-600" />;
       case "cancelled":
@@ -305,7 +305,7 @@ export const Reminders = () => {
   const getStatusColor = (status) => {
     switch (status) {
       case "sent":
-        return "bg-green-50 text-green-700 border-green-200";
+        return "bg-[rgba(110,193,228,0.2)] text-[#5AAFD0] border-[rgba(110,193,228,0.3)]";
       case "failed":
         return "bg-red-50 text-red-700 border-red-200";
       case "cancelled":
@@ -673,3 +673,6 @@ export const Reminders = () => {
 };
 
 export default Reminders;
+
+
+

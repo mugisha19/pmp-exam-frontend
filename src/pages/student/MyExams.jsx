@@ -176,7 +176,7 @@ export const MyExams = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
             <div className="flex-1">
-              <p className="text-emerald-600 font-semibold mb-2">
+              <p className="text-[#FF5100] font-semibold mb-2">
                 Your Progress
               </p>
               <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
@@ -192,7 +192,7 @@ export const MyExams = () => {
                   className={cn(
                     "inline-flex items-center gap-2 px-6 py-3 font-semibold rounded-lg transition-colors",
                     activeTab === "in-progress"
-                      ? "bg-emerald-600 text-white hover:bg-emerald-700"
+                      ? "bg-[#FF5100] text-white hover:bg-[#E64800]"
                       : "border border-gray-300 text-gray-700 hover:bg-gray-50"
                   )}
                 >
@@ -209,7 +209,7 @@ export const MyExams = () => {
                   className={cn(
                     "inline-flex items-center gap-2 px-6 py-3 font-semibold rounded-lg transition-colors",
                     activeTab === "completed"
-                      ? "bg-emerald-600 text-white hover:bg-emerald-700"
+                      ? "bg-[#FF5100] text-white hover:bg-[#E64800]"
                       : "border border-gray-300 text-gray-700 hover:bg-gray-50"
                   )}
                 >
@@ -226,7 +226,7 @@ export const MyExams = () => {
                   className={cn(
                     "inline-flex items-center gap-2 px-6 py-3 font-semibold rounded-lg transition-colors",
                     activeTab === "all"
-                      ? "bg-emerald-600 text-white hover:bg-emerald-700"
+                      ? "bg-[#FF5100] text-white hover:bg-[#E64800]"
                       : "border border-gray-300 text-gray-700 hover:bg-gray-50"
                   )}
                 >
@@ -245,7 +245,7 @@ export const MyExams = () => {
                 <div className="text-sm text-gray-600">Total Exams</div>
               </div>
               <div className="text-center">
-                <div className="text-4xl font-bold text-emerald-600">
+                <div className="text-4xl font-bold text-[#FF5100]">
                   {stats.active}
                 </div>
                 <div className="text-sm text-gray-600">Active Now</div>
@@ -270,7 +270,7 @@ export const MyExams = () => {
                 <span className="text-sm font-medium text-gray-700">
                   Completion Progress
                 </span>
-                <span className="text-sm font-semibold text-emerald-600">
+                <span className="text-sm font-semibold text-[#6EC1E4]">
                   {stats.total > 0
                     ? Math.round((stats.completed / stats.total) * 100)
                     : 0}
@@ -279,7 +279,7 @@ export const MyExams = () => {
               </div>
               <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-emerald-500 rounded-full transition-all duration-500"
+                  className="h-full bg-[#6EC1E4] rounded-full transition-all duration-500"
                   style={{
                     width: `${
                       stats.total > 0
@@ -296,8 +296,8 @@ export const MyExams = () => {
 
             <div className="flex gap-8">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center">
-                  <Target className="w-5 h-5 text-emerald-600" />
+                <div className="w-10 h-10 rounded-lg bg-[rgba(110,193,228,0.2)] flex items-center justify-center">
+                  <Target className="w-5 h-5 text-[#6EC1E4]" />
                 </div>
                 <div>
                   <div className="text-lg font-bold text-gray-900">
@@ -334,7 +334,7 @@ export const MyExams = () => {
                 placeholder="Search exams..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none transition-all"
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:border-[#FF5100] focus:ring-2 focus:ring-[rgba(255,81,0,0.2)] focus:outline-none transition-all"
               />
               {searchQuery && (
                 <button
@@ -353,14 +353,14 @@ export const MyExams = () => {
                 className={cn(
                   "inline-flex items-center gap-2 px-4 py-2.5 border rounded-lg font-medium text-sm transition-colors",
                   showFilters || activeFiltersCount > 0
-                    ? "border-emerald-500 text-emerald-600 bg-emerald-50"
+                    ? "border-[#FF5100] text-[#FF5100] bg-[rgba(255,81,0,0.1)]"
                     : "border-gray-300 text-gray-700 hover:bg-gray-50"
                 )}
               >
                 <Filter className="w-4 h-4" />
                 Filters
                 {activeFiltersCount > 0 && (
-                  <span className="px-1.5 py-0.5 text-xs bg-emerald-600 text-white rounded-full">
+                  <span className="px-1.5 py-0.5 text-xs bg-[#FF5100] text-white rounded-full">
                     {activeFiltersCount}
                   </span>
                 )}
@@ -369,7 +369,7 @@ export const MyExams = () => {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none"
+                className="px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 focus:border-[#FF5100] focus:ring-2 focus:ring-[rgba(255,81,0,0.2)] focus:outline-none"
               >
                 <option value="date">Sort by Date</option>
                 <option value="title">Sort by Title</option>
@@ -422,7 +422,7 @@ export const MyExams = () => {
                         className={cn(
                           "px-3 py-1.5 text-sm font-medium rounded-full transition-colors",
                           typeFilter === option.value
-                            ? "bg-emerald-100 text-emerald-700"
+                            ? "bg-[rgba(110,193,228,0.15)] text-[#5AAFD0]"
                             : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                         )}
                       >
@@ -462,7 +462,7 @@ export const MyExams = () => {
         {loadingQuizzes ? (
           <div className="flex items-center justify-center py-16">
             <div className="flex flex-col items-center gap-4">
-              <div className="w-12 h-12 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin" />
+              <div className="w-12 h-12 border-4 border-[rgba(255,81,0,0.2)] border-t-[#FF5100] rounded-full animate-spin" />
               <p className="text-sm text-gray-500 font-medium">
                 Loading exams...
               </p>
@@ -483,7 +483,7 @@ export const MyExams = () => {
             </p>
             <button
               onClick={() => navigate("/browse")}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-700 transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-[#FF5100] text-white font-semibold rounded-lg hover:bg-[#E64800] transition-colors"
             >
               Browse Exams
               <ArrowRight className="w-4 h-4" />
@@ -537,7 +537,7 @@ export const MyExams = () => {
       {/* CTA Banner */}
       {activeTab === "in-progress" && stats.active > 0 && (
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
-          <div className="bg-emerald-600 rounded-xl p-8 text-white">
+          <div className="bg-[#FF5100] rounded-xl p-8 text-white">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
               <div className="flex-1">
                 <h2 className="text-2xl font-bold mb-2 text-white">
@@ -564,7 +564,7 @@ export const MyExams = () => {
         <section className="bg-gray-50 border-y border-gray-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <div className="flex items-center gap-3 mb-6">
-              <Play className="w-6 h-6 text-emerald-600" />
+              <Play className="w-6 h-6 text-[#FF5100]" />
               <h2 className="text-2xl font-bold text-gray-900">
                 Available Right Now
               </h2>
@@ -584,8 +584,8 @@ export const MyExams = () => {
                       onClick={() => handleStartQuiz(quizId)}
                       className="flex items-center gap-4 p-4 bg-white border border-gray-200 rounded-lg cursor-pointer hover:shadow-md hover:border-gray-300 transition-all"
                     >
-                      <div className="w-12 h-12 rounded-lg bg-emerald-100 flex items-center justify-center shrink-0">
-                        <Play className="w-5 h-5 text-emerald-600" />
+                      <div className="w-12 h-12 rounded-lg bg-[rgba(255,81,0,0.1)] flex items-center justify-center shrink-0">
+                        <Play className="w-5 h-5 text-[#FF5100]" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className="font-medium text-gray-900 truncate text-sm">
@@ -609,8 +609,8 @@ export const MyExams = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <BookOpen className="w-6 h-6 text-emerald-600" />
+              <div className="w-12 h-12 bg-[rgba(110,193,228,0.2)] rounded-lg flex items-center justify-center mx-auto mb-4">
+                <BookOpen className="w-6 h-6 text-[#6EC1E4]" />
               </div>
               <h3 className="font-semibold text-gray-900 mb-2">
                 Comprehensive Exams
@@ -663,3 +663,6 @@ export const MyExams = () => {
 };
 
 export default MyExams;
+
+
+

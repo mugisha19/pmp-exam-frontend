@@ -67,7 +67,7 @@ export const SearchOverlay = ({ onClose }) => {
     if (type === "quiz") {
       navigate(`/exams/${id}`);
     } else if (type === "group") {
-      navigate(`/groups/${id}`);
+      navigate(`/my-groups/${id}`);
     }
     onClose();
   };

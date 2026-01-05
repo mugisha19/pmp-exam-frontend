@@ -122,7 +122,7 @@ export const Achievements = () => {
                 </div>
                 <div className="h-4 bg-bg-tertiary rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-gradient-emerald transition-all duration-500"
+                    className="h-full bg-gradient-to-r from-primary-500 to-secondary-500 transition-all duration-500"
                     style={{ width: `${xpProgress}%` }}
                   />
                 </div>
@@ -186,3 +186,6 @@ export const Achievements = () => {
 };
 
 export default Achievements;
+
+
+

@@ -41,12 +41,12 @@ export const NotificationPanel = ({ onClose }) => {
       // Transform backend routes to frontend routes
       let frontendLink = notification.link;
       frontendLink = frontendLink.replace(/\/quizzes\//g, '/exams/');
-      frontendLink = frontendLink.replace(/\/groups\//g, '/groups/');
+      frontendLink = frontendLink.replace(/\/groups\//g, '/my-groups/');
       navigate(frontendLink);
     } else if (notification.related_entity_type === "quiz") {
       navigate(`/exams/${notification.related_entity_id}`);
     } else if (notification.related_entity_type === "group") {
-      navigate(`/groups/${notification.related_entity_id}`);
+      navigate(`/my-groups/${notification.related_entity_id}`);
     }
     onClose();
   };

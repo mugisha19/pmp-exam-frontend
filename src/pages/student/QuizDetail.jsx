@@ -126,7 +126,7 @@ export const QuizDetail = () => {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin" />
+          <div className="w-12 h-12 border-4 border-[rgba(255,81,0,0.2)] border-t-[#FF5100] rounded-full animate-spin" />
           <p className="text-sm text-gray-500 font-medium">
             Loading quiz details...
           </p>
@@ -151,7 +151,7 @@ export const QuizDetail = () => {
             </p>
             <button
               onClick={() => navigate(-1)}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-700 transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-[#FF5100] text-white font-semibold rounded-lg hover:bg-[#E64800] transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               Go Back
@@ -235,7 +235,7 @@ export const QuizDetail = () => {
       if (now >= startDate && now <= endDate) {
         return {
           label: "Active Now",
-          color: "bg-emerald-100 text-emerald-700",
+          color: "bg-orange-100 text-orange-700",
           icon: Zap,
           pulse: true,
         };
@@ -251,7 +251,7 @@ export const QuizDetail = () => {
     if (quiz.status === "active" || quiz.is_available) {
       return {
         label: "Available",
-        color: "bg-emerald-100 text-emerald-700",
+        color: "bg-[rgba(255,81,0,0.1)] text-[#FF5100]",
         icon: Play,
       };
     }
@@ -264,11 +264,11 @@ export const QuizDetail = () => {
   const getDifficultyInfo = (difficulty) => {
     switch (difficulty?.toLowerCase()) {
       case "easy":
-        return { label: "Easy", color: "bg-green-100 text-green-700" };
+        return { label: "Easy", color: "bg-[rgba(110,193,228,0.2)] text-[#5AAFD0]" };
       case "hard":
         return { label: "Hard", color: "bg-red-100 text-red-700" };
       default:
-        return { label: "Medium", color: "bg-orange-100 text-orange-700" };
+        return { label: "Medium", color: "bg-[rgba(255,81,0,0.1)] text-[#FF5100]" };
     }
   };
 
@@ -310,7 +310,7 @@ export const QuizDetail = () => {
                     )}
                   >
                     {statusInfo.pulse && (
-                      <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                      <span className="w-2 h-2 bg-[#FF5100] rounded-full animate-pulse" />
                     )}
                     {!statusInfo.pulse && (
                       <statusInfo.icon className="w-4 h-4" />
@@ -382,7 +382,7 @@ export const QuizDetail = () => {
 
             {/* Right - CTA Card (Desktop) */}
             <div className="hidden lg:block w-80 shrink-0">
-              <div className="bg-gradient-to-br from-emerald-600 to-teal-600 rounded-xl p-6 text-white shadow-lg">
+              <div className="bg-gradient-to-br from-[#FF5100] to-[#FF6B2C] rounded-xl p-6 text-white shadow-lg">
                 <h3 className="text-lg font-bold mb-2 text-white">
                   {hasAttempted ? "Continue Learning" : "Ready to Start?"}
                 </h3>
@@ -400,11 +400,11 @@ export const QuizDetail = () => {
                   <button
                     onClick={handleStartQuiz}
                     disabled={isStarting}
-                    className="w-full px-6 py-3 bg-white text-emerald-600 rounded-lg hover:bg-gray-50 font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all shadow-sm"
+                    className="w-full px-6 py-3 bg-white text-[#FF5100] rounded-lg hover:bg-gray-50 font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all shadow-sm"
                   >
                     {isStarting ? (
                       <>
-                        <div className="w-4 h-4 border-2 border-emerald-200 border-t-emerald-600 rounded-full animate-spin" />
+                        <div className="w-4 h-4 border-2 border-[rgba(255,81,0,0.2)] border-t-[#FF5100] rounded-full animate-spin" />
                         Starting...
                       </>
                     ) : (
@@ -463,7 +463,7 @@ export const QuizDetail = () => {
             <button
               onClick={handleStartQuiz}
               disabled={isStarting}
-              className="px-5 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-semibold disabled:opacity-50 flex items-center gap-2 transition-colors"
+              className="px-5 py-2.5 bg-[#FF5100] text-white rounded-lg hover:bg-[#E64800] font-semibold disabled:opacity-50 flex items-center gap-2 transition-colors"
             >
               {isStarting ? (
                 <>
@@ -493,7 +493,7 @@ export const QuizDetail = () => {
                 className={cn(
                   "flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors",
                   activeTab === "overview"
-                    ? "border-emerald-600 text-emerald-600"
+                    ? "border-[#FF5100] text-[#FF5100]"
                     : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                 )}
               >
@@ -505,7 +505,7 @@ export const QuizDetail = () => {
                 className={cn(
                   "flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors",
                   activeTab === "attempts"
-                    ? "border-emerald-600 text-emerald-600"
+                    ? "border-[#FF5100] text-[#FF5100]"
                     : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                 )}
               >
@@ -530,10 +530,10 @@ export const QuizDetail = () => {
                         <AlertCircle className="w-5 h-5 text-amber-600" />
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-semibold text-amber-900 mb-1">
+                        <h3 className="font-semibold text-[#5AAFD0] mb-1">
                           Active Quiz Detected
                         </h3>
-                        <p className="text-sm text-amber-700 mb-4">
+                        <p className="text-sm text-[#6EC1E4] mb-4">
                           {activeQuizError.message}
                         </p>
                         <div className="flex flex-wrap gap-3">
@@ -552,7 +552,7 @@ export const QuizDetail = () => {
                                 setActiveQuizError(null);
                               }
                             }}
-                            className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 text-sm font-medium transition-colors"
+                            className="px-4 py-2 bg-[#FF5100] text-white rounded-lg hover:bg-[#E64800] text-sm font-medium transition-colors"
                           >
                             Resume Quiz
                           </button>
@@ -580,7 +580,7 @@ export const QuizDetail = () => {
                                 setActiveQuizError(null);
                               }
                             }}
-                            className="px-4 py-2 border border-amber-300 text-amber-700 rounded-lg hover:bg-amber-100 text-sm font-medium transition-colors"
+                            className="px-4 py-2 border border-[rgba(110,193,228,0.3)] text-[#6EC1E4] rounded-lg hover:bg-[rgba(110,193,228,0.1)] text-sm font-medium transition-colors"
                           >
                             Abandon & Start New
                           </button>
@@ -614,8 +614,8 @@ export const QuizDetail = () => {
                 {/* Instructions Card */}
                 <div className="bg-white border border-gray-200 rounded-lg p-6">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center">
-                      <Info className="w-5 h-5 text-emerald-600" />
+                    <div className="w-10 h-10 rounded-lg bg-[rgba(110,193,228,0.2)] flex items-center justify-center">
+                      <Info className="w-5 h-5 text-[#6EC1E4]" />
                     </div>
                     <h2 className="text-lg font-semibold text-gray-900">
                       Instructions
@@ -645,8 +645,8 @@ export const QuizDetail = () => {
                       },
                     ].map((instruction, index) => (
                       <li key={index} className="flex items-start gap-3">
-                        <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center shrink-0 mt-0.5">
-                          <instruction.icon className="w-3.5 h-3.5 text-emerald-600" />
+                        <div className="w-6 h-6 rounded-full bg-[rgba(110,193,228,0.2)] flex items-center justify-center shrink-0 mt-0.5">
+                          <instruction.icon className="w-3.5 h-3.5 text-[#6EC1E4]" />
                         </div>
                         <span className="text-gray-600 text-sm">
                           {instruction.text}
@@ -695,7 +695,7 @@ export const QuizDetail = () => {
                 {loadingAttempts ? (
                   <div className="flex items-center justify-center py-16">
                     <div className="flex flex-col items-center gap-4">
-                      <div className="w-10 h-10 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin" />
+                      <div className="w-10 h-10 border-4 border-[rgba(255,81,0,0.2)] border-t-[#FF5100] rounded-full animate-spin" />
                       <p className="text-sm text-gray-500">
                         Loading attempts...
                       </p>
@@ -713,7 +713,7 @@ export const QuizDetail = () => {
                     {canStartQuiz() && canRetake && (
                       <button
                         onClick={handleStartQuiz}
-                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors"
+                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#FF5100] text-white font-medium rounded-lg hover:bg-[#E64800] transition-colors"
                       >
                         <Play className="w-4 h-4" />
                         Start Quiz
@@ -726,9 +726,9 @@ export const QuizDetail = () => {
                       const isLatest = index === 0;
                       const scoreColor =
                         attempt.score >= (quiz.passing_score || 70)
-                          ? "text-green-600"
+                          ? "text-secondary-600"
                           : attempt.score >= 50
-                          ? "text-orange-600"
+                          ? "text-primary-500"
                           : "text-red-600";
 
                       return (
@@ -738,7 +738,7 @@ export const QuizDetail = () => {
                           className={cn(
                             "flex items-center gap-5 p-5 bg-white border rounded-lg cursor-pointer transition-all",
                             isLatest
-                              ? "border-emerald-200 hover:border-emerald-300"
+                              ? "border-[rgba(110,193,228,0.3)] hover:border-[rgba(110,193,228,0.5)]"
                               : "border-gray-200 hover:border-gray-300",
                             "hover:shadow-md"
                           )}
@@ -748,7 +748,7 @@ export const QuizDetail = () => {
                             className={cn(
                               "w-12 h-12 rounded-xl flex items-center justify-center font-bold text-lg shrink-0",
                               isLatest
-                                ? "bg-emerald-100 text-emerald-700"
+                                ? "bg-blue-100 text-blue-700"
                                 : "bg-gray-100 text-gray-600"
                             )}
                           >
@@ -766,7 +766,7 @@ export const QuizDetail = () => {
                                   : "N/A"}
                               </span>
                               {attempt.passed === true && (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 rounded text-xs font-medium">
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-[rgba(110,193,228,0.2)] text-[#5AAFD0] rounded text-xs font-medium">
                                   <CheckCircle className="w-3 h-3" />
                                   Passed
                                 </span>
@@ -778,7 +778,7 @@ export const QuizDetail = () => {
                                 </span>
                               )}
                               {isLatest && (
-                                <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded text-xs font-medium">
+                                <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs font-medium">
                                   Latest
                                 </span>
                               )}
@@ -842,7 +842,7 @@ export const QuizDetail = () => {
               {hasAttempted && (
                 <div className="bg-white border border-gray-200 rounded-lg p-5">
                   <div className="flex items-center gap-2 mb-4">
-                    <TrendingUp className="w-5 h-5 text-emerald-600" />
+                    <TrendingUp className="w-5 h-5 text-[#6EC1E4]" />
                     <h3 className="font-semibold text-gray-900">
                       Your Progress
                     </h3>
@@ -858,8 +858,8 @@ export const QuizDetail = () => {
                           className={cn(
                             "text-lg font-bold",
                             bestScore >= (quiz.passing_score || 70)
-                              ? "text-green-600"
-                              : "text-orange-600"
+                              ? "text-secondary-600"
+                              : "text-primary-500"
                           )}
                         >
                           {bestScore}%
@@ -870,8 +870,8 @@ export const QuizDetail = () => {
                           className={cn(
                             "h-full rounded-full transition-all",
                             bestScore >= (quiz.passing_score || 70)
-                              ? "bg-green-500"
-                              : "bg-orange-500"
+                              ? "bg-secondary-500"
+                              : "bg-primary-500"
                           )}
                           style={{ width: `${bestScore}%` }}
                         />
@@ -980,7 +980,7 @@ export const QuizDetail = () => {
                 </p>
                 <Link
                   to="/help"
-                  className="text-xs font-medium text-emerald-600 hover:text-emerald-700"
+                  className="text-xs font-medium text-[#FF5100] hover:text-[#E64800]"
                 >
                   View Help Center →
                 </Link>
@@ -1002,3 +1002,6 @@ export const QuizDetail = () => {
 };
 
 export default QuizDetail;
+
+
+

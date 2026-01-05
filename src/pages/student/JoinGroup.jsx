@@ -65,7 +65,7 @@ export const JoinGroup = () => {
         message: "Joining via invite link",
       }),
     onSuccess: (data) => {
-      navigate(`/groups?tab=mygroups&joinRequest=success`);
+      navigate(`/my-groups?tab=mygroups&joinRequest=success`);
     },
     onError: (error) => {
       const errorMessage =
@@ -374,7 +374,7 @@ export const JoinGroup = () => {
                 <p className="text-xs text-gray-500 text-center mt-4">
                   Already a member?{" "}
                   <Link
-                    to="/groups?tab=mygroups"
+                    to="/my-groups?tab=mygroups"
                     className="text-blue-600 hover:text-blue-700 font-medium"
                   >
                     View My Groups
@@ -390,4 +390,7 @@ export const JoinGroup = () => {
 };
 
 export default JoinGroup;
+
+
+
 

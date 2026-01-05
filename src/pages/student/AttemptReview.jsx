@@ -55,7 +55,7 @@ export const AttemptReview = () => {
           <button
             onClick={() => navigate(`/exams/${quizId}`)}
             className="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors"
-            style={{ background: "#476072" }}
+            style={{ background: "#FF5100" }}
           >
             Back to Quiz
           </button>
@@ -117,19 +117,19 @@ export const AttemptReview = () => {
             <div
               className={`px-4 py-2 rounded-lg ${
                 isPassed
-                  ? "bg-green-50 border border-green-200"
+                  ? "bg-[rgba(110,193,228,0.1)] border border-[rgba(110,193,228,0.3)]"
                   : "bg-red-50 border border-red-200"
               }`}
             >
               <div className="flex items-center gap-2 mb-1">
                 {isPassed ? (
-                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  <CheckCircle className="w-5 h-5 text-[#6EC1E4]" />
                 ) : (
                   <XCircle className="w-5 h-5 text-red-600" />
                 )}
                 <span
                   className={`text-2xl font-bold ${
-                    isPassed ? "text-green-700" : "text-red-700"
+                    isPassed ? "text-[#5AAFD0]" : "text-red-700"
                   }`}
                 >
                   {score}%
@@ -137,7 +137,7 @@ export const AttemptReview = () => {
               </div>
               <p
                 className={`text-xs font-semibold ${
-                  isPassed ? "text-green-700" : "text-red-700"
+                  isPassed ? "text-[#5AAFD0]" : "text-red-700"
                 }`}
               >
                 {isPassed ? "Passed" : "Failed"}
@@ -155,7 +155,7 @@ export const AttemptReview = () => {
             <div className="flex items-center gap-3">
               <div
                 className="w-10 h-10 rounded-lg flex items-center justify-center"
-                style={{ background: "#476072" }}
+                style={{ background: "#FF5100" }}
               >
                 <Target className="w-5 h-5 text-white" />
               </div>
@@ -215,20 +215,20 @@ export const AttemptReview = () => {
         <div
           className={`mb-6 p-4 rounded-lg border ${
             isPassed
-              ? "bg-green-50 border-green-200"
+              ? "bg-secondary-50 border-secondary-200"
               : "bg-red-50 border-red-200"
           }`}
         >
           <div className="flex items-start gap-3">
             {isPassed ? (
-              <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
+              <CheckCircle className="w-5 h-5 text-secondary-600 mt-0.5" />
             ) : (
               <XCircle className="w-5 h-5 text-red-600 mt-0.5" />
             )}
             <div>
               <p
                 className={`font-semibold mb-1 ${
-                  isPassed ? "text-green-900" : "text-red-900"
+                  isPassed ? "text-secondary-700" : "text-red-900"
                 }`}
               >
                 {isPassed
@@ -282,7 +282,7 @@ export const AttemptReview = () => {
                   <div
                     className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm ${
                       isCorrect
-                        ? "bg-green-100 text-green-700"
+                        ? "bg-[rgba(110,193,228,0.2)] text-[#5AAFD0]"
                         : "bg-red-100 text-red-700"
                     }`}
                   >
@@ -291,13 +291,13 @@ export const AttemptReview = () => {
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
                       {isCorrect ? (
-                        <CheckCircle className="w-4 h-4 text-green-600" />
+                        <CheckCircle className="w-4 h-4 text-secondary-600" />
                       ) : (
                         <XCircle className="w-4 h-4 text-red-600" />
                       )}
                       <span
                         className={`text-xs font-semibold ${
-                          isCorrect ? "text-green-700" : "text-red-700"
+                          isCorrect ? "text-[#5AAFD0]" : "text-red-700"
                         }`}
                       >
                         {isCorrect ? "Correct" : "Incorrect"}
@@ -356,12 +356,12 @@ export const AttemptReview = () => {
                                       key={idx}
                                       className={`p-3 rounded-lg border flex items-center gap-2 mb-2 ${
                                         isCorrectPair
-                                          ? "bg-green-50 border-green-200"
+                                          ? "bg-secondary-50 border-secondary-200"
                                           : "bg-red-50 border-red-200"
                                       }`}
                                     >
                                       {isCorrectPair ? (
-                                        <CheckCircle className="w-4 h-4 text-green-600" />
+                                        <CheckCircle className="w-4 h-4 text-secondary-600" />
                                       ) : (
                                         <XCircle className="w-4 h-4 text-red-600" />
                                       )}
@@ -392,9 +392,9 @@ export const AttemptReview = () => {
                                   return (
                                     <div
                                       key={idx}
-                                      className="p-3 rounded-lg border border-green-200 bg-green-50 flex items-center gap-2 mb-2"
+                                      className="p-3 rounded-lg border border-[rgba(110,193,228,0.3)] bg-[rgba(110,193,228,0.1)] flex items-center gap-2 mb-2"
                                     >
-                                      <CheckCircle className="w-4 h-4 text-green-600" />
+                                      <CheckCircle className="w-4 h-4 text-[#6EC1E4]" />
                                       <span className="text-sm text-gray-900">
                                         {left?.text || "—"}
                                       </span>
@@ -460,20 +460,20 @@ export const AttemptReview = () => {
                           let icon = null;
 
                           if (isUserAnswer && isCorrectOption) {
-                            bgColor = "bg-green-50";
-                            borderColor = "border-green-200";
+                            bgColor = "bg-secondary-50";
+                            borderColor = "border-secondary-200";
                             icon = (
-                              <CheckCircle className="w-5 h-5 text-green-600" />
+                              <CheckCircle className="w-5 h-5 text-secondary-600" />
                             );
                           } else if (isUserAnswer && !isCorrectOption) {
                             bgColor = "bg-red-50";
                             borderColor = "border-red-200";
                             icon = <XCircle className="w-5 h-5 text-red-600" />;
                           } else if (!isUserAnswer && isCorrectOption) {
-                            bgColor = "bg-green-50";
-                            borderColor = "border-green-200";
+                            bgColor = "bg-secondary-50";
+                            borderColor = "border-secondary-200";
                             icon = (
-                              <CheckCircle className="w-5 h-5 text-green-600" />
+                              <CheckCircle className="w-5 h-5 text-secondary-600" />
                             );
                           }
 
@@ -488,7 +488,7 @@ export const AttemptReview = () => {
                                   {option.option_text || option.text}
                                 </span>
                                 {isUserAnswer && isCorrectOption && (
-                                  <span className="text-xs font-semibold text-green-700">
+                                  <span className="text-xs font-semibold text-secondary-700">
                                     Your Answer
                                   </span>
                                 )}
@@ -498,7 +498,7 @@ export const AttemptReview = () => {
                                   </span>
                                 )}
                                 {!isUserAnswer && isCorrectOption && (
-                                  <span className="text-xs font-semibold text-green-700">
+                                  <span className="text-xs font-semibold text-secondary-700">
                                     Correct
                                   </span>
                                 )}
@@ -514,11 +514,11 @@ export const AttemptReview = () => {
                 {!isCorrect && question.explanation && (
                   <div
                     className="p-3 rounded-lg border border-blue-200"
-                    style={{ background: "#476072" + "10" }}
+                    style={{ background: "#FF5100" + "10" }}
                   >
                     <p
                       className="text-xs font-semibold mb-1"
-                      style={{ color: "#476072" }}
+                      style={{ color: "#FF5100" }}
                     >
                       💡 Explanation
                     </p>
@@ -538,7 +538,7 @@ export const AttemptReview = () => {
           <button
             onClick={() => navigate(`/exams/${quizId}`)}
             className="px-6 py-2 text-sm font-medium text-white rounded-lg transition-colors"
-            style={{ background: "#476072" }}
+            style={{ background: "#FF5100" }}
           >
             Back to Quiz
           </button>
@@ -549,3 +549,6 @@ export const AttemptReview = () => {
 };
 
 export default AttemptReview;
+
+
+

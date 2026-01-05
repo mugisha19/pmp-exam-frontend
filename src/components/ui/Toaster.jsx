@@ -18,16 +18,16 @@ import {
  */
 export const CustomToast = ({ t, message, type = "default" }) => {
   const icons = {
-    success: <CheckCircle className="w-5 h-5 text-emerald-500" />,
+    success: <CheckCircle className="w-5 h-5 text-secondary-600" />,
     error: <XCircle className="w-5 h-5 text-red-500" />,
     warning: <AlertTriangle className="w-5 h-5 text-amber-500" />,
     info: <Info className="w-5 h-5 text-blue-500" />,
-    loading: <Loader2 className="w-5 h-5 text-emerald-500 animate-spin" />,
+    loading: <Loader2 className="w-5 h-5 text-secondary-500 animate-spin" />,
     default: <Info className="w-5 h-5 text-gray-500" />,
   };
 
   const backgrounds = {
-    success: "bg-emerald-50 border-emerald-200",
+    success: "bg-secondary-50 border-secondary-200",
     error: "bg-red-50 border-red-200",
     warning: "bg-amber-50 border-amber-200",
     info: "bg-blue-50 border-blue-200",
@@ -36,7 +36,7 @@ export const CustomToast = ({ t, message, type = "default" }) => {
   };
 
   const textColors = {
-    success: "text-emerald-800",
+    success: "text-secondary-700",
     error: "text-red-800",
     warning: "text-amber-800",
     info: "text-blue-800",
@@ -45,11 +45,11 @@ export const CustomToast = ({ t, message, type = "default" }) => {
   };
 
   const progressColors = {
-    success: "bg-emerald-500",
+    success: "bg-secondary-500",
     error: "bg-red-500",
     warning: "bg-amber-500",
     info: "bg-blue-500",
-    loading: "bg-emerald-500",
+    loading: "bg-secondary-500",
     default: "bg-gray-500",
   };
 

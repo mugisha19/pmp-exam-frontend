@@ -64,7 +64,7 @@ export const GroupDetail = () => {
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Group Not Found</h2>
         <p className="text-gray-600 mb-8 font-medium">The group you're looking for doesn't exist.</p>
         <button
-          onClick={() => navigate("/groups")}
+          onClick={() => navigate("/my-groups")}
           className="px-6 py-3 bg-gradient-to-r from-accent-primary to-accent-secondary text-white font-bold rounded-xl hover:shadow-lg transition-all duration-200 hover:scale-105"
         >
           Back to Groups
@@ -80,7 +80,7 @@ export const GroupDetail = () => {
       {/* Header */}
       <div className="bg-gradient-to-br from-white to-gray-50/50 rounded-2xl border-2 border-gray-100 shadow-lg shadow-gray-100/50 p-8">
         <button
-          onClick={() => navigate("/groups")}
+          onClick={() => navigate("/my-groups")}
           className="flex items-center gap-2 text-gray-600 hover:text-accent-primary mb-6 font-semibold transition-colors duration-200 group"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform duration-200" />
@@ -116,10 +116,10 @@ export const GroupDetail = () => {
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-white to-blue-50/30 rounded-lg border shadow-sm hover:shadow transition-all duration-200 p-4" style={{ borderColor: 'rgba(71, 96, 114, 0.2)' }}>
+        <div className="bg-gradient-to-br from-white to-blue-50/30 rounded-lg border shadow-sm hover:shadow transition-all duration-200 p-4" style={{ borderColor: 'rgba(255, 81, 0, 0.2)' }}>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgba(71, 96, 114, 0.1)' }}>
-              <Calendar className="w-5 h-5" style={{ color: '#476072' }} />
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgba(255, 81, 0, 0.1)' }}>
+              <Calendar className="w-5 h-5" style={{ color: '#FF5100' }} />
             </div>
             <div>
               <p className="text-xs font-bold text-gray-600 uppercase tracking-wide mb-1">Duration</p>
@@ -164,3 +164,6 @@ export const GroupDetail = () => {
 };
 
 export default GroupDetail;
+
+
+

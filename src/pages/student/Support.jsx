@@ -80,7 +80,7 @@ export const Support = () => {
       case "in_progress":
         return "bg-yellow-100 text-yellow-700 border-yellow-200";
       case "resolved":
-        return "bg-green-100 text-green-700 border-green-200";
+        return "bg-[rgba(110,193,228,0.2)] text-[#5AAFD0] border-[rgba(110,193,228,0.3)]";
       case "closed":
         return "bg-gray-100 text-gray-700 border-gray-200";
       default:
@@ -129,7 +129,7 @@ export const Support = () => {
           {/* Create Ticket Form */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 h-[500px] flex flex-col">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#476072] to-[#5a7a8f] flex items-center justify-center">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#FF5100] to-[#FF6B2C] flex items-center justify-center">
                 <MessageSquare className="w-5 h-5 text-white" />
               </div>
               <div>
@@ -157,7 +157,7 @@ export const Support = () => {
                     setFormData({ ...formData, subject: e.target.value })
                   }
                   placeholder="Brief description of your issue (min 5 characters)"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#476072] focus:border-[#476072] outline-none"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF5100] focus:border-[#FF5100] outline-none"
                   minLength={5}
                   maxLength={200}
                   required
@@ -175,7 +175,7 @@ export const Support = () => {
                   }
                   placeholder="Provide detailed information about your issue (min 10 characters)..."
                   rows={6}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#476072] focus:border-[#476072] outline-none resize-none"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF5100] focus:border-[#FF5100] outline-none resize-none"
                   minLength={10}
                   maxLength={5000}
                   required
@@ -185,7 +185,7 @@ export const Support = () => {
               <button
                 type="submit"
                 disabled={createMutation.isPending}
-                className="w-full px-4 py-3 bg-gradient-to-r from-[#476072] to-[#5a7a8f] text-white rounded-lg hover:opacity-90 transition-opacity font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full px-4 py-3 bg-gradient-to-r from-[#FF5100] to-[#FF6B2C] text-white rounded-lg hover:opacity-90 transition-opacity font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {createMutation.isPending ? (
                   <>
@@ -209,7 +209,7 @@ export const Support = () => {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#476072] focus:border-[#476072] outline-none"
+                className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#FF5100] focus:border-[#FF5100] outline-none"
               >
                 <option value="all">All Status</option>
                 <option value="open">Open</option>
@@ -221,7 +221,7 @@ export const Support = () => {
 
             {isLoading ? (
               <div className="flex items-center justify-center flex-1">
-                <div className="w-8 h-8 border-3 border-[#476072]/30 border-t-[#476072] rounded-full animate-spin" />
+                <div className="w-8 h-8 border-3 border-[rgba(255,81,0,0.3)] border-t-[#FF5100] rounded-full animate-spin" />
               </div>
             ) : !ticketsData || ticketsData?.tickets?.length === 0 ? (
               <div className="text-center flex-1 flex items-center justify-center">
@@ -255,7 +255,7 @@ export const Support = () => {
                       <div
                         key={ticket.ticket_id}
                         onClick={() => openTicketModal(ticket)}
-                        className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all cursor-pointer hover:border-[#476072]"
+                        className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all cursor-pointer hover:border-[#FF5100]"
                       >
                         <div className="flex items-start justify-between mb-2">
                           <h3 className="font-semibold text-gray-900 line-clamp-1 flex-1">
@@ -353,11 +353,11 @@ export const Support = () => {
                 </div>
 
                 {selectedTicket.resolution_notes && (
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                    <h3 className="text-sm font-semibold text-green-900 mb-2">
-                      Resolution Notes
+                  <div className="bg-[rgba(110,193,228,0.1)] border border-[rgba(110,193,228,0.3)] rounded-lg p-4">
+                    <h3 className="text-sm font-semibold text-[#5AAFD0] mb-2">
+                      Resolution
                     </h3>
-                    <p className="text-green-800 whitespace-pre-wrap">
+                    <p className="text-[#6EC1E4] whitespace-pre-wrap">
                       {selectedTicket.resolution_notes}
                     </p>
                   </div>
@@ -395,3 +395,6 @@ export const Support = () => {
 };
 
 export default Support;
+
+
+

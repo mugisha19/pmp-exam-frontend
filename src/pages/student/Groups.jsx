@@ -136,7 +136,7 @@ export const Groups = () => {
   };
 
   const handleViewGroup = (groupId) => {
-    navigate(`/groups/${groupId}`);
+    navigate(`/my-groups/${groupId}`);
   };
 
   // Calculate statistics
@@ -225,7 +225,7 @@ export const Groups = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
             <div className="flex-1">
-              <p className="text-emerald-600 font-semibold mb-2">
+              <p className="text-[#6EC1E4] font-semibold mb-2">
                 Collaborative Learning
               </p>
               <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
@@ -241,7 +241,7 @@ export const Groups = () => {
                   className={cn(
                     "inline-flex items-center gap-2 px-6 py-3 font-semibold rounded-lg transition-colors",
                     activeTab === "all"
-                      ? "bg-emerald-600 text-white hover:bg-emerald-700"
+                      ? "bg-[#6EC1E4] text-white hover:bg-[#5AAFD0]"
                       : "border border-gray-300 text-gray-700 hover:bg-gray-50"
                   )}
                 >
@@ -253,7 +253,7 @@ export const Groups = () => {
                   className={cn(
                     "inline-flex items-center gap-2 px-6 py-3 font-semibold rounded-lg transition-colors",
                     activeTab === "my-groups"
-                      ? "bg-emerald-600 text-white hover:bg-emerald-700"
+                      ? "bg-[#6EC1E4] text-white hover:bg-[#5AAFD0]"
                       : "border border-gray-300 text-gray-700 hover:bg-gray-50"
                   )}
                 >
@@ -278,7 +278,7 @@ export const Groups = () => {
                   <div className="text-sm text-gray-600">Total Groups</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-4xl font-bold text-emerald-600">
+                  <div className="text-4xl font-bold text-[#6EC1E4]">
                     {stats.activeGroups}
                   </div>
                   <div className="text-sm text-gray-600">Active</div>
@@ -286,7 +286,7 @@ export const Groups = () => {
                 <div className="text-center">
                   <div
                     className="text-4xl font-bold"
-                    style={{ color: "#476072" }}
+                    style={{ color: "#FF5100" }}
                   >
                     {stats.totalQuizzes}
                   </div>
@@ -310,7 +310,7 @@ export const Groups = () => {
                 placeholder="Search groups..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none transition-all"
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:border-[#6EC1E4] focus:ring-2 focus:ring-[#6EC1E4]/20 focus:outline-none transition-all"
               />
               {searchQuery && (
                 <button
@@ -330,14 +330,14 @@ export const Groups = () => {
                 className={cn(
                   "inline-flex items-center gap-2 px-4 py-2.5 border rounded-lg font-medium text-sm transition-colors",
                   showFilters || activeFiltersCount > 0
-                    ? "border-emerald-500 text-emerald-600 bg-emerald-50"
+                    ? "border-[#6EC1E4] text-[#6EC1E4] bg-[rgba(110,193,228,0.1)]"
                     : "border-gray-300 text-gray-700 hover:bg-gray-50"
                 )}
               >
                 <Filter className="w-4 h-4" />
                 Filters
                 {activeFiltersCount > 0 && (
-                  <span className="px-1.5 py-0.5 text-xs bg-emerald-600 text-white rounded-full">
+                  <span className="px-1.5 py-0.5 text-xs bg-[#6EC1E4] text-white rounded-full">
                     {activeFiltersCount}
                   </span>
                 )}
@@ -347,7 +347,7 @@ export const Groups = () => {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none"
+                className="px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 focus:border-[#6EC1E4] focus:ring-2 focus:ring-[#6EC1E4]/20 focus:outline-none"
               >
                 <option value="name">Sort by Name</option>
                 <option value="members">Sort by Members</option>
@@ -404,7 +404,7 @@ export const Groups = () => {
                         className={cn(
                           "px-3 py-1.5 text-sm font-medium rounded-full transition-colors",
                           typeFilter === option.value
-                            ? "bg-emerald-100 text-emerald-700"
+                            ? "bg-[rgba(110,193,228,0.15)] text-[#5AAFD0]"
                             : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                         )}
                       >
@@ -431,7 +431,7 @@ export const Groups = () => {
                           className={cn(
                             "px-3 py-1.5 text-sm font-medium rounded-full transition-colors",
                             statusFilter === option.value
-                              ? "bg-emerald-100 text-emerald-700"
+                              ? "bg-[rgba(110,193,228,0.15)] text-[#5AAFD0]"
                               : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                           )}
                         >
@@ -472,7 +472,7 @@ export const Groups = () => {
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
             <div className="flex flex-col items-center gap-4">
-              <div className="w-12 h-12 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin" />
+              <div className="w-12 h-12 border-4 border-[rgba(110,193,228,0.3)] border-t-[#6EC1E4] rounded-full animate-spin" />
               <p className="text-sm text-gray-500 font-medium">
                 Loading groups...
               </p>
@@ -494,7 +494,7 @@ export const Groups = () => {
             {activeTab === "my-groups" && (
               <button
                 onClick={() => handleTabChange("all")}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-700 transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-[#6EC1E4] text-white font-semibold rounded-lg hover:bg-[#5AAFD0] transition-colors"
               >
                 Browse Groups
                 <ArrowRight className="w-4 h-4" />
@@ -531,7 +531,7 @@ export const Groups = () => {
       {/* CTA Banner */}
       {activeTab === "all" && availableGroups.length > 0 && (
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
-          <div className="bg-emerald-600 rounded-xl p-8 text-white">
+          <div className="bg-[#6EC1E4] rounded-xl p-8 text-white">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
               <div className="flex-1">
                 <h2 className="text-2xl font-bold mb-2 text-white">
@@ -564,8 +564,8 @@ export const Groups = () => {
       >
         <ModalBody>
           <div className="flex flex-col items-center text-center space-y-4 py-4">
-            <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center">
-              <CheckCircle className="w-10 h-10 text-emerald-600" />
+            <div className="w-16 h-16 bg-[rgba(110,193,228,0.15)] rounded-full flex items-center justify-center">
+              <CheckCircle className="w-10 h-10 text-[#6EC1E4]" />
             </div>
             <div className="space-y-2">
               <h3 className="text-lg font-semibold text-gray-900">
@@ -575,9 +575,9 @@ export const Groups = () => {
                 You have successfully sent a join request. Please wait for
                 approval from the group administrator.
               </p>
-              <div className="flex items-start gap-2 mt-4 p-3 bg-emerald-50 rounded-lg border border-emerald-200">
-                <Bell className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
-                <p className="text-sm text-emerald-900 text-left">
+              <div className="flex items-start gap-2 mt-4 p-3 bg-[rgba(110,193,228,0.1)] rounded-lg border border-[rgba(110,193,228,0.3)]">
+                <Bell className="w-5 h-5 text-[#6EC1E4] shrink-0 mt-0.5" />
+                <p className="text-sm text-[#2A5F80] text-left">
                   You will be notified once your request is approved or
                   rejected.
                 </p>
@@ -610,7 +610,7 @@ const GroupCardModern = ({ group, onJoin, onView, isLoading }) => {
       <div
         className="h-24 relative overflow-hidden"
         style={{
-          background: "linear-gradient(135deg, #476072 0%, #5a7a8f 100%)",
+          background: "linear-gradient(135deg, #FF5100 0%, #5a7a8f 100%)",
         }}
       >
         <div className="absolute inset-0 opacity-10">
@@ -647,7 +647,7 @@ const GroupCardModern = ({ group, onJoin, onView, isLoading }) => {
           <div className="absolute bottom-3 right-3">
             <div
               className="flex items-center gap-1 px-2.5 py-1 text-white rounded-lg text-xs font-semibold shadow-sm"
-              style={{ backgroundColor: "#476072" }}
+              style={{ backgroundColor: "#FF5100" }}
             >
               <CheckCircle className="w-3 h-3" />
               Joined
@@ -658,7 +658,7 @@ const GroupCardModern = ({ group, onJoin, onView, isLoading }) => {
 
       {/* Content */}
       <div className="p-4 flex flex-col flex-1">
-        <h3 className="font-bold text-base text-gray-900 mb-2 line-clamp-1 group-hover:text-[#476072] transition-colors">
+        <h3 className="font-bold text-base text-gray-900 mb-2 line-clamp-1 group-hover:text-[#FF5100] transition-colors">
           {group.name}
         </h3>
 
@@ -675,7 +675,7 @@ const GroupCardModern = ({ group, onJoin, onView, isLoading }) => {
               className="w-8 h-8 rounded-lg flex items-center justify-center"
               style={{ backgroundColor: "#F5F2F2" }}
             >
-              <Users className="w-4 h-4" style={{ color: "#476072" }} />
+              <Users className="w-4 h-4" style={{ color: "#FF5100" }} />
             </div>
             <div>
               <div className="text-[10px] text-gray-500 font-medium">
@@ -692,7 +692,7 @@ const GroupCardModern = ({ group, onJoin, onView, isLoading }) => {
               className="w-8 h-8 rounded-lg flex items-center justify-center"
               style={{ backgroundColor: "#F5F2F2" }}
             >
-              <BookOpen className="w-4 h-4" style={{ color: "#476072" }} />
+              <BookOpen className="w-4 h-4" style={{ color: "#FF5100" }} />
             </div>
             <div>
               <div className="text-[10px] text-gray-500 font-medium">
@@ -712,7 +712,7 @@ const GroupCardModern = ({ group, onJoin, onView, isLoading }) => {
                 onView();
               }}
               className="w-full py-2 font-semibold text-sm rounded-lg transition-all duration-200 flex items-center justify-center gap-2 border shadow-sm hover:shadow-md hover:scale-[1.02]"
-              style={{ borderColor: "#476072", color: "#476072" }}
+              style={{ borderColor: "#FF5100", color: "#FF5100" }}
             >
               View Group
               <ChevronRight className="w-4 h-4" />
@@ -726,7 +726,7 @@ const GroupCardModern = ({ group, onJoin, onView, isLoading }) => {
               disabled={isLoading}
               className="w-full py-2 text-white font-semibold text-sm rounded-lg transition-all duration-200 shadow-md hover:shadow-lg hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
               style={{
-                background: "linear-gradient(135deg, #476072 0%, #5a7a8f 100%)",
+                background: "linear-gradient(135deg, #FF5100 0%, #5a7a8f 100%)",
               }}
             >
               {isLoading ? "Joining..." : "Join Group"}
@@ -753,7 +753,7 @@ const GroupListItem = ({ group, onJoin, onView, isLoading }) => {
       <div
         className="w-20 h-20 rounded-xl flex items-center justify-center text-white font-bold text-xl shrink-0 shadow-md relative overflow-hidden"
         style={{
-          background: "linear-gradient(135deg, #476072 0%, #5a7a8f 100%)",
+          background: "linear-gradient(135deg, #FF5100 0%, #5a7a8f 100%)",
         }}
       >
         <div className="absolute inset-0 opacity-10">
@@ -767,14 +767,14 @@ const GroupListItem = ({ group, onJoin, onView, isLoading }) => {
       {/* Content */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-3 mb-2">
-          <h3 className="text-lg font-bold text-gray-900 truncate group-hover:text-[#476072] transition-colors">
+          <h3 className="text-lg font-bold text-gray-900 truncate group-hover:text-[#FF5100] transition-colors">
             {group.name}
           </h3>
           <span
             className="px-2.5 py-1 text-xs font-semibold rounded-lg"
             style={{
               backgroundColor: isPublic ? "#F5F2F2" : "#f3f4f6",
-              color: isPublic ? "#476072" : "#6b7280",
+              color: isPublic ? "#FF5100" : "#6b7280",
             }}
           >
             {isPublic ? "Public" : "Private"}
@@ -782,11 +782,11 @@ const GroupListItem = ({ group, onJoin, onView, isLoading }) => {
           {group.status === "active" && (
             <span
               className="flex items-center gap-1.5 text-xs font-semibold"
-              style={{ color: "#476072" }}
+              style={{ color: "#FF5100" }}
             >
               <span
                 className="w-2 h-2 rounded-full animate-pulse"
-                style={{ backgroundColor: "#476072" }}
+                style={{ backgroundColor: "#FF5100" }}
               />
               Active
             </span>
@@ -794,7 +794,7 @@ const GroupListItem = ({ group, onJoin, onView, isLoading }) => {
           {group.isJoined && (
             <span
               className="flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg"
-              style={{ backgroundColor: "#F5F2F2", color: "#476072" }}
+              style={{ backgroundColor: "#F5F2F2", color: "#FF5100" }}
             >
               <CheckCircle className="w-3 h-3" />
               Joined
@@ -812,7 +812,7 @@ const GroupListItem = ({ group, onJoin, onView, isLoading }) => {
               className="w-8 h-8 rounded-lg flex items-center justify-center"
               style={{ backgroundColor: "#F5F2F2" }}
             >
-              <Users className="w-4 h-4" style={{ color: "#476072" }} />
+              <Users className="w-4 h-4" style={{ color: "#FF5100" }} />
             </div>
             <span className="font-medium">{memberCount} members</span>
           </span>
@@ -821,7 +821,7 @@ const GroupListItem = ({ group, onJoin, onView, isLoading }) => {
               className="w-8 h-8 rounded-lg flex items-center justify-center"
               style={{ backgroundColor: "#F5F2F2" }}
             >
-              <BookOpen className="w-4 h-4" style={{ color: "#476072" }} />
+              <BookOpen className="w-4 h-4" style={{ color: "#FF5100" }} />
             </div>
             <span className="font-medium">{quizCount} quizzes</span>
           </span>
@@ -838,7 +838,7 @@ const GroupListItem = ({ group, onJoin, onView, isLoading }) => {
           disabled={isLoading}
           className="px-8 py-3 text-white font-semibold text-sm rounded-lg transition-all duration-200 shrink-0 shadow-md hover:shadow-lg hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
           style={{
-            background: "linear-gradient(135deg, #476072 0%, #5a7a8f 100%)",
+            background: "linear-gradient(135deg, #FF5100 0%, #5a7a8f 100%)",
           }}
         >
           {isLoading ? "Joining..." : "Join Group"}
@@ -848,7 +848,7 @@ const GroupListItem = ({ group, onJoin, onView, isLoading }) => {
       {group.isJoined && (
         <ChevronRight
           className="w-5 h-5 shrink-0"
-          style={{ color: "#476072" }}
+          style={{ color: "#FF5100" }}
         />
       )}
     </div>
@@ -856,3 +856,6 @@ const GroupListItem = ({ group, onJoin, onView, isLoading }) => {
 };
 
 export default Groups;
+
+
+

@@ -77,7 +77,7 @@ export const ProfileDropdown = ({ onClose }) => {
               <div className="text-xs text-text-muted">Complete</div>
             </div>
             <div className="text-center">
-              <div className="text-lg font-bold text-accent-teal">85%</div>
+              <div className="text-lg font-bold text-secondary-500">85%</div>
               <div className="text-xs text-text-muted">Avg Score</div>
             </div>
           </div>

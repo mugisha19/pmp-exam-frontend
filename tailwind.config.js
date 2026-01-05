@@ -12,30 +12,30 @@ export default {
     },
     extend: {
       colors: {
-        // Primary Colors - Unique Educational Theme
+        // Primary Colors - Student Portal Orange Theme
         primary: {
-          50: "#ecfdf5",
-          100: "#d1fae5",
-          200: "#a7f3d0",
-          300: "#6ee7b7",
-          400: "#34d399",
-          500: "#10b981", // Main emerald
-          600: "#059669",
-          700: "#047857",
-          800: "#065f46",
-          900: "#064e3b",
+          50: "#fff5f0",
+          100: "#ffe6d9",
+          200: "#ffccb3",
+          300: "#ffad80",
+          400: "#ff844d",
+          500: "#FF5100", // Main orange
+          600: "#E64800",
+          700: "#CC4000",
+          800: "#B33800",
+          900: "#993000",
         },
         secondary: {
-          50: "#fff7ed",
-          100: "#ffedd5",
-          200: "#fed7aa",
-          300: "#fdba74",
-          400: "#fb923c",
-          500: "#f97316", // Warm orange
-          600: "#ea580c",
-          700: "#c2410c",
-          800: "#9a3412",
-          900: "#7c2d12",
+          50: "#f0f9fd",
+          100: "#d9f0fa",
+          200: "#b3e1f5",
+          300: "#8dd2f0",
+          400: "#67c3eb",
+          500: "#6EC1E4", // Sky blue
+          600: "#5AAFD0",
+          700: "#4A95B3",
+          800: "#3A7A99",
+          900: "#2A5F80",
         },
         accent: {
           teal: "#0d9488",
@@ -72,9 +72,9 @@ export default {
         },
         // Semantic colors
         error: "#ef4444",
-        success: "#10b981",
-        warning: "#f59e0b",
-        info: "#0ea5e9",
+        success: "#6EC1E4", // Blue for success
+        warning: "#6EC1E4", // Blue for warning
+        info: "#FF5100", // Orange for info
       },
       fontFamily: {
         sans: ["Inter", "Poppins", "sans-serif"],
@@ -82,15 +82,15 @@ export default {
       },
       boxShadow: {
         soft: "0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04)",
-        glow: "0 0 20px rgba(16, 185, 129, 0.3)",
-        "glow-orange": "0 0 20px rgba(249, 115, 22, 0.3)",
+        glow: "0 0 20px rgba(110, 193, 228, 0.3)", // Blue glow
+        "glow-orange": "0 0 20px rgba(255, 81, 0, 0.3)", // Orange glow
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-emerald": "linear-gradient(135deg, #10b981 0%, #0d9488 100%)",
-        "gradient-orange": "linear-gradient(135deg, #f97316 0%, #fb7185 100%)",
+        "gradient-emerald": "linear-gradient(135deg, #6EC1E4 0%, #5AAFD0 100%)", // Blue gradient
+        "gradient-orange": "linear-gradient(135deg, #FF5100 0%, #FF6B2C 100%)", // Orange gradient
         "gradient-mesh":
-          "radial-gradient(at 0% 0%, #10b981 0px, transparent 50%), radial-gradient(at 100% 100%, #f97316 0px, transparent 50%)",
+          "radial-gradient(at 0% 0%, #FF5100 0px, transparent 50%), radial-gradient(at 100% 100%, #6EC1E4 0px, transparent 50%)",
       },
     },
   },

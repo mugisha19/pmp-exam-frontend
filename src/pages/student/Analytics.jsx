@@ -130,7 +130,7 @@ export const Analytics = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="w-12 h-12 border-4 border-emerald-500/20 border-t-emerald-600 rounded-full animate-spin" />
+        <div className="w-12 h-12 border-4 border-[rgba(255,81,0,0.2)] border-t-[#FF5100] rounded-full animate-spin" />
       </div>
     );
   }
@@ -143,8 +143,8 @@ export const Analytics = () => {
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 bg-emerald-100 rounded-lg">
-                  <BarChart3 className="w-6 h-6 text-emerald-600" />
+                <div className="p-2 bg-[rgba(255,81,0,0.1)] rounded-lg">
+                  <BarChart3 className="w-6 h-6 text-[#FF5100]" />
                 </div>
                 <h1 className="text-3xl lg:text-4xl font-bold text-gray-900">
                   Performance Analytics
@@ -170,7 +170,7 @@ export const Analytics = () => {
                   className={cn(
                     "px-4 py-2 rounded-lg text-sm font-medium transition-all",
                     timeRange === range.value
-                      ? "bg-emerald-600 text-white shadow-sm"
+                      ? "bg-[#FF5100] text-white shadow-sm"
                       : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"
                   )}
                 >
@@ -207,11 +207,11 @@ export const Analytics = () => {
 
           <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow">
             <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-emerald-100 rounded-lg">
-                <Target className="w-6 h-6 text-emerald-600" />
+              <div className="p-3 bg-[rgba(110,193,228,0.2)] rounded-lg">
+                <Target className="w-6 h-6 text-[#6EC1E4]" />
               </div>
               <div className="text-right">
-                <div className="text-3xl font-bold text-emerald-600">
+                <div className="text-3xl font-bold text-[#6EC1E4]">
                   {Math.round(performanceData?.average_score || 0)}%
                 </div>
                 <div className="text-sm text-gray-500 mt-1">Average Score</div>
@@ -263,7 +263,7 @@ export const Analytics = () => {
                 <Trophy className="w-6 h-6 text-purple-600" />
               </div>
               <div className="text-right">
-                <div className="text-3xl font-bold text-gray-900">
+                <div className="text-3xl font-bold text-[#6EC1E4]">
                   {performanceData?.total_passed || 0}
                 </div>
                 <div className="text-sm text-gray-500 mt-1">Quizzes Passed</div>
@@ -295,7 +295,7 @@ export const Analytics = () => {
                   Your scores across recent quizzes
                 </p>
               </div>
-              <Zap className="w-6 h-6 text-emerald-600" />
+              <Zap className="w-6 h-6 text-[#6EC1E4]" />
             </div>
             <LineChartComponent
               data={scoresTrendData}
@@ -359,7 +359,7 @@ export const Analytics = () => {
               {/* Mastery Legend */}
               <div className="flex flex-wrap gap-4 p-4 bg-gray-50 rounded-lg">
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded bg-emerald-500" />
+                  <div className="w-4 h-4 rounded bg-[#6EC1E4]" />
                   <span className="text-sm text-gray-700">Expert (80-100%)</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -401,7 +401,7 @@ export const Analytics = () => {
                 {topicData.topics.slice(0, 10).map((topic, index) => {
                   const mastery = Math.round(topic.accuracy || 0);
                   const getMasteryColor = (score) => {
-                    if (score >= 80) return { bg: 'bg-emerald-500', text: 'text-emerald-600', light: 'bg-emerald-100' };
+                    if (score >= 80) return { bg: 'bg-[#6EC1E4]', text: 'text-[#6EC1E4]', light: 'bg-[rgba(110,193,228,0.2)]' };
                     if (score >= 60) return { bg: 'bg-blue-500', text: 'text-blue-600', light: 'bg-blue-100' };
                     if (score >= 40) return { bg: 'bg-yellow-500', text: 'text-yellow-600', light: 'bg-yellow-100' };
                     return { bg: 'bg-red-500', text: 'text-red-600', light: 'bg-red-100' };
@@ -475,10 +475,10 @@ export const Analytics = () => {
                 strongestTopics.map((topic, index) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between p-4 bg-emerald-50 rounded-lg border border-emerald-100"
+                    className="flex items-center justify-between p-4 bg-[rgba(110,193,228,0.1)] rounded-lg border border-[rgba(110,193,228,0.3)]"
                   >
                     <div className="flex items-center gap-3 flex-1">
-                      <div className="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                      <div className="w-10 h-10 rounded-full bg-[#6EC1E4] flex items-center justify-center flex-shrink-0">
                         <span className="text-sm font-bold text-white">
                           #{index + 1}
                         </span>
@@ -495,10 +495,10 @@ export const Analytics = () => {
                       </div>
                     </div>
                     <div className="text-right ml-4 flex-shrink-0">
-                      <div className="text-2xl font-bold text-emerald-600">
+                      <div className="text-2xl font-bold text-[#6EC1E4]">
                         {Math.round(topic.accuracy || 0)}%
                       </div>
-                      <div className="text-xs text-emerald-600 font-medium">accuracy</div>
+                      <div className="text-xs text-[#6EC1E4] font-medium">accuracy</div>
                     </div>
                   </div>
                 ))
@@ -600,11 +600,11 @@ export const Analytics = () => {
                   of class
                 </div>
               </div>
-              <div className="p-4 bg-emerald-50 rounded-lg text-center">
+              <div className="p-4 bg-blue-50 rounded-lg text-center">
                 <div className="text-sm text-gray-600 mb-1">
                   vs. Group Average
                 </div>
-                <div className="text-3xl font-bold text-emerald-600">
+                <div className="text-3xl font-bold text-[#6EC1E4]">
                   {groupComparisonData?.user_average >
                   groupComparisonData?.group_average
                     ? "+"
@@ -644,11 +644,11 @@ export const Analytics = () => {
                       <div
                         className={cn(
                           "w-10 h-10 rounded-lg flex items-center justify-center",
-                          attempt.score >= 60 ? "bg-green-100" : "bg-red-100"
+                          attempt.score >= 60 ? "bg-secondary-100" : "bg-red-100"
                         )}
                       >
                         {attempt.score >= 60 ? (
-                          <CheckCircle className="w-5 h-5 text-green-600" />
+                          <CheckCircle className="w-5 h-5 text-secondary-600" />
                         ) : (
                           <XCircle className="w-5 h-5 text-red-600" />
                         )}
@@ -674,7 +674,7 @@ export const Analytics = () => {
                         className={cn(
                           "text-xl font-bold",
                           attempt.score >= 60
-                            ? "text-green-600"
+                            ? "text-secondary-600"
                             : "text-red-600"
                         )}
                       >
@@ -701,3 +701,6 @@ export const Analytics = () => {
 };
 
 export default Analytics;
+
+
+

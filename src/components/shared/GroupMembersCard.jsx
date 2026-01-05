@@ -41,7 +41,7 @@ export const GroupMembersCard = ({ className }) => {
         </h3>
         {firstGroup && (
           <button
-            onClick={() => navigate("/groups")}
+            onClick={() => navigate("/my-groups")}
             className="text-xs text-accent-primary hover:text-accent-secondary font-bold transition-colors duration-200 hover:underline flex-shrink-0"
           >
             All
@@ -60,7 +60,7 @@ export const GroupMembersCard = ({ className }) => {
           </div>
           <p className="text-xs text-gray-600 font-medium mb-2">No groups yet</p>
           <button
-            onClick={() => navigate("/groups")}
+            onClick={() => navigate("/my-groups")}
             className="px-3 py-1.5 bg-gradient-to-r from-accent-primary to-accent-secondary text-white text-xs font-bold rounded-lg hover:shadow-md transition-all duration-200 hover:scale-105"
           >
             Browse
@@ -85,7 +85,7 @@ export const GroupMembersCard = ({ className }) => {
               <div
                 key={memberId}
                 className="flex items-center gap-2.5 p-2 rounded-lg hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 transition-all duration-200 cursor-pointer group"
-                onClick={() => navigate(`/groups/${groupId}`)}
+                onClick={() => navigate(`/my-groups/${groupId}`)}
               >
                 <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-primary/20 to-accent-secondary/20 flex items-center justify-center flex-shrink-0 shadow-sm group-hover:shadow-md transition-all">
                   <span className="text-xs font-bold text-gray-700">
@@ -117,7 +117,7 @@ export const GroupMembersCard = ({ className }) => {
           })}
           {hasMore && (
             <button
-              onClick={() => navigate(`/groups/${groupId}`)}
+              onClick={() => navigate(`/my-groups/${groupId}`)}
               className="w-full flex items-center justify-center gap-1.5 px-3 py-2 bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700 text-xs font-bold rounded-lg hover:from-accent-primary/10 hover:to-accent-secondary/10 hover:text-accent-primary transition-all duration-200 mt-2"
             >
               View All {members.length}

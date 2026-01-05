@@ -951,7 +951,7 @@ export const QuizTaking = () => {
                       ? "cursor-not-allowed opacity-60"
                       : "cursor-pointer",
                     isSelected
-                      ? "border-emerald-500 bg-emerald-50 shadow-sm"
+                      ? "border-[#6EC1E4] bg-[rgba(110,193,228,0.1)] shadow-sm"
                       : "border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50"
                   )}
                 >
@@ -959,7 +959,7 @@ export const QuizTaking = () => {
                     className={cn(
                       "flex items-center justify-center w-8 h-8 rounded-lg font-semibold text-sm shrink-0 transition-colors",
                       isSelected
-                        ? "bg-emerald-500 text-white"
+                        ? "bg-[#6EC1E4] text-white"
                         : "bg-gray-100 text-gray-600"
                     )}
                   >
@@ -986,7 +986,7 @@ export const QuizTaking = () => {
                     </span>
                   </div>
                   {isSelected && (
-                    <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0 mt-1" />
+                    <CheckCircle className="w-5 h-5 text-[#6EC1E4] shrink-0 mt-1" />
                   )}
                 </label>
               );
@@ -1017,7 +1017,7 @@ export const QuizTaking = () => {
                       ? "cursor-not-allowed opacity-60"
                       : "cursor-pointer",
                     isSelected
-                      ? "border-emerald-500 bg-emerald-50 shadow-sm"
+                      ? "border-[#6EC1E4] bg-[rgba(110,193,228,0.1)] shadow-sm"
                       : "border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50"
                   )}
                 >
@@ -1025,7 +1025,7 @@ export const QuizTaking = () => {
                     className={cn(
                       "flex items-center justify-center w-8 h-8 rounded-lg font-semibold text-sm shrink-0 transition-colors",
                       isSelected
-                        ? "bg-emerald-500 text-white"
+                        ? "bg-[#6EC1E4] text-white"
                         : "bg-gray-100 text-gray-600"
                     )}
                   >
@@ -1057,7 +1057,7 @@ export const QuizTaking = () => {
                     className={cn(
                       "w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 mt-1 transition-colors",
                       isSelected
-                        ? "border-emerald-500 bg-emerald-500"
+                        ? "border-[#6EC1E4] bg-[#6EC1E4]"
                         : "border-gray-300 bg-white"
                     )}
                   >
@@ -1080,7 +1080,7 @@ export const QuizTaking = () => {
                 value: "true",
                 label: "True",
                 icon: CheckCircle,
-                color: "emerald",
+                color: "blue",
               },
               { value: "false", label: "False", icon: XCircle, color: "red" },
             ].map(({ value, label, icon: Icon, color }) => {
@@ -1095,8 +1095,8 @@ export const QuizTaking = () => {
                       ? "cursor-not-allowed opacity-60"
                       : "cursor-pointer",
                     isSelected
-                      ? color === "emerald"
-                        ? "border-emerald-500 bg-emerald-50 shadow-sm"
+                      ? color === "blue"
+                        ? "border-[#6EC1E4] bg-blue-50 shadow-sm"
                         : "border-red-500 bg-red-50 shadow-sm"
                       : "border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50"
                   )}
@@ -1115,8 +1115,8 @@ export const QuizTaking = () => {
                     className={cn(
                       "w-8 h-8 transition-colors",
                       isSelected
-                        ? color === "emerald"
-                          ? "text-emerald-500"
+                        ? color === "blue"
+                          ? "text-[#6EC1E4]"
                           : "text-red-500"
                         : "text-gray-400"
                     )}
@@ -1125,8 +1125,8 @@ export const QuizTaking = () => {
                     className={cn(
                       "text-lg font-semibold transition-colors",
                       isSelected
-                        ? color === "emerald"
-                          ? "text-emerald-700"
+                        ? color === "blue"
+                          ? "text-blue-700"
                           : "text-red-700"
                         : "text-gray-600"
                     )}
@@ -1178,7 +1178,7 @@ export const QuizTaking = () => {
                       className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm"
                     >
                       <div className="flex items-start gap-3 mb-3">
-                        <span className="flex-shrink-0 w-7 h-7 bg-emerald-600 text-white rounded-lg flex items-center justify-center font-semibold text-sm">
+                        <span className="flex-shrink-0 w-7 h-7 bg-[#6EC1E4] text-white rounded-lg flex items-center justify-center font-semibold text-sm">
                           {index + 1}
                         </span>
                         <p className="font-medium text-gray-900 pt-0.5">
@@ -1191,22 +1191,22 @@ export const QuizTaking = () => {
                           if (isDisabled) return;
                           e.preventDefault();
                           e.currentTarget.classList.add(
-                            "border-emerald-400",
-                            "bg-emerald-50"
+                            "border-[#FF6B2C]",
+                            "bg-orange-50"
                           );
                         }}
                         onDragLeave={(e) => {
                           e.currentTarget.classList.remove(
-                            "border-emerald-400",
-                            "bg-emerald-50"
+                            "border-[#FF6B2C]",
+                            "bg-orange-50"
                           );
                         }}
                         onDrop={(e) => {
                           if (isDisabled) return;
                           e.preventDefault();
                           e.currentTarget.classList.remove(
-                            "border-emerald-400",
-                            "bg-emerald-50"
+                            "border-[#FF6B2C]",
+                            "bg-orange-50"
                           );
                           const rightId = e.dataTransfer.getData("rightId");
                           const newPairs = matchedPairs.filter(
@@ -1223,14 +1223,14 @@ export const QuizTaking = () => {
                         className={cn(
                           "min-h-[60px] border-2 border-dashed rounded-lg p-3 transition-all",
                           rightItem
-                            ? "border-emerald-300 bg-emerald-50"
+                            ? "border-secondary-400 bg-[rgba(110,193,228,0.1)]"
                             : "border-gray-300 bg-gray-50"
                         )}
                       >
                         {rightItem ? (
                           <div className="flex items-center justify-between gap-2">
                             <div className="flex items-center gap-2 flex-1">
-                              <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+                              <CheckCircle className="w-4 h-4 text-[#6EC1E4] shrink-0" />
                               <span className="text-sm text-gray-700">
                                 {rightItem.text}
                               </span>
@@ -1283,7 +1283,7 @@ export const QuizTaking = () => {
                         className={cn(
                           "border-2 rounded-xl p-4 transition-all",
                           isMatched
-                            ? "border-emerald-200 bg-emerald-50 opacity-60"
+                            ? "border-[rgba(110,193,228,0.3)] bg-[rgba(110,193,228,0.1)] opacity-60"
                             : "border-orange-200 bg-orange-50 cursor-grab hover:border-orange-300 hover:shadow-md active:cursor-grabbing"
                         )}
                       >
@@ -1291,7 +1291,7 @@ export const QuizTaking = () => {
                           {rightItem.text}
                         </p>
                         {isMatched && (
-                          <div className="flex items-center gap-1 mt-2 text-emerald-600">
+                          <div className="flex items-center gap-1 mt-2 text-[#6EC1E4]">
                             <CheckCircle className="w-4 h-4" />
                             <span className="text-xs font-medium">Matched</span>
                           </div>
@@ -1330,7 +1330,7 @@ export const QuizTaking = () => {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin" />
+          <div className="w-12 h-12 border-4 border-[rgba(255,81,0,0.2)] border-t-[#FF5100] rounded-full animate-spin" />
           <p className="text-gray-600 font-medium">Loading quiz...</p>
         </div>
       </div>
@@ -1353,7 +1353,7 @@ export const QuizTaking = () => {
           </p>
           <button
             onClick={() => navigate(`/exams/${quizId}`)}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-700 transition-colors"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-[#FF5100] text-white font-semibold rounded-lg hover:bg-[#E64800] transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Go Back
@@ -1375,8 +1375,8 @@ export const QuizTaking = () => {
     return (
       <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 z-50">
         <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-lg w-full text-center border border-gray-200">
-          <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-amber-100 to-orange-100 flex items-center justify-center">
-            <Coffee className="w-12 h-12 text-amber-600" />
+          <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-[rgba(255,81,0,0.1)] to-[rgba(255,107,44,0.1)] flex items-center justify-center">
+            <Coffee className="w-12 h-12 text-[#FF5100]" />
           </div>
 
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Quiz Paused</h2>
@@ -1395,7 +1395,7 @@ export const QuizTaking = () => {
                   "inline-flex items-center gap-3 px-8 py-4 rounded-xl font-mono text-3xl font-bold",
                   pauseTimeRemaining < 60
                     ? "bg-red-50 text-red-600 border-2 border-red-200"
-                    : "bg-amber-50 text-amber-600 border-2 border-amber-200"
+                    : "bg-[rgba(255,81,0,0.1)] text-[#FF5100] border-2 border-[rgba(255,81,0,0.2)]"
                 )}
               >
                 <Timer className="w-8 h-8" />
@@ -1407,8 +1407,8 @@ export const QuizTaking = () => {
           {/* Auto-resuming State */}
           {isCountdownExpired && sessionData.quiz_mode === "exam" && (
             <div className="mb-8">
-              <div className="inline-flex items-center gap-3 px-6 py-3 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200">
-                <div className="w-5 h-5 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin" />
+              <div className="inline-flex items-center gap-3 px-6 py-3 rounded-xl bg-[rgba(110,193,228,0.1)] text-[#6EC1E4] border border-[rgba(110,193,228,0.3)]">
+                <div className="w-5 h-5 border-2 border-[#6EC1E4] border-t-transparent rounded-full animate-spin" />
                 <span className="font-medium">
                   Resuming quiz automatically...
                 </span>
@@ -1445,7 +1445,7 @@ export const QuizTaking = () => {
             <button
               onClick={handleResume}
               disabled={isResuming}
-              className="w-full px-6 py-4 bg-emerald-600 text-white rounded-xl font-semibold text-lg flex items-center justify-center gap-2 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-lg shadow-emerald-600/20"
+              className="w-full px-6 py-4 bg-[#FF5100] text-white rounded-xl font-semibold text-lg flex items-center justify-center gap-2 hover:bg-[#E64800] disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-lg shadow-[rgba(255,81,0,0.2)]"
             >
               {isResuming ? (
                 <>
@@ -1479,8 +1479,8 @@ export const QuizTaking = () => {
             Your quiz is being automatically submitted. Please wait...
           </p>
 
-          <div className="inline-flex items-center gap-3 px-6 py-3 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 mb-6">
-            <div className="w-5 h-5 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin" />
+          <div className="inline-flex items-center gap-3 px-6 py-3 rounded-xl bg-[rgba(110,193,228,0.1)] text-[#6EC1E4] border border-[rgba(110,193,228,0.3)] mb-6">
+            <div className="w-5 h-5 border-2 border-[#6EC1E4] border-t-transparent rounded-full animate-spin" />
             <span className="font-medium">Submitting quiz...</span>
           </div>
 
@@ -1526,7 +1526,7 @@ export const QuizTaking = () => {
                       "inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium",
                       isExamMode
                         ? "bg-red-100 text-red-700"
-                        : "bg-emerald-100 text-emerald-700"
+                        : "bg-[rgba(110,193,228,0.1)] text-[#6EC1E4]"
                     )}
                   >
                     {isExamMode ? (
@@ -1581,7 +1581,7 @@ export const QuizTaking = () => {
               <button
                 onClick={handleSubmitClick}
                 disabled={isSubmitting || isWaitingForAutoSubmit}
-                className="flex items-center gap-2 px-5 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-colors shadow-sm"
+                className="flex items-center gap-2 px-5 py-2 bg-[#FF5100] text-white rounded-lg hover:bg-[#E64800] disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-colors shadow-sm"
               >
                 {isSubmitting ? (
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -1596,7 +1596,7 @@ export const QuizTaking = () => {
           {/* Progress Bar */}
           <div className="h-1 bg-gray-100 -mx-4 sm:-mx-6 lg:-mx-8">
             <div
-              className="h-full bg-emerald-500 transition-all duration-500"
+              className="h-full bg-[#6EC1E4] transition-all duration-500"
               style={{ width: `${progressPercentage}%` }}
             />
           </div>
@@ -1693,7 +1693,7 @@ export const QuizTaking = () => {
                         sessionData.pause_info?.is_paused ||
                         isWaitingForAutoSubmit
                       }
-                      className="flex items-center gap-2 px-4 py-2 bg-[#476072] text-white rounded-lg hover:bg-[#3a4d5c] disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
+                      className="flex items-center gap-2 px-4 py-2 bg-[#FF5100] text-white rounded-lg hover:bg-[#3a4d5c] disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
                     >
                       <Target className="w-4 h-4" />
                       {showAnswer ? "Hide Answer" : "Show Answer"}
@@ -1703,23 +1703,23 @@ export const QuizTaking = () => {
 
                 {/* Answer Display */}
                 {showAnswer && !isExamMode && (
-                  <div className="p-4 bg-emerald-50 border-2 border-emerald-200 rounded-xl">
+                  <div className="p-4 bg-[rgba(110,193,228,0.1)] border-2 border-[rgba(110,193,228,0.3)] rounded-xl">
                     <div className="flex items-start gap-3">
-                      <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+                      <CheckCircle className="w-5 h-5 text-[#6EC1E4] shrink-0 mt-0.5" />
                       <div className="flex-1">
-                        <h4 className="font-semibold text-emerald-900 mb-2">
+                        <h4 className="font-semibold text-[#2A5F80] mb-2">
                           Correct Answer:
                         </h4>
                         {currentQ?.question_type === "multiple_choice" && (
                           <div>
-                            <p className="text-emerald-800 font-medium mb-2">
+                            <p className="text-[#2A5F80] font-medium mb-2">
                               {currentQ.options.find((opt) => opt.is_correct)
                                 ?.text || "Answer not available"}
                             </p>
                             {currentQ.options.find((opt) => opt.is_correct)
                               ?.explanation && (
-                              <div className="mt-3 pt-3 border-t border-emerald-200">
-                                <p className="text-sm text-emerald-700">
+                              <div className="mt-3 pt-3 border-t border-[rgba(110,193,228,0.3)]">
+                                <p className="text-sm text-[#5AAFD0]">
                                   <span className="font-semibold">
                                     Explanation:{" "}
                                   </span>
@@ -1735,7 +1735,7 @@ export const QuizTaking = () => {
                         )}
                         {currentQ?.question_type === "multiple_response" && (
                           <div>
-                            <ul className="list-disc list-inside space-y-1 text-emerald-800 mb-2">
+                            <ul className="list-disc list-inside space-y-1 text-[#2A5F80] mb-2">
                               {currentQ.options
                                 .filter((opt) => opt.is_correct)
                                 .map((opt) => (
@@ -1747,8 +1747,8 @@ export const QuizTaking = () => {
                             {currentQ.options
                               .filter((opt) => opt.is_correct)
                               .some((opt) => opt.explanation) && (
-                              <div className="mt-3 pt-3 border-t border-emerald-200">
-                                <p className="text-sm font-semibold text-emerald-700 mb-2">
+                              <div className="mt-3 pt-3 border-t border-[rgba(110,193,228,0.3)]">
+                                <p className="text-sm font-semibold text-[#5AAFD0] mb-2">
                                   Explanations:
                                 </p>
                                 {currentQ.options
@@ -1758,7 +1758,7 @@ export const QuizTaking = () => {
                                   .map((opt) => (
                                     <div
                                       key={opt.id}
-                                      className="text-sm text-emerald-700 mb-2"
+                                      className="text-sm text-[#5AAFD0] mb-2"
                                     >
                                       <span className="font-semibold">
                                         {opt.text}:{" "}
@@ -1772,14 +1772,14 @@ export const QuizTaking = () => {
                         )}
                         {currentQ?.question_type === "true_false" && (
                           <div>
-                            <p className="text-emerald-800 font-semibold mb-2">
+                            <p className="text-[#2A5F80] font-semibold mb-2">
                               {currentQ.options.find((opt) => opt.is_correct)
                                 ?.text || "Answer not available"}
                             </p>
                             {currentQ.options.find((opt) => opt.is_correct)
                               ?.explanation && (
-                              <div className="mt-3 pt-3 border-t border-emerald-200">
-                                <p className="text-sm text-emerald-700">
+                              <div className="mt-3 pt-3 border-t border-[rgba(110,193,228,0.3)]">
+                                <p className="text-sm text-[#5AAFD0]">
                                   <span className="font-semibold">
                                     Explanation:{" "}
                                   </span>
@@ -1809,7 +1809,7 @@ export const QuizTaking = () => {
                                   return (
                                     <div
                                       key={idx}
-                                      className="flex items-center gap-2 text-emerald-800 font-medium"
+                                      className="flex items-center gap-2 text-[#2A5F80] font-medium"
                                     >
                                       <span>{leftItem?.text}</span>
                                       <span>→</span>
@@ -1822,8 +1822,8 @@ export const QuizTaking = () => {
                             {currentQ.options.correct_matches?.some(
                               (pair) => pair.explanation
                             ) && (
-                              <div className="mt-3 pt-3 border-t border-emerald-200">
-                                <p className="text-sm font-semibold text-emerald-700 mb-2">
+                              <div className="mt-3 pt-3 border-t border-[rgba(110,193,228,0.3)]">
+                                <p className="text-sm font-semibold text-[#5AAFD0] mb-2">
                                   Explanations:
                                 </p>
                                 {currentQ.options.correct_matches
@@ -1840,7 +1840,7 @@ export const QuizTaking = () => {
                                     return (
                                       <div
                                         key={idx}
-                                        className="text-sm text-emerald-700 mb-2"
+                                        className="text-sm text-[#5AAFD0] mb-2"
                                       >
                                         <span className="font-semibold">
                                           {leftItem?.text} → {rightItem?.text}:{" "}
@@ -1891,9 +1891,9 @@ export const QuizTaking = () => {
                             className={cn(
                               "w-2 h-2 rounded-full transition-all",
                               isCurrent
-                                ? "w-4 bg-emerald-600"
+                                ? "w-4 bg-[#6EC1E4]"
                                 : q.is_answered
-                                ? "bg-emerald-400"
+                                ? "bg-[#6EC1E4]"
                                 : "bg-gray-300"
                             )}
                           />
@@ -1919,7 +1919,7 @@ export const QuizTaking = () => {
                         !selectedAnswer ||
                         lastQuestionAnswerSaved
                       }
-                      className="flex items-center gap-2 px-5 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-colors"
+                      className="flex items-center gap-2 px-5 py-2.5 bg-[#6EC1E4] text-white rounded-lg hover:bg-[#5AAFD0] disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-colors"
                     >
                       {isSaving ? (
                         <>
@@ -1941,7 +1941,7 @@ export const QuizTaking = () => {
                         isWaitingForAutoSubmit ||
                         sessionData.pause_info?.is_paused
                       }
-                      className="flex items-center gap-2 px-5 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-colors"
+                      className="flex items-center gap-2 px-5 py-2.5 bg-[#6EC1E4] text-white rounded-lg hover:bg-[#5AAFD0] disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-colors"
                     >
                       {isSaving ? (
                         <>
@@ -1993,11 +1993,11 @@ export const QuizTaking = () => {
                         className={cn(
                           "relative w-full aspect-square rounded-lg font-semibold text-sm transition-all duration-200",
                           isCurrent
-                            ? "bg-emerald-600 text-white shadow-lg shadow-emerald-600/30 scale-110 z-10"
+                            ? "bg-[#6EC1E4] text-white shadow-lg shadow-[#6EC1E4]/30 scale-110 z-10"
                             : isFlagged
                             ? "bg-orange-100 text-orange-700 hover:bg-orange-200 ring-2 ring-orange-300"
                             : isAnswered
-                            ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
+                            ? "bg-[rgba(110,193,228,0.15)] text-[#5AAFD0] hover:bg-[rgba(110,193,228,0.3)]"
                             : isDisabled
                             ? "bg-gray-100 text-gray-400 cursor-not-allowed opacity-50"
                             : "bg-gray-100 text-gray-600 hover:bg-gray-200"
@@ -2020,11 +2020,11 @@ export const QuizTaking = () => {
               <div className="px-5 py-4 border-t border-gray-100 bg-gray-50 rounded-b-xl">
                 <div className="grid grid-cols-2 gap-3 text-xs">
                   <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 rounded bg-emerald-600" />
+                    <div className="w-4 h-4 rounded bg-[#6EC1E4]" />
                     <span className="text-gray-600">Current</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 rounded bg-emerald-100 border border-emerald-200" />
+                    <div className="w-4 h-4 rounded bg-[rgba(110,193,228,0.15)] border border-[rgba(110,193,228,0.3)]" />
                     <span className="text-gray-600">Answered</span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -2050,16 +2050,16 @@ export const QuizTaking = () => {
                   </div>
                   <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-emerald-500 rounded-full transition-all duration-500"
+                      className="h-full bg-[#6EC1E4] rounded-full transition-all duration-500"
                       style={{ width: `${progressPercentage}%` }}
                     />
                   </div>
                   <div className="grid grid-cols-3 gap-2 pt-2">
-                    <div className="text-center p-2 bg-emerald-50 rounded-lg">
-                      <div className="text-lg font-bold text-emerald-700">
+                    <div className="text-center p-2 bg-[rgba(110,193,228,0.1)] rounded-lg">
+                      <div className="text-lg font-bold text-[#5AAFD0]">
                         {sessionData.progress?.answered_count || 0}
                       </div>
-                      <div className="text-xs text-emerald-600">Done</div>
+                      <div className="text-xs text-[#6EC1E4]">Done</div>
                     </div>
                     <div className="text-center p-2 bg-gray-50 rounded-lg">
                       <div className="text-lg font-bold text-gray-700">
@@ -2119,14 +2119,14 @@ export const QuizTaking = () => {
             )}
 
             {getUnansweredCount() === 0 && (
-              <div className="w-full p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-left">
+              <div className="w-full p-4 bg-[rgba(110,193,228,0.1)] border border-[rgba(110,193,228,0.3)] rounded-xl text-left">
                 <div className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+                  <CheckCircle className="w-5 h-5 text-[#6EC1E4] shrink-0 mt-0.5" />
                   <div>
-                    <p className="font-semibold text-emerald-800">
+                    <p className="font-semibold text-[#2A5F80]">
                       All questions answered!
                     </p>
-                    <p className="text-sm text-emerald-700 mt-1">
+                    <p className="text-sm text-[#5AAFD0] mt-1">
                       Great job! You're ready to submit.
                     </p>
                   </div>
@@ -2147,7 +2147,7 @@ export const QuizTaking = () => {
           <button
             onClick={handleSubmitConfirm}
             disabled={isSubmitting}
-            className="px-5 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-colors flex items-center gap-2"
+            className="px-5 py-2.5 bg-[#6EC1E4] text-white rounded-lg hover:bg-[#5AAFD0] disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-colors flex items-center gap-2"
           >
             {isSubmitting ? (
               <>
@@ -2168,3 +2168,6 @@ export const QuizTaking = () => {
 };
 
 export default QuizTaking;
+
+
+

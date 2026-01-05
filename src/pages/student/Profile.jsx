@@ -217,7 +217,7 @@ export function Profile() {
                 ) : null}
                 <div
                   className={cn(
-                    "w-32 h-32 lg:w-40 lg:h-40 rounded-2xl flex items-center justify-center text-white text-4xl lg:text-5xl font-bold border-4 border-white shadow-lg bg-gradient-to-br from-emerald-500 to-teal-600",
+                    "w-32 h-32 lg:w-40 lg:h-40 rounded-2xl flex items-center justify-center text-white text-4xl lg:text-5xl font-bold border-4 border-white shadow-lg bg-gradient-to-br from-[#FF5100] to-[#FF6B2C]",
                     displayAvatar ? "hidden" : "flex"
                   )}
                 >
@@ -226,7 +226,7 @@ export function Profile() {
                 </div>
 
                 {/* Online Status */}
-                <div className="absolute bottom-2 right-2 w-5 h-5 bg-emerald-500 border-3 border-white rounded-full shadow-sm" />
+                <div className="absolute bottom-2 right-2 w-5 h-5 bg-[#6EC1E4] border-3 border-white rounded-full shadow-sm" />
               </div>
 
               {/* Edit Avatar Button */}
@@ -235,7 +235,7 @@ export function Profile() {
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="absolute -bottom-2 -right-2 p-3 bg-emerald-600 rounded-xl shadow-lg hover:bg-emerald-700 hover:shadow-xl transition-all"
+                    className="absolute -bottom-2 -right-2 p-3 bg-[#FF5100] rounded-xl shadow-lg hover:bg-[#E64800] hover:shadow-xl transition-all"
                     title="Upload photo"
                   >
                     <Camera className="w-5 h-5 text-white" />
@@ -280,7 +280,7 @@ export function Profile() {
                     </span>
                   </div>
                   <div className="flex items-center gap-2 mt-3">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-sm font-medium">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-[rgba(110,193,228,0.2)] text-[#5AAFD0] rounded-lg text-sm font-medium">
                       <Shield className="w-4 h-4" />
                       {user?.role?.charAt(0).toUpperCase() +
                         user?.role?.slice(1)}
@@ -296,7 +296,7 @@ export function Profile() {
                 {!isEditing && (
                   <button
                     onClick={() => setIsEditing(true)}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-700 transition-colors shadow-sm"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#FF5100] text-white font-semibold rounded-lg hover:bg-[#E64800] transition-colors shadow-sm"
                   >
                     <Edit3 className="w-4 h-4" />
                     Edit Profile
@@ -317,8 +317,8 @@ export function Profile() {
             <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
               <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center">
-                    <User className="w-5 h-5 text-emerald-600" />
+                  <div className="w-10 h-10 rounded-lg bg-[rgba(110,193,228,0.2)] flex items-center justify-center">
+                    <User className="w-5 h-5 text-[#6EC1E4]" />
                   </div>
                   <div>
                     <h2 className="text-lg font-semibold text-gray-900">
@@ -344,7 +344,7 @@ export function Profile() {
                           {...register("first_name")}
                           placeholder="Enter first name"
                           className={cn(
-                            "w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all",
+                            "w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-[rgba(255,81,0,0.2)] focus:border-[#FF5100] outline-none transition-all",
                             errors.first_name
                               ? "border-red-300 focus:border-red-500 focus:ring-red-500/20"
                               : "border-gray-300"
@@ -374,7 +374,7 @@ export function Profile() {
                           {...register("last_name")}
                           placeholder="Enter last name"
                           className={cn(
-                            "w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all",
+                            "w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-[rgba(255,81,0,0.2)] focus:border-[#FF5100] outline-none transition-all",
                             errors.last_name
                               ? "border-red-300 focus:border-red-500 focus:ring-red-500/20"
                               : "border-gray-300"
@@ -403,7 +403,7 @@ export function Profile() {
                       <span className="text-gray-900 font-medium flex-1">
                         {user?.email}
                       </span>
-                      <CheckCircle className="w-4 h-4 text-emerald-500" />
+                      <CheckCircle className="w-4 h-4 text-[#6EC1E4]" />
                     </div>
                     <p className="text-xs text-gray-500 mt-1.5">
                       Email cannot be changed
@@ -420,7 +420,7 @@ export function Profile() {
                         (!isDirty && !selectedFile) ||
                         updateProfileMutation.isPending
                       }
-                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#FF5100] text-white font-semibold rounded-lg hover:bg-[#E64800] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       {updateProfileMutation.isPending ? (
                         <>
@@ -457,8 +457,8 @@ export function Profile() {
               </div>
               <div className="p-5 space-y-4">
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center">
-                    <BookOpen className="w-5 h-5 text-emerald-600" />
+                  <div className="w-10 h-10 rounded-lg bg-[rgba(110,193,228,0.2)] flex items-center justify-center">
+                    <BookOpen className="w-5 h-5 text-[#6EC1E4]" />
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Exams Taken</p>
@@ -487,7 +487,7 @@ export function Profile() {
               <div className="px-5 py-3 border-t border-gray-100 bg-gray-50">
                 <Link
                   to="/my-learning"
-                  className="text-sm font-medium text-emerald-600 hover:text-emerald-700 flex items-center gap-1"
+                  className="text-sm font-medium text-[#FF5100] hover:text-[#E64800] flex items-center gap-1"
                 >
                   View detailed stats
                   <ChevronRight className="w-4 h-4" />
@@ -496,7 +496,7 @@ export function Profile() {
             </div>
 
             {/* Member Since Card */}
-            <div className="bg-gradient-to-br from-emerald-600 to-teal-600 rounded-xl p-5 text-white">
+            <div className="bg-gradient-to-br from-[#FF5100] to-[#FF6B2C] rounded-xl p-5 text-white">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center">
                   <Calendar className="w-5 h-5 text-white" />
@@ -535,3 +535,6 @@ export function Profile() {
 }
 
 export default Profile;
+
+
+

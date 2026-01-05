@@ -194,7 +194,7 @@ export const Home = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 sm:gap-8">
             <div className="flex-1">
-              <p className="text-emerald-600 font-semibold mb-2 text-sm sm:text-base">
+              <p className="text-[#FF5100] font-semibold mb-2 text-sm sm:text-base">
                 Welcome back
               </p>
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-3 sm:mb-4">
@@ -216,14 +216,14 @@ export const Home = () => {
                         }`
                       )
                     }
-                    className="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-700 transition-colors text-sm sm:text-base"
+                    className="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-[#FF5100] text-white font-semibold rounded-lg hover:bg-[#E64800] transition-colors text-sm sm:text-base"
                   >
                     <Play className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                     Start Practice Exam
                   </button>
                 )}
                 <button
-                  onClick={() => navigate("/groups")}
+                  onClick={() => navigate("/my-groups")}
                   className="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors text-sm sm:text-base"
                 >
                   <Users className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -241,13 +241,13 @@ export const Home = () => {
                 <div className="text-xs sm:text-sm text-gray-600">Available Exams</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl sm:text-4xl font-bold text-green-600">
+                <div className="text-3xl sm:text-4xl font-bold text-secondary-500">
                   {dashboardStats.completedQuizzes}
                 </div>
                 <div className="text-xs sm:text-sm text-gray-600">Completed</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl sm:text-4xl font-bold text-emerald-600">
+                <div className="text-3xl sm:text-4xl font-bold text-[#FF5100]">
                   {dashboardStats.averageScore}%
                 </div>
                 <div className="text-xs sm:text-sm text-gray-600">Avg Score</div>
@@ -268,7 +268,7 @@ export const Home = () => {
                 <span className="text-xs sm:text-sm font-medium text-gray-700">
                   Overall Completion
                 </span>
-                <span className="text-xs sm:text-sm font-semibold text-emerald-600">
+                <span className="text-xs sm:text-sm font-semibold text-[#6EC1E4]">
                   {dashboardStats.totalQuizzes > 0
                     ? Math.round(
                         (dashboardStats.completedQuizzes /
@@ -281,7 +281,7 @@ export const Home = () => {
               </div>
               <div className="h-2.5 sm:h-3 bg-gray-200 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-emerald-500 rounded-full transition-all duration-500"
+                  className="h-full bg-[#6EC1E4] rounded-full transition-all duration-500"
                   style={{
                     width: `${
                       dashboardStats.totalQuizzes > 0
@@ -332,10 +332,10 @@ export const Home = () => {
 
       {/* Continue Learning Section */}
       {inProgressQuizzes.length > 0 && (
-        <section className="bg-emerald-50 border-y border-emerald-100">
+        <section className="bg-[rgba(110,193,228,0.1)] border-y border-[rgba(110,193,228,0.15)]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
             <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
-              <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600" />
+              <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-[#6EC1E4]" />
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
                 Continue Where You Left Off
               </h2>
@@ -345,7 +345,7 @@ export const Home = () => {
                 <div
                   key={quiz.quiz_id || quiz.id}
                   onClick={() => navigate(`/exams/${quiz.quiz_id || quiz.id}`)}
-                  className="flex flex-col xs:flex-row items-start xs:items-center justify-between bg-white rounded-lg p-4 sm:p-5 border border-emerald-200 cursor-pointer hover:border-emerald-400 transition-colors gap-3 xs:gap-4"
+                  className="flex flex-col xs:flex-row items-start xs:items-center justify-between bg-white rounded-lg p-4 sm:p-5 border border-[rgba(110,193,228,0.3)] cursor-pointer hover:border-[#6EC1E4] transition-colors gap-3 xs:gap-4"
                 >
                   <div className="flex-1 min-w-0 w-full xs:w-auto">
                     <h3 className="font-semibold text-gray-900 mb-1 text-sm sm:text-base">
@@ -360,7 +360,7 @@ export const Home = () => {
                       )}
                     </div>
                   </div>
-                  <button className="flex items-center justify-center gap-2 px-4 py-2 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors text-sm w-full xs:w-auto">
+                  <button className="flex items-center justify-center gap-2 px-4 py-2 bg-[#6EC1E4] text-white font-medium rounded-lg hover:bg-[#5AAFD0] transition-colors text-sm w-full xs:w-auto">
                     <Play className="w-4 h-4 text-white" />
                     Continue
                   </button>
@@ -383,7 +383,7 @@ export const Home = () => {
             </div>
             <Link
               to="/my-learning"
-              className="text-emerald-600 hover:text-emerald-700 font-medium flex items-center gap-1 text-sm sm:text-base"
+              className="text-[#6EC1E4] hover:text-[#5AAFD0] font-medium flex items-center gap-1 text-sm sm:text-base"
             >
               View all <ChevronRight className="w-4 h-4" />
             </Link>
@@ -426,14 +426,14 @@ export const Home = () => {
             <div>
               <div className="flex items-center justify-between mb-4 sm:mb-6">
                 <div className="flex items-center gap-2 sm:gap-3">
-                  <Users className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600" />
+                  <Users className="w-5 h-5 sm:w-6 sm:h-6 text-[#6EC1E4]" />
                   <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
                     Study Groups
                   </h2>
                 </div>
                 <Link
-                  to="/groups"
-                  className="text-emerald-600 hover:text-emerald-700 font-medium text-xs sm:text-sm"
+                  to="/my-groups"
+                  className="text-[#6EC1E4] hover:text-[#5AAFD0] font-medium text-xs sm:text-sm"
                 >
                   View all
                 </Link>
@@ -445,11 +445,11 @@ export const Home = () => {
                     <div
                       key={group.group_id || group.id}
                       onClick={() =>
-                        navigate(`/groups/${group.group_id || group.id}`)
+                        navigate(`/my-groups/${group.group_id || group.id}`)
                       }
                       className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-white border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
                     >
-                      <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-emerald-100 text-emerald-700 font-bold text-base sm:text-lg flex-shrink-0">
+                      <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-[rgba(110,193,228,0.15)] text-[#5AAFD0] font-bold text-base sm:text-lg flex-shrink-0">
                         {group.name?.[0]?.toUpperCase() || "G"}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -465,7 +465,7 @@ export const Home = () => {
                           "text-xs px-2 py-1 rounded-full flex-shrink-0",
                           group.is_private
                             ? "bg-gray-100 text-gray-600"
-                            : "bg-green-100 text-green-700"
+                            : "bg-secondary-100 text-secondary-700"
                         )}
                       >
                         {group.is_private ? "Private" : "Public"}
@@ -480,7 +480,7 @@ export const Home = () => {
                     You haven't joined any groups yet
                   </p>
                   <button
-                    onClick={() => navigate("/groups")}
+                    onClick={() => navigate("/my-groups")}
                     className="text-primary-600 hover:text-primary-700 font-medium text-sm sm:text-base"
                   >
                     Browse Groups →
@@ -492,7 +492,7 @@ export const Home = () => {
             {/* Recent Activity */}
             <div>
               <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
-                <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600" />
+                <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-[#6EC1E4]" />
                 <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
                   Recent Activity
                 </h2>
@@ -509,9 +509,9 @@ export const Home = () => {
                         className={cn(
                           "flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full shrink-0",
                           activity.metadata?.score >= 80
-                            ? "bg-green-100"
+                            ? "bg-secondary-100"
                             : activity.metadata?.score >= 60
-                            ? "bg-orange-100"
+                            ? "bg-primary-100"
                             : "bg-gray-100"
                         )}
                       >
@@ -519,9 +519,9 @@ export const Home = () => {
                           className={cn(
                             "w-4 h-4 sm:w-5 sm:h-5",
                             activity.metadata?.score >= 80
-                              ? "text-green-600"
+                              ? "text-secondary-600"
                               : activity.metadata?.score >= 60
-                              ? "text-orange-600"
+                              ? "text-primary-500"
                               : "text-gray-500"
                           )}
                         />
@@ -541,9 +541,9 @@ export const Home = () => {
                         className={cn(
                           "text-base sm:text-lg font-bold flex-shrink-0",
                           activity.metadata?.score >= 80
-                            ? "text-green-600"
+                            ? "text-secondary-600"
                             : activity.metadata?.score >= 60
-                            ? "text-orange-600"
+                            ? "text-primary-500"
                             : "text-gray-600"
                         )}
                       >
@@ -569,7 +569,7 @@ export const Home = () => {
       {/* Active Exams Banner */}
       {activeQuizzes.length > 0 && (
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-          <div className="bg-emerald-600 rounded-xl p-6 sm:p-8 text-white">
+          <div className="bg-[#6EC1E4] rounded-xl p-6 sm:p-8 text-white">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 sm:gap-6">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
@@ -593,10 +593,10 @@ export const Home = () => {
                     }`
                   )
                 }
-                className="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-white text-emerald-600 font-semibold rounded-lg hover:bg-gray-50 transition-colors shrink-0 text-sm sm:text-base w-full md:w-auto"
+                className="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-white text-[#6EC1E4] font-semibold rounded-lg hover:bg-gray-50 transition-colors shrink-0 text-sm sm:text-base w-full md:w-auto"
               >
                 Start Now
-                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600" />
+                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-[#6EC1E4]" />
               </button>
             </div>
           </div>
@@ -607,7 +607,7 @@ export const Home = () => {
       <section className="border-t border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
           <div className="text-center max-w-3xl mx-auto">
-            <Award className="w-10 h-10 sm:w-12 sm:h-12 text-emerald-600 mx-auto mb-4" />
+            <Award className="w-10 h-10 sm:w-12 sm:h-12 text-[#6EC1E4] mx-auto mb-4" />
             <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">
               About PMP Exam Platform
             </h2>
@@ -618,19 +618,19 @@ export const Home = () => {
             </p>
             <div className="flex flex-wrap justify-center gap-6 sm:gap-8 text-center">
               <div>
-                <div className="text-2xl sm:text-3xl font-bold text-emerald-600">
+                <div className="text-2xl sm:text-3xl font-bold text-[#6EC1E4]">
                   {dashboardStats.totalQuizzes}+
                 </div>
                 <div className="text-xs sm:text-sm text-gray-600">Practice Exams</div>
               </div>
               <div>
-                <div className="text-2xl sm:text-3xl font-bold text-emerald-600">
+                <div className="text-2xl sm:text-3xl font-bold text-[#6EC1E4]">
                   {myGroups.length}
                 </div>
                 <div className="text-xs sm:text-sm text-gray-600">Study Groups</div>
               </div>
               <div>
-                <div className="text-2xl sm:text-3xl font-bold text-emerald-600">24/7</div>
+                <div className="text-2xl sm:text-3xl font-bold text-[#6EC1E4]">24/7</div>
                 <div className="text-xs sm:text-sm text-gray-600">Available</div>
               </div>
             </div>
@@ -642,3 +642,7 @@ export const Home = () => {
 };
 
 export default Home;
+
+
+
+

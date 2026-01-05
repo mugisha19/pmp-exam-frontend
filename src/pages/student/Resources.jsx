@@ -108,7 +108,7 @@ export const Resources = () => {
 
   return (
     <div className="min-h-screen bg-bg-secondary">
-      <div className="bg-gradient-to-br from-accent-teal to-primary-600 text-white">
+      <div className="bg-gradient-to-br from-secondary-500 to-primary-600 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="flex items-center gap-3 mb-4">
             <Book className="w-8 h-8" />
@@ -197,3 +197,6 @@ export const Resources = () => {
 };
 
 export default Resources;
+
+
+

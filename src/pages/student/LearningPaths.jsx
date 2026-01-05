@@ -83,7 +83,7 @@ export const LearningPaths = () => {
   return (
     <div className="min-h-screen bg-bg-secondary">
       {/* Header */}
-      <div className="bg-gradient-to-br from-primary-500 to-accent-teal text-white">
+      <div className="bg-gradient-to-br from-primary-500 to-secondary-500 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="flex items-center gap-3 mb-4">
             <Target className="w-8 h-8" />
@@ -215,7 +215,7 @@ export const LearningPaths = () => {
                         className={cn(
                           "flex items-center gap-4 p-4 rounded-xl border-2 transition-all",
                           quiz.completed
-                            ? "border-success/30 bg-green-50"
+                            ? "border-secondary-400/30 bg-secondary-50"
                             : "border-border-light bg-white hover:border-primary-300"
                         )}
                       >
@@ -253,7 +253,7 @@ export const LearningPaths = () => {
                           className={cn(
                             "flex items-center gap-2 px-6 py-2.5 rounded-lg font-semibold transition-all",
                             quiz.completed
-                              ? "bg-white border-2 border-success text-success hover:bg-green-50"
+                              ? "bg-white border-2 border-secondary-500 text-secondary-600 hover:bg-secondary-50"
                               : "bg-primary-600 text-white hover:bg-primary-700"
                           )}
                         >
@@ -289,3 +289,6 @@ export const LearningPaths = () => {
 };
 
 export default LearningPaths;
+
+
+

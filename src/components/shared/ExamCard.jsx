@@ -23,11 +23,11 @@ import { cn } from "@/utils/cn";
 
 // Color Constants
 const COLORS = {
-  primary: "#476072",
-  primaryLight: "#5a7a8f",
-  primaryDark: "#3a5060",
-  accent: "#E7F2EF",
-  accentDark: "#d4e8e3",
+  primary: "#FF5100",
+  primaryLight: "#FF6B2C",
+  primaryDark: "#E64800",
+  accent: "#FFF5F0",
+  accentDark: "#FFE6D9",
 };
 
 export const ExamCard = ({
@@ -50,9 +50,9 @@ export const ExamCard = ({
       case "easy":
         return {
           label: "Easy",
-          bg: "bg-teal-50",
-          text: "text-teal-700",
-          border: "border-teal-200",
+          bg: "bg-[rgba(110,193,228,0.1)]",
+          text: "text-[#5AAFD0]",
+          border: "border-[rgba(110,193,228,0.3)]",
         };
       case "hard":
         return {
@@ -64,9 +64,9 @@ export const ExamCard = ({
       default:
         return {
           label: "Medium",
-          bg: "bg-amber-50",
-          text: "text-amber-700",
-          border: "border-amber-200",
+          bg: "bg-[rgba(255,81,0,0.1)]",
+          text: "text-[#E64800]",
+          border: "border-[rgba(255,81,0,0.2)]",
         };
     }
   };
@@ -74,14 +74,14 @@ export const ExamCard = ({
   const difficultyConfig = getDifficultyConfig(difficulty);
 
   const getScoreColor = (score) => {
-    if (score >= 80) return "text-teal-600";
-    if (score >= 60) return "text-amber-600";
+    if (score >= 80) return "text-[#6EC1E4]";
+    if (score >= 60) return "text-[#FF5100]";
     return "text-rose-600";
   };
 
   const getScoreBg = (score) => {
-    if (score >= 80) return "bg-teal-50 border-teal-200";
-    if (score >= 60) return "bg-amber-50 border-amber-200";
+    if (score >= 80) return "bg-[rgba(110,193,228,0.1)] border-[rgba(110,193,228,0.3)]";
+    if (score >= 60) return "bg-[rgba(255,81,0,0.1)] border-[rgba(255,81,0,0.2)]";
     return "bg-rose-50 border-rose-200";
   };
 
@@ -144,7 +144,7 @@ export const ExamCard = ({
                 </span>
               )}
               {isCompleted && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-teal-50 text-teal-700 text-xs font-semibold rounded-lg border border-teal-200">
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-[rgba(110,193,228,0.1)] text-[#5AAFD0] text-xs font-semibold rounded-lg border border-[rgba(110,193,228,0.3)]">
                   <CheckCircle className="w-3 h-3" />
                   Completed
                 </span>

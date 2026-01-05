@@ -105,17 +105,17 @@ export const TopNavbar = () => {
   }, [location.pathname]);
 
   const isActive = (path) => {
-    if (path === "/dashboard") {
-      return location.pathname === "/dashboard" || location.pathname === "/";
+    if (path === "/home") {
+      return location.pathname === "/home" || location.pathname === "/" || location.pathname === "/dashboard";
     }
     return location.pathname.startsWith(path);
   };
 
   const mainNavItems = [
-    { label: "Home", path: "/dashboard", icon: Home },
+    { label: "Home", path: "/home", icon: Home },
     { label: "My Learning", path: "/my-learning", icon: TrendingUp },
-    { label: "Groups", path: "/groups", icon: Users },
-    { label: "Analytics", path: "/analytics", icon: BarChart3 },
+    { label: "Groups", path: "/my-groups", icon: Users },
+    { label: "Analytics", path: "/my-analytics", icon: BarChart3 },
   ];
 
   return (
@@ -134,14 +134,9 @@ export const TopNavbar = () => {
             <div className="flex items-center gap-8">
               {/* Logo */}
               <Link to="/dashboard" className="flex items-center gap-2.5 group">
-                <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-sm group-hover:shadow-md transition-shadow">
-                  <GraduationCap className="w-5 h-5 text-white" />
-                </div>
-                <div className="hidden sm:block">
-                  <span className="text-lg font-bold text-gray-900">
-                    <span className="text-emerald-600">PMP</span>
-                  </span>
-                </div>
+                <span className="text-xl font-bold text-[#FF5100]">
+                  PMP Exam
+                </span>
               </Link>
 
               {/* Desktop Navigation */}
@@ -155,16 +150,19 @@ export const TopNavbar = () => {
                       key={item.label}
                       to={item.path}
                       className={cn(
-                        "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
+                        "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 relative",
                         active
-                          ? "text-emerald-700 bg-emerald-50"
+                          ? "text-[#FF5100] bg-orange-50"
                           : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                       )}
                     >
                       <Icon
-                        className={cn("w-4 h-4", active && "text-emerald-600")}
+                        className={cn("w-4 h-4", active ? "text-[#FF5100]" : "")}
                       />
                       {item.label}
+                      {active && (
+                        <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-[#FF5100] rounded-full" />
+                      )}
                     </Link>
                   );
                 })}
@@ -185,7 +183,7 @@ export const TopNavbar = () => {
                 className={cn(
                   "relative p-2 rounded-lg transition-all duration-200",
                   notesOpen
-                    ? "text-emerald-600 bg-emerald-50"
+                    ? "text-primary-500 bg-primary-50"
                     : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                 )}
               >
@@ -204,7 +202,7 @@ export const TopNavbar = () => {
                 className={cn(
                   "relative p-2 rounded-lg transition-all duration-200",
                   reminderOpen
-                    ? "text-emerald-600 bg-emerald-50"
+                    ? "text-primary-500 bg-primary-50"
                     : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                 )}
               >
@@ -224,7 +222,7 @@ export const TopNavbar = () => {
                   className={cn(
                     "relative p-2 rounded-lg transition-all duration-200",
                     notificationsOpen
-                      ? "text-emerald-600 bg-emerald-50"
+                      ? "text-primary-500 bg-primary-50"
                       : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                   )}
                 >
@@ -257,28 +255,29 @@ export const TopNavbar = () => {
                     setReminderOpen(false);
                   }}
                   className={cn(
-                    "flex items-center gap-3 pl-1 pr-3 py-1 rounded-full transition-all duration-200",
+                    "flex items-center gap-2 px-3 py-2 rounded-xl transition-all duration-200 border",
                     profileOpen
-                      ? "bg-emerald-50 ring-2 ring-emerald-500/20"
-                      : "hover:bg-gray-50"
+                      ? "bg-primary-50 border-primary-300 shadow-sm"
+                      : "bg-white border-gray-200 hover:border-primary-300 hover:shadow-sm"
                   )}
                 >
                   {/* Avatar */}
                   <div className="relative">
-                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white text-sm font-bold shadow-sm">
+                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-[#FF5100] to-[#6EC1E4] text-white text-sm font-bold shadow-sm">
                       {user?.first_name?.charAt(0)?.toUpperCase() || "U"}
                     </div>
                     {/* Online indicator */}
-                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full" />
+                    <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-white rounded-full" />
                   </div>
 
                   {/* User Info */}
-                  <div className="flex items-center max-w-[120px] sm:max-w-[150px]">
+                  <div className="flex flex-col max-w-[120px]">
                     <span className="text-sm font-semibold text-gray-900 leading-tight truncate">
                       {user?.first_name && user?.last_name
                         ? `${user.first_name} ${user.last_name}`
                         : user?.first_name || "User"}
                     </span>
+                    <span className="text-xs text-gray-500 capitalize">{user?.role || "Student"}</span>
                   </div>
 
                   <ChevronDown
@@ -335,12 +334,12 @@ export const TopNavbar = () => {
                   className={cn(
                     "flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200",
                     active
-                      ? "text-emerald-700 bg-emerald-50"
+                      ? "text-[#FF5100] bg-orange-50 border-l-4 border-[#FF5100]"
                       : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                   )}
                 >
                   <Icon
-                    className={cn("w-5 h-5", active && "text-emerald-600")}
+                    className={cn("w-5 h-5", active ? "text-[#FF5100]" : "")}
                   />
                   {item.label}
                 </Link>
@@ -352,7 +351,7 @@ export const TopNavbar = () => {
 
             {/* Quick Profile Info - Mobile */}
             <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-xl">
-              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white font-bold">
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 text-white font-bold">
                 {user?.name?.charAt(0)?.toUpperCase() || "U"}
               </div>
               <div className="flex-1">

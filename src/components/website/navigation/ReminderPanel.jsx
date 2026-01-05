@@ -453,7 +453,7 @@ export const ReminderPanel = ({ onClose, preselectedQuizId = null }) => {
                                   <span>{new Date(reminder.scheduled_time).toLocaleString()}</span>
                                 </div>
                               </div>
-                              <div className="inline-flex items-center gap-1.5 mt-2 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
+                              <div className="inline-flex items-center gap-1.5 mt-2 px-2.5 py-1 rounded-full text-xs font-medium bg-secondary-100 text-secondary-700">
                                 <Clock className="w-3 h-3" />
                                 In {timeRemaining}
                               </div>
