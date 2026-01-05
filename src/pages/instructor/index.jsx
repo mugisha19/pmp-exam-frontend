@@ -5,19 +5,13 @@
 
 // Implemented Pages
 export { Dashboard as InstructorDashboard } from "./Dashboard";
+export { default as QuestionBankPage } from "./QuestionBank";
 
 // Placeholder Pages - To be implemented
 export const ManageExamsPage = () => (
   <div className="p-6">
     <h1 className="text-2xl font-bold text-gray-900 mb-2">Manage Exams</h1>
     <p className="text-gray-500">Create and manage your exams - Coming Soon</p>
-  </div>
-);
-
-export const QuestionBankPage = () => (
-  <div className="p-6">
-    <h1 className="text-2xl font-bold text-gray-900 mb-2">Question Bank</h1>
-    <p className="text-gray-500">Create and organize questions - Coming Soon</p>
   </div>
 );
 

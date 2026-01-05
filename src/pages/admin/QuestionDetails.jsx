@@ -110,17 +110,30 @@ const renderOptions = (question) => {
                 (item) => item.id === match.right_id
               );
               return (
-                <div
-                  key={index}
-                  className="p-3 bg-green-50 rounded-lg border border-green-200 flex items-center gap-2"
-                >
-                  <span className="font-medium text-green-700">
-                    {leftItem?.text || match.left_id}
-                  </span>
-                  <span className="text-green-600">→</span>
-                  <span className="font-medium text-green-700">
-                    {rightItem?.text || match.right_id}
-                  </span>
+                <div key={index} className="space-y-2">
+                  <div className="p-3 bg-green-50 rounded-lg border border-green-200 flex items-center gap-2">
+                    <span className="font-medium text-green-700">
+                      {leftItem?.text || match.left_id}
+                    </span>
+                    <span className="text-green-600">→</span>
+                    <span className="font-medium text-green-700">
+                      {rightItem?.text || match.right_id}
+                    </span>
+                  </div>
+                  {match.explanation && (
+                    <div className="ml-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                      <div className="flex items-start gap-2">
+                        <BookOpen className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                        <div>
+                          <p className="text-xs font-semibold text-blue-700 mb-1">Explanation:</p>
+                          <div
+                            className="text-sm text-gray-700"
+                            dangerouslySetInnerHTML={{ __html: match.explanation }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -171,6 +184,20 @@ const renderOptions = (question) => {
                     Correct Answer
                   </Badge>
                 )}
+                {option.explanation && (
+                  <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="flex items-start gap-2">
+                      <BookOpen className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="text-xs font-semibold text-blue-700 mb-1">Explanation:</p>
+                        <div
+                          className="text-sm text-gray-700"
+                          dangerouslySetInnerHTML={{ __html: option.explanation }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -178,6 +205,42 @@ const renderOptions = (question) => {
       })}
     </div>
   );
+};
+
+/**
+ * Extract explanation from options
+ */
+const getExplanation = (question) => {
+  const { question_type, options } = question;
+
+  if (question_type === "matching") {
+    // For matching, explanations can be in correct_matches
+    const matchingOptions = options || {};
+    const explanations = matchingOptions.correct_matches
+      ?.map(match => match.explanation)
+      .filter(Boolean);
+    
+    if (explanations && explanations.length > 0) {
+      return explanations.join('<br/><br/>');
+    }
+    return null;
+  }
+
+  // For other question types, find explanation in correct answer option(s)
+  const optionsArray = Array.isArray(options) ? options : [];
+  const correctOptions = optionsArray.filter(opt => opt.is_correct === true);
+  
+  if (correctOptions.length > 0) {
+    const explanations = correctOptions
+      .map(opt => opt.explanation)
+      .filter(Boolean);
+    
+    if (explanations.length > 0) {
+      return explanations.join('<br/><br/>');
+    }
+  }
+
+  return null;
 };
 
 export const QuestionDetails = () => {
@@ -378,20 +441,30 @@ export const QuestionDetails = () => {
         </CardContent>
       </Card>
 
-      {/* Explanation */}
-      {question.explanation && (
-        <Card>
-          <CardContent className="p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+      {/* Explanation - Always show */}
+      <Card className="bg-blue-50 border-blue-200">
+        <CardContent className="p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <BookOpen className="w-5 h-5 text-blue-600" />
+            <h3 className="text-lg font-semibold text-gray-900">
               Explanation
             </h3>
-            <div
-              className="prose max-w-none text-gray-700"
-              dangerouslySetInnerHTML={{ __html: question.explanation }}
-            />
-          </CardContent>
-        </Card>
-      )}
+          </div>
+          {(() => {
+            const explanation = question.explanation || getExplanation(question);
+            return explanation ? (
+              <div
+                className="prose max-w-none text-gray-800 bg-white p-4 rounded-lg border border-blue-100"
+                dangerouslySetInnerHTML={{ __html: explanation }}
+              />
+            ) : (
+              <div className="bg-white p-4 rounded-lg border border-blue-100">
+                <p className="text-gray-500 italic">No explanation provided for this question.</p>
+              </div>
+            );
+          })()}
+        </CardContent>
+      </Card>
 
       {/* Metadata */}
       {question.metadata && Object.keys(question.metadata).length > 0 && (

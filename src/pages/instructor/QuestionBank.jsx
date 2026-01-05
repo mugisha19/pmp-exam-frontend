@@ -1,5 +1,5 @@
 /**
- * Admin Question Management Page
+ * Instructor Question Bank Page
  * Manage questions with topic linking and various question types
  */
 
@@ -64,7 +64,7 @@ const DOMAIN_OPTIONS = [
   { value: "Business Environment", label: "Business Environment" },
 ];
 
-export default function QuestionManagement() {
+export default function QuestionBank() {
   const navigate = useNavigate();
   const { user } = useAuthStore();
 
@@ -269,17 +269,6 @@ export default function QuestionManagement() {
         ),
       },
       {
-        key: "topic_name",
-        header: "Topic",
-        sortable: true,
-        render: (_, question) => (
-          <div className="flex items-center gap-2">
-            <BookOpen className="w-4 h-4 text-gray-400" />
-            <span className="text-sm">{question?.topic_name || "N/A"}</span>
-          </div>
-        ),
-      },
-      {
         key: "question_type",
         header: "Type",
         sortable: true,
@@ -346,24 +335,24 @@ export default function QuestionManagement() {
 
   const totalQuestionsCard = (
     <div className="mb-6">
-      <div className="bg-gradient-to-r from-gray-100 to-gray-200 rounded-xl shadow-md p-6 border border-gray-300">
+      <div className="bg-gradient-to-r from-blue-100 to-blue-200 rounded-xl shadow-md p-6 border border-blue-300">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="bg-gray-300 p-4 rounded-xl">
-              <FileQuestion className="w-8 h-8 text-gray-700" />
+            <div className="bg-blue-300 p-4 rounded-xl">
+              <FileQuestion className="w-8 h-8 text-blue-700" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-600 mb-1">
+              <p className="text-sm font-medium text-blue-600 mb-1">
                 Total Questions
               </p>
-              <p className="text-4xl font-bold text-gray-900">
+              <p className="text-4xl font-bold text-blue-900">
                 {totalCount || 0}
               </p>
             </div>
           </div>
           <div className="hidden md:block">
             <div className="text-right">
-              <p className="text-xs text-gray-600 font-medium">
+              <p className="text-xs text-blue-600 font-medium">
                 Available questions
               </p>
             </div>
@@ -576,15 +565,13 @@ export default function QuestionManagement() {
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <PageHeader
-        title="Question Bank Management"
+        title="Question Bank"
         subtitle="Manage questions organized by topics for PMP exam preparation"
         actions={
-          user?.role === "admin" && (
-            <Button onClick={handleCreateQuestion} size="lg">
-              <Plus className="w-5 h-5 mr-2" />
-              Create Question
-            </Button>
-          )
+          <Button onClick={handleCreateQuestion} size="lg">
+            <Plus className="w-5 h-5 mr-2" />
+            Create Question
+          </Button>
         }
       />
 
