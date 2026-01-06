@@ -13,6 +13,7 @@ import {
   Filter,
   GraduationCap,
   FolderTree,
+  X,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 
