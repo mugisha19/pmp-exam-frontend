@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { FileQuestion, Plus, Search } from "lucide-react";
 import { useGroupQuizzes } from "@/hooks/queries/useGroupQueries";
 import { useQuizBanks } from "@/hooks/queries/useQuizBankQueries";
+import { useAuthStore } from "@/stores/auth.store";
 import { DataTable } from "@/components/shared/DataTable";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { Badge } from "@/components/ui/Badge";
@@ -57,6 +58,7 @@ const getModeBadgeVariant = (mode) => {
 
 export const GroupQuizzesTab = ({ groupId }) => {
   const navigate = useNavigate();
+  const { user } = useAuthStore();
   const [isSelectQuizBankOpen, setIsSelectQuizBankOpen] = useState(false);
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
   const [selectedQuizBank, setSelectedQuizBank] = useState(null);
@@ -219,22 +221,24 @@ export const GroupQuizzesTab = ({ groupId }) => {
   if (!isLoading && quizzes.length === 0) {
     return (
       <Card className="p-6">
-        <div className="flex justify-between items-center mb-4">
-          <Button
-            variant="primary"
-            size="sm"
-            leftIcon={<Plus className="w-4 h-4" />}
-            onClick={() => setIsSelectQuizBankOpen(true)}
-          >
-            Publish Quiz to Group
-          </Button>
-        </div>
+        {user?.role === "admin" && (
+          <div className="flex justify-between items-center mb-4">
+            <Button
+              variant="primary"
+              size="sm"
+              leftIcon={<Plus className="w-4 h-4" />}
+              onClick={() => setIsSelectQuizBankOpen(true)}
+            >
+              Publish Quiz to Group
+            </Button>
+          </div>
+        )}
         <EmptyState
           icon={FileQuestion}
           title="No quizzes yet"
           description="No quizzes have been assigned to this group."
-          actionLabel="Publish Quiz"
-          onAction={() => setIsSelectQuizBankOpen(true)}
+          actionLabel={user?.role === "admin" ? "Publish Quiz" : undefined}
+          onAction={user?.role === "admin" ? () => setIsSelectQuizBankOpen(true) : undefined}
         />
 
         {/* Quiz Bank Selection Modal */}
@@ -322,16 +326,18 @@ export const GroupQuizzesTab = ({ groupId }) => {
 
   return (
     <>
-      <div className="mb-4 flex justify-end">
-        <Button
-          variant="primary"
-          size="sm"
-          leftIcon={<Plus className="w-4 h-4" />}
-          onClick={() => setIsSelectQuizBankOpen(true)}
-        >
-          Publish Quiz to Group
-        </Button>
-      </div>
+      {user?.role === "admin" && (
+        <div className="mb-4 flex justify-end">
+          <Button
+            variant="primary"
+            size="sm"
+            leftIcon={<Plus className="w-4 h-4" />}
+            onClick={() => setIsSelectQuizBankOpen(true)}
+          >
+            Publish Quiz to Group
+          </Button>
+        </div>
+      )}
 
       <DataTable
         columns={columns}

@@ -418,7 +418,7 @@ export const Dashboard = () => {
       value: stats?.activeGroups || 0,
       icon: UsersRound,
       iconBg: "bg-orange-50 text-orange-600",
-      onClick: !isInstructor ? () => navigate("/groups") : undefined,
+      onClick: () => navigate("/groups"),
     },
   ];
 
@@ -791,7 +791,7 @@ export const Dashboard = () => {
                       <tr
                         key={user.user_id || user.id}
                         className="hover:bg-gray-50 cursor-pointer transition-colors"
-                        onClick={() => navigate(`/users/${user.id}`)}
+                        onClick={() => navigate(`/users/${user.user_id || user.id}`)}
                       >
                         <td className="py-3 px-2">
                           <div className="flex items-center gap-3">

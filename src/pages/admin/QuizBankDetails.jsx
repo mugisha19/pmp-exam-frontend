@@ -231,34 +231,36 @@ export const QuizBankDetails = () => {
         actions={
           <div className="flex items-center gap-2">
             {user?.role === "admin" && (
-              <>
-                <Button
-                  variant="primary"
-                  size="sm"
-                  leftIcon={<Send className="w-4 h-4" />}
-                  onClick={() => setIsPublishModalOpen(true)}
-                  disabled={!questions || questions.length === 0}
-                >
-                  Publish Quiz
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  leftIcon={<Edit2 className="w-4 h-4" />}
-                  onClick={() => setIsEditModalOpen(true)}
-                >
-                  Edit Details
-                </Button>
-                <Button
-                  variant="danger"
-                  size="sm"
-                  leftIcon={<Trash2 className="w-4 h-4" />}
-                  onClick={() => setIsDeleteDialogOpen(true)}
-                  disabled={deleteQuizBankMutation.isPending}
-                >
-                  Delete
-                </Button>
-              </>
+              <Button
+                variant="primary"
+                size="sm"
+                leftIcon={<Send className="w-4 h-4" />}
+                onClick={() => setIsPublishModalOpen(true)}
+                disabled={!questions || questions.length === 0}
+              >
+                Publish Quiz
+              </Button>
+            )}
+            {(user?.role === "admin" || user?.role === "instructor") && (
+              <Button
+                variant="outline"
+                size="sm"
+                leftIcon={<Edit2 className="w-4 h-4" />}
+                onClick={() => setIsEditModalOpen(true)}
+              >
+                Edit Details
+              </Button>
+            )}
+            {user?.role === "admin" && (
+              <Button
+                variant="danger"
+                size="sm"
+                leftIcon={<Trash2 className="w-4 h-4" />}
+                onClick={() => setIsDeleteDialogOpen(true)}
+                disabled={deleteQuizBankMutation.isPending}
+              >
+                Delete
+              </Button>
             )}
             <Button
               variant="ghost"
@@ -300,7 +302,7 @@ export const QuizBankDetails = () => {
                 {questions.length} question(s) in this quiz bank
               </p>
             </div>
-            {user?.role === "admin" && (
+            {(user?.role === "admin" || user?.role === "instructor") && (
               <Button
                 size="sm"
                 leftIcon={<Plus className="w-4 h-4" />}
@@ -321,9 +323,9 @@ export const QuizBankDetails = () => {
             <EmptyState
               icon={FileQuestion}
               title="No questions yet"
-              description={user?.role === "admin" ? "Add questions to this quiz bank to get started" : "This quiz bank has no questions yet"}
-              actionLabel={user?.role === "admin" ? "Add Questions" : undefined}
-              onAction={user?.role === "admin" ? () =>
+              description={(user?.role === "admin" || user?.role === "instructor") ? "Add questions to this quiz bank to get started" : "This quiz bank has no questions yet"}
+              actionLabel={(user?.role === "admin" || user?.role === "instructor") ? "Add Questions" : undefined}
+              onAction={(user?.role === "admin" || user?.role === "instructor") ? () =>
                 navigate(`/quiz-banks/${quizBankId}/add-questions`)
               : undefined}
             />

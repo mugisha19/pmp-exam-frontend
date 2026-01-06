@@ -349,7 +349,7 @@ export const QuestionDetails = () => {
         subtitle={`View and manage question information`}
         actions={
           <div className="flex items-center gap-2">
-            {user?.role === "admin" && (
+            {(user?.role === "admin" || user?.role === "instructor") && (
               <>
                 <Button
                   variant="outline"
