@@ -15,6 +15,8 @@ import {
   useMarkAllAsReadMutation,
 } from "@/hooks/queries/useNotificationQueries";
 import { formatDistanceToNow } from "date-fns";
+import { useAuthStore } from "@/stores/auth.store";
+import { transformNotificationLink } from "@/utils/notification.utils";
 
 // Notification type to icon/color mapping (reserved for future styling enhancements)
 const _getNotificationStyle = (type) => {
@@ -51,6 +53,7 @@ const formatTime = (dateString) => {
 export const NotificationBell = ({ className }) => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+  const { user } = useAuthStore();
 
   // Get unread count for badge
   const { data: unreadCount = 0 } = useUnreadNotificationCount();
@@ -73,9 +76,12 @@ export const NotificationBell = ({ className }) => {
       markAsReadMutation.mutate(notification.id);
     }
 
-    // Navigate if there's a link
-    if (notification.link) {
-      navigate(notification.link);
+    // Navigate if there's a link using the utility
+    if (notification.link && user) {
+      const transformedLink = transformNotificationLink(notification.link, user.role);
+      if (transformedLink) {
+        navigate(transformedLink);
+      }
     }
   };
 
@@ -84,7 +90,10 @@ export const NotificationBell = ({ className }) => {
   };
 
   const handleViewAll = () => {
-    navigate("/notifications");
+    const notificationsPath = user?.role === "student" 
+      ? "/my-notifications" 
+      : "/notifications";
+    navigate(notificationsPath);
   };
 
   return (

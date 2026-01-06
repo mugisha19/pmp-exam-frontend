@@ -83,17 +83,62 @@ export function NotificationDetailModal({ isOpen, onClose, notification, onMarkR
     ? format(new Date(created_at), "PPpp")
     : "";
 
+  // Get fallback navigation based on notification category
+  const getNavigationFromCategory = () => {
+    const notificationCategory = category?.toLowerCase();
+    const isStudent = user?.role === "student";
+    
+    switch (notificationCategory) {
+      case "quiz_published":
+      case "quiz_created":
+      case "quiz_deadline":
+      case "quiz_started":
+      case "quiz_completed":
+      case "quiz_auto_submitted":
+      case "results_available":
+        return isStudent ? "/my-learning" : "/exams";
+      case "group_added":
+      case "group_approved":
+      case "group_removed":
+      case "member_added":
+      case "member_removed":
+      case "join_request_approved":
+      case "join_request_rejected":
+      case "group_created":
+        return isStudent ? "/my-groups" : "/groups";
+      case "pause_started":
+      case "pause_ending":
+        return isStudent ? "/my-learning" : "/exams";
+      case "performance_update":
+        return isStudent ? "/my-analytics" : "/analytics";
+      default:
+        return isStudent ? "/home" : "/dashboard";
+    }
+  };
+
   const handleGoToLink = async () => {
+    // Mark as read before navigating
+    if (!isRead && onMarkRead) {
+      await onMarkRead(id);
+    }
+    
+    let navigationTarget = null;
+    
     if (link && user) {
-      // Mark as read before navigating
-      if (!isRead && onMarkRead) {
-        await onMarkRead(id);
-      }
       const transformedLink = transformNotificationLink(link, user.role);
       if (transformedLink) {
-        navigate(transformedLink);
-        onClose();
+        navigationTarget = transformedLink;
       }
+    }
+    
+    // Fallback: navigate based on category
+    if (!navigationTarget && user) {
+      navigationTarget = getNavigationFromCategory();
+    }
+    
+    if (navigationTarget) {
+      navigate(navigationTarget);
+      onClose();
     }
   };
 

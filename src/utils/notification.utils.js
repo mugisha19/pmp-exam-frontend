@@ -14,10 +14,18 @@ import { ROLES } from "@/constants/roles.constants";
  * @returns {string} - The transformed link appropriate for the user's role
  */
 export const transformNotificationLink = (link, userRole) => {
-  if (!link) return null;
+  // Check for empty or invalid link
+  if (!link || link.trim() === "" || link === "/") {
+    return null;
+  }
 
   // Remove leading slash for easier processing
-  const cleanLink = link.startsWith("/") ? link.substring(1) : link;
+  let cleanLink = link.startsWith("/") ? link.substring(1) : link;
+  
+  // If after removing slash, link is empty, return null
+  if (!cleanLink || cleanLink.trim() === "") {
+    return null;
+  }
 
   // Student role - transform management links to student portal links
   if (userRole === ROLES.STUDENT) {
@@ -42,8 +50,8 @@ export const transformNotificationLink = (link, userRole) => {
       return `/${cleanLink}`;
     }
 
-    // Default: redirect to home if link doesn't match
-    return "/home";
+    // Default: return the link as is for student
+    return `/${cleanLink}`;
   }
 
   // Admin/Instructor role - remove /admin prefix if present

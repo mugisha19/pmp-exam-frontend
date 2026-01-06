@@ -13,10 +13,13 @@ import {
   useMarkAllAsReadMutation,
 } from "@/hooks/queries/useNotificationQueries";
 import { formatDistanceToNow } from "date-fns";
+import { useAuthStore } from "@/stores/auth.store";
+import { transformNotificationLink } from "@/utils/notification.utils";
 
 export const NotificationPanel = ({ onClose }) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { user } = useAuthStore();
 
   const { data: notificationsData, isLoading, error, refetch } = useNotifications({
     page: 1,
@@ -30,25 +33,165 @@ export const NotificationPanel = ({ onClose }) => {
     ? notificationsData 
     : (notificationsData?.items || []);
 
+  // Get fallback navigation based on notification category or content
+  const getNavigationFromCategory = (notification) => {
+    const category = notification.category?.toLowerCase();
+    const isStudent = user?.role === "student";
+    const title = notification.title?.toLowerCase() || "";
+    const message = notification.message?.toLowerCase() || "";
+    
+    // First check specific categories
+    switch (category) {
+      case "quiz_published":
+      case "quiz_created":
+      case "quiz_deadline":
+      case "quiz_started":
+      case "quiz_completed":
+      case "quiz_auto_submitted":
+      case "results_available":
+        return isStudent ? "/my-learning" : "/exams";
+      case "group_added":
+      case "group_approved":
+      case "group_removed":
+      case "member_added":
+      case "member_removed":
+      case "join_request_approved":
+      case "join_request_rejected":
+      case "group_created":
+        return isStudent ? "/my-groups" : "/groups";
+      case "pause_started":
+      case "pause_ending":
+        return isStudent ? "/my-learning" : "/exams";
+      case "performance_update":
+        return isStudent ? "/my-analytics" : "/analytics";
+    }
+    
+    // For generic "notification" category, try to determine from title/message content
+    if (category === "notification" || !category) {
+      // Check for group-related content
+      if (title.includes("group") || message.includes("group") || 
+          title.includes("added to") || title.includes("removed from") ||
+          message.includes("added to") || message.includes("removed from") ||
+          title.includes("join request") || message.includes("join request")) {
+        return isStudent ? "/my-groups" : "/groups";
+      }
+      
+      // Check for quiz-related content
+      if (title.includes("quiz") || message.includes("quiz") ||
+          title.includes("exam") || message.includes("exam") ||
+          title.includes("published") || message.includes("published") ||
+          title.includes("deadline") || message.includes("deadline") ||
+          title.includes("completed") || message.includes("completed") ||
+          title.includes("score") || message.includes("score")) {
+        return isStudent ? "/my-learning" : "/exams";
+      }
+      
+      // Check for pause-related content
+      if (title.includes("pause") || message.includes("pause") ||
+          title.includes("break") || message.includes("break")) {
+        return isStudent ? "/my-learning" : "/exams";
+      }
+    }
+    
+    // Default: go to home/dashboard
+    return isStudent ? "/home" : "/dashboard";
+  };
+
   const handleNotificationClick = (notification) => {
+    // Debug: Log notification data
+    console.log('[DEBUG] Notification clicked:', {
+      id: notification.notification_id || notification.id,
+      title: notification.title,
+      message: notification.message,
+      link: notification.link,
+      linkType: typeof notification.link,
+      category: notification.category,
+      related_entity_type: notification.related_entity_type,
+      related_entity_id: notification.related_entity_id,
+      extra_data: notification.extra_data,
+      userRole: user?.role
+    });
+    
     if (!notification.is_read) {
       markAsReadMutation.mutate(
         notification.notification_id || notification.id
       );
     }
-    // Navigate based on link field or fallback to entity type
-    if (notification.link) {
-      // Transform backend routes to frontend routes
-      let frontendLink = notification.link;
-      frontendLink = frontendLink.replace(/\/quizzes\//g, '/exams/');
-      frontendLink = frontendLink.replace(/\/groups\//g, '/my-groups/');
-      navigate(frontendLink);
-    } else if (notification.related_entity_type === "quiz") {
-      navigate(`/exams/${notification.related_entity_id}`);
-    } else if (notification.related_entity_type === "group") {
-      navigate(`/my-groups/${notification.related_entity_id}`);
+    
+    let navigationTarget = null;
+    
+    // Navigate based on link field using the utility function
+    if (notification.link && notification.link.trim() !== "" && user) {
+      const transformedLink = transformNotificationLink(notification.link, user.role);
+      console.log('[DEBUG] Transformed link:', transformedLink);
+      if (transformedLink) {
+        navigationTarget = transformedLink;
+      }
     }
+    
+    // Fallback: use entity type if available OR check extra_data for entity IDs
+    if (!navigationTarget) {
+      const quizId = notification.related_entity_id || 
+                     notification.extra_data?.quiz_id || 
+                     notification.template_data?.quiz_id;
+      const groupId = notification.extra_data?.group_id || 
+                      notification.template_data?.group_id;
+      
+      if (notification.related_entity_type === "quiz" && notification.related_entity_id) {
+        navigationTarget = user?.role === "student" 
+          ? `/my-exams/${notification.related_entity_id}`
+          : `/exams/${notification.related_entity_id}`;
+        console.log('[DEBUG] Using entity type fallback (quiz):', navigationTarget);
+      } else if (notification.related_entity_type === "group" && notification.related_entity_id) {
+        navigationTarget = user?.role === "student"
+          ? `/my-groups/${notification.related_entity_id}`
+          : `/groups/${notification.related_entity_id}`;
+        console.log('[DEBUG] Using entity type fallback (group):', navigationTarget);
+      } else if (quizId) {
+        // Check if this is a completion/result notification - navigate to the quiz detail
+        const title = notification.title?.toLowerCase() || "";
+        const category = notification.category?.toLowerCase() || "";
+        const attemptId = notification.extra_data?.attempt_id || notification.template_data?.attempt_id;
+        
+        if ((title.includes("completed") || title.includes("submitted") || 
+            category.includes("completed") || category.includes("submitted") ||
+            category.includes("results")) && attemptId) {
+          // If we have attempt_id, navigate to the attempt review
+          navigationTarget = user?.role === "student" 
+            ? `/my-exams/${quizId}/attempts/${attemptId}`
+            : `/exams/${quizId}`;
+        } else {
+          // Otherwise navigate to the quiz/exam
+          navigationTarget = user?.role === "student" 
+            ? `/my-exams/${quizId}`
+            : `/exams/${quizId}`;
+        }
+        console.log('[DEBUG] Using extra_data quiz_id:', navigationTarget);
+      } else if (groupId) {
+        navigationTarget = user?.role === "student"
+          ? `/my-groups/${groupId}`
+          : `/groups/${groupId}`;
+        console.log('[DEBUG] Using extra_data group_id:', navigationTarget);
+      }
+    }
+    
+    // Final fallback: navigate based on category
+    if (!navigationTarget) {
+      navigationTarget = getNavigationFromCategory(notification);
+      console.log('[DEBUG] Using category fallback:', navigationTarget);
+    }
+    
+    console.log('[DEBUG] Final navigation target:', navigationTarget);
+    
+    // Close the panel first
     onClose();
+    
+    // Then navigate after a short delay to ensure panel is closed
+    if (navigationTarget) {
+      setTimeout(() => {
+        navigate(navigationTarget);
+      }, 100);
+    }
   };
 
   const handleMarkAllRead = () => {
