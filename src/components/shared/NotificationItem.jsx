@@ -18,6 +18,8 @@ import {
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "@/stores/auth.store";
+import { transformNotificationLink } from "@/utils/notification.utils";
 
 // Icon mapping based on notification type
 const notificationIcons = {
@@ -58,6 +60,7 @@ export function NotificationItem({
   onClick,
 }) {
   const navigate = useNavigate();
+  const { user } = useAuthStore();
   const {
     id,
     type = "default",
@@ -97,8 +100,11 @@ export function NotificationItem({
     }
     
     // Navigate to link if provided and no onClick handler
-    if (link && !onClick) {
-      navigate(link);
+    if (link && !onClick && user) {
+      const transformedLink = transformNotificationLink(link, user.role);
+      if (transformedLink) {
+        navigate(transformedLink);
+      }
     }
   };
 

@@ -19,6 +19,8 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "@/stores/auth.store";
+import { transformNotificationLink } from "@/utils/notification.utils";
 
 // Icon mapping based on notification type
 const notificationIcons = {
@@ -52,6 +54,7 @@ const notificationIcons = {
 
 export function NotificationDetailModal({ isOpen, onClose, notification, onMarkRead }) {
   const navigate = useNavigate();
+  const { user } = useAuthStore();
 
   if (!notification) return null;
 
@@ -80,10 +83,17 @@ export function NotificationDetailModal({ isOpen, onClose, notification, onMarkR
     ? format(new Date(created_at), "PPpp")
     : "";
 
-  const handleGoToLink = () => {
-    if (link) {
-      navigate(link);
-      onClose();
+  const handleGoToLink = async () => {
+    if (link && user) {
+      // Mark as read before navigating
+      if (!isRead && onMarkRead) {
+        await onMarkRead(id);
+      }
+      const transformedLink = transformNotificationLink(link, user.role);
+      if (transformedLink) {
+        navigate(transformedLink);
+        onClose();
+      }
     }
   };
 
