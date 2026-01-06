@@ -429,7 +429,7 @@ export const UserManagement = () => {
               data={users}
               rowKey="user_id"
               paginated={false}
-              onRowClick={(user) => navigate(`/admin/users/${user.user_id}`)}
+              onRowClick={(user) => navigate(`/users/${user.user_id}`)}
             />
           )}
         </CardContent>
