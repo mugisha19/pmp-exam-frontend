@@ -209,13 +209,7 @@ export const Home = () => {
               <div className="flex flex-col xs:flex-row flex-wrap gap-3 sm:gap-4">
                 {activeQuizzes.length > 0 && (
                   <button
-                    onClick={() =>
-                      navigate(
-                        `/my-exams/${
-                          activeQuizzes[0]?.quiz_id || activeQuizzes[0]?.id
-                        }`
-                      )
-                    }
+                    onClick={() => navigate("/my-learning")}
                     className="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-[#FF5100] text-white font-semibold rounded-lg hover:bg-[#E64800] transition-colors text-sm sm:text-base"
                   >
                     <Play className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
@@ -586,13 +580,7 @@ export const Home = () => {
                 </p>
               </div>
               <button
-                onClick={() =>
-                  navigate(
-                    `/my-exams/${
-                      activeQuizzes[0]?.quiz_id || activeQuizzes[0]?.id
-                    }`
-                  )
-                }
+                onClick={() => navigate("/my-learning")}
                 className="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-white text-[#6EC1E4] font-semibold rounded-lg hover:bg-gray-50 transition-colors shrink-0 text-sm sm:text-base w-full md:w-auto"
               >
                 Start Now
