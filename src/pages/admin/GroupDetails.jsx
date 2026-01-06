@@ -299,85 +299,87 @@ export const GroupDetails = () => {
         }
         subtitle={group.description || "No description provided"}
         actions={
-          user?.role === "admin" && (
-            <div className="flex items-center gap-2">
-              <Button
-                variant="primary"
-                size="sm"
-                leftIcon={<UserPlus className="w-4 h-4" />}
-                onClick={() => setIsAddMemberModalOpen(true)}
-              >
-                Add Member
-              </Button>
-              {isPrivateGroup && (
+          <div className="flex items-center gap-2">
+            {user?.role === "admin" && (
+              <>
                 <Button
                   variant="primary"
                   size="sm"
-                  leftIcon={<Copy className="w-4 h-4" />}
-                  onClick={handleCopyInviteLink}
-                  loading={generateInviteMutation.isPending}
+                  leftIcon={<UserPlus className="w-4 h-4" />}
+                  onClick={() => setIsAddMemberModalOpen(true)}
                 >
-                  Copy Invite Link
+                  Add Member
                 </Button>
-              )}
-              <div className="relative inline-block" ref={statusDropdownRef}>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={statusMutation.isPending}
-                  onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
-                >
-                  Mark as
-                  <ChevronDown
-                    className={`w-4 h-4 ml-2 transition-transform ${
-                      isStatusDropdownOpen ? "rotate-180" : ""
-                    }`}
-                  />
-                </Button>
-                {isStatusDropdownOpen && (
-                  <div className="absolute right-0 z-50 mt-1.5 min-w-[300px] bg-white rounded-lg shadow-lg border border-gray-200/80 py-1 animate-in fade-in slide-in-from-top-1 duration-150">
-                    {statusOptions.map((option) => {
-                      const Icon = option.icon;
-                      return (
-                        <button
-                          key={option.value}
-                          onClick={() => handleStatusSelect(option.value)}
-                          disabled={
-                            group.status === option.value ||
-                            statusMutation.isPending
-                          }
-                          className={`w-full flex items-start gap-3 px-4 py-3 text-left text-sm transition-colors ${
-                            group.status === option.value ||
-                            statusMutation.isPending
-                              ? "text-gray-400 cursor-not-allowed opacity-50"
-                              : "text-gray-700 hover:bg-gray-100"
-                          }`}
-                        >
-                          {Icon && (
-                            <Icon className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                          )}
-                          <div className="flex flex-col flex-1">
-                            <span className="font-medium">{option.label}</span>
-                            <span className="text-xs text-gray-500 mt-0.5">
-                              {option.description}
-                            </span>
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
+                {isPrivateGroup && (
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    leftIcon={<Copy className="w-4 h-4" />}
+                    onClick={handleCopyInviteLink}
+                    loading={generateInviteMutation.isPending}
+                  >
+                    Copy Invite Link
+                  </Button>
                 )}
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                leftIcon={<ArrowLeft className="w-4 h-4" />}
-                onClick={() => navigate("/groups")}
-              >
-                Back to Groups
-              </Button>
-            </div>
-          )
+                <div className="relative inline-block" ref={statusDropdownRef}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={statusMutation.isPending}
+                    onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
+                  >
+                    Mark as
+                    <ChevronDown
+                      className={`w-4 h-4 ml-2 transition-transform ${
+                        isStatusDropdownOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  </Button>
+                  {isStatusDropdownOpen && (
+                    <div className="absolute right-0 z-50 mt-1.5 min-w-[300px] bg-white rounded-lg shadow-lg border border-gray-200/80 py-1 animate-in fade-in slide-in-from-top-1 duration-150">
+                      {statusOptions.map((option) => {
+                        const Icon = option.icon;
+                        return (
+                          <button
+                            key={option.value}
+                            onClick={() => handleStatusSelect(option.value)}
+                            disabled={
+                              group.status === option.value ||
+                              statusMutation.isPending
+                            }
+                            className={`w-full flex items-start gap-3 px-4 py-3 text-left text-sm transition-colors ${
+                              group.status === option.value ||
+                              statusMutation.isPending
+                                ? "text-gray-400 cursor-not-allowed opacity-50"
+                                : "text-gray-700 hover:bg-gray-100"
+                            }`}
+                          >
+                            {Icon && (
+                              <Icon className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                            )}
+                            <div className="flex flex-col flex-1">
+                              <span className="font-medium">{option.label}</span>
+                              <span className="text-xs text-gray-500 mt-0.5">
+                                {option.description}
+                              </span>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              leftIcon={<ArrowLeft className="w-4 h-4" />}
+              onClick={() => navigate("/groups")}
+            >
+              Back to Groups
+            </Button>
+          </div>
         }
       />
 

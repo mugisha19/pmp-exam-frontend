@@ -339,7 +339,7 @@ export default function QuizBankManagement() {
         title="Quiz Bank Management"
         subtitle="Manage quiz bank templates and their questions"
         actions={
-          (user?.role === "admin" || user?.role === "instructor") && (
+          user?.role === "admin" && (
             <Button onClick={handleCreateQuizBank}>
               <Plus className="w-4 h-4 mr-2" />
               Create Quiz Bank

@@ -579,7 +579,7 @@ export default function QuestionManagement() {
         title="Question Bank Management"
         subtitle="Manage questions organized by topics for PMP exam preparation"
         actions={
-          (user?.role === "admin" || user?.role === "instructor") && (
+          user?.role === "admin" && (
             <Button onClick={handleCreateQuestion} size="lg">
               <Plus className="w-5 h-5 mr-2" />
               Create Question

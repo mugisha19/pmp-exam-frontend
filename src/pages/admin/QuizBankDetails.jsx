@@ -302,7 +302,7 @@ export const QuizBankDetails = () => {
                 {questions.length} question(s) in this quiz bank
               </p>
             </div>
-            {(user?.role === "admin" || user?.role === "instructor") && (
+            {user?.role === "admin" && (
               <Button
                 size="sm"
                 leftIcon={<Plus className="w-4 h-4" />}
