@@ -74,14 +74,14 @@ export const ExamCard = ({
   const difficultyConfig = getDifficultyConfig(difficulty);
 
   const getScoreColor = (score) => {
-    if (score >= 80) return "text-[#6EC1E4]";
-    if (score >= 60) return "text-[#FF5100]";
+    if (score >= 80) return "text-emerald-600";
+    if (score >= 60) return "text-amber-600";
     return "text-rose-600";
   };
 
   const getScoreBg = (score) => {
-    if (score >= 80) return "bg-[rgba(110,193,228,0.1)] border-[rgba(110,193,228,0.3)]";
-    if (score >= 60) return "bg-[rgba(255,81,0,0.1)] border-[rgba(255,81,0,0.2)]";
+    if (score >= 80) return "bg-emerald-50 border-emerald-200";
+    if (score >= 60) return "bg-amber-50 border-amber-200";
     return "bg-rose-50 border-rose-200";
   };
 
