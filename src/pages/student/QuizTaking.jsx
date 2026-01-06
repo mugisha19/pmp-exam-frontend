@@ -92,7 +92,7 @@ export const QuizTaking = () => {
     }
 
     if (!sessionToken) {
-      navigate(`/exams/${quizId}`);
+      navigate(`/my-exams/${quizId}`);
       return;
     }
 
@@ -125,7 +125,7 @@ export const QuizTaking = () => {
             "This quiz has already been submitted"
           );
         }
-        navigate(`/exams/${quizId}`);
+        navigate(`/my-exams/${quizId}`);
         return;
       }
 
@@ -209,7 +209,7 @@ export const QuizTaking = () => {
         "Session Error",
         "Failed to load quiz session. Please try again."
       );
-      navigate(`/exams/${quizId}`);
+      navigate(`/my-exams/${quizId}`);
     } finally {
       setLoading(false);
     }
@@ -411,7 +411,7 @@ export const QuizTaking = () => {
             // Even without attempt_id, navigate to quiz detail
             // User can provide feedback from there if needed
             clearInterval(pollInterval);
-            navigate(`/exams/${quizId}`);
+            navigate(`/my-exams/${quizId}`);
           }
           return;
         }
@@ -430,7 +430,7 @@ export const QuizTaking = () => {
             setIsWaitingForAutoSubmit(false);
             setShowFeedbackModal(true);
           } else {
-            navigate(`/exams/${quizId}`);
+            navigate(`/my-exams/${quizId}`);
           }
           return;
         }
@@ -442,7 +442,7 @@ export const QuizTaking = () => {
           sessionStorage.removeItem("quiz_session_data");
           showToast.info("Time's up!", "Quiz was auto-submitted.");
           // For 404/410 errors, we don't have the attempt_id, so navigate
-          navigate(`/exams/${quizId}`);
+          navigate(`/my-exams/${quizId}`);
         } else {
           console.error("Failed to poll session status:", error);
         }
@@ -523,7 +523,7 @@ export const QuizTaking = () => {
       if (error.response?.status === 410) {
         sessionStorage.removeItem("quiz_session_token");
         sessionStorage.removeItem("quiz_session_data");
-        navigate(`/exams/${quizId}`);
+        navigate(`/my-exams/${quizId}`);
         return { autoPaused: false };
       }
       showToast.error("Save Failed", "Failed to save answer");
@@ -565,7 +565,7 @@ export const QuizTaking = () => {
       if (error.response?.status === 410) {
         sessionStorage.removeItem("quiz_session_token");
         sessionStorage.removeItem("quiz_session_data");
-        navigate(`/exams/${quizId}`);
+        navigate(`/my-exams/${quizId}`);
         return;
       }
       showToast.error("Flag Failed", "Failed to flag question");
@@ -668,7 +668,7 @@ export const QuizTaking = () => {
       ) {
         sessionStorage.removeItem("quiz_session_token");
         sessionStorage.removeItem("quiz_session_data");
-        navigate(`/exams/${quizId}`);
+        navigate(`/my-exams/${quizId}`);
         return;
       }
 
@@ -722,7 +722,7 @@ export const QuizTaking = () => {
       if (error.response?.status === 410 || error.response?.status === 404) {
         sessionStorage.removeItem("quiz_session_token");
         sessionStorage.removeItem("quiz_session_data");
-        navigate(`/exams/${quizId}`);
+        navigate(`/my-exams/${quizId}`);
         return;
       }
 
@@ -842,7 +842,7 @@ export const QuizTaking = () => {
         return;
       }
 
-      navigate(`/exams/${quizId}`);
+      navigate(`/my-exams/${quizId}`);
     } catch (error) {
       console.error("Failed to submit:", error);
       if (error.response?.status === 200 || error.response?.status === 410) {
@@ -863,7 +863,7 @@ export const QuizTaking = () => {
         });
 
         showToast.info("Already Submitted", "Quiz has already been submitted");
-        navigate(`/exams/${quizId}`);
+        navigate(`/my-exams/${quizId}`);
         return;
       }
       showToast.error("Submit Failed", "Failed to submit quiz");
@@ -891,7 +891,7 @@ export const QuizTaking = () => {
 
       showToast.success("Thank you!", "Your feedback has been submitted.");
       setShowFeedbackModal(false);
-      navigate(`/exams/${quizId}`);
+      navigate(`/my-exams/${quizId}`);
     } catch (error) {
       console.error("Failed to submit feedback:", error);
       showToast.error("Feedback Failed", "Failed to submit feedback");
@@ -910,7 +910,7 @@ export const QuizTaking = () => {
     });
 
     setShowFeedbackModal(false);
-    navigate(`/exams/${quizId}`);
+    navigate(`/my-exams/${quizId}`);
   };
 
   const formatTime = (seconds) => {
@@ -1352,7 +1352,7 @@ export const QuizTaking = () => {
             Unable to load quiz session. Please try again.
           </p>
           <button
-            onClick={() => navigate(`/exams/${quizId}`)}
+            onClick={() => navigate(`/my-exams/${quizId}`)}
             className="inline-flex items-center gap-2 px-6 py-3 bg-[#FF5100] text-white font-semibold rounded-lg hover:bg-[#E64800] transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -1511,7 +1511,7 @@ export const QuizTaking = () => {
             {/* Left: Quiz Info */}
             <div className="flex items-center gap-4">
               <button
-                onClick={() => navigate(`/exams/${quizId}`)}
+                onClick={() => navigate(`/my-exams/${quizId}`)}
                 className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
               >
                 <ArrowLeft className="w-5 h-5" />

@@ -27,12 +27,12 @@ export const CustomToast = ({ t, message, type = "default" }) => {
   };
 
   const backgrounds = {
-    success: "bg-secondary-50 border-secondary-200",
-    error: "bg-red-50 border-red-200",
-    warning: "bg-amber-50 border-amber-200",
-    info: "bg-blue-50 border-blue-200",
-    loading: "bg-gray-50 border-gray-200",
-    default: "bg-white border-gray-200",
+    success: "bg-white border-emerald-300",
+    error: "bg-white border-red-300",
+    warning: "bg-white border-amber-300",
+    info: "bg-white border-blue-300",
+    loading: "bg-white border-gray-300",
+    default: "bg-white border-gray-300",
   };
 
   const textColors = {
@@ -65,7 +65,7 @@ export const CustomToast = ({ t, message, type = "default" }) => {
           relative overflow-hidden
           flex items-start gap-3 p-4 
           ${backgrounds[type]} 
-          border rounded-xl shadow-lg
+          border-2 rounded-xl shadow-xl
           backdrop-blur-sm
         `}
       >

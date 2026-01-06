@@ -86,7 +86,7 @@ export const QuizDetail = () => {
       const sessionData = await startQuizSession(quizId, mode);
       sessionStorage.setItem("quiz_session_token", sessionData.session_token);
       sessionStorage.setItem("quiz_session_data", JSON.stringify(sessionData));
-      navigate(`/exams/${quizId}/take`);
+      navigate(`/my-exams/${quizId}/take`);
     } catch (error) {
       if (error.response?.status === 409) {
         const detail = error.response.data?.detail;
@@ -115,11 +115,11 @@ export const QuizDetail = () => {
   };
 
   const handleRetakeQuiz = () => {
-    navigate(`/exams/${quizId}/start`);
+    navigate(`/my-exams/${quizId}/start`);
   };
 
   const handleViewAttempt = (attemptId) => {
-    navigate(`/exams/${quizId}/attempts/${attemptId}`);
+    navigate(`/my-exams/${quizId}/attempts/${attemptId}`);
   };
 
   if (isLoading) {
@@ -543,7 +543,7 @@ export const QuizDetail = () => {
                                 sessionStorage.getItem("quiz_session_token");
                               if (sessionToken) {
                                 navigate(
-                                  `/exams/${activeQuizError.quiz_id}/take`
+                                  `/my-exams/${activeQuizError.quiz_id}/take`
                                 );
                               } else {
                                 toast.error(

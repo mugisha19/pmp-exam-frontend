@@ -218,7 +218,7 @@ export const BrowseExams = () => {
   };
 
   const handleViewExam = (quizId) => {
-    navigate(`/exams/${quizId}`);
+    navigate(`/my-exams/${quizId}`);
   };
 
   return (

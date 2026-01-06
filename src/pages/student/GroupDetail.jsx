@@ -152,7 +152,7 @@ export const GroupDetail = () => {
               <ExamCard
                 key={quiz.quiz_id}
                 quiz={quiz}
-                onClick={() => navigate(`/exams/${quiz.quiz_id}`)}
+                onClick={() => navigate(`/my-exams/${quiz.quiz_id}`)}
                 variant="list"
               />
             ))}

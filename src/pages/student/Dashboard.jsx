@@ -917,7 +917,7 @@ export const Dashboard = () => {
                                 <button
                                   onClick={() =>
                                     navigate(
-                                      `/exams/${quiz.quiz_id || quiz.id}`
+                                      `/my-exams/${quiz.quiz_id || quiz.id}`
                                     )
                                   }
                                   className="px-3 py-1.5 text-white text-xs font-medium rounded-lg transition-all shadow-sm"
@@ -975,7 +975,7 @@ export const Dashboard = () => {
                               </div>
                               <button
                                 onClick={() =>
-                                  navigate(`/exams/${quiz.quiz_id || quiz.id}`)
+                                  navigate(`/my-exams/${quiz.quiz_id || quiz.id}`)
                                 }
                                 className="px-3 py-1.5 text-white text-xs font-medium rounded-lg transition-all shadow-sm"
                                 style={{ backgroundColor: "#FF5100" }}
@@ -1201,7 +1201,7 @@ export const Dashboard = () => {
                     </p>
                     <button
                       onClick={() =>
-                        navigate(`/exams/${quiz.quiz_id || quiz.id}`)
+                        navigate(`/my-exams/${quiz.quiz_id || quiz.id}`)
                       }
                       className="w-full px-3 py-1.5 text-white text-xs font-medium rounded-lg transition-all shadow-sm"
                       style={{ backgroundColor: "#FF5100" }}

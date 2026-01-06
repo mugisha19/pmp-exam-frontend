@@ -161,7 +161,7 @@ export const MyExams = () => {
   };
 
   const handleStartQuiz = (quizId) => {
-    navigate(`/exams/${quizId}`);
+    navigate(`/my-exams/${quizId}`);
   };
 
   const handleSetReminder = (quizId) => {

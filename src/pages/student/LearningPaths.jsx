@@ -249,7 +249,7 @@ export const LearningPaths = () => {
 
                         {/* Action Button */}
                         <button
-                          onClick={() => navigate(`/exams/${quiz.id}`)}
+                          onClick={() => navigate(`/my-exams/${quiz.id}`)}
                           className={cn(
                             "flex items-center gap-2 px-6 py-2.5 rounded-lg font-semibold transition-all",
                             quiz.completed

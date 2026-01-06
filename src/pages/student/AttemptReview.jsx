@@ -53,7 +53,7 @@ export const AttemptReview = () => {
               "This attempt may not exist or you don't have access to it."}
           </p>
           <button
-            onClick={() => navigate(`/exams/${quizId}`)}
+            onClick={() => navigate(`/my-exams/${quizId}`)}
             className="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors"
             style={{ background: "#FF5100" }}
           >
@@ -97,7 +97,7 @@ export const AttemptReview = () => {
       <div className="bg-white border-b border-gray-200 sticky top-16 z-10 shadow-sm">
         <div className="max-w-6xl mx-auto px-4 py-4">
           <button
-            onClick={() => navigate(`/exams/${quizId}`)}
+            onClick={() => navigate(`/my-exams/${quizId}`)}
             className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 mb-3 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -536,7 +536,7 @@ export const AttemptReview = () => {
         {/* Footer */}
         <div className="mt-6 flex justify-center">
           <button
-            onClick={() => navigate(`/exams/${quizId}`)}
+            onClick={() => navigate(`/my-exams/${quizId}`)}
             className="px-6 py-2 text-sm font-medium text-white rounded-lg transition-colors"
             style={{ background: "#FF5100" }}
           >
