@@ -211,7 +211,7 @@ export const Home = () => {
                   <button
                     onClick={() =>
                       navigate(
-                        `/exams/${
+                        `/my-exams/${
                           activeQuizzes[0]?.quiz_id || activeQuizzes[0]?.id
                         }`
                       )
@@ -344,7 +344,7 @@ export const Home = () => {
               {inProgressQuizzes.map((quiz) => (
                 <div
                   key={quiz.quiz_id || quiz.id}
-                  onClick={() => navigate(`/exams/${quiz.quiz_id || quiz.id}`)}
+                  onClick={() => navigate(`/my-exams/${quiz.quiz_id || quiz.id}`)}
                   className="flex flex-col xs:flex-row items-start xs:items-center justify-between bg-white rounded-lg p-4 sm:p-5 border border-[rgba(110,193,228,0.3)] cursor-pointer hover:border-[#6EC1E4] transition-colors gap-3 xs:gap-4"
                 >
                   <div className="flex-1 min-w-0 w-full xs:w-auto">
@@ -392,7 +392,7 @@ export const Home = () => {
             {recommendedQuizzes.slice(0, 5).map((quiz, index) => (
               <div
                 key={quiz.quiz_id || quiz.id}
-                onClick={() => navigate(`/exams/${quiz.quiz_id || quiz.id}`)}
+                onClick={() => navigate(`/my-exams/${quiz.quiz_id || quiz.id}`)}
                 className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-white border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
               >
                 <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gray-100 text-gray-600 font-semibold text-sm sm:text-base flex-shrink-0">
@@ -588,7 +588,7 @@ export const Home = () => {
               <button
                 onClick={() =>
                   navigate(
-                    `/exams/${
+                    `/my-exams/${
                       activeQuizzes[0]?.quiz_id || activeQuizzes[0]?.id
                     }`
                   )
