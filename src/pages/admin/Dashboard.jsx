@@ -23,6 +23,8 @@ import {
 import { useAdminDashboardData } from "@/hooks/queries/useAdminDashboard";
 import { useAnalyticsDashboard } from "@/hooks/queries/useAnalyticsQueries";
 import analyticsService from "@/services/analytics.service";
+import { useAuthStore } from "@/stores/auth.store";
+import { ROLES } from "@/constants/roles.constants";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { RoleBadge } from "@/components/shared/RoleBadge";
@@ -200,6 +202,8 @@ const ActivityItem = ({
 
 export const Dashboard = () => {
   const navigate = useNavigate();
+  const { user } = useAuthStore();
+  const isInstructor = user?.role === ROLES.INSTRUCTOR;
   const [dateRange, setDateRange] = useState("30");
   const [showDateDropdown, setShowDateDropdown] = useState(false);
   const [attemptsData, setAttemptsData] = useState([]);
@@ -393,28 +397,28 @@ export const Dashboard = () => {
       value: stats?.totalUsers || 0,
       icon: Users,
       iconBg: "bg-blue-50 text-blue-600",
-      onClick: () => navigate("/users"),
+      onClick: !isInstructor ? () => navigate("/users") : undefined,
     },
     {
       title: "Instructors",
       value: stats?.totalInstructors || 0,
       icon: GraduationCap,
       iconBg: "bg-emerald-50 text-emerald-600",
-      onClick: () => navigate("/users?role=instructor"),
+      onClick: !isInstructor ? () => navigate("/users?role=instructor") : undefined,
     },
     {
       title: "Students",
       value: stats?.totalStudents || 0,
       icon: BookOpen,
       iconBg: "bg-cyan-50 text-cyan-600",
-      onClick: () => navigate("/users?role=student"),
+      onClick: !isInstructor ? () => navigate("/users?role=student") : undefined,
     },
     {
       title: "Active Groups",
       value: stats?.activeGroups || 0,
       icon: UsersRound,
       iconBg: "bg-orange-50 text-orange-600",
-      onClick: () => navigate("/groups"),
+      onClick: !isInstructor ? () => navigate("/groups") : undefined,
     },
   ];
 
@@ -661,7 +665,8 @@ export const Dashboard = () => {
         </Card>
       )}
 
-      {/* Recent Activity & Users */}
+      {/* Recent Activity & Users - Hidden for instructors */}
+      {!isInstructor && (
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
         {/* Recent Activity */}
         <Card className="lg:col-span-2">
@@ -838,6 +843,7 @@ export const Dashboard = () => {
           </CardContent>
         </Card>
       </div>
+      )}
 
       {/* Recent Groups */}
       <Card>
@@ -928,7 +934,7 @@ export const Dashboard = () => {
                     <tr
                       key={group.group_id || group.id}
                       className="hover:bg-gray-50 cursor-pointer transition-colors"
-                      onClick={() => navigate(`/groups/${group.id}`)}
+                      onClick={() => navigate(`/groups/${group.group_id || group.id}`)}
                     >
                       <td className="py-3 px-2">
                         <div className="flex items-center gap-3">
