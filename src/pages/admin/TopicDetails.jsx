@@ -209,14 +209,14 @@ export const TopicDetails = () => {
               <InfoItem
                 icon={BookOpen}
                 label="Course"
-                value={topic.course?.name || "Unknown Course"}
+                value={topic.course_name || topic.course?.name || "Unknown Course"}
               />
             )}
-            {topic.domain_id && (
+            {topic.domain && (
               <InfoItem
                 icon={Tag}
                 label="Domain"
-                value={topic.domain?.name || "Unknown Domain"}
+                value={topic.domain}
               />
             )}
             <InfoItem
@@ -253,25 +253,6 @@ export const TopicDetails = () => {
           </CardContent>
         </Card>
       )}
-
-      {/* Stats Card */}
-      <Card>
-        <CardContent className="p-6">
-          <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-blue-900">Questions</p>
-                <p className="text-2xl font-bold text-blue-700 mt-1">
-                  {topic.question_count || 0}
-                </p>
-              </div>
-              <div className="bg-blue-100 p-3 rounded-lg">
-                <BookOpen className="w-6 h-6 text-blue-600" />
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Delete Confirmation Dialog */}
       <ConfirmDialog
