@@ -134,7 +134,7 @@ export const GroupQuizzesTab = ({ groupId }) => {
               {quiz.title || quiz.name || "Untitled Quiz"}
             </p>
             <div
-              className="text-xs text-gray-500 truncate max-w-[200px] prose prose-xs max-w-none"
+              className="text-xs text-gray-500 line-clamp-1 max-w-xs"
               dangerouslySetInnerHTML={{
                 __html: quiz.description || "No description",
               }}
