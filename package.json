@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "serve dist -s -l $PORT"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -46,6 +47,7 @@
     "react-is": "^19.2.3",
     "react-router-dom": "^7.9.6",
     "recharts": "^3.5.1",
+    "serve": "^14.2.5",
     "tailwind-merge": "^3.4.0",
     "zod": "^4.1.13",
     "zustand": "^5.0.9"
