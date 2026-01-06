@@ -18,8 +18,10 @@ const getProfilePath = (role) => {
       return "/profile";
     case "instructor":
       return "/profile";
+    case "student":
+      return "/my-profile";
     default:
-      return "/profile";
+      return "/my-profile";
   }
 };
 

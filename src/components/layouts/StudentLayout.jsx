@@ -192,7 +192,7 @@ export const StudentLayout = () => {
                 <div className="absolute bottom-full left-0 right-0 mb-2 bg-white rounded-lg shadow-md border border-gray-200 py-1 overflow-hidden backdrop-blur-xl animate-in fade-in slide-in-from-bottom-2 duration-200">
                   <button
                     onClick={() => {
-                      navigate("/profile");
+                      navigate("/my-profile");
                       setProfileMenuOpen(false);
                     }}
                     className="w-full px-2.5 py-1.5 text-left text-[11px] text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-all duration-200 group"

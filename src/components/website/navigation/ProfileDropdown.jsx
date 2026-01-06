@@ -28,10 +28,23 @@ export const ProfileDropdown = ({ onClose }) => {
     });
   };
 
+  // Get role-specific profile path
+  const getProfilePath = () => {
+    switch (user?.role?.toLowerCase()) {
+      case "admin":
+      case "instructor":
+        return "/profile";
+      case "student":
+        return "/my-profile";
+      default:
+        return "/my-profile";
+    }
+  };
+
   const menuItems = [
     {
       label: "My Profile",
-      path: "/profile",
+      path: getProfilePath(),
       icon: User,
       description: "View and edit profile",
     },
