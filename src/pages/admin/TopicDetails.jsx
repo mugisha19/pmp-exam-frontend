@@ -149,7 +149,7 @@ export const TopicDetails = () => {
     <div className="space-y-6">
       {/* Page Header */}
       <PageHeader
-        title={topic.name}
+        title="Topic Details"
         subtitle="View and manage topic information"
         actions={
           <div className="flex items-center gap-2">
