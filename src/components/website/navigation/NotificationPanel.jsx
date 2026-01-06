@@ -98,20 +98,6 @@ export const NotificationPanel = ({ onClose }) => {
   };
 
   const handleNotificationClick = (notification) => {
-    // Debug: Log notification data
-    console.log('[DEBUG] Notification clicked:', {
-      id: notification.notification_id || notification.id,
-      title: notification.title,
-      message: notification.message,
-      link: notification.link,
-      linkType: typeof notification.link,
-      category: notification.category,
-      related_entity_type: notification.related_entity_type,
-      related_entity_id: notification.related_entity_id,
-      extra_data: notification.extra_data,
-      userRole: user?.role
-    });
-    
     if (!notification.is_read) {
       markAsReadMutation.mutate(
         notification.notification_id || notification.id
@@ -123,7 +109,6 @@ export const NotificationPanel = ({ onClose }) => {
     // Navigate based on link field using the utility function
     if (notification.link && notification.link.trim() !== "" && user) {
       const transformedLink = transformNotificationLink(notification.link, user.role);
-      console.log('[DEBUG] Transformed link:', transformedLink);
       if (transformedLink) {
         navigationTarget = transformedLink;
       }
@@ -141,12 +126,10 @@ export const NotificationPanel = ({ onClose }) => {
         navigationTarget = user?.role === "student" 
           ? `/my-exams/${notification.related_entity_id}`
           : `/exams/${notification.related_entity_id}`;
-        console.log('[DEBUG] Using entity type fallback (quiz):', navigationTarget);
       } else if (notification.related_entity_type === "group" && notification.related_entity_id) {
         navigationTarget = user?.role === "student"
           ? `/my-groups/${notification.related_entity_id}`
           : `/groups/${notification.related_entity_id}`;
-        console.log('[DEBUG] Using entity type fallback (group):', navigationTarget);
       } else if (quizId) {
         // Check if this is a completion/result notification - navigate to the quiz detail
         const title = notification.title?.toLowerCase() || "";
@@ -166,22 +149,17 @@ export const NotificationPanel = ({ onClose }) => {
             ? `/my-exams/${quizId}`
             : `/exams/${quizId}`;
         }
-        console.log('[DEBUG] Using extra_data quiz_id:', navigationTarget);
       } else if (groupId) {
         navigationTarget = user?.role === "student"
           ? `/my-groups/${groupId}`
           : `/groups/${groupId}`;
-        console.log('[DEBUG] Using extra_data group_id:', navigationTarget);
       }
     }
     
     // Final fallback: navigate based on category
     if (!navigationTarget) {
       navigationTarget = getNavigationFromCategory(notification);
-      console.log('[DEBUG] Using category fallback:', navigationTarget);
     }
-    
-    console.log('[DEBUG] Final navigation target:', navigationTarget);
     
     // Close the panel first
     onClose();
