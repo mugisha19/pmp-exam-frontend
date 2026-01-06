@@ -64,6 +64,7 @@ export const QuizTaking = () => {
   const [loading, setLoading] = useState(true);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [isAnswerModified, setIsAnswerModified] = useState(false);
 
   // Timing state (synced with backend)
   const [timeRemaining, setTimeRemaining] = useState(null);
@@ -456,6 +457,16 @@ export const QuizTaking = () => {
     if (isWaitingForAutoSubmit || sessionData?.pause_info?.is_paused) {
       return;
     }
+    
+    // Check if this is a modification to an existing answer
+    const currentQ = sessionData?.questions?.[currentQuestionIndex];
+    if (currentQ?.user_answer && answer !== currentQ.user_answer) {
+      setIsAnswerModified(true);
+    } else if (!currentQ?.user_answer && answer) {
+      // New answer (not a modification)
+      setIsAnswerModified(false);
+    }
+    
     setSelectedAnswer(answer);
 
     if (
@@ -620,9 +631,28 @@ export const QuizTaking = () => {
 
     // Only save answer when going forward (Next button)
     const isGoingForward = direction === "next";
+    
+    // Auto-save when navigating away from a modified answered question (not using Next)
+    const currentQ = sessionData.questions[currentQuestionIndex];
+    const isNavigatingByClick = typeof direction === "number";
+    const isNavigatingBack = direction === "prev";
+    const shouldAutoSave = (isNavigatingByClick || isNavigatingBack) && 
+                           currentQ?.is_answered && 
+                           isAnswerModified && 
+                           selectedAnswer;
+
+    if (shouldAutoSave) {
+      const saveResult = await handleSaveAnswer();
+      setIsAnswerModified(false);
+      
+      if (saveResult?.autoPaused) {
+        return;
+      }
+    }
 
     if (isGoingForward && selectedAnswer) {
       const saveResult = await handleSaveAnswer();
+      setIsAnswerModified(false);
 
       if (saveResult?.autoPaused) {
         return;
@@ -689,6 +719,7 @@ export const QuizTaking = () => {
         setCurrentQuestionIndex(newIndex);
         const newQ = updatedState.questions[newIndex];
         setSelectedAnswer(newQ?.user_answer || null);
+        setIsAnswerModified(false);
 
         const isLastQuestion = newIndex === updatedState.questions.length - 1;
         if (!isLastQuestion) {
@@ -706,6 +737,7 @@ export const QuizTaking = () => {
       setCurrentQuestionIndex(newIndex);
       const newQ = sessionData.questions[newIndex];
       setSelectedAnswer(newQ?.user_answer || null);
+      setIsAnswerModified(false);
 
       const isLastQuestion = newIndex === sessionData.questions.length - 1;
       if (!isLastQuestion) {
