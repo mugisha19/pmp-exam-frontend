@@ -325,10 +325,14 @@ export const AttemptReview = () => {
                       {(() => {
                         const leftItems = options.left_items || [];
                         const rightItems = options.right_items || [];
-                        const userPairs = Array.isArray(userAnswer)
+                        const userPairs = Array.isArray(userAnswer?.pairs)
+                          ? userAnswer.pairs
+                          : Array.isArray(userAnswer)
                           ? userAnswer
                           : [];
-                        const correctPairs = Array.isArray(correctAnswer)
+                        const correctPairs = Array.isArray(correctAnswer?.correct_matches)
+                          ? correctAnswer.correct_matches
+                          : Array.isArray(correctAnswer)
                           ? correctAnswer
                           : [];
 
@@ -365,11 +369,11 @@ export const AttemptReview = () => {
                                       ) : (
                                         <XCircle className="w-4 h-4 text-red-600" />
                                       )}
-                                      <span className="text-sm text-gray-900">
+                                      <span className="text-sm text-gray-900 font-medium">
                                         {left?.text || "—"}
                                       </span>
                                       <span className="text-gray-500">→</span>
-                                      <span className="text-sm text-gray-900">
+                                      <span className="text-sm text-gray-900 font-medium">
                                         {right?.text || "—"}
                                       </span>
                                     </div>
@@ -395,11 +399,11 @@ export const AttemptReview = () => {
                                       className="p-3 rounded-lg border border-[rgba(110,193,228,0.3)] bg-[rgba(110,193,228,0.1)] flex items-center gap-2 mb-2"
                                     >
                                       <CheckCircle className="w-4 h-4 text-[#6EC1E4]" />
-                                      <span className="text-sm text-gray-900">
+                                      <span className="text-sm text-gray-900 font-medium">
                                         {left?.text || "—"}
                                       </span>
                                       <span className="text-gray-500">→</span>
-                                      <span className="text-sm text-gray-900">
+                                      <span className="text-sm text-gray-900 font-medium">
                                         {right?.text || "—"}
                                       </span>
                                     </div>
@@ -453,11 +457,10 @@ export const AttemptReview = () => {
                             correctAnswers.includes(String(option.id)) ||
                             option.is_correct;
 
-                          if (!isUserAnswer && !isCorrectOption) return null;
-
                           let bgColor = "bg-gray-50";
                           let borderColor = "border-gray-200";
                           let icon = null;
+                          let label = null;
 
                           if (isUserAnswer && isCorrectOption) {
                             bgColor = "bg-secondary-50";
@@ -465,44 +468,59 @@ export const AttemptReview = () => {
                             icon = (
                               <CheckCircle className="w-5 h-5 text-secondary-600" />
                             );
+                            label = (
+                              <span className="text-xs font-semibold text-secondary-700">
+                                Your Answer (Correct)
+                              </span>
+                            );
                           } else if (isUserAnswer && !isCorrectOption) {
                             bgColor = "bg-red-50";
                             borderColor = "border-red-200";
                             icon = <XCircle className="w-5 h-5 text-red-600" />;
+                            label = (
+                              <span className="text-xs font-semibold text-red-700">
+                                Your Answer (Incorrect)
+                              </span>
+                            );
                           } else if (!isUserAnswer && isCorrectOption) {
-                            bgColor = "bg-secondary-50";
-                            borderColor = "border-secondary-200";
+                            bgColor = "bg-orange-50";
+                            borderColor = "border-orange-300";
                             icon = (
-                              <CheckCircle className="w-5 h-5 text-secondary-600" />
+                              <AlertCircle className="w-5 h-5 text-orange-600" />
+                            );
+                            label = (
+                              <span className="text-xs font-semibold text-orange-700">
+                                Correct Answer (Not Selected)
+                              </span>
                             );
                           }
 
                           return (
-                            <div
-                              key={option.id}
-                              className={`p-3 rounded-lg border ${bgColor} ${borderColor}`}
-                            >
-                              <div className="flex items-center gap-3">
-                                {icon}
-                                <span className="flex-1 text-sm text-gray-900">
-                                  {option.option_text || option.text}
-                                </span>
-                                {isUserAnswer && isCorrectOption && (
-                                  <span className="text-xs font-semibold text-secondary-700">
-                                    Your Answer
+                            <div key={option.id}>
+                              <div
+                                className={`p-3 rounded-lg border ${bgColor} ${borderColor}`}
+                              >
+                                <div className="flex items-center gap-3">
+                                  {icon}
+                                  <span className="flex-1 text-sm text-gray-900">
+                                    {option.option_text || option.text}
                                   </span>
-                                )}
-                                {isUserAnswer && !isCorrectOption && (
-                                  <span className="text-xs font-semibold text-red-700">
-                                    Your Answer
-                                  </span>
-                                )}
-                                {!isUserAnswer && isCorrectOption && (
-                                  <span className="text-xs font-semibold text-secondary-700">
-                                    Correct
-                                  </span>
-                                )}
+                                  {label}
+                                </div>
                               </div>
+                              {option.explanation && (
+                                <div className="mt-2 ml-8 p-2 rounded bg-blue-50 border border-blue-200">
+                                  <p className="text-xs font-semibold text-blue-700 mb-1">
+                                    💡 Explanation:
+                                  </p>
+                                  <div
+                                    className="text-xs text-gray-700"
+                                    dangerouslySetInnerHTML={{
+                                      __html: option.explanation,
+                                    }}
+                                  />
+                                </div>
+                              )}
                             </div>
                           );
                         })}
