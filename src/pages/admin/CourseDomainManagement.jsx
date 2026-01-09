@@ -215,11 +215,11 @@ export default function CourseDomainManagement() {
         header: "Course Name",
         sortable: true,
         render: (_, course) => (
-          <div className="flex flex-col">
-            <span className="font-medium text-gray-900">{course?.name}</span>
+          <div className="flex flex-col min-w-0">
+            <span className="font-medium text-gray-900 truncate">{course?.name}</span>
             {course?.description && (
-              <span className="text-sm text-gray-500 truncate max-w-lg">
-                {course.description}
+              <span className="text-sm text-gray-500 truncate">
+                {course.description.length > 50 ? `${course.description.substring(0, 50)}...` : course.description}
               </span>
             )}
           </div>
@@ -290,11 +290,11 @@ export default function CourseDomainManagement() {
         header: "Domain Name",
         sortable: true,
         render: (_, domain) => (
-          <div className="flex flex-col">
-            <span className="font-medium text-gray-900">{domain?.name}</span>
+          <div className="flex flex-col min-w-0">
+            <span className="font-medium text-gray-900 truncate">{domain?.name}</span>
             {domain?.description && (
-              <span className="text-sm text-gray-500 truncate max-w-lg">
-                {domain.description}
+              <span className="text-sm text-gray-500 truncate">
+                {domain.description.length > 50 ? `${domain.description.substring(0, 50)}...` : domain.description}
               </span>
             )}
           </div>

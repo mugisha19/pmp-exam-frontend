@@ -189,11 +189,11 @@ export default function QuizBankManagement() {
         header: "Quiz Bank Title",
         sortable: true,
         render: (_, quizBank) => (
-          <div className="flex flex-col">
-            <span className="font-medium text-gray-900">{quizBank?.title}</span>
+          <div className="flex flex-col min-w-0">
+            <span className="font-medium text-gray-900 truncate">{quizBank?.title}</span>
             {quizBank?.description && (
-              <span className="text-sm text-gray-500 truncate max-w-md">
-                {quizBank.description}
+              <span className="text-sm text-gray-500 truncate">
+                {quizBank.description.length > 50 ? `${quizBank.description.substring(0, 50)}...` : quizBank.description}
               </span>
             )}
           </div>

@@ -236,7 +236,7 @@ export default function QuestionManagement() {
         key: "question_text",
         header: "Question",
         render: (_, question) => (
-          <div className="max-w-2xl">
+          <div className="min-w-0">
             <div
               className="text-sm text-gray-900 line-clamp-2"
               dangerouslySetInnerHTML={{

@@ -165,11 +165,11 @@ export default function TopicManagement() {
         header: "Topic Name",
         sortable: true,
         render: (_, topic) => (
-          <div className="flex flex-col">
-            <span className="font-medium text-gray-900">{topic?.name}</span>
+          <div className="flex flex-col min-w-0">
+            <span className="font-medium text-gray-900 truncate">{topic?.name}</span>
             {topic?.description && (
-              <span className="text-sm text-gray-500 truncate max-w-lg">
-                {topic.description}
+              <span className="text-sm text-gray-500 truncate">
+                {topic.description.length > 50 ? `${topic.description.substring(0, 50)}...` : topic.description}
               </span>
             )}
           </div>

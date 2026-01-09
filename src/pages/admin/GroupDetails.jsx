@@ -297,7 +297,7 @@ export const GroupDetails = () => {
             <StatusBadge status={group.status || "active"} size="md" />
           </div>
         }
-        subtitle={group.description || "No description provided"}
+        subtitle={group.description ? (group.description.length > 100 ? `${group.description.substring(0, 100)}...` : group.description) : "No description provided"}
         actions={
           <div className="flex items-center gap-2">
             {user?.role === "admin" && (

@@ -280,11 +280,11 @@ export default function GroupManagement() {
         header: "Group Name",
         sortable: true,
         render: (_, group) => (
-          <div className="flex flex-col">
-            <span className="font-medium text-gray-900">{group?.name}</span>
+          <div className="flex flex-col min-w-0">
+            <span className="font-medium text-gray-900 truncate">{group?.name}</span>
             {group?.description && (
-              <span className="text-sm text-gray-500 truncate max-w-xs">
-                {group.description}
+              <span className="text-sm text-gray-500 truncate">
+                {group.description.length > 50 ? `${group.description.substring(0, 50)}...` : group.description}
               </span>
             )}
           </div>
