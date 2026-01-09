@@ -857,6 +857,16 @@ export const QuizTaking = () => {
         }
       }
 
+      // Clear all flags before submitting
+      const flaggedQuestions = sessionData.questions.filter(q => q.is_flagged);
+      for (const q of flaggedQuestions) {
+        try {
+          await flagQuestion(sessionToken, q.quiz_question_id, false);
+        } catch (error) {
+          console.error("Failed to unflag question:", error);
+        }
+      }
+
       const result = await submitQuiz(sessionToken);
 
       sessionStorage.removeItem("quiz_session_token");
