@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Badge } from "@/components/ui/Badge";
+import { RichTextEditor } from "@/components/ui/RichTextEditor";
 import {
   useCreateQuestionMutation,
   useUpdateQuestionMutation,
@@ -211,23 +212,25 @@ export function CreateQuestionModal({
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Question Text <span className="text-red-500">*</span>
           </label>
-          <textarea
-            {...register("question_text", {
+          <Controller
+            name="question_text"
+            control={control}
+            rules={{
               required: "Question text is required",
               minLength: {
                 value: 10,
                 message: "Question must be at least 10 characters",
               },
-            })}
-            rows={4}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Enter your question..."
+            }}
+            render={({ field }) => (
+              <RichTextEditor
+                value={field.value}
+                onChange={field.onChange}
+                placeholder="Enter your question..."
+                error={errors.question_text?.message}
+              />
+            )}
           />
-          {errors.question_text && (
-            <p className="text-xs text-red-500 mt-1">
-              {errors.question_text.message}
-            </p>
-          )}
         </div>
 
         {/* Options based on question type */}
@@ -789,22 +792,25 @@ export function EditQuestionModal({
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Question Text <span className="text-red-500">*</span>
           </label>
-          <textarea
-            {...register("question_text", {
+          <Controller
+            name="question_text"
+            control={control}
+            rules={{
               required: "Question text is required",
               minLength: {
                 value: 10,
                 message: "Question must be at least 10 characters",
               },
-            })}
-            rows={4}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            }}
+            render={({ field }) => (
+              <RichTextEditor
+                value={field.value}
+                onChange={field.onChange}
+                placeholder="Enter your question..."
+                error={errors.question_text?.message}
+              />
+            )}
           />
-          {errors.question_text && (
-            <p className="text-xs text-red-500 mt-1">
-              {errors.question_text.message}
-            </p>
-          )}
         </div>
 
         {/* Options based on question type */}

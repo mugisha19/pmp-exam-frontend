@@ -17,10 +17,6 @@ import { Placeholder } from "@tiptap/extension-placeholder";
 import { CharacterCount } from "@tiptap/extension-character-count";
 import { TaskList } from "@tiptap/extension-task-list";
 import { TaskItem } from "@tiptap/extension-task-item";
-import { Table } from "@tiptap/extension-table";
-import { TableRow } from "@tiptap/extension-table-row";
-import { TableCell } from "@tiptap/extension-table-cell";
-import { TableHeader } from "@tiptap/extension-table-header";
 import { Image } from "@tiptap/extension-image";
 import { Youtube } from "@tiptap/extension-youtube";
 import { FontFamily } from "@tiptap/extension-font-family";
@@ -50,7 +46,6 @@ import {
   Minus,
   RemoveFormatting,
   ListChecks,
-  Table as TableIcon,
   Image as ImageIcon,
   Youtube as YoutubeIcon,
   Type,
@@ -338,15 +333,10 @@ export const RichTextEditor = ({
   const [showHighlightPicker, setShowHighlightPicker] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [showFindReplace, setShowFindReplace] = useState(false);
-  const [findText, setFindText] = useState("");
-  const [replaceText, setReplaceText] = useState("");
   const [showSourceCode, setShowSourceCode] = useState(false);
   const [sourceCode, setSourceCode] = useState("");
-  const [showTableMenu, setShowTableMenu] = useState(false);
   const [showLinkModal, setShowLinkModal] = useState(false);
   const [linkUrl, setLinkUrl] = useState("");
-  const [linkText, setLinkText] = useState("");
 
   const colorPickerRef = useRef(null);
   const highlightPickerRef = useRef(null);
@@ -384,10 +374,6 @@ export const RichTextEditor = ({
       CharacterCount.configure({ limit: maxCharacters }),
       TaskList,
       TaskItem.configure({ nested: true }),
-      Table.configure({ resizable: true }),
-      TableRow,
-      TableCell,
-      TableHeader,
       Image.configure({
         HTMLAttributes: { class: "max-w-full h-auto rounded-lg" },
       }),
@@ -500,7 +486,6 @@ export const RichTextEditor = ({
     const handleKeyDown = (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key === "f") {
         e.preventDefault();
-        setShowFindReplace(true);
       }
     };
     document.addEventListener("keydown", handleKeyDown);
@@ -549,32 +534,6 @@ export const RichTextEditor = ({
     if (url) {
       editor.commands.setYoutubeVideo({ src: url });
     }
-  };
-
-  // Table functions
-  const insertTable = (rows = 3, cols = 3) => {
-    editor
-      .chain()
-      .focus()
-      .insertTable({ rows, cols, withHeaderRow: true })
-      .run();
-    setShowTableMenu(false);
-  };
-
-  // Find and Replace
-  const handleFind = () => {
-    if (!findText) return;
-    // Simple find - highlight matching text
-    const content = editor.getHTML();
-    // This is a simplified version - in production, use a proper find/replace extension
-    window.find(findText);
-  };
-
-  const handleReplace = () => {
-    if (!findText || !replaceText) return;
-    const content = editor.getHTML();
-    const newContent = content.replace(new RegExp(findText, "g"), replaceText);
-    editor.commands.setContent(newContent);
   };
 
   // Source code view
@@ -1054,84 +1013,6 @@ export const RichTextEditor = ({
             <ToolbarButton onClick={handleYoutubeEmbed} title="Embed YouTube">
               <YoutubeIcon className="w-4 h-4" />
             </ToolbarButton>
-
-            {/* Table Dropdown */}
-            <Dropdown
-              trigger={
-                <ToolbarButton active={showTableMenu} title="Insert Table">
-                  <TableIcon className="w-4 h-4" />
-                </ToolbarButton>
-              }
-              className="w-64 p-3"
-            >
-              <div className="text-xs font-medium text-gray-500 mb-2">
-                Insert Table
-              </div>
-              <div className="grid grid-cols-5 gap-1 mb-3">
-                {[...Array(25)].map((_, i) => {
-                  const row = Math.floor(i / 5) + 1;
-                  const col = (i % 5) + 1;
-                  return (
-                    <button
-                      key={i}
-                      className="w-6 h-6 border border-gray-300 hover:bg-blue-100 hover:border-blue-400 transition-colors"
-                      onClick={() => insertTable(row, col)}
-                      title={`${row}×${col}`}
-                    />
-                  );
-                })}
-              </div>
-              {editor.isActive("table") && (
-                <div className="border-t border-gray-200 pt-3 space-y-1">
-                  <button
-                    onClick={() => editor.chain().focus().addRowBefore().run()}
-                    className="w-full px-2 py-1 text-sm text-left hover:bg-gray-100 rounded flex items-center gap-2"
-                  >
-                    <Plus className="w-3 h-3" /> Add Row Above
-                  </button>
-                  <button
-                    onClick={() => editor.chain().focus().addRowAfter().run()}
-                    className="w-full px-2 py-1 text-sm text-left hover:bg-gray-100 rounded flex items-center gap-2"
-                  >
-                    <Plus className="w-3 h-3" /> Add Row Below
-                  </button>
-                  <button
-                    onClick={() =>
-                      editor.chain().focus().addColumnBefore().run()
-                    }
-                    className="w-full px-2 py-1 text-sm text-left hover:bg-gray-100 rounded flex items-center gap-2"
-                  >
-                    <Plus className="w-3 h-3" /> Add Column Left
-                  </button>
-                  <button
-                    onClick={() =>
-                      editor.chain().focus().addColumnAfter().run()
-                    }
-                    className="w-full px-2 py-1 text-sm text-left hover:bg-gray-100 rounded flex items-center gap-2"
-                  >
-                    <Plus className="w-3 h-3" /> Add Column Right
-                  </button>
-                  <button
-                    onClick={() => editor.chain().focus().deleteRow().run()}
-                    className="w-full px-2 py-1 text-sm text-left hover:bg-red-50 text-red-600 rounded flex items-center gap-2"
-                  >
-                    <Trash2 className="w-3 h-3" /> Delete Row
-                  </button>
-                  <button
-                    onClick={() => editor.chain().focus().deleteColumn().run()}
-                    className="w-full px-2 py-1 text-sm text-left hover:bg-red-50 text-red-600 rounded flex items-center gap-2"
-                  >
-                    <Trash2 className="w-3 h-3" /> Delete Column
-                  </button>
-                  <button
-                    onClick={() => editor.chain().focus().deleteTable().run()}
-                    className="w-full px-2 py-1 text-sm text-left hover:bg-red-50 text-red-600 rounded flex items-center gap-2"
-                  >
-                    <Trash2 className="w-3 h-3" /> Delete Table
-                  </button>
-                </div>
-              )}
-            </Dropdown>
           </ToolbarGroup>
 
           <ToolbarDivider />
@@ -1212,13 +1093,6 @@ export const RichTextEditor = ({
           {/* Utility Buttons */}
           <ToolbarGroup>
             <ToolbarButton
-              onClick={() => setShowFindReplace(!showFindReplace)}
-              active={showFindReplace}
-              title="Find & Replace (Ctrl+F)"
-            >
-              <Search className="w-4 h-4" />
-            </ToolbarButton>
-            <ToolbarButton
               onClick={toggleSourceCode}
               active={showSourceCode}
               title="View Source"
@@ -1264,50 +1138,6 @@ export const RichTextEditor = ({
             </ToolbarButton>
           </ToolbarGroup>
         </div>
-
-        {/* Find & Replace Bar */}
-        {showFindReplace && (
-          <div className="flex items-center gap-2 p-2 border-b border-gray-200 bg-gray-50">
-            <div className="flex items-center gap-1 flex-1">
-              <Search className="w-4 h-4 text-gray-400" />
-              <input
-                type="text"
-                value={findText}
-                onChange={(e) => setFindText(e.target.value)}
-                placeholder="Find..."
-                className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-              />
-            </div>
-            <div className="flex items-center gap-1 flex-1">
-              <Replace className="w-4 h-4 text-gray-400" />
-              <input
-                type="text"
-                value={replaceText}
-                onChange={(e) => setReplaceText(e.target.value)}
-                placeholder="Replace with..."
-                className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-              />
-            </div>
-            <button
-              onClick={handleFind}
-              className="px-3 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded transition-colors"
-            >
-              Find
-            </button>
-            <button
-              onClick={handleReplace}
-              className="px-3 py-1 text-sm bg-blue-500 text-white hover:bg-blue-600 rounded transition-colors"
-            >
-              Replace All
-            </button>
-            <button
-              onClick={() => setShowFindReplace(false)}
-              className="p-1 hover:bg-gray-200 rounded"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-        )}
 
         {/* Editor Content or Source Code */}
         <div
