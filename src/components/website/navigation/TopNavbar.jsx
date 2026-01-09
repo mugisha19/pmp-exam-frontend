@@ -133,7 +133,11 @@ export const TopNavbar = () => {
             {/* Left Section: Logo + Navigation */}
             <div className="flex items-center gap-8">
               {/* Logo */}
-              <Link to="/dashboard" className="flex items-center gap-2.5 group">
+              <Link 
+                to="/home" 
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                className="flex items-center gap-2.5 group"
+              >
                 <span className="text-xl font-bold text-[#FF5100]">
                   PMP Exam
                 </span>
