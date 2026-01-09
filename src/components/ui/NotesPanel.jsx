@@ -95,7 +95,7 @@ export const NotesPanel = ({ isOpen, onClose }) => {
       />
 
       {/* Panel */}
-      <div className="fixed top-0 right-0 bottom-0 z-50 w-full sm:w-[600px] bg-white shadow-2xl overflow-x-hidden">
+      <div className="fixed top-0 right-0 bottom-0 z-50 w-full sm:w-[800px] bg-white shadow-2xl overflow-x-hidden">
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="px-4 py-3 bg-gradient-to-r from-[#476072] to-[#5a7a8f] text-white">
