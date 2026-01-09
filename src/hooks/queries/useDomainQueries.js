@@ -55,7 +55,7 @@ export const useCreateDomainMutation = () => {
     onSuccess: () => {
       // Invalidate domains list
       queryClient.invalidateQueries({ queryKey: ["domains"] });
-      toast.success("Domain created");
+      toast.success("Domain created successfully");
     },
     onError: (error) => {
       const errorMessage =
@@ -87,7 +87,7 @@ export const useUpdateDomainMutation = () => {
       );
       // Invalidate domains list
       queryClient.invalidateQueries({ queryKey: ["domains"] });
-      toast.success("Domain updated");
+      toast.success("Domain updated successfully");
     },
     onError: (error) => {
       const errorMessage =
@@ -118,7 +118,7 @@ export const useDeleteDomainMutation = () => {
       });
       // Invalidate domains list
       queryClient.invalidateQueries({ queryKey: ["domains"] });
-      toast.success("Domain deleted");
+      toast.success("Domain deleted successfully");
     },
     onError: (error) => {
       const errorMessage =

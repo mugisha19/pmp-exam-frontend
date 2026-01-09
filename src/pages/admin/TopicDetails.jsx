@@ -71,15 +71,10 @@ export const TopicDetails = () => {
   } = useTopic(topicId);
   const deleteTopicMutation = useDeleteTopicMutation();
 
-  // Handle delete
   const handleDelete = async () => {
-    try {
-      await deleteTopicMutation.mutateAsync(topicId);
-      toast.success("Topic deleted successfully");
-      navigate("/topics");
-    } catch (error) {
-      toast.error(error.message || "Failed to delete topic");
-    }
+    await deleteTopicMutation.mutateAsync(topicId);
+    toast.success("Topic deleted successfully");
+    navigate("/topics");
   };
 
   // Loading state
@@ -263,7 +258,7 @@ export const TopicDetails = () => {
         message={`Are you sure you want to delete "${topic.name}"? This action cannot be undone and may affect associated questions.`}
         confirmText="Delete"
         confirmVariant="danger"
-        isLoading={deleteTopicMutation.isPending}
+        loading={deleteTopicMutation.isPending}
       />
 
       {/* Edit Topic Modal */}

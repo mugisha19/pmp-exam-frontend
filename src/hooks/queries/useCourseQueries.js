@@ -55,7 +55,7 @@ export const useCreateCourseMutation = () => {
     onSuccess: () => {
       // Invalidate courses list
       queryClient.invalidateQueries({ queryKey: ["courses"] });
-      toast.success("Course created");
+      toast.success("Course created successfully");
     },
     onError: (error) => {
       const errorMessage =
@@ -87,7 +87,7 @@ export const useUpdateCourseMutation = () => {
       );
       // Invalidate courses list
       queryClient.invalidateQueries({ queryKey: ["courses"] });
-      toast.success("Course updated");
+      toast.success("Course updated successfully");
     },
     onError: (error) => {
       const errorMessage =
@@ -118,7 +118,7 @@ export const useDeleteCourseMutation = () => {
       });
       // Invalidate courses list
       queryClient.invalidateQueries({ queryKey: ["courses"] });
-      toast.success("Course deleted");
+      toast.success("Course deleted successfully");
     },
     onError: (error) => {
       const errorMessage =

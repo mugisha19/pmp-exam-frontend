@@ -129,6 +129,7 @@ export default function TopicManagement() {
     if (!selectedTopic) return;
 
     await deleteTopicMutation.mutateAsync(selectedTopic.topic_id);
+    toast.success("Topic deleted successfully");
     setIsDeleteDialogOpen(false);
     setSelectedTopic(null);
     clearSelection();
@@ -143,6 +144,7 @@ export default function TopicManagement() {
         deleteTopicMutation.mutateAsync(topicId)
       )
     );
+    toast.success(`${selectedTopics.length} topic(s) deleted successfully`);
     clearSelection();
     refetch();
   }, [selectedTopics, deleteTopicMutation, clearSelection, refetch]);

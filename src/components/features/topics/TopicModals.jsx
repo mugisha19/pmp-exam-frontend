@@ -87,29 +87,23 @@ export const CreateTopicModal = ({ isOpen, onClose, onSuccess }) => {
   }, [isOpen, reset]);
 
   const createTopic = async (data) => {
-    try {
-      const payload = {
-        name: data.name,
-        description: data.description || null,
-      };
+    const payload = {
+      name: data.name,
+      description: data.description || null,
+    };
 
-      // If domain is provided, use domain_id, otherwise use course_id
-      if (data.domain_id && data.domain_id !== "") {
-        payload.domain_id = data.domain_id;
-      } else {
-        payload.course_id = data.course_id;
-      }
-
-      await createMutation.mutateAsync(payload);
-      toast.success("Topic created successfully");
-      reset();
-      setSelectedCourseId("");
-      setShowConfirmDialog(false);
-      setPendingFormData(null);
-      onSuccess?.();
-    } catch (error) {
-      toast.error(error.message || "Failed to create topic");
+    if (data.domain_id && data.domain_id !== "") {
+      payload.domain_id = data.domain_id;
+    } else {
+      payload.course_id = data.course_id;
     }
+
+    await createMutation.mutateAsync(payload);
+    reset();
+    setSelectedCourseId("");
+    setShowConfirmDialog(false);
+    setPendingFormData(null);
+    onSuccess?.();
   };
 
   const onSubmit = async (data) => {
@@ -118,14 +112,12 @@ export const CreateTopicModal = ({ isOpen, onClose, onSuccess }) => {
       return;
     }
 
-    // If domain is not selected, show confirmation dialog
     if (!data.domain_id || data.domain_id === "") {
       setPendingFormData(data);
       setShowConfirmDialog(true);
       return;
     }
 
-    // If domain is selected, create topic directly
     await createTopic(data);
   };
 
@@ -351,39 +343,34 @@ export const EditTopicModal = ({ isOpen, onClose, topic, onSuccess }) => {
   const updateMutation = useUpdateTopicMutation();
 
   const onSubmit = async (data) => {
-    try {
-      const payload = {
-        name: data.name,
-        description: data.description || null,
-        is_active: data.is_active === "true",
-      };
+    const payload = {
+      name: data.name,
+      description: data.description || null,
+      is_active: data.is_active === "true",
+    };
 
-      if (parentType === "course") {
-        if (!data.course_id) {
-          toast.error("Please select a course");
-          return;
-        }
-        payload.course_id = data.course_id;
-        payload.domain_id = null;
-      } else {
-        if (!data.domain_id) {
-          toast.error("Please select a domain");
-          return;
-        }
-        payload.domain_id = data.domain_id;
-        payload.course_id = null;
+    if (parentType === "course") {
+      if (!data.course_id) {
+        toast.error("Please select a course");
+        return;
       }
-
-      await updateMutation.mutateAsync({
-        topicId: topic.topic_id,
-        data: payload,
-      });
-      toast.success("Topic updated successfully");
-      reset();
-      onSuccess?.();
-    } catch (error) {
-      toast.error(error.message || "Failed to update topic");
+      payload.course_id = data.course_id;
+      payload.domain_id = null;
+    } else {
+      if (!data.domain_id) {
+        toast.error("Please select a domain");
+        return;
+      }
+      payload.domain_id = data.domain_id;
+      payload.course_id = null;
     }
+
+    await updateMutation.mutateAsync({
+      topicId: topic.topic_id,
+      data: payload,
+    });
+    reset();
+    onSuccess?.();
   };
 
   const handleClose = () => {

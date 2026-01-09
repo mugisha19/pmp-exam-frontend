@@ -17,11 +17,7 @@ export const useTopics = (params = {}, options = {}) => {
   return useQuery({
     queryKey: queryKeys.topics.list(params),
     queryFn: () => topicService.getTopics(params),
-    staleTime: 5 * 60 * 1000, // 5 minutes - topics don't change often
-    onError: (error) => {
-      const errorMessage = error.message || "Failed to fetch topics";
-      toast.error(errorMessage);
-    },
+    staleTime: 5 * 60 * 1000,
     ...options,
   });
 };
@@ -36,11 +32,8 @@ export const useTopic = (topicId, options = {}) => {
     queryKey: queryKeys.topics.detail(topicId),
     queryFn: () => topicService.getTopicById(topicId),
     enabled: !!topicId,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    onError: (error) => {
-      const errorMessage = error.message || "Failed to fetch topic";
-      toast.error(errorMessage);
-    },
+    staleTime: 5 * 60 * 1000,
+    retry: false,
     ...options,
   });
 };
@@ -54,10 +47,8 @@ export const useCreateTopicMutation = () => {
   return useMutation({
     mutationFn: (topicData) => topicService.createTopic(topicData),
     onSuccess: () => {
-      // Invalidate topics list
       queryClient.invalidateQueries({ queryKey: queryKeys.topics.all });
-
-      toast.success("Topic created");
+      toast.success("Topic created successfully");
     },
     onError: (error) => {
       const errorMessage =
@@ -83,16 +74,12 @@ export const useUpdateTopicMutation = () => {
   return useMutation({
     mutationFn: ({ topicId, data }) => topicService.updateTopic(topicId, data),
     onSuccess: (data, variables) => {
-      // Update specific topic in cache
       queryClient.setQueryData(
         queryKeys.topics.detail(variables.topicId),
         data
       );
-
-      // Invalidate topics list
       queryClient.invalidateQueries({ queryKey: queryKeys.topics.all });
-
-      toast.success("Topic updated");
+      toast.success("Topic updated successfully");
     },
     onError: (error) => {
       const errorMessage =
@@ -118,13 +105,8 @@ export const useDeleteTopicMutation = () => {
   return useMutation({
     mutationFn: (topicId) => topicService.deleteTopic(topicId),
     onSuccess: (_, topicId) => {
-      // Remove topic from cache
       queryClient.removeQueries({ queryKey: queryKeys.topics.detail(topicId) });
-
-      // Invalidate topics list
       queryClient.invalidateQueries({ queryKey: queryKeys.topics.all });
-
-      toast.success("Topic deleted");
     },
     onError: (error) => {
       const errorMessage =

@@ -32,14 +32,9 @@ export const CreateQuizBankModal = ({ isOpen, onClose, onSuccess }) => {
   const createMutation = useCreateQuizBankMutation();
 
   const onSubmit = async (data) => {
-    try {
-      await createMutation.mutateAsync(data);
-      toast.success("Quiz bank created successfully");
-      reset();
-      onSuccess?.();
-    } catch (error) {
-      toast.error(error.message || "Failed to create quiz bank");
-    }
+    await createMutation.mutateAsync(data);
+    reset();
+    onSuccess?.();
   };
 
   const handleClose = () => {
@@ -126,17 +121,12 @@ export const EditQuizBankModal = ({ isOpen, onClose, quizBank, onSuccess }) => {
   }, [quizBank, reset]);
 
   const onSubmit = async (data) => {
-    try {
-      await updateMutation.mutateAsync({
-        quizBankId: quizBank.quiz_bank_id,
-        data,
-      });
-      toast.success("Quiz bank updated successfully");
-      reset();
-      onSuccess?.();
-    } catch (error) {
-      toast.error(error.message || "Failed to update quiz bank");
-    }
+    await updateMutation.mutateAsync({
+      quizBankId: quizBank.quiz_bank_id,
+      data,
+    });
+    reset();
+    onSuccess?.();
   };
 
   const handleClose = () => {
