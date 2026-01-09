@@ -20,6 +20,8 @@ export const startQuizSession = async (quizId, mode = "practice") => {
   const response = await api.post(`${SESSION_BASE}/start`, { 
     quiz_id: quizId,
     mode: mode 
+  }, {
+    timeout: 180000 // 3 minutes for quiz initialization
   });
   return response.data;
 };

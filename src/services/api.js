@@ -20,7 +20,7 @@ const AUTH_SERVICE_URL = "http://localhost:8000/api/v1";
 // Create axios instance
 const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 30000,
+  timeout: 120000, // Increased to 120 seconds for production
   headers: {
     "Content-Type": "application/json",
   },
