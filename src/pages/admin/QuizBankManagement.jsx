@@ -139,43 +139,23 @@ export default function QuizBankManagement() {
   const handleConfirmDelete = useCallback(async () => {
     if (!selectedQuizBank) return;
 
-    try {
-      await deleteQuizBankMutation.mutateAsync(selectedQuizBank.quiz_bank_id);
-      toast.success("Quiz bank deleted successfully");
-      setIsDeleteDialogOpen(false);
-      setSelectedQuizBank(null);
-      clearSelection();
-      refetch();
-    } catch (error) {
-      const message =
-        typeof error === "object"
-          ? error.message || JSON.stringify(error)
-          : error;
-      toast.error(`Failed to delete quiz bank: ${message}`);
-    }
+    await deleteQuizBankMutation.mutateAsync(selectedQuizBank.quiz_bank_id);
+    setIsDeleteDialogOpen(false);
+    setSelectedQuizBank(null);
+    clearSelection();
+    refetch();
   }, [selectedQuizBank, deleteQuizBankMutation, clearSelection, refetch]);
 
   const handleBulkDelete = useCallback(async () => {
     if (selectedQuizBanks.length === 0) return;
 
-    try {
-      await Promise.all(
-        selectedQuizBanks.map((quizBankId) =>
-          deleteQuizBankMutation.mutateAsync(quizBankId)
-        )
-      );
-      toast.success(
-        `Deleted ${selectedQuizBanks.length} quiz bank(s) successfully`
-      );
-      clearSelection();
-      refetch();
-    } catch (error) {
-      const message =
-        typeof error === "object"
-          ? error.message || JSON.stringify(error)
-          : error;
-      toast.error(`Failed to delete quiz banks: ${message}`);
-    }
+    await Promise.all(
+      selectedQuizBanks.map((quizBankId) =>
+        deleteQuizBankMutation.mutateAsync(quizBankId)
+      )
+    );
+    clearSelection();
+    refetch();
   }, [selectedQuizBanks, deleteQuizBankMutation, clearSelection, refetch]);
 
   const handleViewQuizBank = useCallback(
@@ -324,7 +304,7 @@ export default function QuizBankManagement() {
 
         {/* Bulk delete action */}
         {selectedQuizBanks.length > 1 && (
-          <Button variant="danger" size="sm" onClick={handleBulkDelete}>
+          <Button variant="danger" size="sm" onClick={handleBulkDelete} loading={deleteQuizBankMutation.isPending}>
             <Trash2 className="w-4 h-4 mr-1" />
             Delete ({selectedQuizBanks.length})
           </Button>
@@ -417,7 +397,7 @@ export default function QuizBankManagement() {
         message={`Are you sure you want to delete "${selectedQuizBank?.title}"? This action cannot be undone and will remove all questions from this quiz bank.`}
         confirmText="Delete"
         confirmVariant="danger"
-        isLoading={deleteQuizBankMutation.isPending}
+        loading={deleteQuizBankMutation.isPending}
       />
     </div>
   );

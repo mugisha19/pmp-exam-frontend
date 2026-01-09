@@ -191,44 +191,22 @@ export default function QuestionManagement() {
   const handleConfirmDelete = useCallback(async () => {
     if (!selectedQuestion) return;
 
-    try {
-      await deleteQuestionMutation.mutateAsync(selectedQuestion.question_id);
-      toast.success("Question deleted successfully");
-      setIsDeleteDialogOpen(false);
-      setSelectedQuestion(null);
-      clearSelection();
-      refetch();
-    } catch (error) {
-      const message =
-        typeof error === "object"
-          ? error.message || JSON.stringify(error)
-          : error;
-      toast.error(`Failed to delete question: ${message}`);
-    }
-  }, [selectedQuestion, deleteQuestionMutation, clearSelection, refetch]);
+    await deleteQuestionMutation.mutateAsync(selectedQuestion.question_id);
+    setIsDeleteDialogOpen(false);
+    setSelectedQuestion(null);
+    clearSelection();
+  }, [selectedQuestion, deleteQuestionMutation, clearSelection]);
 
   const handleBulkDelete = useCallback(async () => {
     if (selectedQuestions.length === 0) return;
 
-    try {
-      await Promise.all(
-        selectedQuestions.map((questionId) =>
-          deleteQuestionMutation.mutateAsync(questionId)
-        )
-      );
-      toast.success(
-        `Deleted ${selectedQuestions.length} question(s) successfully`
-      );
-      clearSelection();
-      refetch();
-    } catch (error) {
-      const message =
-        typeof error === "object"
-          ? error.message || JSON.stringify(error)
-          : error;
-      toast.error(`Failed to delete questions: ${message}`);
-    }
-  }, [selectedQuestions, deleteQuestionMutation, clearSelection, refetch]);
+    await Promise.all(
+      selectedQuestions.map((questionId) =>
+        deleteQuestionMutation.mutateAsync(questionId)
+      )
+    );
+    clearSelection();
+  }, [selectedQuestions, deleteQuestionMutation, clearSelection]);
 
   // Modal handlers
   const handleCreateModalClose = useCallback(() => {
@@ -564,7 +542,7 @@ export default function QuestionManagement() {
         )}
 
         {selectedQuestions.length > 1 && (
-          <Button variant="danger" size="sm" onClick={handleBulkDelete}>
+          <Button variant="danger" size="sm" onClick={handleBulkDelete} loading={deleteQuestionMutation.isPending}>
             <Trash2 className="w-4 h-4 mr-1" />
             Delete ({selectedQuestions.length})
           </Button>
@@ -666,7 +644,7 @@ export default function QuestionManagement() {
         message={`Are you sure you want to delete this question? This action cannot be undone and may affect quiz banks using this question.`}
         confirmText="Delete"
         confirmVariant="danger"
-        isLoading={deleteQuestionMutation.isPending}
+        loading={deleteQuestionMutation.isPending}
       />
     </div>
   );

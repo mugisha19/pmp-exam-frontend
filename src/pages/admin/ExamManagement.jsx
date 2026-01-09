@@ -129,14 +129,10 @@ export default function ExamManagement() {
   const handleConfirmDelete = useCallback(async () => {
     if (!selectedExam) return;
 
-    try {
-      await deleteExamMutation.mutateAsync(selectedExam.quiz_id);
-      setIsDeleteDialogOpen(false);
-      setSelectedExam(null);
-      refetch();
-    } catch (error) {
-      // Error handled by mutation
-    }
+    await deleteExamMutation.mutateAsync(selectedExam.quiz_id);
+    setIsDeleteDialogOpen(false);
+    setSelectedExam(null);
+    refetch();
   }, [selectedExam, deleteExamMutation, refetch]);
 
   // Table columns
@@ -282,7 +278,7 @@ export default function ExamManagement() {
         message={`Are you sure you want to delete "${selectedExam?.title}"? This action cannot be undone.`}
         confirmText="Delete"
         confirmVariant="danger"
-        isLoading={deleteExamMutation.isPending}
+        loading={deleteExamMutation.isPending}
       />
     </div>
   );

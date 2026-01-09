@@ -128,41 +128,23 @@ export default function TopicManagement() {
   const handleConfirmDelete = useCallback(async () => {
     if (!selectedTopic) return;
 
-    try {
-      await deleteTopicMutation.mutateAsync(selectedTopic.topic_id);
-      toast.success("Topic deleted successfully");
-      setIsDeleteDialogOpen(false);
-      setSelectedTopic(null);
-      clearSelection();
-      refetch();
-    } catch (error) {
-      const message =
-        typeof error === "object"
-          ? error.message || JSON.stringify(error)
-          : error;
-      toast.error(`Failed to delete topic: ${message}`);
-    }
+    await deleteTopicMutation.mutateAsync(selectedTopic.topic_id);
+    setIsDeleteDialogOpen(false);
+    setSelectedTopic(null);
+    clearSelection();
+    refetch();
   }, [selectedTopic, deleteTopicMutation, clearSelection, refetch]);
 
   const handleBulkDelete = useCallback(async () => {
     if (selectedTopics.length === 0) return;
 
-    try {
-      await Promise.all(
-        selectedTopics.map((topicId) =>
-          deleteTopicMutation.mutateAsync(topicId)
-        )
-      );
-      toast.success(`Deleted ${selectedTopics.length} topic(s) successfully`);
-      clearSelection();
-      refetch();
-    } catch (error) {
-      const message =
-        typeof error === "object"
-          ? error.message || JSON.stringify(error)
-          : error;
-      toast.error(`Failed to delete topics: ${message}`);
-    }
+    await Promise.all(
+      selectedTopics.map((topicId) =>
+        deleteTopicMutation.mutateAsync(topicId)
+      )
+    );
+    clearSelection();
+    refetch();
   }, [selectedTopics, deleteTopicMutation, clearSelection, refetch]);
 
   // Modal handlers
@@ -403,7 +385,7 @@ export default function TopicManagement() {
         )}
 
         {selectedTopics.length > 1 && (
-          <Button variant="danger" size="sm" onClick={handleBulkDelete}>
+          <Button variant="danger" size="sm" onClick={handleBulkDelete} loading={deleteTopicMutation.isPending}>
             <Trash2 className="w-4 h-4 mr-1" />
             Delete ({selectedTopics.length})
           </Button>
@@ -460,7 +442,7 @@ export default function TopicManagement() {
         message={`Are you sure you want to delete "${selectedTopic?.name}"? This action cannot be undone and may affect associated questions.`}
         confirmText="Delete"
         confirmVariant="danger"
-        isLoading={deleteTopicMutation.isPending}
+        loading={deleteTopicMutation.isPending}
       />
     </div>
   );

@@ -178,7 +178,6 @@ export const UserManagement = () => {
 
   // Bulk actions
   const handleBulkDelete = async () => {
-    // TODO: Implement bulk delete when API supports it
     for (const userId of selectedUsers) {
       await deleteUserMutation.mutateAsync(userId);
     }
@@ -374,7 +373,7 @@ export const UserManagement = () => {
             >
               Deactivate
             </Button>
-            <Button variant="danger" size="sm" onClick={handleBulkDelete}>
+            <Button variant="danger" size="sm" onClick={handleBulkDelete} loading={deleteUserMutation.isPending}>
               Delete
             </Button>
             <Button

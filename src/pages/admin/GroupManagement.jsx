@@ -194,41 +194,23 @@ export default function GroupManagement() {
   const handleConfirmDelete = useCallback(async () => {
     if (!selectedGroup) return;
 
-    try {
-      await deleteGroupMutation.mutateAsync(selectedGroup.group_id);
-      toast.success("Group deleted successfully");
-      setIsDeleteDialogOpen(false);
-      setSelectedGroup(null);
-      clearSelection();
-      refetch();
-    } catch (error) {
-      const message =
-        typeof error === "object"
-          ? error.message || JSON.stringify(error)
-          : error;
-      toast.error(`Failed to delete group: ${message}`);
-    }
+    await deleteGroupMutation.mutateAsync(selectedGroup.group_id);
+    setIsDeleteDialogOpen(false);
+    setSelectedGroup(null);
+    clearSelection();
+    refetch();
   }, [selectedGroup, deleteGroupMutation, clearSelection, refetch]);
 
   const handleBulkDelete = useCallback(async () => {
     if (selectedGroups.length === 0) return;
 
-    try {
-      await Promise.all(
-        selectedGroups.map((groupId) =>
-          deleteGroupMutation.mutateAsync(groupId)
-        )
-      );
-      toast.success(`Deleted ${selectedGroups.length} group(s) successfully`);
-      clearSelection();
-      refetch();
-    } catch (error) {
-      const message =
-        typeof error === "object"
-          ? error.message || JSON.stringify(error)
-          : error;
-      toast.error(`Failed to delete groups: ${message}`);
-    }
+    await Promise.all(
+      selectedGroups.map((groupId) =>
+        deleteGroupMutation.mutateAsync(groupId)
+      )
+    );
+    clearSelection();
+    refetch();
   }, [selectedGroups, deleteGroupMutation, clearSelection, refetch]);
 
   const handleViewGroup = useCallback(
@@ -484,7 +466,7 @@ export default function GroupManagement() {
 
         {/* Bulk delete action - only show when multiple selected */}
         {selectedGroups.length > 1 && (
-          <Button variant="danger" size="sm" onClick={handleBulkDelete}>
+          <Button variant="danger" size="sm" onClick={handleBulkDelete} loading={deleteGroupMutation.isPending}>
             <Trash2 className="w-4 h-4 mr-1" />
             Delete ({selectedGroups.length})
           </Button>
@@ -568,7 +550,7 @@ export default function GroupManagement() {
         message={`Are you sure you want to delete "${selectedGroup?.name}"? This action cannot be undone and will remove all members from the group.`}
         confirmText="Delete"
         confirmVariant="danger"
-        isLoading={deleteGroupMutation.isPending}
+        loading={deleteGroupMutation.isPending}
       />
     </div>
   );

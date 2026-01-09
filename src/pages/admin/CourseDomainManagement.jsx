@@ -151,34 +151,24 @@ export default function CourseDomainManagement() {
   const handleConfirmDeleteCourse = useCallback(async () => {
     if (!selectedCourse) return;
 
-    try {
-      await deleteCourseMutation.mutateAsync(selectedCourse.course_id);
-      setIsCourseDeleteDialogOpen(false);
-      setSelectedCourse(null);
-      refetchCourses();
-    } catch (error) {
-      // Error handled by mutation
-    }
-  }, [selectedCourse, deleteCourseMutation, refetchCourses]);
+    await deleteCourseMutation.mutateAsync(selectedCourse.course_id);
+    setIsCourseDeleteDialogOpen(false);
+    setSelectedCourse(null);
+  }, [selectedCourse, deleteCourseMutation]);
 
   const handleCourseSubmit = useCallback(async (data, isEdit = false) => {
-    try {
-      if (isEdit && selectedCourse) {
-        await updateCourseMutation.mutateAsync({
-          courseId: selectedCourse.course_id,
-          data,
-        });
-        setIsCourseEditModalOpen(false);
-      } else {
-        await createCourseMutation.mutateAsync(data);
-        setIsCourseCreateModalOpen(false);
-      }
-      setSelectedCourse(null);
-      refetchCourses();
-    } catch (error) {
-      // Error handled by mutation
+    if (isEdit && selectedCourse) {
+      await updateCourseMutation.mutateAsync({
+        courseId: selectedCourse.course_id,
+        data,
+      });
+      setIsCourseEditModalOpen(false);
+    } else {
+      await createCourseMutation.mutateAsync(data);
+      setIsCourseCreateModalOpen(false);
     }
-  }, [selectedCourse, createCourseMutation, updateCourseMutation, refetchCourses]);
+    setSelectedCourse(null);
+  }, [selectedCourse, createCourseMutation, updateCourseMutation]);
 
   // Domain handlers
   const handleCreateDomain = useCallback(() => {
@@ -198,34 +188,24 @@ export default function CourseDomainManagement() {
   const handleConfirmDeleteDomain = useCallback(async () => {
     if (!selectedDomain) return;
 
-    try {
-      await deleteDomainMutation.mutateAsync(selectedDomain.domain_id);
-      setIsDomainDeleteDialogOpen(false);
-      setSelectedDomain(null);
-      refetchDomains();
-    } catch (error) {
-      // Error handled by mutation
-    }
-  }, [selectedDomain, deleteDomainMutation, refetchDomains]);
+    await deleteDomainMutation.mutateAsync(selectedDomain.domain_id);
+    setIsDomainDeleteDialogOpen(false);
+    setSelectedDomain(null);
+  }, [selectedDomain, deleteDomainMutation]);
 
   const handleDomainSubmit = useCallback(async (data, isEdit = false) => {
-    try {
-      if (isEdit && selectedDomain) {
-        await updateDomainMutation.mutateAsync({
-          domainId: selectedDomain.domain_id,
-          data,
-        });
-        setIsDomainEditModalOpen(false);
-      } else {
-        await createDomainMutation.mutateAsync(data);
-        setIsDomainCreateModalOpen(false);
-      }
-      setSelectedDomain(null);
-      refetchDomains();
-    } catch (error) {
-      // Error handled by mutation
+    if (isEdit && selectedDomain) {
+      await updateDomainMutation.mutateAsync({
+        domainId: selectedDomain.domain_id,
+        data,
+      });
+      setIsDomainEditModalOpen(false);
+    } else {
+      await createDomainMutation.mutateAsync(data);
+      setIsDomainCreateModalOpen(false);
     }
-  }, [selectedDomain, createDomainMutation, updateDomainMutation, refetchDomains]);
+    setSelectedDomain(null);
+  }, [selectedDomain, createDomainMutation, updateDomainMutation]);
 
   // Course columns
   const courseColumns = useMemo(
@@ -552,6 +532,7 @@ export default function CourseDomainManagement() {
         onSubmit={handleCourseSubmit}
         course={selectedCourse}
         isEdit={isCourseEditModalOpen}
+        isLoading={createCourseMutation.isPending || updateCourseMutation.isPending}
       />
 
       {/* Course Delete Dialog */}
@@ -566,7 +547,7 @@ export default function CourseDomainManagement() {
         message={`Are you sure you want to delete "${selectedCourse?.name}"? This action cannot be undone and will delete all associated domains and topics.`}
         confirmText="Delete"
         confirmVariant="danger"
-        isLoading={deleteCourseMutation.isPending}
+        loading={deleteCourseMutation.isPending}
       />
 
       {/* Domain Create/Edit Modal */}
@@ -581,6 +562,7 @@ export default function CourseDomainManagement() {
         domain={selectedDomain}
         courses={courses}
         isEdit={isDomainEditModalOpen}
+        isLoading={createDomainMutation.isPending || updateDomainMutation.isPending}
       />
 
       {/* Domain Delete Dialog */}
@@ -595,7 +577,7 @@ export default function CourseDomainManagement() {
         message={`Are you sure you want to delete "${selectedDomain?.name}"? This action cannot be undone and will delete all associated topics.`}
         confirmText="Delete"
         confirmVariant="danger"
-        isLoading={deleteDomainMutation.isPending}
+        loading={deleteDomainMutation.isPending}
       />
     </div>
   );
@@ -604,7 +586,7 @@ export default function CourseDomainManagement() {
 /**
  * Course Modal Component
  */
-function CourseModal({ isOpen, onClose, onSubmit, course, isEdit }) {
+function CourseModal({ isOpen, onClose, onSubmit, course, isEdit, isLoading }) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [isActive, setIsActive] = useState(true);
@@ -624,14 +606,14 @@ function CourseModal({ isOpen, onClose, onSubmit, course, isEdit }) {
     }
   }, [isOpen, isEdit, course]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!name.trim()) {
       toast.error("Course name is required");
       return;
     }
 
-    onSubmit(
+    await onSubmit(
       {
         name: name.trim(),
         description: description.trim() || null,
@@ -691,10 +673,10 @@ function CourseModal({ isOpen, onClose, onSubmit, course, isEdit }) {
         </ModalBody>
 
         <ModalFooter>
-          <Button type="button" variant="ghost" onClick={onClose}>
+          <Button type="button" variant="ghost" onClick={onClose} disabled={isLoading}>
             Cancel
           </Button>
-          <Button type="submit">
+          <Button type="submit" loading={isLoading}>
             {isEdit ? "Update Course" : "Create Course"}
           </Button>
         </ModalFooter>
@@ -706,7 +688,7 @@ function CourseModal({ isOpen, onClose, onSubmit, course, isEdit }) {
 /**
  * Domain Modal Component
  */
-function DomainModal({ isOpen, onClose, onSubmit, domain, courses, isEdit }) {
+function DomainModal({ isOpen, onClose, onSubmit, domain, courses, isEdit, isLoading }) {
   const [courseId, setCourseId] = useState("");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -734,7 +716,7 @@ function DomainModal({ isOpen, onClose, onSubmit, domain, courses, isEdit }) {
     label: course.name,
   }));
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!name.trim()) {
       toast.error("Domain name is required");
@@ -745,7 +727,7 @@ function DomainModal({ isOpen, onClose, onSubmit, domain, courses, isEdit }) {
       return;
     }
 
-    onSubmit(
+    await onSubmit(
       {
         course_id: courseId || domain?.course_id,
         name: name.trim(),
@@ -822,10 +804,10 @@ function DomainModal({ isOpen, onClose, onSubmit, domain, courses, isEdit }) {
         </ModalBody>
 
         <ModalFooter>
-          <Button type="button" variant="ghost" onClick={onClose}>
+          <Button type="button" variant="ghost" onClick={onClose} disabled={isLoading}>
             Cancel
           </Button>
-          <Button type="submit">
+          <Button type="submit" loading={isLoading}>
             {isEdit ? "Update Domain" : "Create Domain"}
           </Button>
         </ModalFooter>
