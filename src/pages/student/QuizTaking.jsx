@@ -370,9 +370,22 @@ export const QuizTaking = () => {
     if (!isWaitingForAutoSubmit || !sessionToken) return;
     if (isQuizSubmittedRef.current) return;
 
+    let pollCount = 0;
+    const maxPolls = 30; // Maximum 60 seconds (30 * 2s)
+
     const pollInterval = setInterval(async () => {
       if (isQuizSubmittedRef.current) {
         clearInterval(pollInterval);
+        return;
+      }
+
+      pollCount++;
+      if (pollCount > maxPolls) {
+        clearInterval(pollInterval);
+        sessionStorage.removeItem("quiz_session_token");
+        sessionStorage.removeItem("quiz_session_data");
+        showToast.error("Timeout", "Quiz submission took too long. Redirecting...");
+        navigate(`/my-exams/${quizId}`);
         return;
       }
 
