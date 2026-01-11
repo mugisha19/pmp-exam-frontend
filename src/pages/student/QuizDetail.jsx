@@ -72,6 +72,8 @@ export const QuizDetail = () => {
     queryFn: () => getQuizAttempts(quizId),
     enabled: !!quizId,
     refetchOnMount: true,
+    refetchOnWindowFocus: true,
+    staleTime: 0,
   });
 
   const handleStartQuiz = () => {
@@ -869,11 +871,11 @@ export const QuizDetail = () => {
                         <div
                           className={cn(
                             "h-full rounded-full transition-all",
-                            bestScore >= (quiz.passing_score || 70)
-                              ? "bg-secondary-500"
-                              : "bg-primary-500"
+                            (bestScore || 0) >= (quiz.passing_score || 70)
+                              ? "bg-[#6EC1E4]"
+                              : "bg-[#FF5100]"
                           )}
-                          style={{ width: `${bestScore}%` }}
+                          style={{ width: `${bestScore || 0}%` }}
                         />
                       </div>
                       {quiz.passing_score && (
