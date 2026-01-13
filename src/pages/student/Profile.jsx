@@ -280,11 +280,6 @@ export function Profile() {
                     </span>
                   </div>
                   <div className="flex items-center gap-2 mt-3">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-[rgba(110,193,228,0.2)] text-[#5AAFD0] rounded-lg text-sm font-medium">
-                      <Shield className="w-4 h-4" />
-                      {user?.role?.charAt(0).toUpperCase() +
-                        user?.role?.slice(1)}
-                    </span>
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium">
                       <CheckCircle className="w-4 h-4" />
                       Verified

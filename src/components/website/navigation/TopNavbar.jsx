@@ -356,11 +356,13 @@ export const TopNavbar = () => {
             {/* Quick Profile Info - Mobile */}
             <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-xl">
               <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 text-white font-bold">
-                {user?.name?.charAt(0)?.toUpperCase() || "U"}
+                {user?.first_name?.charAt(0)?.toUpperCase() || "U"}
               </div>
               <div className="flex-1">
                 <div className="font-semibold text-gray-900">
-                  {user?.name || "User"}
+                  {user?.first_name && user?.last_name
+                    ? `${user.first_name} ${user.last_name}`
+                    : user?.first_name || "User"}
                 </div>
                 <div className="text-sm text-gray-500 capitalize">
                   {user?.role || "Student"}
