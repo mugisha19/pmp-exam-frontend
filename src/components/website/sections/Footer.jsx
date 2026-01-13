@@ -4,16 +4,7 @@
  */
 
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import {
-  GraduationCap,
-  Mail,
-  Phone,
-  MapPin,
-  Facebook,
-  Twitter,
-  Linkedin,
-  Instagram,
-} from "lucide-react";
+import { GraduationCap } from "lucide-react";
 
 export const Footer = () => {
   const navigate = useNavigate();
@@ -24,10 +15,9 @@ export const Footer = () => {
     {
       title: "Learn",
       links: [
-        { label: "Dashboard", path: "/home" },
-        { label: "Browse Exams", path: "/browse-exams" },
+        { label: "Dashboard", path: "/my-dashboard" },
+        { label: "Browse Exams", path: "/my-exams" },
         { label: "My Learning", path: "/my-learning" },
-        { label: "Learning Paths", path: "/learning-paths" },
       ],
     },
     {
@@ -40,16 +30,9 @@ export const Footer = () => {
       title: "Account",
       links: [
         { label: "Profile", path: "/my-profile" },
-        { label: "Support", path: "/support" },
+        { label: "Support", path: "/my-support" },
       ],
     },
-  ];
-
-  const socialLinks = [
-    { icon: Facebook, href: "#", label: "Facebook" },
-    { icon: Twitter, href: "#", label: "Twitter" },
-    { icon: Linkedin, href: "#", label: "LinkedIn" },
-    { icon: Instagram, href: "#", label: "Instagram" },
   ];
 
   return (
@@ -64,20 +47,21 @@ export const Footer = () => {
                 to="/home"
                 onClick={(e) => {
                   e.preventDefault();
-                  console.log('[Footer Logo] Click detected');
-                  console.log('[Footer Logo] Current path:', location.pathname);
-                  console.log('[Footer Logo] Current scroll position:', window.scrollY);
                   
                   if (location.pathname === '/home') {
-                    // Already on home, just smooth scroll to top
-                    console.log('[Footer Logo] Already on /home, just scrolling');
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   } else {
-                    // Navigate without scrolling first - React Router will handle it
-                    console.log('[Footer Logo] Navigating to /home');
-                    navigate('/home');
-                    // Scroll to top after navigation
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    const root = document.getElementById('root');
+                    root.style.transition = 'opacity 0.3s ease-in-out';
+                    root.style.opacity = '0';
+                    
+                    setTimeout(() => {
+                      window.scrollTo({ top: 0, behavior: 'instant' });
+                      navigate('/home', { replace: true });
+                      setTimeout(() => {
+                        root.style.opacity = '1';
+                      }, 50);
+                    }, 300);
                   }
                 }}
                 className="flex items-center gap-3 group mb-4 transition-all duration-300 hover:scale-105"
@@ -99,25 +83,6 @@ export const Footer = () => {
                 with real questions, track your progress, and learn with a
                 community of aspiring project managers.
               </p>
-
-              {/* Social Links */}
-              <div className="flex items-center gap-3">
-                {socialLinks.map((social) => {
-                  const Icon = social.icon;
-                  return (
-                    <a
-                      key={social.label}
-                      href={social.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-center w-10 h-10 bg-white hover:bg-primary-50 text-text-tertiary hover:text-primary-600 rounded-lg transition-colors duration-200"
-                      aria-label={social.label}
-                    >
-                      <Icon className="w-5 h-5" />
-                    </a>
-                  );
-                })}
-              </div>
             </div>
 
             {/* Footer Links */}
@@ -131,7 +96,6 @@ export const Footer = () => {
                     <li key={link.path}>
                       <Link
                         to={link.path}
-                        onClick={() => console.log("[Footer] Navigating to:", link.path)}
                         className="text-text-tertiary hover:text-primary-600 text-sm transition-colors duration-200"
                       >
                         {link.label}
