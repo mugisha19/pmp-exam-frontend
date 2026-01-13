@@ -92,8 +92,25 @@ export const ProfileDropdown = ({ onClose }) => {
         {/* User Info */}
         <div className="px-4 py-4 border-b border-border-light">
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-12 h-12 bg-gradient-orange text-white font-bold text-lg rounded-full flex-shrink-0">
+            {user?.avatar_url ? (
+              <img
+                src={user.avatar_url}
+                alt={`${user?.first_name} ${user?.last_name}`}
+                className="w-12 h-12 rounded-full object-cover flex-shrink-0 border-2 border-primary-100"
+                onError={(e) => {
+                  e.target.style.display = "none";
+                  e.target.nextSibling.style.display = "flex";
+                }}
+              />
+            ) : null}
+            <div 
+              className={cn(
+                "items-center justify-center w-12 h-12 bg-gradient-to-br from-[#FF5100] to-[#6EC1E4] text-white font-bold text-lg rounded-full flex-shrink-0 shadow-sm",
+                user?.avatar_url ? "hidden" : "flex"
+              )}
+            >
               {user?.first_name?.charAt(0)?.toUpperCase() || "U"}
+              {user?.last_name?.charAt(0)?.toUpperCase() || ""}
             </div>
             <div className="flex-1 min-w-0">
               <div className="font-semibold text-text-primary truncate">
