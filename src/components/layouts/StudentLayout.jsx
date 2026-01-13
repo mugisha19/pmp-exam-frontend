@@ -62,12 +62,7 @@ export const StudentLayout = () => {
           {/* Logo & Brand */}
           <div className="p-3 pb-2.5 border-b border-gray-100">
             <div className="flex items-center gap-2">
-              <div className="relative">
-                <div className="flex items-center justify-center w-8 h-8 rounded-lg shadow-sm ring-2" style={{ backgroundColor: '#476072', ringColor: 'rgba(71, 96, 114, 0.1)' }}>
-                  <GraduationCap className="w-4 h-4 text-white" />
-                </div>
-                <div className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white shadow-sm" style={{ backgroundColor: '#476072' }}></div>
-              </div>
+              <img src="/pmp logo.png" alt="PMP Portal" className="w-8 h-8 object-contain" />
               <div>
                 <h1 className="text-base font-semibold bg-clip-text text-transparent" style={{ background: 'linear-gradient(135deg, #53629E 0%, #6b7aad 100%)', WebkitBackgroundClip: 'text' }}>
                   PMP Portal
@@ -229,9 +224,7 @@ export const StudentLayout = () => {
         <div className="px-4 py-3">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2.5">
-              <div className="flex items-center justify-center w-9 h-9 rounded-lg shadow-sm" style={{ background: 'linear-gradient(135deg, #476072 0%, #3d5161 100%)' }}>
-                <GraduationCap className="w-5 h-5 text-white" />
-              </div>
+              <img src="/pmp logo.png" alt="PMP Portal" className="w-9 h-9 object-contain" />
               <div>
                 <h1 className="text-base font-semibold" style={{ color: '#476072' }}>
                   PMP Portal

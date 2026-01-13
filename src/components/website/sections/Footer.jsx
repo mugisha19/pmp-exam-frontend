@@ -15,7 +15,7 @@ export const Footer = () => {
     {
       title: "Learn",
       links: [
-        { label: "Dashboard", path: "/my-dashboard" },
+        { label: "Home", path: "/home" },
         { label: "Browse Exams", path: "/my-exams" },
         { label: "My Learning", path: "/my-learning" },
       ],
@@ -66,9 +66,7 @@ export const Footer = () => {
                 }}
                 className="flex items-center gap-3 group mb-4 transition-all duration-300 hover:scale-105"
               >
-                <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300">
-                  <GraduationCap className="w-6 h-6 text-white" />
-                </div>
+                <img src="/pmp logo.png" alt="PMP Portal" className="w-12 h-12 object-contain" />
                 <div>
                   <h2 className="text-2xl font-bold bg-gradient-to-r from-primary-500 to-secondary-500 bg-clip-text text-transparent">
                     PMP Portal
@@ -96,6 +94,12 @@ export const Footer = () => {
                     <li key={link.path}>
                       <Link
                         to={link.path}
+                        onClick={(e) => {
+                          if (link.label === "Home" && location.pathname === link.path) {
+                            e.preventDefault();
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                          }
+                        }}
                         className="text-text-tertiary hover:text-primary-600 text-sm transition-colors duration-200"
                       >
                         {link.label}

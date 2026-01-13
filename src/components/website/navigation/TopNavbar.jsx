@@ -129,18 +129,16 @@ export const TopNavbar = () => {
         )}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-20">
             {/* Left Section: Logo + Navigation */}
             <div className="flex items-center gap-8">
               {/* Logo */}
               <Link 
                 to="/home" 
                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                className="flex items-center gap-2.5 group"
+                className="flex items-center -my-2"
               >
-                <span className="text-xl font-bold text-[#FF5100]">
-                  PMP Exam
-                </span>
+                <img src="/pmp logo.png" alt="PMP Portal" className="h-24 w-auto object-contain" style={{ imageRendering: 'crisp-edges' }} />
               </Link>
 
               {/* Desktop Navigation */}
@@ -390,7 +388,7 @@ export const TopNavbar = () => {
       <NotesPanel isOpen={notesOpen} onClose={() => setNotesOpen(false)} />
 
       {/* Spacer to prevent content from going under fixed navbar */}
-      <div className="h-16" />
+      <div className="h-20" />
     </>
   );
 };
