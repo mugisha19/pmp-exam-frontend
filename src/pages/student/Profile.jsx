@@ -36,7 +36,7 @@ import { useUpdateProfileMutation } from "@/hooks/queries/useUserQueries";
 import api from "@/services/api";
 import toast from "react-hot-toast";
 import { cn } from "@/utils/cn";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const profileSchema = z.object({
   first_name: z
@@ -62,10 +62,23 @@ const profileSchema = z.object({
     ),
 });
 
+const passwordSchema = z.object({
+  current_password: z.string().min(1, "Current password is required"),
+  new_password: z.string().min(8, "Password must be at least 8 characters"),
+  confirm_password: z.string().min(1, "Please confirm your password"),
+}).refine((data) => data.new_password === data.confirm_password, {
+  message: "Passwords don't match",
+  path: ["confirm_password"],
+});
+
 export function Profile() {
+  const navigate = useNavigate();
   const { user } = useAuthStore();
   const updateUser = useAuthStore((state) => state.updateUser);
+  const clearAuth = useAuthStore((state) => state.clearAuth);
   const [isEditing, setIsEditing] = useState(false);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [isPasswordLoading, setIsPasswordLoading] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const fileInputRef = useRef(null);
@@ -85,6 +98,20 @@ export function Profile() {
       first_name: user?.first_name || "",
       last_name: user?.last_name || "",
       avatar_url: user?.avatar_url || "",
+    },
+  });
+
+  const {
+    register: registerPassword,
+    handleSubmit: handlePasswordSubmit,
+    reset: resetPassword,
+    formState: { errors: passwordErrors },
+  } = useForm({
+    resolver: zodResolver(passwordSchema),
+    defaultValues: {
+      current_password: "",
+      new_password: "",
+      confirm_password: "",
     },
   });
 
@@ -181,6 +208,25 @@ export function Profile() {
     setSelectedFile(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
+    }
+  };
+
+  const onPasswordSubmit = async (data) => {
+    setIsPasswordLoading(true);
+    try {
+      const { changePassword } = await import("@/services/auth.service");
+      await changePassword(data.current_password, data.new_password);
+      toast.success("Password changed successfully! Logging out...");
+      resetPassword();
+      setIsChangingPassword(false);
+      setTimeout(() => {
+        clearAuth();
+        navigate("/login");
+      }, 1500);
+    } catch (error) {
+      toast.error(error.message || "Failed to change password");
+    } finally {
+      setIsPasswordLoading(false);
     }
   };
 
@@ -437,6 +483,137 @@ export function Profile() {
                     >
                       Cancel
                     </button>
+                  </div>
+                )}
+              </form>
+            </div>
+
+            {/* Password Change Card */}
+            <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
+                    <Lock className="w-5 h-5 text-[#FF5100]" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-semibold text-gray-900">
+                      Change Password
+                    </h2>
+                    <p className="text-sm text-gray-500">
+                      Update your password to keep your account secure
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <form onSubmit={handlePasswordSubmit(onPasswordSubmit)} className="p-6">
+                {!isChangingPassword ? (
+                  <button
+                    type="button"
+                    onClick={() => setIsChangingPassword(true)}
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    <Lock className="w-4 h-4" />
+                    Change Password
+                  </button>
+                ) : (
+                  <div className="space-y-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Current Password
+                      </label>
+                      <input
+                        {...registerPassword("current_password")}
+                        type="password"
+                        placeholder="Enter current password"
+                        className={cn(
+                          "w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-[rgba(255,81,0,0.2)] focus:border-[#FF5100] outline-none transition-all",
+                          passwordErrors.current_password
+                            ? "border-red-300 focus:border-red-500 focus:ring-red-500/20"
+                            : "border-gray-300"
+                        )}
+                      />
+                      {passwordErrors.current_password && (
+                        <p className="mt-1 text-sm text-red-600">
+                          {passwordErrors.current_password.message}
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        New Password
+                      </label>
+                      <input
+                        {...registerPassword("new_password")}
+                        type="password"
+                        placeholder="Enter new password"
+                        className={cn(
+                          "w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-[rgba(255,81,0,0.2)] focus:border-[#FF5100] outline-none transition-all",
+                          passwordErrors.new_password
+                            ? "border-red-300 focus:border-red-500 focus:ring-red-500/20"
+                            : "border-gray-300"
+                        )}
+                      />
+                      {passwordErrors.new_password && (
+                        <p className="mt-1 text-sm text-red-600">
+                          {passwordErrors.new_password.message}
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Confirm New Password
+                      </label>
+                      <input
+                        {...registerPassword("confirm_password")}
+                        type="password"
+                        placeholder="Confirm new password"
+                        className={cn(
+                          "w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-[rgba(255,81,0,0.2)] focus:border-[#FF5100] outline-none transition-all",
+                          passwordErrors.confirm_password
+                            ? "border-red-300 focus:border-red-500 focus:ring-red-500/20"
+                            : "border-gray-300"
+                        )}
+                      />
+                      {passwordErrors.confirm_password && (
+                        <p className="mt-1 text-sm text-red-600">
+                          {passwordErrors.confirm_password.message}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-3 pt-4 border-t border-gray-100">
+                      <button
+                        type="submit"
+                        disabled={isPasswordLoading}
+                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#FF5100] text-white font-semibold rounded-lg hover:bg-[#E64800] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      >
+                        {isPasswordLoading ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            Updating...
+                          </>
+                        ) : (
+                          <>
+                            <Save className="w-4 h-4" />
+                            Update Password
+                          </>
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        disabled={isPasswordLoading}
+                        onClick={() => {
+                          setIsChangingPassword(false);
+                          resetPassword();
+                        }}
+                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
                   </div>
                 )}
               </form>
