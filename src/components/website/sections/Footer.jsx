@@ -3,7 +3,7 @@
  * Website footer with links and information
  */
 
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   GraduationCap,
   Mail,
@@ -16,14 +16,16 @@ import {
 } from "lucide-react";
 
 export const Footer = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const currentYear = new Date().getFullYear();
 
   const footerSections = [
     {
       title: "Learn",
       links: [
-        { label: "Dashboard", path: "/dashboard" },
-        { label: "Browse Exams", path: "/browse" },
+        { label: "Dashboard", path: "/home" },
+        { label: "Browse Exams", path: "/browse-exams" },
         { label: "My Learning", path: "/my-learning" },
         { label: "Learning Paths", path: "/learning-paths" },
       ],
@@ -37,7 +39,7 @@ export const Footer = () => {
     {
       title: "Account",
       links: [
-        { label: "Profile", path: "/profile" },
+        { label: "Profile", path: "/my-profile" },
         { label: "Support", path: "/support" },
       ],
     },
@@ -59,8 +61,26 @@ export const Footer = () => {
             {/* Brand Section */}
             <div className="lg:col-span-2">
               <Link
-                to="/dashboard"
-                className="flex items-center gap-3 group mb-4"
+                to="/home"
+                onClick={(e) => {
+                  e.preventDefault();
+                  console.log('[Footer Logo] Click detected');
+                  console.log('[Footer Logo] Current path:', location.pathname);
+                  console.log('[Footer Logo] Current scroll position:', window.scrollY);
+                  
+                  if (location.pathname === '/home') {
+                    // Already on home, just smooth scroll to top
+                    console.log('[Footer Logo] Already on /home, just scrolling');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  } else {
+                    // Navigate without scrolling first - React Router will handle it
+                    console.log('[Footer Logo] Navigating to /home');
+                    navigate('/home');
+                    // Scroll to top after navigation
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }
+                }}
+                className="flex items-center gap-3 group mb-4 transition-all duration-300 hover:scale-105"
               >
                 <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300">
                   <GraduationCap className="w-6 h-6 text-white" />
