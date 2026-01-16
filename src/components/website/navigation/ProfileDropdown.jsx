@@ -4,14 +4,17 @@
  */
 
 import { Link, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { useAuthStore } from "@/stores/auth.store";
 import { useLogoutMutation } from "@/hooks/queries/useAuthQueries";
+import analyticsService from "@/services/analytics.service";
 import {
   User,
   Settings,
   BookOpen,
   LogOut,
   TrendingUp,
+  Loader2,
 } from "lucide-react";
 import { cn } from "@/utils/cn";
 
@@ -19,6 +22,29 @@ export const ProfileDropdown = ({ onClose }) => {
   const navigate = useNavigate();
   const { user } = useAuthStore();
   const logoutMutation = useLogoutMutation();
+
+  // Fetch real student performance data
+  const { data: performanceData, isLoading: statsLoading } = useQuery({
+    queryKey: ["profile-dropdown-stats", user?.user_id],
+    queryFn: async () => {
+      try {
+        const response = await analyticsService.getStudentPerformance(
+          user?.user_id,
+          "all"
+        );
+        return response;
+      } catch (error) {
+        console.error("Error fetching performance stats:", error);
+        return {
+          total_attempts: 0,
+          total_passed: 0,
+          average_score: 0,
+        };
+      }
+    },
+    enabled: !!user?.user_id && user?.role?.toLowerCase() === "student",
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
 
   const handleLogout = () => {
     logoutMutation.mutate(undefined, {
@@ -66,12 +92,31 @@ export const ProfileDropdown = ({ onClose }) => {
         {/* User Info */}
         <div className="px-4 py-4 border-b border-border-light">
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-12 h-12 bg-gradient-orange text-white font-bold text-lg rounded-full flex-shrink-0">
-              {user?.name?.charAt(0)?.toUpperCase() || "U"}
+            {user?.avatar_url ? (
+              <img
+                src={user.avatar_url}
+                alt={`${user?.first_name} ${user?.last_name}`}
+                className="w-12 h-12 rounded-full object-cover flex-shrink-0 border-2 border-primary-100"
+                onError={(e) => {
+                  e.target.style.display = "none";
+                  e.target.nextSibling.style.display = "flex";
+                }}
+              />
+            ) : null}
+            <div 
+              className={cn(
+                "items-center justify-center w-12 h-12 bg-gradient-to-br from-[#FF5100] to-[#6EC1E4] text-white font-bold text-lg rounded-full flex-shrink-0 shadow-sm",
+                user?.avatar_url ? "hidden" : "flex"
+              )}
+            >
+              {user?.first_name?.charAt(0)?.toUpperCase() || "U"}
+              {user?.last_name?.charAt(0)?.toUpperCase() || ""}
             </div>
             <div className="flex-1 min-w-0">
               <div className="font-semibold text-text-primary truncate">
-                {user?.name || "User"}
+                {user?.first_name && user?.last_name
+                  ? `${user.first_name} ${user.last_name}`
+                  : user?.first_name || "User"}
               </div>
               <div className="text-sm text-text-tertiary truncate">
                 {user?.email}
@@ -81,18 +126,32 @@ export const ProfileDropdown = ({ onClose }) => {
 
           {/* Quick Stats */}
           <div className="flex items-center gap-4 mt-3 pt-3 border-t border-border-light">
-            <div className="text-center">
-              <div className="text-lg font-bold text-primary-600">24</div>
-              <div className="text-xs text-text-muted">Exams</div>
-            </div>
-            <div className="text-center">
-              <div className="text-lg font-bold text-secondary-600">18</div>
-              <div className="text-xs text-text-muted">Complete</div>
-            </div>
-            <div className="text-center">
-              <div className="text-lg font-bold text-secondary-500">85%</div>
-              <div className="text-xs text-text-muted">Avg Score</div>
-            </div>
+            {statsLoading ? (
+              <div className="flex-1 flex items-center justify-center py-2">
+                <Loader2 className="w-5 h-5 text-gray-400 animate-spin" />
+              </div>
+            ) : (
+              <>
+                <div className="text-center">
+                  <div className="text-lg font-bold text-primary-600">
+                    {performanceData?.total_attempts || 0}
+                  </div>
+                  <div className="text-xs text-text-muted">Attempts</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-lg font-bold text-secondary-600">
+                    {performanceData?.total_passed || 0}
+                  </div>
+                  <div className="text-xs text-text-muted">Passed</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-lg font-bold text-secondary-500">
+                    {Math.round(performanceData?.average_score || 0)}%
+                  </div>
+                  <div className="text-xs text-text-muted">Avg Score</div>
+                </div>
+              </>
+            )}
           </div>
         </div>
 

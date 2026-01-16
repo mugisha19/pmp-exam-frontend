@@ -3,11 +3,20 @@
  * 403 - Access Denied
  */
 
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button, Logo } from "../components/ui";
 import { ShieldAlert } from "lucide-react";
+import { useAuthStore } from "@/stores/auth.store";
 
 export const Unauthorized = () => {
+  const navigate = useNavigate();
+  const { user } = useAuthStore();
+
+  const handleGoToDashboard = () => {
+    const dashboardPath = user?.role === 'student' ? '/my-dashboard' : '/dashboard';
+    navigate(dashboardPath);
+  };
+
   return (
     <div className="min-h-screen bg-bg-primary flex items-center justify-center p-6">
       <div className="text-center max-w-md">
@@ -34,8 +43,7 @@ export const Unauthorized = () => {
 
         <div className="space-y-3">
           <Button
-            as={Link}
-            to="/dashboard"
+            onClick={handleGoToDashboard}
             variant="primary"
             size="lg"
             fullWidth

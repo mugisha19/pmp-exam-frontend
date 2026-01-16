@@ -129,18 +129,16 @@ export const TopNavbar = () => {
         )}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-20">
             {/* Left Section: Logo + Navigation */}
             <div className="flex items-center gap-8">
               {/* Logo */}
               <Link 
                 to="/home" 
                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                className="flex items-center gap-2.5 group"
+                className="flex items-center -my-2"
               >
-                <span className="text-xl font-bold text-[#FF5100]">
-                  PMP Exam
-                </span>
+                <img src="/pmp logo.png" alt="PMP Portal" className="h-24 w-auto object-contain" style={{ imageRendering: 'crisp-edges' }} />
               </Link>
 
               {/* Desktop Navigation */}
@@ -356,11 +354,13 @@ export const TopNavbar = () => {
             {/* Quick Profile Info - Mobile */}
             <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-xl">
               <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 text-white font-bold">
-                {user?.name?.charAt(0)?.toUpperCase() || "U"}
+                {user?.first_name?.charAt(0)?.toUpperCase() || "U"}
               </div>
               <div className="flex-1">
                 <div className="font-semibold text-gray-900">
-                  {user?.name || "User"}
+                  {user?.first_name && user?.last_name
+                    ? `${user.first_name} ${user.last_name}`
+                    : user?.first_name || "User"}
                 </div>
                 <div className="text-sm text-gray-500 capitalize">
                   {user?.role || "Student"}
@@ -388,7 +388,7 @@ export const TopNavbar = () => {
       <NotesPanel isOpen={notesOpen} onClose={() => setNotesOpen(false)} />
 
       {/* Spacer to prevent content from going under fixed navbar */}
-      <div className="h-16" />
+      <div className="h-20" />
     </>
   );
 };

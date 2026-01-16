@@ -3,29 +3,21 @@
  * Website footer with links and information
  */
 
-import { Link } from "react-router-dom";
-import {
-  GraduationCap,
-  Mail,
-  Phone,
-  MapPin,
-  Facebook,
-  Twitter,
-  Linkedin,
-  Instagram,
-} from "lucide-react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { GraduationCap } from "lucide-react";
 
 export const Footer = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const currentYear = new Date().getFullYear();
 
   const footerSections = [
     {
       title: "Learn",
       links: [
-        { label: "Dashboard", path: "/dashboard" },
-        { label: "Browse Exams", path: "/browse" },
+        { label: "Home", path: "/home" },
+        { label: "Browse Exams", path: "/my-exams" },
         { label: "My Learning", path: "/my-learning" },
-        { label: "Learning Paths", path: "/learning-paths" },
       ],
     },
     {
@@ -37,17 +29,10 @@ export const Footer = () => {
     {
       title: "Account",
       links: [
-        { label: "Profile", path: "/profile" },
-        { label: "Support", path: "/support" },
+        { label: "Profile", path: "/my-profile" },
+        { label: "Support", path: "/my-support" },
       ],
     },
-  ];
-
-  const socialLinks = [
-    { icon: Facebook, href: "#", label: "Facebook" },
-    { icon: Twitter, href: "#", label: "Twitter" },
-    { icon: Linkedin, href: "#", label: "LinkedIn" },
-    { icon: Instagram, href: "#", label: "Instagram" },
   ];
 
   return (
@@ -59,12 +44,29 @@ export const Footer = () => {
             {/* Brand Section */}
             <div className="lg:col-span-2">
               <Link
-                to="/dashboard"
-                className="flex items-center gap-3 group mb-4"
+                to="/home"
+                onClick={(e) => {
+                  e.preventDefault();
+                  
+                  if (location.pathname === '/home') {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  } else {
+                    const root = document.getElementById('root');
+                    root.style.transition = 'opacity 0.3s ease-in-out';
+                    root.style.opacity = '0';
+                    
+                    setTimeout(() => {
+                      window.scrollTo({ top: 0, behavior: 'instant' });
+                      navigate('/home', { replace: true });
+                      setTimeout(() => {
+                        root.style.opacity = '1';
+                      }, 50);
+                    }, 300);
+                  }
+                }}
+                className="flex items-center gap-3 group mb-4 transition-all duration-300 hover:scale-105"
               >
-                <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300">
-                  <GraduationCap className="w-6 h-6 text-white" />
-                </div>
+                <img src="/pmp logo.png" alt="PMP Portal" className="w-12 h-12 object-contain" />
                 <div>
                   <h2 className="text-2xl font-bold bg-gradient-to-r from-primary-500 to-secondary-500 bg-clip-text text-transparent">
                     PMP Portal
@@ -79,25 +81,6 @@ export const Footer = () => {
                 with real questions, track your progress, and learn with a
                 community of aspiring project managers.
               </p>
-
-              {/* Social Links */}
-              <div className="flex items-center gap-3">
-                {socialLinks.map((social) => {
-                  const Icon = social.icon;
-                  return (
-                    <a
-                      key={social.label}
-                      href={social.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-center w-10 h-10 bg-white hover:bg-primary-50 text-text-tertiary hover:text-primary-600 rounded-lg transition-colors duration-200"
-                      aria-label={social.label}
-                    >
-                      <Icon className="w-5 h-5" />
-                    </a>
-                  );
-                })}
-              </div>
             </div>
 
             {/* Footer Links */}
@@ -111,7 +94,12 @@ export const Footer = () => {
                     <li key={link.path}>
                       <Link
                         to={link.path}
-                        onClick={() => console.log("[Footer] Navigating to:", link.path)}
+                        onClick={(e) => {
+                          if (link.label === "Home" && location.pathname === link.path) {
+                            e.preventDefault();
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                          }
+                        }}
                         className="text-text-tertiary hover:text-primary-600 text-sm transition-colors duration-200"
                       >
                         {link.label}

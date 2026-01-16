@@ -79,8 +79,7 @@ export const UserDropdown = ({ className }) => {
               ? `${user.first_name} ${user.last_name}`
               : user?.first_name ||
                 user?.last_name ||
-                user?.email?.split("@")[0] ||
-                "User"}
+                user?.email?.split("@")[0]}
           </span>
           <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
         </button>
@@ -93,8 +92,7 @@ export const UserDropdown = ({ className }) => {
             ? `${user.first_name} ${user.last_name}`
             : user?.first_name ||
               user?.last_name ||
-              user?.email?.split("@")[0] ||
-              "User"}
+              user?.email?.split("@")[0]}
         </p>
         <p className="text-xs text-gray-500 truncate">{user?.email}</p>
       </div>

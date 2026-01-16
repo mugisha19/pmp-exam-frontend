@@ -28,6 +28,9 @@ import {
 } from "@/pages/student";
 import QuizTaking from "@/pages/student/QuizTaking";
 import AttemptReview from "@/pages/student/AttemptReview";
+import Privacy from "@/pages/Privacy";
+import Terms from "@/pages/Terms";
+import Cookies from "@/pages/Cookies";
 
 export const studentRoutes = (
   <Route
@@ -51,5 +54,8 @@ export const studentRoutes = (
     <Route path="/my-exams/:quizId/attempts/:attemptId" element={<AttemptReview />} />
     <Route path="/my-notifications" element={<Notifications />} />
     <Route path="/my-profile" element={<Profile />} />
+    <Route path="/privacy" element={<Privacy />} />
+    <Route path="/terms" element={<Terms />} />
+    <Route path="/cookies" element={<Cookies />} />
   </Route>
 );
