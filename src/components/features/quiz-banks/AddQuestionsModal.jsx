@@ -160,18 +160,11 @@ export function AddQuestionsModal({ isOpen, onClose, quizBankId, onSuccess }) {
         quizBankId,
         questionIds: selectedQuestions,
       });
-      toast.success(
-        `Successfully added ${selectedQuestions.length} question(s) to quiz bank`
-      );
       setSelectedQuestions([]);
       onSuccess?.();
       onClose();
     } catch (error) {
-      const message =
-        typeof error === "object"
-          ? error.message || JSON.stringify(error)
-          : error;
-      toast.error(`Failed to add questions: ${message}`);
+      // Error toast is already handled by the mutation
     }
   };
 
