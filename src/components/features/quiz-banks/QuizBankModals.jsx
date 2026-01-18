@@ -205,7 +205,7 @@ export const CreateQuizBankSelectionModal = ({
             }}
             className="w-full p-4 text-left border border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
           >
-            <div className="font-medium text-gray-900">Create New Group</div>
+            <div className="font-medium text-gray-900">Create New Quiz Bank</div>
             <div className="text-sm text-gray-500 mt-1">
               Create a new quiz bank from scratch
             </div>
@@ -217,7 +217,7 @@ export const CreateQuizBankSelectionModal = ({
             }}
             className="w-full p-4 text-left border border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
           >
-            <div className="font-medium text-gray-900">Merge Group</div>
+            <div className="font-medium text-gray-900">Merge Quiz Bank</div>
             <div className="text-sm text-gray-500 mt-1">
               Combine multiple quiz banks into one
             </div>
