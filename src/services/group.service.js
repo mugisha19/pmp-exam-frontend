@@ -340,6 +340,21 @@ const handleGroupError = (error) => {
 };
 
 /**
+ * Get available users for a group (not already members)
+ * @param {string} groupId - Group ID
+ * @param {Object} params - Query parameters
+ * @param {string} [params.search] - Search query
+ * @returns {Promise<Array>} List of available users
+ */
+export const getAvailableUsers = async (groupId, params = {}) => {
+  try {
+    const response = await api.get(`/groups/${groupId}/available-users`, { params });
+    return response.data;
+  } catch (error) {
+    throw handleGroupError(error);
+  }
+};
+/**
  * Get group preview by invite token (public endpoint)
  * @param {string} token - Invite token
  * @returns {Promise<Object>} Group preview data
@@ -384,6 +399,7 @@ export default {
   getGroupQuizStats,
   getMyGroups,
   getUserGroups,
+  getAvailableUsers,
   getGroupPreviewByToken,
   joinGroupByToken,
   joinPublicGroup,

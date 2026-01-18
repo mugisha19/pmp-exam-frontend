@@ -326,7 +326,7 @@ export const QuizBankDetails = () => {
               description={(user?.role === "admin" || user?.role === "instructor") ? "Add questions to this quiz bank to get started" : "This quiz bank has no questions yet"}
               actionLabel={(user?.role === "admin" || user?.role === "instructor") ? "Add Questions" : undefined}
               onAction={(user?.role === "admin" || user?.role === "instructor") ? () =>
-                navigate(`/quiz-banks/${quizBankId}/add-questions`)
+                setIsAddQuestionsModalOpen(true)
               : undefined}
             />
           ) : (

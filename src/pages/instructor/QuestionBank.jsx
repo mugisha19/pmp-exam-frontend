@@ -178,7 +178,7 @@ export default function QuestionBank() {
 
   const handleEditQuestion = useCallback(
     (question) => {
-      navigate(`/questions/${question.question_id}`);
+      navigate(`/questions/${question.question_id}/edit`);
     },
     [navigate]
   );

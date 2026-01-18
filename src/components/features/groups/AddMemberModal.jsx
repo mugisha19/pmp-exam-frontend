@@ -8,8 +8,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { UserPlus, Search, Users } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAddMemberMutation } from "@/hooks/queries/useGroupQueries";
-import { useUsers } from "@/hooks/queries/useUserQueries";
+import { getAvailableUsers } from "@/services/group.service";
 import { Modal, ModalFooter } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
@@ -32,16 +33,17 @@ const ROLE_OPTIONS = [
 export const AddMemberModal = ({ isOpen, onClose, group }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const addMemberMutation = useAddMemberMutation();
+  const queryClient = useQueryClient();
 
-  // Fetch users for selection
-  const { data: usersData, isLoading: usersLoading } = useUsers(
-    {
-      page: 1,
-      per_page: 50,
-      search: searchQuery,
+  // Fetch available users for selection (not already members)
+  const { data: usersData, isLoading: usersLoading } = useQuery({
+    queryKey: ["available-users", group?.group_id || group?.id, searchQuery],
+    queryFn: () => {
+      const groupId = group?.group_id || group?.id;
+      return getAvailableUsers(groupId, { search: searchQuery });
     },
-    { enabled: isOpen }
-  );
+    enabled: isOpen && !!(group?.group_id || group?.id),
+  });
 
   const users = usersData?.users || [];
 
@@ -76,6 +78,7 @@ export const AddMemberModal = ({ isOpen, onClose, group }) => {
           role: data.role,
         },
       });
+      queryClient.invalidateQueries(["available-users", group.group_id || group.id]);
       reset();
       setSearchQuery("");
       onClose();
