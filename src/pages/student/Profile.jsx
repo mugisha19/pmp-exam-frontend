@@ -617,51 +617,6 @@ export function Profile() {
 
           {/* Right Sidebar */}
           <div className="lg:w-80 shrink-0 space-y-6">
-            {/* Quick Stats Card */}
-            <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-              <div className="px-5 py-4 border-b border-gray-100 bg-gray-50">
-                <h3 className="font-semibold text-gray-900">Quick Stats</h3>
-              </div>
-              <div className="p-5 space-y-4">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-[rgba(110,193,228,0.2)] flex items-center justify-center">
-                    <BookOpen className="w-5 h-5 text-[#6EC1E4]" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Exams Taken</p>
-                    <p className="text-lg font-bold text-gray-900">12</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
-                    <TrendingUp className="w-5 h-5 text-orange-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Average Score</p>
-                    <p className="text-lg font-bold text-gray-900">85%</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                    <Clock className="w-5 h-5 text-blue-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Study Hours</p>
-                    <p className="text-lg font-bold text-gray-900">24h</p>
-                  </div>
-                </div>
-              </div>
-              <div className="px-5 py-3 border-t border-gray-100 bg-gray-50">
-                <Link
-                  to="/my-learning"
-                  className="text-sm font-medium text-[#FF5100] hover:text-[#E64800] flex items-center gap-1"
-                >
-                  View detailed stats
-                  <ChevronRight className="w-4 h-4" />
-                </Link>
-              </div>
-            </div>
-
             {/* Member Since Card */}
             <div className="bg-gradient-to-br from-[#FF5100] to-[#FF6B2C] rounded-xl p-5 text-white">
               <div className="flex items-center gap-3 mb-3">
