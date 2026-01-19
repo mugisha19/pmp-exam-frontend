@@ -138,7 +138,7 @@ export const TopNavbar = () => {
                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                 className="flex items-center -my-2"
               >
-                <img src="/pmp logo.png" alt="PMP Portal" className="h-24 w-auto object-contain" style={{ imageRendering: 'crisp-edges' }} />
+                <img src="/pmp logo.png" alt="PMP Portal" className="h-12 w-auto object-contain" style={{ imageRendering: 'crisp-edges' }} />
               </Link>
 
               {/* Desktop Navigation */}

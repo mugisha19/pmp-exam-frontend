@@ -66,10 +66,10 @@ export const Footer = () => {
                 }}
                 className="flex items-center gap-3 group mb-4 transition-all duration-300 hover:scale-105"
               >
-                <img src="/pmp logo.png" alt="PMP Portal" className="w-12 h-12 object-contain" />
+                <img src="/pmp logo.png" alt="PMP Portal" className="w-28 h-28 object-contain" />
                 <div>
                   <h2 className="text-2xl font-bold bg-gradient-to-r from-primary-500 to-secondary-500 bg-clip-text text-transparent">
-                    PMP Portal
+                    PMP Prep Exam
                   </h2>
                   <p className="text-xs text-text-tertiary font-medium">
                     Master Your Certification
