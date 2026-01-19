@@ -224,6 +224,59 @@ export default function ExamManagement() {
 
       {isLoading ? (
         <div className="text-center py-8">Loading...</div>
+      ) : exams.length === 0 ? (
+        <div className="text-center py-16">
+          <div className="max-w-md mx-auto">
+            <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6">
+              <BookOpen className="w-10 h-10 text-blue-500" />
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">
+              No Exams Found
+            </h3>
+            <p className="text-gray-600 mb-8">
+              {statusFilter !== "all"
+                ? "No exams match the selected status filter"
+                : "Get started by creating exams from your quiz banks"}
+            </p>
+            {statusFilter !== "all" ? (
+              <Button
+                onClick={() => setStatusFilter("all")}
+                variant="outline"
+              >
+                Clear Filter
+              </Button>
+            ) : (
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
+                  <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <BookOpen className="w-4 h-4 text-blue-600" />
+                      </div>
+                      <h4 className="font-semibold text-gray-900">Quiz Banks</h4>
+                    </div>
+                    <p className="text-sm text-gray-600">Create and manage question banks</p>
+                  </div>
+                  <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                        <Users className="w-4 h-4 text-green-600" />
+                      </div>
+                      <h4 className="font-semibold text-gray-900">Groups</h4>
+                    </div>
+                    <p className="text-sm text-gray-600">Assign exams to study groups</p>
+                  </div>
+                </div>
+                <Button
+                  onClick={() => navigate("/quiz-banks")}
+                  className="w-full sm:w-auto"
+                >
+                  Go to Quiz Banks
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
       ) : (
         <div className="space-y-4">
           {Object.entries(groupedExams).map(([groupName, groupExams]) => {
