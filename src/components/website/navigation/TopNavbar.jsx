@@ -384,7 +384,7 @@ export const TopNavbar = () => {
 
             {/* Quick Profile Info - Mobile */}
             <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-xl">
-              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 text-white font-bold">
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-[#FF5100] to-[#6EC1E4] text-white font-bold">
                 {user?.first_name?.charAt(0)?.toUpperCase() || "U"}
               </div>
               <div className="flex-1">
@@ -398,7 +398,7 @@ export const TopNavbar = () => {
                 </div>
               </div>
               <Link
-                to="/settings"
+                to="/my-profile"
                 onClick={() => setMobileMenuOpen(false)}
                 className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-lg transition-all"
               >
