@@ -228,7 +228,7 @@ export const ReminderPanel = ({ onClose, preselectedQuizId = null }) => {
 
   const handleReminderClick = (reminder) => {
     if (reminder.real_quiz_id) {
-      navigate(`/exams/${reminder.real_quiz_id}`);
+      navigate(`/my-exams/${reminder.real_quiz_id}`);
       onClose();
     }
   };
