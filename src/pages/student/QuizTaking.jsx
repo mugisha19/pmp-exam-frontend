@@ -30,6 +30,7 @@ import {
   Zap,
   Coffee,
   ArrowLeft,
+  Loader2,
 } from "lucide-react";
 import {
   getSessionState,
@@ -58,6 +59,12 @@ export const QuizTaking = () => {
 
   // Track if quiz has been submitted (to prevent effects from running)
   const isQuizSubmittedRef = useRef(false);
+  
+  // Track if this is the initial load (for auto-navigation to next unanswered)
+  const isInitialLoadRef = useRef(true);
+  
+  // Track current question index in a ref to avoid stale closures
+  const currentQuestionIndexRef = useRef(0);
 
   // Session state
   const [sessionData, setSessionData] = useState(null);
@@ -77,6 +84,7 @@ export const QuizTaking = () => {
   const [isResuming, setIsResuming] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isFlagging, setIsFlagging] = useState(false);
   const [isWaitingForAutoSubmit, setIsWaitingForAutoSubmit] = useState(false);
   const [lastQuestionAnswerSaved, setLastQuestionAnswerSaved] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
@@ -145,8 +153,9 @@ export const QuizTaking = () => {
       let qIndex = currentQNum - 1;
       const currentQ = state.questions?.[qIndex];
 
-      // If current question is answered, navigate to next unanswered question
-      if (currentQ?.is_answered) {
+      // Only auto-navigate to next unanswered question on INITIAL load
+      // This prevents the jumping behavior when user manually navigates
+      if (isInitialLoadRef.current && currentQ?.is_answered) {
         const nextUnansweredIndex = state.questions.findIndex(
           (q, idx) => idx > qIndex && !q.is_answered
         );
@@ -169,23 +178,38 @@ export const QuizTaking = () => {
         }
 
         setCurrentQuestionIndex(qIndex);
+        currentQuestionIndexRef.current = qIndex;
         const updatedQ = state.questions?.[qIndex];
         setSelectedAnswer(updatedQ?.user_answer || null);
       }
+      
+      // Mark initial load as complete after first successful load
+      const wasInitialLoad = isInitialLoadRef.current;
+      if (isInitialLoadRef.current) {
+        isInitialLoadRef.current = false;
+      }
 
       setSessionData(state);
-      setCurrentQuestionIndex(qIndex);
+      
+      // Only update currentQuestionIndex from backend on initial load
+      // On subsequent refreshes, preserve the user's current position
+      if (wasInitialLoad) {
+        setCurrentQuestionIndex(qIndex);
+        currentQuestionIndexRef.current = qIndex;
+      }
 
-      const finalQ = state.questions?.[qIndex];
+      // Get the actual current question index using ref (avoids stale closure)
+      const actualIndex = wasInitialLoad ? qIndex : currentQuestionIndexRef.current;
+      const finalQ = state.questions?.[actualIndex];
       if (finalQ) {
         setSelectedAnswer(finalQ.user_answer || null);
       }
 
-      const isLastQuestion = qIndex === state.questions.length - 1;
+      const isLastQuestion = actualIndex === state.questions.length - 1;
       if (!isLastQuestion) {
         setLastQuestionAnswerSaved(false);
       } else {
-        const lastQ = state.questions?.[qIndex];
+        const lastQ = state.questions?.[actualIndex];
         if (lastQ?.user_answer) {
           setLastQuestionAnswerSaved(true);
         } else {
@@ -504,33 +528,54 @@ export const QuizTaking = () => {
     }
 
     setIsSaving(true);
+    
+    // Store the current answer and index before any state changes
+    const currentAnswer = selectedAnswer;
+    const currentIndex = currentQuestionIndexRef.current;
+    const isLastQuestion = currentIndex === sessionData.questions.length - 1;
 
     try {
-      const currentQ = sessionData.questions[currentQuestionIndex];
+      const currentQ = sessionData.questions[currentIndex];
       const response = await saveAnswer(sessionToken, {
         quiz_question_id: currentQ.quiz_question_id,
         question_type: currentQ.question_type,
-        answer: selectedAnswer,
+        answer: currentAnswer,
         time_spent_seconds: currentQ.time_spent_seconds || 0,
         is_flagged: currentQ.is_flagged || false,
       });
 
       if (response.auto_paused) {
         await loadSessionState();
+        // Restore the answer after loading state since we're staying on the same question
+        setSelectedAnswer(currentAnswer);
         return { autoPaused: true };
       }
 
-      await loadSessionState();
-
+      // Get fresh state after saving
       const updatedState = await getSessionState(sessionToken);
+      setSessionData(updatedState);
+      
+      // Update timing from fresh state
+      if (updatedState.timing) {
+        setTimeRemaining(updatedState.timing.time_remaining_seconds);
+        setExamTimeElapsed(updatedState.timing.time_elapsed_seconds || 0);
+        setPauseTimeElapsed(updatedState.timing.pause_time_seconds || 0);
+      }
+      
       if (updatedState.pause_info?.is_paused) {
+        setPauseTimeRemaining(updatedState.pause_info.pause_remaining_seconds);
+        // Restore the answer since we're staying on the same question
+        setSelectedAnswer(currentAnswer);
         return { autoPaused: true };
       }
 
-      if (
-        sessionData &&
-        currentQuestionIndex === sessionData.questions.length - 1
-      ) {
+      // Restore the selected answer from the updated state for current question
+      const updatedQ = updatedState.questions?.[currentIndex];
+      if (updatedQ) {
+        setSelectedAnswer(updatedQ.user_answer || currentAnswer);
+      }
+
+      if (isLastQuestion) {
         setLastQuestionAnswerSaved(true);
       }
 
@@ -542,6 +587,7 @@ export const QuizTaking = () => {
         error.response?.data?.detail?.includes("paused")
       ) {
         await loadSessionState();
+        setSelectedAnswer(currentAnswer);
         return { autoPaused: true };
       }
       if (error.response?.status === 410) {
@@ -558,7 +604,7 @@ export const QuizTaking = () => {
   };
 
   const handleFlagToggle = async () => {
-    if (isWaitingForAutoSubmit) {
+    if (isWaitingForAutoSubmit || isFlagging) {
       return;
     }
 
@@ -574,6 +620,7 @@ export const QuizTaking = () => {
     const newFlagStatus = !currentQ.is_flagged;
     const currentAnswer = selectedAnswer; // Preserve current answer
 
+    setIsFlagging(true);
     try {
       await flagQuestion(
         sessionToken,
@@ -593,6 +640,8 @@ export const QuizTaking = () => {
         return;
       }
       showToast.error("Flag Failed", "Failed to flag question");
+    } finally {
+      setIsFlagging(false);
     }
   };
 
@@ -730,6 +779,7 @@ export const QuizTaking = () => {
 
         // Set the selected answer and current index from the updated state
         setCurrentQuestionIndex(newIndex);
+        currentQuestionIndexRef.current = newIndex;
         const newQ = updatedState.questions[newIndex];
         setSelectedAnswer(newQ?.user_answer || null);
         setIsAnswerModified(false);
@@ -748,6 +798,7 @@ export const QuizTaking = () => {
       }
 
       setCurrentQuestionIndex(newIndex);
+      currentQuestionIndexRef.current = newIndex;
       const newQ = sessionData.questions[newIndex];
       setSelectedAnswer(newQ?.user_answer || null);
       setIsAnswerModified(false);
@@ -806,6 +857,8 @@ export const QuizTaking = () => {
     }
 
     setIsPausing(true);
+    // Store current answer before pause
+    const currentAnswer = selectedAnswer;
     try {
       const response = await pauseQuiz(sessionToken);
       showToast.success(
@@ -813,6 +866,8 @@ export const QuizTaking = () => {
         "Take your time. Resume when you're ready."
       );
       await loadSessionState();
+      // Restore the answer after loading state
+      setSelectedAnswer(currentAnswer);
     } catch (error) {
       console.error("Failed to pause:", error);
       showToast.error(
@@ -827,12 +882,79 @@ export const QuizTaking = () => {
   const handleResume = async () => {
     setIsResuming(true);
     try {
-      await resumeQuiz(sessionToken);
+      const resumeResponse = await resumeQuiz(sessionToken);
       showToast.success(
         "Quiz Resumed",
         "Good luck! Continue where you left off."
       );
-      await loadSessionState();
+      
+      // Use the session state returned from resume endpoint
+      if (resumeResponse.session) {
+        const state = resumeResponse.session;
+        setSessionData(state);
+        
+        // Update timing
+        if (state.timing) {
+          setTimeRemaining(state.timing.time_remaining_seconds);
+          setExamTimeElapsed(state.timing.time_elapsed_seconds || 0);
+          setPauseTimeElapsed(state.timing.pause_time_seconds || 0);
+        }
+        
+        // Clear pause state
+        setPauseTimeRemaining(null);
+        
+        // Find the next unanswered question to navigate to
+        const currentIndex = currentQuestionIndexRef.current;
+        let nextIndex = currentIndex;
+        
+        // If current question is answered, find next unanswered
+        const currentQ = state.questions?.[currentIndex];
+        if (currentQ?.is_answered) {
+          const nextUnansweredIndex = state.questions.findIndex(
+            (q, idx) => idx > currentIndex && !q.is_answered
+          );
+          
+          if (nextUnansweredIndex !== -1) {
+            nextIndex = nextUnansweredIndex;
+          } else {
+            // If no unanswered questions after current, go to next question
+            const nextSeqIndex = currentIndex + 1;
+            if (nextSeqIndex < state.questions.length) {
+              nextIndex = nextSeqIndex;
+            }
+          }
+        }
+        
+        // Navigate to the next question if different from current
+        if (nextIndex !== currentIndex) {
+          try {
+            await navigateToQuestion(sessionToken, nextIndex + 1);
+          } catch (error) {
+            console.error("Failed to navigate after resume:", error);
+          }
+          setCurrentQuestionIndex(nextIndex);
+          currentQuestionIndexRef.current = nextIndex;
+        }
+        
+        // Set the answer for the target question
+        const targetQ = state.questions?.[nextIndex];
+        if (targetQ) {
+          setSelectedAnswer(targetQ.user_answer || null);
+        }
+        
+        // Update last question saved status
+        const isLastQuestion = nextIndex === state.questions.length - 1;
+        if (!isLastQuestion) {
+          setLastQuestionAnswerSaved(false);
+        } else if (targetQ?.user_answer) {
+          setLastQuestionAnswerSaved(true);
+        } else {
+          setLastQuestionAnswerSaved(false);
+        }
+      } else {
+        // Fallback to loadSessionState if no session in response
+        await loadSessionState();
+      }
     } catch (error) {
       console.error("Failed to resume:", error);
       showToast.error("Resume Failed", "Failed to resume quiz");
@@ -1704,18 +1826,24 @@ export const QuizTaking = () => {
                   </div>
                   <button
                     onClick={handleFlagToggle}
+                    disabled={isFlagging}
                     className={cn(
                       "flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium text-sm transition-all",
+                      isFlagging && "opacity-70 cursor-wait",
                       currentQ?.is_flagged
                         ? "bg-orange-100 text-orange-700 hover:bg-orange-200"
                         : "bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700"
                     )}
                   >
-                    <Flag
-                      className="w-4 h-4"
-                      fill={currentQ?.is_flagged ? "currentColor" : "none"}
-                    />
-                    {currentQ?.is_flagged ? "Flagged" : "Flag"}
+                    {isFlagging ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Flag
+                        className="w-4 h-4"
+                        fill={currentQ?.is_flagged ? "currentColor" : "none"}
+                      />
+                    )}
+                    {isFlagging ? "Saving..." : (currentQ?.is_flagged ? "Flagged" : "Flag")}
                   </button>
                 </div>
               </div>
