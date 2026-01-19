@@ -2,6 +2,9 @@
 export const API_BASE_URL = import.meta.env.VITE_API_URL || 
   (import.meta.env.DEV ? "http://localhost:8000/api/v1" : "/api/v1");
 
+// WebSocket URL - converts http to ws protocol
+export const WS_BASE_URL = API_BASE_URL.replace(/^http/, 'ws').replace('/api/v1', '');
+
 if (import.meta.env.DEV) {
   console.log(
     "API Base URL:",
@@ -172,7 +175,7 @@ export const NOTIFICATION_ENDPOINTS = {
   MARK_AS_READ: (notificationId) => `/notifications/${notificationId}/read`,
   MARK_ALL_READ: "/notifications/mark-all-read",
   DELETE_NOTIFICATION: (notificationId) => `/notifications/${notificationId}`,
-  WEBSOCKET_URL: (userIdentifier) => `ws://localhost:8000/ws/${userIdentifier}`,
+  WEBSOCKET_URL: (userIdentifier) => `${WS_BASE_URL}/ws/${userIdentifier}`,
 };
 
 // Analytics endpoints

@@ -11,6 +11,7 @@ import { toast } from "react-hot-toast";
 import { setStorageItem, STORAGE_KEYS } from "@/constants/storage.constants";
 import { setAuthToken } from "@/services/api";
 import { ROLE_ROUTES } from "@/constants/roles.constants";
+import { API_BASE_URL } from "@/constants/api.constants";
 
 export const OAuthCallback = () => {
   const navigate = useNavigate();
@@ -47,7 +48,7 @@ export const OAuthCallback = () => {
         setAuthToken(accessToken, refreshToken, true);
 
         // Fetch user data
-        const response = await fetch("http://localhost:8000/api/v1/users/me", {
+        const response = await fetch(`${API_BASE_URL}/users/me`, {
           headers: { Authorization: `Bearer ${accessToken}` }
         });
         

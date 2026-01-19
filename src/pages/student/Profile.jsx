@@ -37,6 +37,7 @@ import api from "@/services/api";
 import toast from "react-hot-toast";
 import { cn } from "@/utils/cn";
 import { Link, useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "@/constants/api.constants";
 
 const profileSchema = z.object({
   first_name: z
@@ -164,7 +165,7 @@ export function Profile() {
 
         const fullAvatarUrl = avatarUrl.startsWith("http")
           ? avatarUrl
-          : `http://localhost:8000${avatarUrl}`;
+          : `${API_BASE_URL.replace('/api/v1', '')}${avatarUrl}`;
         updateUser({ avatar_url: fullAvatarUrl });
       } else if (data.avatar_url === "file_upload_pending") {
         data.avatar_url = "";

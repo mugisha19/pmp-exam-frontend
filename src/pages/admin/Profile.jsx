@@ -30,6 +30,7 @@ import { useAuthStore } from "@/stores/auth.store";
 import { useUpdateProfileMutation } from "@/hooks/queries/useUserQueries";
 import api from "@/services/api";
 import toast from "react-hot-toast";
+import { API_BASE_URL } from "@/constants/api.constants";
 
 // Profile form schema
 const profileSchema = z.object({
@@ -175,7 +176,7 @@ export function Profile() {
         // Prepend base URL if it's a relative path
         const fullAvatarUrl = avatarUrl.startsWith("http")
           ? avatarUrl
-          : `http://localhost:8000${avatarUrl}`;
+          : `${API_BASE_URL.replace('/api/v1', '')}${avatarUrl}`;
         updateUser({ avatar_url: fullAvatarUrl });
       } else if (data.avatar_url === "file_upload_pending") {
         // If marked as pending but no file, clear it
