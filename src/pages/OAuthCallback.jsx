@@ -10,6 +10,7 @@ import { useAuthStore } from "@/stores/auth.store";
 import { toast } from "react-hot-toast";
 import { setStorageItem, STORAGE_KEYS } from "@/constants/storage.constants";
 import { setAuthToken } from "@/services/api";
+import { ROLE_ROUTES } from "@/constants/roles.constants";
 
 export const OAuthCallback = () => {
   const navigate = useNavigate();
@@ -57,7 +58,11 @@ export const OAuthCallback = () => {
           setStorageItem(STORAGE_KEYS.USER_ROLE, user.role);
           
           toast.success(`Welcome, ${user.first_name}!`);
-          navigate("/home", { replace: true });
+          
+          // Redirect based on user role
+          const userRole = user.role?.toLowerCase();
+          const defaultRoute = ROLE_ROUTES[userRole] || "/home";
+          navigate(defaultRoute, { replace: true });
         } else {
           throw new Error("Failed to fetch user data");
         }
