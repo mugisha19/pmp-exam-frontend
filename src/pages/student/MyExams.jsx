@@ -205,23 +205,6 @@ export const MyExams = () => {
                   )}
                 </button>
                 <button
-                  onClick={() => setActiveTab("completed")}
-                  className={cn(
-                    "inline-flex items-center gap-2 px-6 py-3 font-semibold rounded-lg transition-colors",
-                    activeTab === "completed"
-                      ? "bg-[#FF5100] text-white hover:bg-[#E64800]"
-                      : "border border-gray-300 text-gray-700 hover:bg-gray-50"
-                  )}
-                >
-                  <CheckCircle className="w-5 h-5" />
-                  Completed
-                  {stats.completed > 0 && (
-                    <span className="ml-1 px-2 py-0.5 text-xs bg-white/20 rounded-full">
-                      {stats.completed}
-                    </span>
-                  )}
-                </button>
-                <button
                   onClick={() => setActiveTab("all")}
                   className={cn(
                     "inline-flex items-center gap-2 px-6 py-3 font-semibold rounded-lg transition-colors",
