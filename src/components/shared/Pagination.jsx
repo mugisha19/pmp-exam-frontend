@@ -121,27 +121,6 @@ export const Pagination = ({
       )}
 
       <div className="flex items-center gap-4">
-        {/* Per page selector */}
-        {showPerPageSelector && (
-          <div className="flex items-center gap-2">
-            <label htmlFor="perPage" className="text-sm text-gray-500">
-              Per page:
-            </label>
-            <select
-              id="perPage"
-              value={perPage}
-              onChange={handlePerPageChange}
-              className="bg-white border border-gray-300 rounded-lg px-2 py-1 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              {perPageOptions.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
-
         {/* Page navigation */}
         {totalPages > 1 && (
           <nav className="flex items-center gap-1">
