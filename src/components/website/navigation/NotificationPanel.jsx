@@ -187,10 +187,10 @@ export const NotificationPanel = ({ onClose }) => {
   return (
     <>
       {/* Backdrop */}
-      <div className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm" onClick={onClose} />
+      <div className="fixed inset-0 top-20 z-40 bg-black/10 backdrop-blur-sm" onClick={onClose} />
 
       {/* Panel */}
-      <div className="fixed top-0 right-0 bottom-0 z-50 w-full sm:w-[420px] bg-white shadow-2xl">
+      <div className="fixed top-20 right-0 bottom-0 z-50 w-full sm:w-[420px] bg-white shadow-2xl">
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="px-4 py-3 bg-gradient-to-r from-[#476072] to-[#5a7a8f] text-white">
