@@ -3,7 +3,7 @@
  * Modal for adding members to a group
  */
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -35,6 +35,7 @@ export const AddMemberModal = ({ isOpen, onClose, group }) => {
   const addMemberMutation = useAddMemberMutation();
   const queryClient = useQueryClient();
   const observerTarget = useRef(null);
+  const scrollContainerRef = useRef(null);
 
   // Fetch available users with infinite scroll
   const {
@@ -63,27 +64,27 @@ export const AddMemberModal = ({ isOpen, onClose, group }) => {
 
   const users = data?.pages.flatMap((page) => page.users || []) || [];
 
-  // Intersection observer for infinite scroll
-  const handleObserver = useCallback(
-    (entries) => {
-      const [target] = entries;
-      if (target.isIntersecting && hasNextPage && !isFetchingNextPage) {
-        fetchNextPage();
-      }
-    },
-    [fetchNextPage, hasNextPage, isFetchingNextPage]
-  );
-
-  // Set up intersection observer
-  useState(() => {
+  // Set up intersection observer for infinite scroll
+  useEffect(() => {
     const element = observerTarget.current;
-    const option = { threshold: 0 };
-    const observer = new IntersectionObserver(handleObserver, option);
-    if (element) observer.observe(element);
-    return () => {
-      if (element) observer.unobserve(element);
-    };
-  }, [handleObserver]);
+    if (!element) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [target] = entries;
+        if (target.isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { 
+        threshold: 0.1,
+        root: scrollContainerRef.current 
+      }
+    );
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   const {
     register,
@@ -167,7 +168,10 @@ export const AddMemberModal = ({ isOpen, onClose, group }) => {
         </div>
 
         {/* User List */}
-        <div className="max-h-48 overflow-y-auto border border-gray-200 rounded-xl">
+        <div 
+          ref={scrollContainerRef}
+          className="max-h-64 overflow-y-auto border border-gray-200 rounded-xl"
+        >
           {usersLoading ? (
             <div className="p-4 text-center text-gray-500">
               <Loader2 className="w-5 h-5 animate-spin mx-auto mb-2" />
@@ -199,11 +203,17 @@ export const AddMemberModal = ({ isOpen, onClose, group }) => {
                   </div>
                 );
               })}
-              {/* Infinite scroll trigger */}
-              <div ref={observerTarget} className="h-4" />
-              {isFetchingNextPage && (
-                <div className="p-3 text-center">
-                  <Loader2 className="w-5 h-5 animate-spin mx-auto text-blue-600" />
+              {/* Infinite scroll trigger & loading indicator */}
+              {hasNextPage && (
+                <div ref={observerTarget} className="p-4 text-center">
+                  {isFetchingNextPage ? (
+                    <div className="flex items-center justify-center gap-2 text-gray-500">
+                      <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
+                      <span className="text-sm">Loading more users...</span>
+                    </div>
+                  ) : (
+                    <span className="text-sm text-gray-400">Scroll for more</span>
+                  )}
                 </div>
               )}
             </div>
