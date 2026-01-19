@@ -1724,9 +1724,10 @@ export const QuizTaking = () => {
               <div className="p-6">
                 {/* Question Text */}
                 <div className="mb-8">
-                  <p className="text-lg text-gray-800 leading-relaxed font-medium">
-                    {currentQ?.question_text}
-                  </p>
+                  <div 
+                    className="text-lg text-gray-800 leading-relaxed font-medium"
+                    dangerouslySetInnerHTML={{ __html: currentQ?.question_text }}
+                  />
                   {currentQ?.image_url && (
                     <img
                       src={currentQ.image_url}
