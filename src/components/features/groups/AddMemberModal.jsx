@@ -3,12 +3,12 @@
  * Modal for adding members to a group
  */
 
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { UserPlus, Search, Users } from "lucide-react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { UserPlus, Search, Users, Loader2 } from "lucide-react";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { useAddMemberMutation } from "@/hooks/queries/useGroupQueries";
 import { getAvailableUsers } from "@/services/group.service";
 import { Modal, ModalFooter } from "@/components/ui/Modal";
@@ -34,18 +34,56 @@ export const AddMemberModal = ({ isOpen, onClose, group }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const addMemberMutation = useAddMemberMutation();
   const queryClient = useQueryClient();
+  const observerTarget = useRef(null);
 
-  // Fetch available users for selection (not already members)
-  const { data: usersData, isLoading: usersLoading } = useQuery({
+  // Fetch available users with infinite scroll
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading: usersLoading,
+  } = useInfiniteQuery({
     queryKey: ["available-users", group?.group_id || group?.id, searchQuery],
-    queryFn: () => {
+    queryFn: ({ pageParam = 0 }) => {
       const groupId = group?.group_id || group?.id;
-      return getAvailableUsers(groupId, { search: searchQuery });
+      return getAvailableUsers(groupId, {
+        search: searchQuery,
+        skip: pageParam,
+        limit: 20,
+      });
+    },
+    getNextPageParam: (lastPage, pages) => {
+      const totalFetched = pages.reduce((acc, page) => acc + (page.users?.length || 0), 0);
+      const hasMore = lastPage.total > totalFetched;
+      return hasMore ? totalFetched : undefined;
     },
     enabled: isOpen && !!(group?.group_id || group?.id),
   });
 
-  const users = usersData?.users || [];
+  const users = data?.pages.flatMap((page) => page.users || []) || [];
+
+  // Intersection observer for infinite scroll
+  const handleObserver = useCallback(
+    (entries) => {
+      const [target] = entries;
+      if (target.isIntersecting && hasNextPage && !isFetchingNextPage) {
+        fetchNextPage();
+      }
+    },
+    [fetchNextPage, hasNextPage, isFetchingNextPage]
+  );
+
+  // Set up intersection observer
+  useState(() => {
+    const element = observerTarget.current;
+    const option = { threshold: 0 };
+    const observer = new IntersectionObserver(handleObserver, option);
+    if (element) observer.observe(element);
+    return () => {
+      if (element) observer.unobserve(element);
+    };
+  }, [handleObserver]);
 
   const {
     register,
@@ -132,6 +170,7 @@ export const AddMemberModal = ({ isOpen, onClose, group }) => {
         <div className="max-h-48 overflow-y-auto border border-gray-200 rounded-xl">
           {usersLoading ? (
             <div className="p-4 text-center text-gray-500">
+              <Loader2 className="w-5 h-5 animate-spin mx-auto mb-2" />
               Loading users...
             </div>
           ) : users.length === 0 ? (
@@ -160,6 +199,13 @@ export const AddMemberModal = ({ isOpen, onClose, group }) => {
                   </div>
                 );
               })}
+              {/* Infinite scroll trigger */}
+              <div ref={observerTarget} className="h-4" />
+              {isFetchingNextPage && (
+                <div className="p-3 text-center">
+                  <Loader2 className="w-5 h-5 animate-spin mx-auto text-blue-600" />
+                </div>
+              )}
             </div>
           )}
         </div>

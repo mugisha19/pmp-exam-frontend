@@ -51,7 +51,6 @@ export const VerifyEmail = () => {
 
     try {
       await verifyMutation.mutateAsync({ token });
-      toast.success("Email verified successfully!");
       setTimeout(() => navigate("/login"), 2000);
     } catch {
       // Error handled by mutation
@@ -84,7 +83,6 @@ export const VerifyEmail = () => {
 
     try {
       await resendMutation.mutateAsync({ email: emailToUse });
-      toast.success("Verification link sent to your email!");
       setShowEmailInput(false);
     } catch {
       // Error handled by mutation
@@ -163,17 +161,23 @@ export const VerifyEmail = () => {
           )}
 
           {/* Resend link section */}
-          <div className="border-t border-gray-200 pt-4 space-y-4">
-            <p className="text-sm text-gray-600 text-center">
-              Didn't receive the email?{" "}
+          <div className="border-t border-gray-200 pt-6 space-y-4">
+            <div className="text-center">
+              <p className="text-sm text-gray-600 mb-3">
+                Didn't receive the email?
+              </p>
               <button
                 onClick={handleResend}
                 disabled={resendMutation.isPending}
-                className="text-blue-600 hover:text-blue-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="group relative inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-md transition-all duration-200 transform hover:scale-105 active:scale-95"
               >
-                {resendMutation.isPending ? "Sending..." : "Resend link"}
+                <Mail className="w-4 h-4" />
+                <span>{resendMutation.isPending ? "Sending..." : "Resend Verification Link"}</span>
+                {resendMutation.isPending && (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                )}
               </button>
-            </p>
+            </div>
             <p className="text-xs text-gray-500 text-center">
               If you don't see the email, check your spam folder
             </p>

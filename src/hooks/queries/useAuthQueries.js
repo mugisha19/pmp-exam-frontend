@@ -185,9 +185,6 @@ export const useVerifyEmailMutation = ({ autoLogin = false } = {}) => {
         error.message ||
         "Email verification failed. The link may have expired.";
       toast.error(errorMessage);
-
-      // Navigate to resend verification page
-      navigate(AUTH_ROUTES.VERIFY_EMAIL, { replace: true });
     },
   });
 };
