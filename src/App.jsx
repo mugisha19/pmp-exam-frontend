@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { queryClient } from "@/lib/query-client";
 import Toaster from "@/components/ui/Toaster";
 import { InitializeAuth } from "@/components/InitializeAuth";
+import { ScrollToTop } from "@/components/ScrollToTop";
 import { authRoutes } from "@/routes/auth.routes";
 import { studentRoutes } from "@/routes/student.routes";
 import { managementRoutes } from "@/routes/management.routes";
@@ -15,6 +16,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
+        <ScrollToTop />
         <InitializeAuth>
           <Routes>
             {/* Auth routes (login, signup, etc.) */}
