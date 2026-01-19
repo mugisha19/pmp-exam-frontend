@@ -536,6 +536,13 @@ export const QuizTaking = () => {
 
     try {
       const currentQ = sessionData.questions[currentIndex];
+      
+      // Validate that we have a valid question before saving
+      if (!currentQ || !currentQ.quiz_question_id) {
+        console.error("Invalid question data:", currentQ);
+        return { autoPaused: false };
+      }
+      
       const response = await saveAnswer(sessionToken, {
         quiz_question_id: currentQ.quiz_question_id,
         question_type: currentQ.question_type,
@@ -582,6 +589,8 @@ export const QuizTaking = () => {
       return { autoPaused: false };
     } catch (error) {
       console.error("Failed to save answer:", error);
+      console.error("Error details:", error.response?.data);
+      
       if (
         error.response?.status === 400 &&
         error.response?.data?.detail?.includes("paused")
@@ -596,7 +605,10 @@ export const QuizTaking = () => {
         navigate(`/my-exams/${quizId}`);
         return { autoPaused: false };
       }
-      showToast.error("Save Failed", "Failed to save answer");
+      
+      // Show specific error message if available
+      const errorMsg = error.response?.data?.detail || "Failed to save answer";
+      showToast.error("Save Failed", errorMsg);
       return { autoPaused: false };
     } finally {
       setIsSaving(false);
