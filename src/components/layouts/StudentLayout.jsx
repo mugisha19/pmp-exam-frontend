@@ -220,7 +220,7 @@ export const StudentLayout = () => {
       </aside>
 
       {/* Mobile Top Bar */}
-      <nav className="lg:hidden sticky top-0 z-50 bg-white/95 backdrop-blur-xl shadow-lg border-b border-gray-200">
+      <nav className="block lg:hidden sticky top-0 z-50 bg-white/95 backdrop-blur-xl shadow-lg border-b border-gray-200">
         <div className="px-4 py-3">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2.5">
@@ -233,7 +233,9 @@ export const StudentLayout = () => {
             </div>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="flex items-center justify-center p-2.5 min-w-[44px] min-h-[44px] hover:bg-gray-100 rounded-lg transition-colors active:scale-95 touch-manipulation"
+              aria-label="Toggle menu"
+              type="button"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>

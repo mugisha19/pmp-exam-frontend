@@ -85,10 +85,11 @@ export const ProfileDropdown = ({ onClose }) => {
   return (
     <>
       {/* Backdrop */}
-      <div className="fixed inset-0 z-40" onClick={onClose} />
+      <div className="fixed inset-0 top-20 bg-black/10 backdrop-blur-sm z-40 md:bg-transparent md:backdrop-blur-none" onClick={onClose} />
 
       {/* Dropdown */}
-      <div className="absolute top-full right-0 mt-2 w-80 bg-white rounded-xl shadow-soft border border-border-light z-50">
+      <div className="fixed left-0 right-0 top-20 mx-auto max-w-2xl w-full px-4 z-50 md:absolute md:top-full md:right-0 md:left-auto md:mt-2 md:w-80 md:px-0">
+        <div className="bg-white rounded-xl shadow-soft border border-border-light">
         {/* User Info */}
         <div className="px-4 py-4 border-b border-border-light">
           <div className="flex items-center gap-3">
@@ -189,6 +190,7 @@ export const ProfileDropdown = ({ onClose }) => {
             <LogOut className="w-5 h-5" />
             <span className="font-medium">Sign out</span>
           </button>
+        </div>
         </div>
       </div>
     </>

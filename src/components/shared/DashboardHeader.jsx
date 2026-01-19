@@ -19,10 +19,11 @@ export const DashboardHeader = ({ title, subtitle }) => {
           {/* Mobile Menu Toggle */}
           <button
             onClick={toggleMobileSidebar}
-            className="lg:hidden p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
+            className="flex lg:hidden items-center justify-center p-2.5 min-w-[44px] min-h-[44px] text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0 active:scale-95 touch-manipulation"
             aria-label="Toggle mobile menu"
+            type="button"
           >
-            <Menu className="w-5 h-5 sm:w-6 sm:h-6" />
+            <Menu className="w-6 h-6" />
           </button>
 
           {/* Page Title */}

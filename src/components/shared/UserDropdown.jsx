@@ -4,7 +4,7 @@
  */
 
 import { useNavigate } from "react-router-dom";
-import { User, Settings, LogOut, ChevronDown, Loader2 } from "lucide-react";
+import { User, LogOut, Loader2 } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { useAuthStore } from "@/stores/auth.store";
 import { useLogoutMutation } from "@/hooks/queries/useAuthQueries";
@@ -65,7 +65,7 @@ export const UserDropdown = ({ className }) => {
       trigger={
         <button
           className={cn(
-            "flex items-center gap-2 p-1 hover:bg-gray-100 rounded-lg transition-colors",
+            "flex items-center p-1 hover:bg-gray-100 rounded-full transition-colors",
             className
           )}
         >
@@ -74,14 +74,6 @@ export const UserDropdown = ({ className }) => {
             src={user?.avatar_url || user?.profile_picture}
             size="sm"
           />
-          <span className="hidden sm:block text-sm font-medium text-gray-700 max-w-[120px] truncate">
-            {user?.first_name && user?.last_name
-              ? `${user.first_name} ${user.last_name}`
-              : user?.first_name ||
-                user?.last_name ||
-                user?.email?.split("@")[0]}
-          </span>
-          <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
         </button>
       }
     >

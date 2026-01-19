@@ -173,7 +173,7 @@ export const TopNavbar = () => {
 
             {/* Right Section: Actions */}
             <div className="flex items-center gap-2">
-              {/* Notes */}
+              {/* Notes - Desktop only */}
               <button
                 onClick={() => {
                   setNotesOpen(!notesOpen);
@@ -183,7 +183,7 @@ export const TopNavbar = () => {
                 }}
                 title="My Notes"
                 className={cn(
-                  "relative p-2 rounded-lg transition-all duration-200",
+                  "hidden md:flex relative p-2 rounded-lg transition-all duration-200",
                   notesOpen
                     ? "text-primary-500 bg-primary-50"
                     : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
@@ -192,7 +192,7 @@ export const TopNavbar = () => {
                 <FileText className="w-5 h-5" />
               </button>
 
-              {/* Reminders */}
+              {/* Reminders - Desktop only */}
               <button
                 onClick={() => {
                   setReminderOpen(!reminderOpen);
@@ -202,7 +202,7 @@ export const TopNavbar = () => {
                 }}
                 title="Reminders"
                 className={cn(
-                  "relative p-2 rounded-lg transition-all duration-200",
+                  "hidden md:flex relative p-2 rounded-lg transition-all duration-200",
                   reminderOpen
                     ? "text-primary-500 bg-primary-50"
                     : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
@@ -272,19 +272,19 @@ export const TopNavbar = () => {
                     <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-white rounded-full" />
                   </div>
 
-                  {/* User Info */}
-                  <div className="flex flex-col max-w-[120px]">
+                  {/* User Info - Hidden on mobile */}
+                  <div className="hidden md:flex flex-col max-w-[120px]">
                     <span className="text-sm font-semibold text-gray-900 leading-tight truncate">
                       {user?.first_name && user?.last_name
                         ? `${user.first_name} ${user.last_name}`
                         : user?.first_name || "User"}
                     </span>
-                    <span className="text-xs text-gray-500 capitalize">{user?.role || "Student"}</span>
+                    
                   </div>
 
                   <ChevronDown
                     className={cn(
-                      "w-4 h-4 text-gray-400 transition-transform duration-200",
+                      "hidden md:block w-4 h-4 text-gray-400 transition-transform duration-200",
                       profileOpen && "rotate-180"
                     )}
                   />
@@ -317,13 +317,17 @@ export const TopNavbar = () => {
         </div>
 
         {/* Mobile Menu */}
-        <div
-          className={cn(
-            "lg:hidden overflow-hidden transition-all duration-300 ease-in-out",
-            mobileMenuOpen ? "max-h-96 border-t border-gray-100" : "max-h-0"
-          )}
-        >
-          <div className="bg-white px-4 py-3 space-y-1">
+        {mobileMenuOpen && (
+          <>
+            {/* Mobile Menu Backdrop */}
+            <div 
+              className="fixed inset-0 top-20 bg-black/10 backdrop-blur-sm z-30 lg:hidden" 
+              onClick={() => setMobileMenuOpen(false)}
+            />
+            
+            {/* Mobile Menu Content */}
+            <div className="lg:hidden border-t border-gray-100 relative z-40">
+              <div className="bg-white px-4 py-3 space-y-1">
             {mainNavItems.map((item) => {
               const Icon = item.icon;
               const active = isActive(item.path);
@@ -351,6 +355,33 @@ export const TopNavbar = () => {
             {/* Mobile Divider */}
             <div className="my-2 border-t border-gray-100" />
 
+            {/* Notes - Mobile */}
+            <button
+              onClick={() => {
+                setNotesOpen(true);
+                setMobileMenuOpen(false);
+              }}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+            >
+              <FileText className="w-5 h-5" />
+              My Notes
+            </button>
+
+            {/* Reminders - Mobile */}
+            <button
+              onClick={() => {
+                setReminderOpen(true);
+                setMobileMenuOpen(false);
+              }}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+            >
+              <Calendar className="w-5 h-5" />
+              Reminders
+            </button>
+
+            {/* Mobile Divider */}
+            <div className="my-2 border-t border-gray-100" />
+
             {/* Quick Profile Info - Mobile */}
             <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-xl">
               <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 text-white font-bold">
@@ -374,8 +405,10 @@ export const TopNavbar = () => {
                 <Settings className="w-5 h-5" />
               </Link>
             </div>
-          </div>
-        </div>
+              </div>
+            </div>
+          </>
+        )}
       </header>
 
       {/* Search Overlay */}
