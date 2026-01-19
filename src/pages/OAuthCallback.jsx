@@ -3,37 +3,38 @@
  * Handle OAuth callback and complete sign in
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Spinner } from "@/components/ui";
 import { useAuthStore } from "@/stores/auth.store";
 import { toast } from "react-hot-toast";
+import { setStorageItem, STORAGE_KEYS } from "@/constants/storage.constants";
+import { setAuthToken } from "@/services/api";
 
 export const OAuthCallback = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const setTokens = useAuthStore((state) => state.setTokens);
   const setUser = useAuthStore((state) => state.setUser);
   const [error, setError] = useState(null);
+  const hasProcessed = useRef(false);
 
   useEffect(() => {
+    if (hasProcessed.current) return;
+    hasProcessed.current = true;
+
     const handleCallback = async () => {
       try {
-        // Extract tokens from URL params
         const accessToken = searchParams.get("access_token");
         const refreshToken = searchParams.get("refresh_token");
-        const user = searchParams.get("user");
         const errorParam = searchParams.get("error");
 
-        // Handle error from OAuth provider
         if (errorParam) {
-          setError(errorParam);
-          toast.error("Authentication failed");
+          setError("Authentication failed");
+          toast.error("Google authentication failed");
           setTimeout(() => navigate("/login"), 2000);
           return;
         }
 
-        // Validate tokens
         if (!accessToken || !refreshToken) {
           setError("Missing authentication tokens");
           toast.error("Authentication failed");
@@ -41,19 +42,25 @@ export const OAuthCallback = () => {
           return;
         }
 
-        // Parse user data
-        const userData = user ? JSON.parse(decodeURIComponent(user)) : null;
+        // Store tokens
+        setAuthToken(accessToken, refreshToken, true);
 
-        // Store tokens and user data
-        setTokens(accessToken, refreshToken);
-        if (userData) {
-          setUser(userData);
+        // Fetch user data
+        const response = await fetch("http://localhost:8000/api/v1/users/me", {
+          headers: { Authorization: `Bearer ${accessToken}` }
+        });
+        
+        if (response.ok) {
+          const user = await response.json();
+          setUser(user);
+          setStorageItem(STORAGE_KEYS.USER, user);
+          setStorageItem(STORAGE_KEYS.USER_ROLE, user.role);
+          
+          toast.success(`Welcome, ${user.first_name}!`);
+          navigate("/home", { replace: true });
+        } else {
+          throw new Error("Failed to fetch user data");
         }
-
-        toast.success("Successfully signed in!");
-
-        // Redirect to dashboard
-        navigate("/dashboard", { replace: true });
       } catch (err) {
         console.error("OAuth callback error:", err);
         setError("Failed to complete sign in");
@@ -62,19 +69,8 @@ export const OAuthCallback = () => {
       }
     };
 
-    // Add timeout to prevent hanging
-    const timeout = setTimeout(() => {
-      if (!error) {
-        setError("Authentication timeout");
-        toast.error("Authentication timed out");
-        navigate("/login");
-      }
-    }, 10000); // 10 second timeout
-
     handleCallback();
-
-    return () => clearTimeout(timeout);
-  }, [navigate, searchParams, setTokens, setUser, error]);
+  }, [navigate, searchParams, setUser]);
 
   return (
     <div className="min-h-screen bg-bg-primary flex items-center justify-center">

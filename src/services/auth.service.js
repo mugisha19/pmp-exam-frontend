@@ -229,7 +229,9 @@ export const logout = async (logoutAll = false) => {
 export const getGoogleAuthUrl = async () => {
   try {
     const response = await api.get(AUTH_ENDPOINTS.GOOGLE_AUTH);
-    return response.data.auth_url || response.data.url;
+    const authUrl = response.data.auth_url || response.data.url;
+    // Redirect directly to Google
+    window.location.href = authUrl;
   } catch (error) {
     throw handleAuthError(error);
   }

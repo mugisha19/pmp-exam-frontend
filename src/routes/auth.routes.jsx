@@ -48,5 +48,6 @@ export const authRoutes = (
     />
     <Route path="/reset-password" element={<ResetPassword />} />
     <Route path="/auth/callback" element={<OAuthCallback />} />
+    <Route path="/auth/google/callback" element={<OAuthCallback />} />
   </>
 );

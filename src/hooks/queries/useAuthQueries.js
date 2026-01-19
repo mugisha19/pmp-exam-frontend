@@ -273,10 +273,6 @@ export const useChangePasswordMutation = () => {
 export const useGoogleLogin = () => {
   return useMutation({
     mutationFn: () => authService.getGoogleAuthUrl(),
-    onSuccess: (authUrl) => {
-      // Redirect to Google OAuth
-      window.location.href = authUrl;
-    },
     onError: (error) => {
       const errorMessage =
         error.message || "Failed to initiate Google login. Please try again.";
