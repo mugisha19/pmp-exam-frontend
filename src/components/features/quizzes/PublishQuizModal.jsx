@@ -23,7 +23,7 @@ const publishSchema = z.object({
   group_ids: z.array(z.string()).min(1, "Please select at least one group"),
   title: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  time_limit_minutes: z.union([z.number().min(1).max(480), z.nan(), z.undefined()]).optional().nullable().transform(val => (isNaN(val) || val === undefined) ? null : val),
+  time_limit_minutes: z.number().min(1, "Time limit must be at least 1 minute").max(480, "Time limit cannot exceed 480 minutes"),
   passing_score: z.number().min(0).max(100).default(70),
   max_questions_practice: z.union([z.number().min(0), z.nan(), z.undefined()]).optional().nullable().transform(val => (isNaN(val) || val === undefined) ? null : val),
   max_questions_exam: z.union([z.number().min(0), z.nan(), z.undefined()]).optional().nullable().transform(val => (isNaN(val) || val === undefined) ? null : val),
@@ -210,7 +210,7 @@ export const PublishQuizModal = ({ isOpen, onClose, quizBank, preselectedGroupId
           {/* Time Limit */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Time Limit (minutes)
+              Time Limit (minutes) <span className="text-red-500">*</span>
             </label>
             <Input
               type="number"
@@ -218,10 +218,10 @@ export const PublishQuizModal = ({ isOpen, onClose, quizBank, preselectedGroupId
               placeholder="e.g., 60 (1-480)"
               error={errors.time_limit_minutes?.message}
               leftIcon={<Clock className="w-4 h-4" />}
+              min="1"
+              max="480"
+              onWheel={(e) => e.target.blur()}
             />
-            <p className="text-xs text-gray-500 mt-1">
-              Leave empty for no time limit
-            </p>
           </div>
 
           {/* Passing Score */}
@@ -235,6 +235,9 @@ export const PublishQuizModal = ({ isOpen, onClose, quizBank, preselectedGroupId
               placeholder="70"
               error={errors.passing_score?.message}
               leftIcon={<Target className="w-4 h-4" />}
+              min="0"
+              max="100"
+              onWheel={(e) => e.target.blur()}
             />
             <p className="text-xs text-gray-500 mt-1">
               Default: 70%
@@ -251,6 +254,8 @@ export const PublishQuizModal = ({ isOpen, onClose, quizBank, preselectedGroupId
               {...register("max_attempts", { valueAsNumber: true })}
               placeholder="None (Infinite)"
               error={errors.max_attempts?.message}
+              min="1"
+              onWheel={(e) => e.target.blur()}
             />
             <p className="text-xs text-gray-500 mt-1">
               Leave empty for unlimited attempts
@@ -278,6 +283,8 @@ export const PublishQuizModal = ({ isOpen, onClose, quizBank, preselectedGroupId
                 {...register("max_questions_practice", { valueAsNumber: true })}
                 placeholder={`Max ${quizBank.question_count} (leave empty for all)`}
                 error={errors.max_questions_practice?.message}
+                min="0"
+                onWheel={(e) => e.target.blur()}
               />
             </div>
 
@@ -290,6 +297,8 @@ export const PublishQuizModal = ({ isOpen, onClose, quizBank, preselectedGroupId
                 {...register("max_questions_exam", { valueAsNumber: true })}
                 placeholder={`Max ${quizBank.question_count} (leave empty for all)`}
                 error={errors.max_questions_exam?.message}
+                min="0"
+                onWheel={(e) => e.target.blur()}
               />
             </div>
           </div>
@@ -312,6 +321,8 @@ export const PublishQuizModal = ({ isOpen, onClose, quizBank, preselectedGroupId
                 {...register("pause_after_questions", { valueAsNumber: true })}
                 placeholder="e.g., 10 (0 = no auto-pause)"
                 error={errors.pause_after_questions?.message}
+                min="0"
+                onWheel={(e) => e.target.blur()}
               />
               <p className="text-xs text-gray-500 mt-1">
                 Student can pause after answering this many questions
@@ -327,6 +338,9 @@ export const PublishQuizModal = ({ isOpen, onClose, quizBank, preselectedGroupId
                 {...register("pause_duration_minutes", { valueAsNumber: true })}
                 placeholder="e.g., 5 (max 60)"
                 error={errors.pause_duration_minutes?.message}
+                min="0"
+                max="60"
+                onWheel={(e) => e.target.blur()}
               />
               <p className="text-xs text-gray-500 mt-1">
                 Maximum time allowed for each pause break
