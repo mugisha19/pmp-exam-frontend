@@ -1,8 +1,9 @@
 /**
  * Avatar Component
- * Displays user avatar with fallback to initials
+ * Displays user avatar with fallback to initials and personalized colors
  */
 
+import React from "react";
 import { cn } from "@/utils/cn";
 import { User } from "lucide-react";
 
@@ -22,6 +23,20 @@ const statusSizes = {
   xl: "w-4 h-4",
 };
 
+// Curated gradient color combinations for avatars
+const colorGradients = [
+  "from-blue-500 to-cyan-500",
+  "from-purple-500 to-pink-500",
+  "from-green-500 to-emerald-500",
+  "from-orange-500 to-red-500",
+  "from-indigo-500 to-purple-500",
+  "from-teal-500 to-green-500",
+  "from-rose-500 to-pink-500",
+  "from-amber-500 to-orange-500",
+  "from-cyan-500 to-blue-500",
+  "from-fuchsia-500 to-purple-500",
+];
+
 export const Avatar = ({
   src,
   alt,
@@ -31,6 +46,8 @@ export const Avatar = ({
   isOnline = false,
   className,
 }) => {
+  const [imageError, setImageError] = React.useState(false);
+
   const getInitials = (name) => {
     if (!name) return "";
     const parts = name.trim().split(" ");
@@ -40,28 +57,43 @@ export const Avatar = ({
     return name.substring(0, 2).toUpperCase();
   };
 
+  // Generate consistent color based on name
+  const getColorGradient = (name) => {
+    if (!name) return colorGradients[0];
+    
+    // Simple hash function to get consistent color for same name
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    
+    const index = Math.abs(hash) % colorGradients.length;
+    return colorGradients[index];
+  };
+
   const initials = getInitials(name);
+  const gradientColors = getColorGradient(name);
+  const showImage = src && !imageError;
 
   return (
     <div className={cn("relative inline-block", className)}>
       <div
         className={cn(
-          "rounded-full overflow-hidden bg-gradient-to-br from-blue-500 to-cyan-600",
-          "flex items-center justify-center font-medium text-white",
+          "rounded-full overflow-hidden bg-gradient-to-br",
+          gradientColors,
+          "flex items-center justify-center font-semibold text-white shadow-sm",
           sizeStyles[size]
         )}
       >
-        {src ? (
+        {showImage ? (
           <img
             src={src}
             alt={alt || name || "Avatar"}
             className="w-full h-full object-cover"
-            onError={(e) => {
-              e.target.style.display = "none";
-            }}
+            onError={() => setImageError(true)}
           />
         ) : initials ? (
-          <span>{initials}</span>
+          <span className="select-none">{initials}</span>
         ) : (
           <User className="w-1/2 h-1/2" />
         )}

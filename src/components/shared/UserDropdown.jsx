@@ -65,15 +65,22 @@ export const UserDropdown = ({ className }) => {
       trigger={
         <button
           className={cn(
-            "flex items-center p-1 hover:bg-gray-100 rounded-full transition-colors",
+            "flex items-center gap-2 px-2 py-1.5 hover:bg-gray-100 rounded-lg transition-colors",
             className
           )}
         >
           <Avatar
-            name={user?.name || user?.email}
+            name={`${user?.first_name || ''} ${user?.last_name || ''}`.trim() || user?.email}
             src={user?.avatar_url || user?.profile_picture}
             size="sm"
           />
+          <span className="hidden sm:block text-sm font-medium text-gray-900 truncate max-w-[150px]">
+            {user?.first_name && user?.last_name
+              ? `${user.first_name} ${user.last_name}`
+              : user?.first_name ||
+                user?.last_name ||
+                user?.email?.split("@")[0]}
+          </span>
         </button>
       }
     >
