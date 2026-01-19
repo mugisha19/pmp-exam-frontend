@@ -3,7 +3,7 @@
  * Email verification with link from email
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { AuthLayout, AuthFormWrapper } from "../components/layouts";
 import { VerifyIllustration } from "../components/illustrations";
@@ -24,6 +24,7 @@ export const VerifyEmail = () => {
 
   const verifyMutation = useVerifyEmailMutation();
   const resendMutation = useResendVerificationMutation();
+  const hasVerified = useRef(false);
 
   // Get email from storage on mount
   useEffect(() => {
@@ -37,7 +38,8 @@ export const VerifyEmail = () => {
 
   // Auto-verify if token is present in URL
   useEffect(() => {
-    if (token) {
+    if (token && !hasVerified.current) {
+      hasVerified.current = true;
       handleVerify();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
