@@ -54,7 +54,31 @@ export const getSessionState = async (sessionToken) => {
  * @returns {Promise<Object>} Save result
  */
 export const saveAnswer = async (sessionToken, answerData) => {
-  const response = await api.post(`${SESSION_BASE}/save-answer`, answerData, {
+  // Normalize answer data to ensure selected_option_id is string
+  const normalizedAnswer = { ...answerData };
+  
+  if (normalizedAnswer.answer) {
+    // For multiple_choice and true_false: convert selected_option_id to string
+    if (normalizedAnswer.answer.selected_option_id !== undefined) {
+      normalizedAnswer.answer.selected_option_id = String(normalizedAnswer.answer.selected_option_id);
+    }
+    
+    // For multiple_response: convert all selected_option_ids to strings
+    if (Array.isArray(normalizedAnswer.answer.selected_option_ids)) {
+      normalizedAnswer.answer.selected_option_ids = normalizedAnswer.answer.selected_option_ids.map(id => String(id));
+    }
+    
+    // For matching: convert left_id and right_id to strings
+    if (Array.isArray(normalizedAnswer.answer.pairs)) {
+      normalizedAnswer.answer.pairs = normalizedAnswer.answer.pairs.map(pair => ({
+        left_id: String(pair.left_id),
+        right_id: String(pair.right_id)
+      }));
+    }
+  }
+  
+  console.log("Saving answer:", normalizedAnswer);
+  const response = await api.post(`${SESSION_BASE}/save-answer`, normalizedAnswer, {
     headers: { "X-Session-Token": sessionToken },
   });
   return response.data;
@@ -67,6 +91,7 @@ export const saveAnswer = async (sessionToken, answerData) => {
  * @returns {Promise<Object>} Save result
  */
 export const saveMultipleAnswers = async (sessionToken, data) => {
+  console.log("Saving multiple answers:", data);
   const response = await api.post(`${SESSION_BASE}/save-answers`, data, {
     headers: { "X-Session-Token": sessionToken },
   });

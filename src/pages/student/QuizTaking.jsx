@@ -47,6 +47,7 @@ import { cn } from "@/utils/cn";
 import { Modal, ModalBody, ModalFooter } from "@/components/ui/Modal";
 import { FeedbackModal } from "@/components/ui/FeedbackModal";
 import { submitFeedback } from "@/services/feedback.service";
+import QuestionNavigator from "./QuestionNavigator";
 
 export const QuizTaking = () => {
   const { quizId } = useParams();
@@ -2159,121 +2160,14 @@ export const QuizTaking = () => {
 
           {/* Sidebar - Question Navigator */}
           <div className="lg:w-80 shrink-0">
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm sticky top-24">
-              {/* Navigator Header */}
-              <div className="px-5 py-4 border-b border-gray-100">
-                <h3 className="font-semibold text-gray-900">
-                  Question Navigator
-                </h3>
-                <p className="text-xs text-gray-500 mt-0.5">
-                  Click to jump to any question
-                </p>
-              </div>
-
-              {/* Question Grid */}
-              <div className="p-4">
-                <div className="grid grid-cols-5 gap-2">
-                  {sessionData.questions.map((q, idx) => {
-                    const isCurrent =
-                      q.quiz_question_id === currentQ?.quiz_question_id;
-                    const isFlagged = q.is_flagged;
-                    const isAnswered = q.is_answered;
-                    const isAhead = idx > currentQuestionIndex;
-                    const isDisabled = isAhead && !isAnswered && !isFlagged;
-
-                    return (
-                      <button
-                        key={q.quiz_question_id}
-                        onClick={() => handleNavigate(idx + 1)}
-                        disabled={isDisabled}
-                        className={cn(
-                          "relative w-full aspect-square rounded-lg font-semibold text-sm transition-all duration-200",
-                          isCurrent
-                            ? "bg-[#6EC1E4] text-white shadow-lg shadow-[#6EC1E4]/30 scale-110 z-10"
-                            : isFlagged
-                            ? "bg-orange-100 text-orange-700 hover:bg-orange-200 ring-2 ring-orange-300"
-                            : isAnswered
-                            ? "bg-[rgba(110,193,228,0.15)] text-[#5AAFD0] hover:bg-[rgba(110,193,228,0.3)]"
-                            : isDisabled
-                            ? "bg-gray-100 text-gray-400 cursor-not-allowed opacity-50"
-                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                        )}
-                      >
-                        {idx + 1}
-                        {isFlagged && !isCurrent && (
-                          <Flag
-                            className="absolute -top-1 -right-1 w-3 h-3 text-orange-600"
-                            fill="currentColor"
-                          />
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Legend */}
-              <div className="px-5 py-4 border-t border-gray-100 bg-gray-50 rounded-b-xl">
-                <div className="grid grid-cols-2 gap-3 text-xs">
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 rounded bg-[#6EC1E4]" />
-                    <span className="text-gray-600">Current</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 rounded bg-[rgba(110,193,228,0.15)] border border-[rgba(110,193,228,0.3)]" />
-                    <span className="text-gray-600">Answered</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 rounded bg-gray-100 border border-gray-200" />
-                    <span className="text-gray-600">Unanswered</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 rounded bg-orange-100 ring-2 ring-orange-300" />
-                    <span className="text-gray-600">Flagged</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Progress Stats */}
-              <div className="px-5 py-4 border-t border-gray-100">
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Progress</span>
-                    <span className="text-sm font-bold text-gray-900">
-                      {sessionData.progress?.answered_count || 0} /{" "}
-                      {sessionData.progress?.total_questions || 0}
-                    </span>
-                  </div>
-                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-[#6EC1E4] rounded-full transition-all duration-500"
-                      style={{ width: `${progressPercentage}%` }}
-                    />
-                  </div>
-                  <div className="grid grid-cols-3 gap-2 pt-2">
-                    <div className="text-center p-2 bg-[rgba(110,193,228,0.1)] rounded-lg">
-                      <div className="text-lg font-bold text-[#5AAFD0]">
-                        {sessionData.progress?.answered_count || 0}
-                      </div>
-                      <div className="text-xs text-[#6EC1E4]">Done</div>
-                    </div>
-                    <div className="text-center p-2 bg-gray-50 rounded-lg">
-                      <div className="text-lg font-bold text-gray-700">
-                        {sessionData.progress?.unanswered_count || 0}
-                      </div>
-                      <div className="text-xs text-gray-500">Left</div>
-                    </div>
-                    <div className="text-center p-2 bg-orange-50 rounded-lg">
-                      <div className="text-lg font-bold text-orange-700">
-                        {sessionData.progress?.flagged_count || 0}
-                      </div>
-                      <div className="text-xs text-orange-600">Flagged</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+            <QuestionNavigator
+              questions={sessionData.questions}
+              currentQuestion={currentQ}
+              currentQuestionIndex={currentQuestionIndex}
+              onNavigate={handleNavigate}
+              progress={sessionData.progress}
+            />
+        </div>
         </div>
       </main>
 
