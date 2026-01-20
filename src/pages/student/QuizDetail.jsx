@@ -304,30 +304,6 @@ export const QuizDetail = () => {
             <div className="flex-1">
               {/* Badges */}
               <div className="flex flex-wrap items-center gap-2 mb-4">
-                {statusInfo && (
-                  <span
-                    className={cn(
-                      "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium",
-                      statusInfo.color
-                    )}
-                  >
-                    {statusInfo.pulse && (
-                      <span className="w-2 h-2 bg-[#FF5100] rounded-full animate-pulse" />
-                    )}
-                    {!statusInfo.pulse && (
-                      <statusInfo.icon className="w-4 h-4" />
-                    )}
-                    {statusInfo.label}
-                  </span>
-                )}
-                <span
-                  className={cn(
-                    "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium",
-                    difficultyInfo.color
-                  )}
-                >
-                  {difficultyInfo.label}
-                </span>
                 {quiz.is_premium && (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-yellow-100 text-yellow-700 rounded-lg text-sm font-medium">
                     <Award className="w-4 h-4" />

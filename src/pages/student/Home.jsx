@@ -152,25 +152,34 @@ export const Home = () => {
   // Recent activity timeline
   const recentActivity = useMemo(() => {
     const attempts = allAttemptsData?.attempts || [];
-    return attempts
-      .filter(
-        (att) => att.status === "submitted" || att.status === "auto_submitted"
-      )
-      .sort((a, b) => new Date(b.submitted_at) - new Date(a.submitted_at))
+    
+    // Show all attempts that have been completed (have a score and completed_at date)
+    const completed = attempts.filter((att) => {
+      return att.score !== null && att.score !== undefined && 
+             (att.completed_at || att.submitted_at);
+    });
+    
+    return completed
+      .sort((a, b) => {
+        const dateA = new Date(a.completed_at || a.submitted_at || a.updated_at);
+        const dateB = new Date(b.completed_at || b.submitted_at || b.updated_at);
+        return dateB - dateA;
+      })
       .slice(0, 5)
       .map((att) => {
         const quiz = allQuizzes.find(
           (q) => (q.quiz_id || q.id) === att.quiz_id
         );
         return {
+          quiz_id: att.quiz_id,
           title: quiz?.title || "Quiz Completed",
-          description: `Scored ${att.score}% with ${
+          description: `Scored ${Math.round(att.score || 0)}% with ${
             att.correct_answers || 0
           } correct answers`,
           status: "completed",
-          date: att.submitted_at,
+          date: att.completed_at || att.submitted_at || att.updated_at,
           metadata: {
-            score: att.score,
+            score: Math.round(att.score || 0),
             duration: att.time_spent_seconds
               ? `${Math.round(att.time_spent_seconds / 60)} min`
               : null,
@@ -497,7 +506,8 @@ export const Home = () => {
                   {recentActivity.slice(0, 4).map((activity, index) => (
                     <div
                       key={index}
-                      className="flex items-start gap-3 sm:gap-4 p-3 sm:p-4 bg-white border border-gray-200 rounded-lg"
+                      onClick={() => navigate(`/my-exams/${activity.quiz_id}`)}
+                      className="flex items-start gap-3 sm:gap-4 p-3 sm:p-4 bg-white border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
                     >
                       <div
                         className={cn(

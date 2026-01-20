@@ -1128,8 +1128,9 @@ export const QuizTaking = () => {
         return (
           <div className="space-y-3">
             {currentQ.options.map((option, index) => {
+              // Ensure both IDs are strings for comparison
               const isSelected =
-                selectedAnswer?.selected_option_id === option.id;
+                String(selectedAnswer?.selected_option_id) === String(option.id);
               const optionLetter = String.fromCharCode(65 + index);
 
               return (
@@ -1195,7 +1196,8 @@ export const QuizTaking = () => {
               </span>
             </div>
             {currentQ.options.map((option, index) => {
-              const isSelected = selectedIds.includes(option.id);
+              // Ensure both IDs are strings for comparison
+              const isSelected = selectedIds.map(id => String(id)).includes(String(option.id));
               const optionLetter = String.fromCharCode(65 + index);
 
               return (
@@ -1274,7 +1276,8 @@ export const QuizTaking = () => {
               },
               { value: "false", label: "False", icon: XCircle, color: "red" },
             ].map(({ value, label, icon: Icon, color }) => {
-              const isSelected = selectedAnswer?.selected_option_id === value;
+              // Ensure both values are strings for comparison
+              const isSelected = String(selectedAnswer?.selected_option_id) === String(value);
 
               return (
                 <label
@@ -1331,7 +1334,8 @@ export const QuizTaking = () => {
 
       case "matching": {
         const matchedPairs = selectedAnswer?.pairs || [];
-        const matchedRightIds = new Set(matchedPairs.map((p) => p.right_id));
+        // Convert all IDs to strings for consistent comparison
+        const matchedRightIds = new Set(matchedPairs.map((p) => String(p.right_id)));
 
         return (
           <div className="space-y-6">
@@ -1353,12 +1357,13 @@ export const QuizTaking = () => {
                   </span>
                 </div>
                 {currentQ.options.left_items.map((leftItem, index) => {
+                  // Convert IDs to strings for consistent comparison
                   const match = matchedPairs.find(
-                    (p) => p.left_id === leftItem.id
+                    (p) => String(p.left_id) === String(leftItem.id)
                   );
                   const rightItem = match
                     ? currentQ.options.right_items.find(
-                        (r) => r.id === match.right_id
+                        (r) => String(r.id) === String(match.right_id)
                       )
                     : null;
 
@@ -1457,7 +1462,8 @@ export const QuizTaking = () => {
                 </h4>
                 <div className="space-y-3">
                   {currentQ.options.right_items.map((rightItem) => {
-                    const isMatched = matchedRightIds.has(rightItem.id);
+                    // Convert IDs to strings for consistent comparison
+                    const isMatched = matchedRightIds.has(String(rightItem.id));
 
                     return (
                       <div
