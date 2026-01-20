@@ -104,12 +104,17 @@ export default function QuizBankAddQuestions() {
     return topicsData?.items || topicsData || [];
   }, [topicsData]);
 
-  // Build query params
+  // Build query params - include exclude_quiz_bank_id to filter server-side
   const queryParams = useMemo(() => {
     const params = {
       skip: (page - 1) * pageSize,
       limit: pageSize,
     };
+    
+    // Always include exclude_quiz_bank_id if we have a quizBankId
+    if (quizBankId) {
+      params.exclude_quiz_bank_id = quizBankId;
+    }
 
     if (topicId) params.topic_id = topicId;
     if (domain) params.domain = domain;
@@ -119,24 +124,22 @@ export default function QuizBankAddQuestions() {
     if (searchQuery) params.search = searchQuery;
 
     return params;
-  }, [searchQuery, topicId, domain, difficulty, questionType, status, page]);
+  }, [searchQuery, topicId, domain, difficulty, questionType, status, page, quizBankId]);
 
-  // Fetch available questions
+  // Fetch available questions (filtered server-side to exclude questions already in quiz bank)
   const { data: questionsData, isLoading: questionsLoading } =
     useQuestions(queryParams);
   const addQuestionsMutation = useAddQuestionsToQuizBankMutation();
 
   const questions = useMemo(() => {
     const result = questionsData?.items || questionsData || [];
-    console.log("Questions Data:", questionsData);
-    console.log("Parsed Questions:", result);
-    console.log("Query Params:", queryParams);
     return result;
-  }, [questionsData, queryParams]);
+  }, [questionsData]);
 
+  // Use total from API since server-side filtering is now done
   const totalCount = questionsData?.total || questions.length || 0;
 
-  // Filter out questions already in quiz bank
+  // Questions are already filtered server-side, but keep client-side filter as safety fallback
   const availableQuestions = useMemo(() => {
     return questions.filter((q) => !existingQuestionIds.has(q.question_id));
   }, [questions, existingQuestionIds]);

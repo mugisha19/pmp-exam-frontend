@@ -368,7 +368,8 @@ export const QuizBankDetails = () => {
         onClose={() => setIsAddQuestionsModalOpen(false)}
         quizBankId={quizBankId}
         onSuccess={() => {
-          setIsAddQuestionsModalOpen(false);
+          // Don't close modal - let user continue adding more questions
+          // Just refetch the data to update stats
           refetchQuestions();
           refetchQuizBank();
         }}

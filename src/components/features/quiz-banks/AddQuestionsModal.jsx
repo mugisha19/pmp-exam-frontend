@@ -79,9 +79,12 @@ export function AddQuestionsModal({ isOpen, onClose, quizBankId, onSuccess }) {
   const [selectedQuestions, setSelectedQuestions] = useState([]);
 
   // Fetch existing questions in quiz bank
-  const { data: existingQuestionsData } = useQuizBankQuestions(quizBankId);
+  const { data: existingQuestionsData, refetch: refetchExisting } = useQuizBankQuestions(quizBankId);
   const existingQuestions = useMemo(() => {
-    return existingQuestionsData?.items || existingQuestionsData || [];
+    const items = existingQuestionsData?.items || existingQuestionsData || [];
+    console.log('[AddQuestionsModal] existingQuestionsData:', existingQuestionsData);
+    console.log('[AddQuestionsModal] existingQuestions count:', items.length);
+    return items;
   }, [existingQuestionsData]);
   const existingQuestionIds = useMemo(
     () => new Set(existingQuestions.map((q) => q.question_id)),
@@ -94,12 +97,17 @@ export function AddQuestionsModal({ isOpen, onClose, quizBankId, onSuccess }) {
     return topicsData?.items || topicsData || [];
   }, [topicsData]);
 
-  // Build query params
+  // Build query params - include exclude_quiz_bank_id to filter server-side
   const queryParams = useMemo(() => {
     const params = {
       skip: (page - 1) * pageSize,
       limit: pageSize,
     };
+
+    // Exclude questions already in this quiz bank (server-side filtering)
+    if (quizBankId) {
+      params.exclude_quiz_bank_id = quizBankId;
+    }
 
     if (topicId) params.topic_id = topicId;
     if (domain) params.domain = domain;
@@ -109,9 +117,9 @@ export function AddQuestionsModal({ isOpen, onClose, quizBankId, onSuccess }) {
     if (searchQuery) params.search = searchQuery;
 
     return params;
-  }, [searchQuery, topicId, domain, difficulty, questionType, status, page]);
+  }, [searchQuery, topicId, domain, difficulty, questionType, status, page, quizBankId]);
 
-  // Fetch available questions
+  // Fetch available questions (filtered server-side)
   const { data: questionsData, isLoading: questionsLoading } =
     useQuestions(queryParams);
   const addQuestionsMutation = useAddQuestionsToQuizBankMutation();
@@ -120,9 +128,10 @@ export function AddQuestionsModal({ isOpen, onClose, quizBankId, onSuccess }) {
     return questionsData?.items || questionsData || [];
   }, [questionsData]);
 
+  // Use total from API since server-side filtering is now done
   const totalCount = questionsData?.total || questions.length || 0;
 
-  // Filter out questions already in quiz bank
+  // Questions are already filtered server-side, but keep client-side filter as fallback
   const availableQuestions = useMemo(() => {
     return questions.filter((q) => !existingQuestionIds.has(q.question_id));
   }, [questions, existingQuestionIds]);
@@ -161,8 +170,9 @@ export function AddQuestionsModal({ isOpen, onClose, quizBankId, onSuccess }) {
         questionIds: selectedQuestions,
       });
       setSelectedQuestions([]);
+      // Don't close modal - let user continue adding more questions
+      // The queries will auto-refetch due to invalidation in the mutation
       onSuccess?.();
-      onClose();
     } catch (error) {
       // Error toast is already handled by the mutation
     }

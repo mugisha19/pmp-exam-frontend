@@ -143,12 +143,14 @@ export const addQuestionsToBank = async (quizBankId, questionIds) => {
 /**
  * Get all questions in a quiz bank
  * @param {string} quizBankId - Quiz bank ID
+ * @param {number} limit - Maximum number of questions to fetch (default 500)
  * @returns {Promise<Array>} List of questions in the quiz bank
  */
-export const getBankQuestions = async (quizBankId) => {
+export const getBankQuestions = async (quizBankId, limit = 500) => {
   try {
     const response = await api.get(
-      QUIZ_ENDPOINTS.LIST_BANK_QUESTIONS(quizBankId)
+      QUIZ_ENDPOINTS.LIST_BANK_QUESTIONS(quizBankId),
+      { params: { limit } }
     );
     return response.data;
   } catch (error) {

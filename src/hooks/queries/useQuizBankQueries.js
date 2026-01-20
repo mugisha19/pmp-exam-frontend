@@ -271,15 +271,20 @@ export const useAddQuestionsToBankMutation = () => {
   return useMutation({
     mutationFn: ({ quizBankId, questionIds }) =>
       quizBankService.addQuestionsToBank(quizBankId, questionIds),
-    onSuccess: (data, variables) => {
-      // Invalidate quiz bank questions
-      queryClient.invalidateQueries({
+    onSuccess: async (data, variables) => {
+      // Force refetch quiz bank questions (for "Already Added" stat)
+      await queryClient.refetchQueries({
         queryKey: ["quiz-bank-questions", variables.quizBankId],
       });
 
-      // Also invalidate quiz bank detail to update question count
-      queryClient.invalidateQueries({
+      // Also refetch quiz bank detail to update question count
+      await queryClient.refetchQueries({
         queryKey: queryKeys.quizBanks.detail(variables.quizBankId),
+      });
+
+      // Force refetch questions list to update available questions
+      await queryClient.refetchQueries({
+        queryKey: queryKeys.questions.all,
       });
 
       const count = data?.added_count || variables.questionIds?.length || 0;
