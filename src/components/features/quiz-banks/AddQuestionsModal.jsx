@@ -79,12 +79,9 @@ export function AddQuestionsModal({ isOpen, onClose, quizBankId, onSuccess }) {
   const [selectedQuestions, setSelectedQuestions] = useState([]);
 
   // Fetch existing questions in quiz bank
-  const { data: existingQuestionsData, refetch: refetchExisting } = useQuizBankQuestions(quizBankId);
+  const { data: existingQuestionsData } = useQuizBankQuestions(quizBankId);
   const existingQuestions = useMemo(() => {
-    const items = existingQuestionsData?.items || existingQuestionsData || [];
-    console.log('[AddQuestionsModal] existingQuestionsData:', existingQuestionsData);
-    console.log('[AddQuestionsModal] existingQuestions count:', items.length);
-    return items;
+    return existingQuestionsData?.items || existingQuestionsData || [];
   }, [existingQuestionsData]);
   const existingQuestionIds = useMemo(
     () => new Set(existingQuestions.map((q) => q.question_id)),
