@@ -71,8 +71,6 @@ export default function QuestionManagement() {
   // Filter states
   const [searchQuery, setSearchQuery] = useState("");
   const [topicId, setTopicId] = useState("");
-  const [domain, setDomain] = useState("");
-  const [difficulty, setDifficulty] = useState("");
   const [questionType, setQuestionType] = useState("");
   const [status, setStatus] = useState("");
   const [page, setPage] = useState(1);
@@ -103,14 +101,12 @@ export default function QuestionManagement() {
     };
 
     if (topicId) params.topic_id = topicId;
-    if (domain) params.domain = domain;
-    if (difficulty) params.difficulty = difficulty;
     if (questionType) params.question_type = questionType;
     if (status) params.status = status;
     if (searchQuery) params.search = searchQuery;
 
     return params;
-  }, [searchQuery, topicId, domain, difficulty, questionType, status, page, pageSize]);
+  }, [searchQuery, topicId, questionType, status, page, pageSize]);
 
   // Fetch questions
   const { data: questionsData, isLoading, refetch } = useQuestions(queryParams);
@@ -311,19 +307,15 @@ export default function QuestionManagement() {
     let count = 0;
     if (searchQuery) count++;
     if (topicId) count++;
-    if (domain) count++;
     if (questionType) count++;
-    if (difficulty) count++;
     if (status) count++;
     return count;
-  }, [searchQuery, topicId, domain, questionType, difficulty, status]);
+  }, [searchQuery, topicId, questionType, status]);
 
   const handleClearFilters = () => {
     setSearchQuery("");
     setTopicId("");
-    setDomain("");
     setQuestionType("");
-    setDifficulty("");
     setStatus("");
     setPage(1);
   };
@@ -411,7 +403,7 @@ export default function QuestionManagement() {
           </div>
 
           {/* Filter Dropdowns */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-1">
                 Topic
@@ -430,22 +422,6 @@ export default function QuestionManagement() {
 
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-1">
-                Domain
-              </label>
-              <Select
-                value={domain}
-                onChange={(e) => {
-                  setDomain(e.target.value);
-                  setPage(1);
-                }}
-                options={DOMAIN_OPTIONS}
-                className="w-full"
-                size="sm"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">
                 Type
               </label>
               <Select
@@ -455,22 +431,6 @@ export default function QuestionManagement() {
                   setPage(1);
                 }}
                 options={QUESTION_TYPE_OPTIONS}
-                className="w-full"
-                size="sm"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">
-                Difficulty
-              </label>
-              <Select
-                value={difficulty}
-                onChange={(e) => {
-                  setDifficulty(e.target.value);
-                  setPage(1);
-                }}
-                options={DIFFICULTY_OPTIONS}
                 className="w-full"
                 size="sm"
               />

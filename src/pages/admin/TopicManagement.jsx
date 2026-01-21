@@ -28,14 +28,8 @@ import {
   useTopics,
   useDeleteTopicMutation,
 } from "@/hooks/queries/useTopicQueries";
+import { useDomains } from "@/hooks/queries/useDomainQueries";
 import { CreateTopicModal } from "@/components/features/topics";
-
-const DOMAIN_OPTIONS = [
-  { value: "", label: "All Domains" },
-  { value: "People", label: "People" },
-  { value: "Process", label: "Process" },
-  { value: "Business Environment", label: "Business Environment" },
-];
 
 const STATUS_OPTIONS = [
   { value: "", label: "All Status" },
@@ -45,6 +39,21 @@ const STATUS_OPTIONS = [
 
 export default function TopicManagement() {
   const navigate = useNavigate();
+
+  // Fetch domains
+  const { data: domainsData } = useDomains();
+  
+  // Create domain options from fetched data
+  const DOMAIN_OPTIONS = useMemo(() => {
+    const domains = domainsData?.items || domainsData || [];
+    return [
+      { value: "", label: "All Domains" },
+      ...domains.map((domain) => ({
+        value: domain.name,
+        label: domain.name,
+      })),
+    ];
+  }, [domainsData]);
 
   // Filter states
   const [searchQuery, setSearchQuery] = useState("");
