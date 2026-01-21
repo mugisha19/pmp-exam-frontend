@@ -85,8 +85,8 @@ export const SupportTickets = () => {
       header: "Subject",
       render: (_, row) => (
         <div className="max-w-md">
-          <p className="font-medium text-gray-900 truncate">{row.subject}</p>
-          <p className="text-xs text-gray-500 truncate">{row.description}</p>
+          <p className="font-medium text-gray-900 truncate">{row.subject || 'No subject'}</p>
+          <p className="text-xs text-gray-500 truncate">{row.description || 'No description'}</p>
         </div>
       ),
     },

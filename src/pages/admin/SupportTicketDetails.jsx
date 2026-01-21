@@ -59,14 +59,28 @@ export const SupportTicketDetails = () => {
   const [status, setStatus] = useState("");
   const [resolutionNotes, setResolutionNotes] = useState("");
 
+  console.log('=== SUPPORT TICKET DETAILS DEBUG ===');
+  console.log('Ticket ID from params:', ticketId);
+  console.log('Ticket ID type:', typeof ticketId);
+  console.log('===================================');
+
   const { data: ticket, isLoading, isError, error } = useQuery({
     queryKey: ["support-ticket", ticketId],
     queryFn: () => supportService.getTicketById(ticketId),
     onSuccess: (data) => {
-      setStatus(data.status);
-      setResolutionNotes(data.resolution_notes || "");
+      if (!status) {
+        setStatus(data.status);
+      }
+      if (!resolutionNotes) {
+        setResolutionNotes(data.resolution_notes || "");
+      }
     },
   });
+
+  // Set initial status when ticket loads
+  if (ticket && !status) {
+    setStatus(ticket.status);
+  }
 
   const { data: user } = useUser(ticket?.user_id, {
     enabled: !!ticket?.user_id,
@@ -142,7 +156,7 @@ export const SupportTicketDetails = () => {
             variant="ghost"
             size="sm"
             leftIcon={<ArrowLeft className="w-4 h-4" />}
-            onClick={() => navigate("/admin/support")}
+            onClick={() => navigate("/support")}
           >
             Back
           </Button>
@@ -168,35 +182,49 @@ export const SupportTicketDetails = () => {
                 Update Ticket
               </h3>
               <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Status
-                  </label>
-                  <Select
-                    value={status}
-                    onChange={(e) => setStatus(e.target.value)}
-                    options={STATUS_OPTIONS}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Resolution Notes
-                  </label>
-                  <Textarea
-                    value={resolutionNotes}
-                    onChange={(e) => setResolutionNotes(e.target.value)}
-                    placeholder="Add notes about the resolution..."
-                    rows={4}
-                  />
-                </div>
-                <Button
-                  variant="primary"
-                  onClick={handleUpdate}
-                  loading={updateMutation.isPending}
-                  disabled={status === ticket.status && resolutionNotes === (ticket.resolution_notes || "")}
-                >
-                  Update Ticket
-                </Button>
+                {ticket.status !== 'resolved' && ticket.status !== 'closed' ? (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Status
+                      </label>
+                      <Select
+                        value={status}
+                        onChange={(e) => setStatus(e.target.value)}
+                        options={STATUS_OPTIONS}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Resolution Notes
+                      </label>
+                      <Textarea
+                        value={resolutionNotes}
+                        onChange={(e) => setResolutionNotes(e.target.value)}
+                        placeholder="Add notes about the resolution..."
+                        rows={4}
+                      />
+                    </div>
+                    <Button
+                      variant="primary"
+                      onClick={handleUpdate}
+                      loading={updateMutation.isPending}
+                      disabled={status === ticket.status && resolutionNotes === (ticket.resolution_notes || "")}
+                    >
+                      Update Ticket
+                    </Button>
+                  </>
+                ) : (
+                  <div className="text-center py-8">
+                    <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-3" />
+                    <p className="text-lg font-semibold text-gray-900 mb-1">
+                      Ticket {ticket.status === 'resolved' ? 'Resolved' : 'Closed'}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      This ticket has been {ticket.status === 'resolved' ? 'resolved' : 'closed'} and cannot be modified.
+                    </p>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>

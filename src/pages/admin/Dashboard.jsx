@@ -690,7 +690,7 @@ export const Dashboard = () => {
               <div className="space-y-3">
                 {[...Array(4)].map((_, i) => (
                   <div
-                    key={i}
+                    key={`activity-skeleton-${i}`}
                     className="flex items-center gap-3 py-3 animate-pulse"
                   >
                     <div className="w-10 h-10 rounded-xl bg-gray-200" />
@@ -755,7 +755,7 @@ export const Dashboard = () => {
               <div className="space-y-3">
                 {[...Array(5)].map((_, i) => (
                   <div
-                    key={i}
+                    key={`user-skeleton-${i}`}
                     className="flex items-center gap-4 py-3 animate-pulse"
                   >
                     <div className="w-9 h-9 rounded-full bg-gray-200" />
@@ -886,7 +886,7 @@ export const Dashboard = () => {
                 </thead>
                 <tbody>
                   {[...Array(3)].map((_, i) => (
-                    <tr key={i} className="animate-pulse">
+                    <tr key={`group-skeleton-${i}`} className="animate-pulse">
                       <td className="py-3 px-2">
                         <div className="h-4 bg-gray-200 rounded w-32" />
                       </td>
