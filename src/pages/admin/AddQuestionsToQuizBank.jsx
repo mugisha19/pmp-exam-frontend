@@ -1,9 +1,10 @@
 /**
- * Add Questions to Quiz Bank Modal
+ * Add Questions to Quiz Bank Page
  * Browse and select questions to add to a quiz bank
  */
 
 import { useState, useMemo, useCallback } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   Plus,
   Search,
@@ -12,24 +13,24 @@ import {
   Filter,
   BookOpen,
   FileQuestion,
-  X,
   ChevronDown,
   ChevronUp,
+  ArrowLeft,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 
-import { Modal } from "@/components/ui/Modal";
+import { PageHeader } from "@/components/shared/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Badge } from "@/components/ui/Badge";
 import { Card, CardContent } from "@/components/ui/Card";
 import { DataTable } from "@/components/shared/DataTable";
-import { Skeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/shared/EmptyState";
 import {
   useQuizBankQuestions,
   useAddQuestionsToQuizBankMutation,
+  useQuizBank,
 } from "@/hooks/queries/useQuizBankQueries";
 import { useQuestions } from "@/hooks/queries/useQuestionQueries";
 import { useTopics } from "@/hooks/queries/useTopicQueries";
@@ -42,28 +43,10 @@ const QUESTION_TYPE_OPTIONS = [
   { value: "matching", label: "Matching" },
 ];
 
-const DIFFICULTY_OPTIONS = [
-  { value: "", label: "All Difficulties" },
-  { value: "easy", label: "Easy" },
-  { value: "medium", label: "Medium" },
-  { value: "hard", label: "Hard" },
-];
+export function AddQuestionsToQuizBank() {
+  const { quizBankId } = useParams();
+  const navigate = useNavigate();
 
-const STATUS_OPTIONS = [
-  { value: "", label: "All Status" },
-  { value: "active", label: "Active" },
-  { value: "draft", label: "Draft" },
-  { value: "archived", label: "Archived" },
-];
-
-const DOMAIN_OPTIONS = [
-  { value: "", label: "All Domains" },
-  { value: "People", label: "People" },
-  { value: "Process", label: "Process" },
-  { value: "Business Environment", label: "Business Environment" },
-];
-
-export function AddQuestionsModal({ isOpen, onClose, quizBankId, onSuccess }) {
   // Filter states
   const [searchQuery, setSearchQuery] = useState("");
   const [topicId, setTopicId] = useState("");
@@ -74,6 +57,9 @@ export function AddQuestionsModal({ isOpen, onClose, quizBankId, onSuccess }) {
 
   // Selection state
   const [selectedQuestions, setSelectedQuestions] = useState([]);
+
+  // Fetch quiz bank details
+  const { data: quizBank } = useQuizBank(quizBankId);
 
   // Fetch existing questions in quiz bank
   const { data: existingQuestionsData } = useQuizBankQuestions(quizBankId);
@@ -91,26 +77,21 @@ export function AddQuestionsModal({ isOpen, onClose, quizBankId, onSuccess }) {
     return topicsData?.items || topicsData || [];
   }, [topicsData]);
 
-  // Build query params - include exclude_quiz_bank_id to filter server-side
+  // Build query params
   const queryParams = useMemo(() => {
     const params = {
       skip: (page - 1) * pageSize,
       limit: pageSize,
     };
 
-    // Exclude questions already in this quiz bank (server-side filtering)
-    if (quizBankId) {
-      params.exclude_quiz_bank_id = quizBankId;
-    }
-
     if (topicId) params.topic_id = topicId;
     if (questionType) params.question_type = questionType;
     if (searchQuery) params.search = searchQuery;
 
     return params;
-  }, [searchQuery, topicId, questionType, page, quizBankId]);
+  }, [searchQuery, topicId, questionType, page]);
 
-  // Fetch available questions (filtered server-side)
+  // Fetch available questions
   const { data: questionsData, isLoading: questionsLoading } =
     useQuestions(queryParams);
   const addQuestionsMutation = useAddQuestionsToQuizBankMutation();
@@ -119,10 +100,9 @@ export function AddQuestionsModal({ isOpen, onClose, quizBankId, onSuccess }) {
     return questionsData?.items || questionsData || [];
   }, [questionsData]);
 
-  // Use total from API since server-side filtering is now done
   const totalCount = questionsData?.total || questions.length || 0;
 
-  // Questions are already filtered server-side, but keep client-side filter as fallback
+  // Filter out questions already in quiz bank for display
   const availableQuestions = useMemo(() => {
     return questions.filter((q) => !existingQuestionIds.has(q.question_id));
   }, [questions, existingQuestionIds]);
@@ -161,9 +141,6 @@ export function AddQuestionsModal({ isOpen, onClose, quizBankId, onSuccess }) {
         questionIds: selectedQuestions,
       });
       setSelectedQuestions([]);
-      // Don't close modal - let user continue adding more questions
-      // The queries will auto-refetch due to invalidation in the mutation
-      onSuccess?.();
     } catch (error) {
       // Error toast is already handled by the mutation
     }
@@ -281,161 +258,158 @@ export function AddQuestionsModal({ isOpen, onClose, quizBankId, onSuccess }) {
     setPage(1);
   };
 
-  // Reset state when modal closes
-  const handleClose = () => {
-    setSelectedQuestions([]);
-    setSearchQuery("");
-    setTopicId("");
-    setQuestionType("");
-    setPage(1);
-    onClose();
-  };
-
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={handleClose}
-      title="Add Questions to Quiz Bank"
-      size="xl"
-    >
-      <div className="space-y-4 max-h-[80vh] overflow-y-auto">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-3 gap-3">
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-medium text-gray-600">
-                    Available
-                  </p>
-                  <p className="text-2xl font-bold text-gray-900 mt-1">
-                    {availableQuestions.length}
-                  </p>
-                </div>
-                <div className="bg-blue-100 p-2 rounded-lg">
-                  <FileQuestion className="w-5 h-5 text-blue-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-medium text-gray-600">
-                    Already Added
-                  </p>
-                  <p className="text-2xl font-bold text-gray-900 mt-1">
-                    {existingQuestions.length}
-                  </p>
-                </div>
-                <div className="bg-green-100 p-2 rounded-lg">
-                  <CheckCircle2 className="w-5 h-5 text-green-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-medium text-gray-600">
-                    Selected
-                  </p>
-                  <p className="text-2xl font-bold text-gray-900 mt-1">
-                    {selectedQuestions.length}
-                  </p>
-                </div>
-                <div className="bg-purple-100 p-2 rounded-lg">
-                  <Circle className="w-5 h-5 text-purple-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+    <div className="space-y-6">
+      {/* Page Header */}
+      <PageHeader
+        title={`Add Questions to ${quizBank?.title || "Quiz Bank"}`}
+        subtitle="Browse and select questions to add to this quiz bank"
+        actions={
+          <Button
+            variant="ghost"
+            size="sm"
+            leftIcon={<ArrowLeft className="w-4 h-4" />}
+            onClick={() => navigate(`/quiz-banks/${quizBankId}`)}
+          >
+            Back to Quiz Bank
+          </Button>
+        }
+      />
 
-        {/* Filters */}
+      {/* Stats Cards */}
+      <div className="grid grid-cols-3 gap-4">
         <Card>
-          <CardContent className="p-3">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <Filter className="w-4 h-4 text-gray-500" />
-                <h3 className="text-xs font-semibold text-gray-900">Filters</h3>
-                {activeFiltersCount > 0 && (
-                  <Badge variant="secondary" className="text-xs px-1.5 py-0.5">
-                    {activeFiltersCount}
-                  </Badge>
-                )}
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">
+                  Available
+                </p>
+                <p className="text-3xl font-bold text-gray-900 mt-2">
+                  {availableQuestions.length}
+                </p>
               </div>
-              <div className="flex items-center gap-1">
-                {activeFiltersCount > 0 && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={clearAllFilters}
-                    className="text-xs h-7 px-2"
-                  >
-                    Clear
-                  </Button>
-                )}
+              <div className="bg-blue-100 p-3 rounded-lg">
+                <FileQuestion className="w-6 h-6 text-blue-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">
+                  Already Added
+                </p>
+                <p className="text-3xl font-bold text-gray-900 mt-2">
+                  {existingQuestions.length}
+                </p>
+              </div>
+              <div className="bg-green-100 p-3 rounded-lg">
+                <CheckCircle2 className="w-6 h-6 text-green-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">
+                  Selected
+                </p>
+                <p className="text-3xl font-bold text-gray-900 mt-2">
+                  {selectedQuestions.length}
+                </p>
+              </div>
+              <div className="bg-purple-100 p-3 rounded-lg">
+                <Circle className="w-6 h-6 text-purple-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Filters */}
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Filter className="w-5 h-5 text-gray-500" />
+              <h3 className="text-sm font-semibold text-gray-900">Filters</h3>
+              {activeFiltersCount > 0 && (
+                <Badge variant="secondary" className="text-xs">
+                  {activeFiltersCount}
+                </Badge>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              {activeFiltersCount > 0 && (
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setShowFilters(!showFilters)}
-                  className="h-7 px-2"
+                  onClick={clearAllFilters}
                 >
-                  {showFilters ? (
-                    <ChevronUp className="w-4 h-4" />
-                  ) : (
-                    <ChevronDown className="w-4 h-4" />
-                  )}
+                  Clear
                 </Button>
+              )}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowFilters(!showFilters)}
+              >
+                {showFilters ? (
+                  <ChevronUp className="w-4 h-4" />
+                ) : (
+                  <ChevronDown className="w-4 h-4" />
+                )}
+              </Button>
+            </div>
+          </div>
+
+          {showFilters && (
+            <div className="space-y-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <Input
+                  placeholder="Search questions..."
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setPage(1);
+                  }}
+                  className="pl-10"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <Select
+                  value={topicId}
+                  onChange={(e) => {
+                    setTopicId(e.target.value);
+                    setPage(1);
+                  }}
+                  options={topicOptions}
+                />
+
+                <Select
+                  value={questionType}
+                  onChange={(e) => {
+                    setQuestionType(e.target.value);
+                    setPage(1);
+                  }}
+                  options={QUESTION_TYPE_OPTIONS}
+                />
               </div>
             </div>
+          )}
+        </CardContent>
+      </Card>
 
-            {showFilters && (
-              <div className="space-y-3">
-                <div className="relative">
-                  <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                  <Input
-                    placeholder="Search questions..."
-                    value={searchQuery}
-                    onChange={(e) => {
-                      setSearchQuery(e.target.value);
-                      setPage(1);
-                    }}
-                    className="pl-9 h-9 text-sm"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-2">
-                  <Select
-                    value={topicId}
-                    onChange={(e) => {
-                      setTopicId(e.target.value);
-                      setPage(1);
-                    }}
-                    options={topicOptions}
-                    className="text-sm"
-                  />
-
-                  <Select
-                    value={questionType}
-                    onChange={(e) => {
-                      setQuestionType(e.target.value);
-                      setPage(1);
-                    }}
-                    options={QUESTION_TYPE_OPTIONS}
-                    className="text-sm"
-                  />
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Questions Table */}
-        <div className="max-h-96 overflow-y-auto">
+      {/* Questions Table */}
+      <Card>
+        <CardContent className="p-6">
           {availableQuestions.length === 0 && !questionsLoading ? (
             <EmptyState
               icon={Filter}
@@ -464,8 +438,8 @@ export function AddQuestionsModal({ isOpen, onClose, quizBankId, onSuccess }) {
 
               {/* Pagination Controls */}
               {totalCount > pageSize && (
-                <div className="flex items-center justify-between mt-4 pt-4 border-t">
-                  <div className="text-xs text-gray-600">
+                <div className="flex items-center justify-between mt-6 pt-6 border-t">
+                  <div className="text-sm text-gray-600">
                     Showing {(page - 1) * pageSize + 1} to{" "}
                     {Math.min(page * pageSize, totalCount)} of {totalCount}
                   </div>
@@ -475,11 +449,10 @@ export function AddQuestionsModal({ isOpen, onClose, quizBankId, onSuccess }) {
                       size="sm"
                       onClick={() => setPage(page - 1)}
                       disabled={page === 1}
-                      className="text-xs h-7 px-2"
                     >
-                      Prev
+                      Previous
                     </Button>
-                    <span className="text-xs text-gray-600">
+                    <span className="text-sm text-gray-600">
                       Page {page} of {Math.ceil(totalCount / pageSize)}
                     </span>
                     <Button
@@ -487,7 +460,6 @@ export function AddQuestionsModal({ isOpen, onClose, quizBankId, onSuccess }) {
                       size="sm"
                       onClick={() => setPage(page + 1)}
                       disabled={page >= Math.ceil(totalCount / pageSize)}
-                      className="text-xs h-7 px-2"
                     >
                       Next
                     </Button>
@@ -496,11 +468,32 @@ export function AddQuestionsModal({ isOpen, onClose, quizBankId, onSuccess }) {
               )}
             </>
           )}
-        </div>
+        </CardContent>
+      </Card>
 
-        {/* Footer Actions */}
-        <div className="flex justify-end gap-3 pt-4 border-t">
-          <Button type="button" variant="outline" onClick={handleClose}>
+      {/* Footer Actions */}
+      <div className="flex justify-between items-center">
+        <div className="text-sm text-gray-600">
+          {selectedQuestions.length > 0 && (
+            <span>
+              {selectedQuestions.length} question(s) selected
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={clearSelection}
+                className="ml-2"
+              >
+                Clear Selection
+              </Button>
+            </span>
+          )}
+        </div>
+        <div className="flex gap-3">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => navigate(`/quiz-banks/${quizBankId}`)}
+          >
             Cancel
           </Button>
           <Button
@@ -513,8 +506,8 @@ export function AddQuestionsModal({ isOpen, onClose, quizBankId, onSuccess }) {
           </Button>
         </div>
       </div>
-    </Modal>
+    </div>
   );
 }
 
-
+export default AddQuestionsToQuizBank;

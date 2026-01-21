@@ -30,7 +30,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { DataTable } from "@/components/shared/DataTable";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
-import { EditQuizBankModal, AddQuestionsModal } from "@/components/features/quiz-banks";
+import { EditQuizBankModal } from "@/components/features/quiz-banks";
 import { PublishQuizModal } from "@/components/features/quizzes/PublishQuizModal";
 import toast from "react-hot-toast";
 
@@ -70,7 +70,6 @@ export const QuizBankDetails = () => {
   const { user } = useAuthStore();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
-  const [isAddQuestionsModalOpen, setIsAddQuestionsModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const deleteQuizBankMutation = useDeleteQuizBankMutation();
@@ -188,7 +187,7 @@ export const QuizBankDetails = () => {
       header: "Question",
       render: (_, question) => (
         <div
-          className="text-sm max-w-2xl truncate"
+          className="text-sm whitespace-normal"
           dangerouslySetInnerHTML={{ __html: question.question_text }}
         />
       ),
@@ -199,26 +198,6 @@ export const QuizBankDetails = () => {
       render: (_, question) => (
         <Badge variant="outline">{question.question_type}</Badge>
       ),
-    },
-    {
-      key: "difficulty",
-      header: "Difficulty",
-      render: (_, question) => {
-        const variants = {
-          easy: "success",
-          medium: "warning",
-          hard: "danger",
-        };
-        return (
-          <Badge
-            variant={
-              variants[question.difficulty?.toLowerCase()] || "secondary"
-            }
-          >
-            {question.difficulty}
-          </Badge>
-        );
-      },
     },
   ];
 
@@ -306,7 +285,7 @@ export const QuizBankDetails = () => {
               <Button
                 size="sm"
                 leftIcon={<Plus className="w-4 h-4" />}
-                onClick={() => setIsAddQuestionsModalOpen(true)}
+                onClick={() => navigate(`/quiz-banks/${quizBankId}/add-questions`)}
               >
                 Add Questions
               </Button>
@@ -326,7 +305,7 @@ export const QuizBankDetails = () => {
               description={(user?.role === "admin" || user?.role === "instructor") ? "Add questions to this quiz bank to get started" : "This quiz bank has no questions yet"}
               actionLabel={(user?.role === "admin" || user?.role === "instructor") ? "Add Questions" : undefined}
               onAction={(user?.role === "admin" || user?.role === "instructor") ? () =>
-                setIsAddQuestionsModalOpen(true)
+                navigate(`/quiz-banks/${quizBankId}/add-questions`)
               : undefined}
             />
           ) : (
@@ -360,19 +339,6 @@ export const QuizBankDetails = () => {
         isOpen={isPublishModalOpen}
         onClose={() => setIsPublishModalOpen(false)}
         quizBank={quizBank}
-      />
-
-      {/* Add Questions Modal */}
-      <AddQuestionsModal
-        isOpen={isAddQuestionsModalOpen}
-        onClose={() => setIsAddQuestionsModalOpen(false)}
-        quizBankId={quizBankId}
-        onSuccess={() => {
-          // Don't close modal - let user continue adding more questions
-          // Just refetch the data to update stats
-          refetchQuestions();
-          refetchQuizBank();
-        }}
       />
 
       {/* Delete Confirmation Dialog */}

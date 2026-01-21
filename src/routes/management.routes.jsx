@@ -34,6 +34,7 @@ import {
   AdminQuestionEditPage,
   AdminQuizBanksPage,
   AdminQuizBankDetailsPage,
+  AddQuestionsToQuizBankPage,
   AnalyticsPage,
   NotificationsPage,
   SystemSettingsPage,
@@ -84,6 +85,7 @@ export const managementRoutes = (
       <Route path="/questions/:questionId/edit" element={<AdminQuestionEditPage />} />
       <Route path="/quiz-banks" element={<AdminQuizBanksPage />} />
       <Route path="/quiz-banks/:quizBankId" element={<AdminQuizBankDetailsPage />} />
+      <Route path="/quiz-banks/:quizBankId/add-questions" element={<AddQuestionsToQuizBankPage />} />
       
       {/* Shared routes - Analytics & Notifications */}
       <Route path="/analytics" element={<AnalyticsPage />} />

@@ -19,6 +19,7 @@ export { default as AdminQuestionEditPage } from "./QuestionEdit";
 export { default as AdminQuizBanksPage } from "./QuizBankManagement";
 export { default as AdminQuizBankAddQuestionsPage } from "./QuizBankAddQuestions";
 export { default as AdminQuizBankDetailsPage } from "./QuizBankDetails";
+export { default as AddQuestionsToQuizBankPage } from "./AddQuestionsToQuizBank";
 export { default as AdminExamManagementPage } from "./ExamManagement";
 export { default as AdminExamDetailsPage } from "./ExamDetails";
 export { default as AdminExamEditPage } from "./ExamEdit";
