@@ -544,6 +544,9 @@ export const QuizTaking = () => {
         return { autoPaused: false };
       }
       
+      const perfStart = performance.now();
+      console.log('[PERF] Starting save answer request');
+      
       const response = await saveAnswer(sessionToken, {
         quiz_question_id: currentQ.quiz_question_id,
         question_type: currentQ.question_type,
@@ -551,6 +554,9 @@ export const QuizTaking = () => {
         time_spent_seconds: currentQ.time_spent_seconds || 0,
         is_flagged: currentQ.is_flagged || false,
       });
+      
+      const perfSaveAnswer = performance.now();
+      console.log(`[PERF] Save answer API call completed in ${(perfSaveAnswer - perfStart).toFixed(2)}ms`);
 
       if (response.auto_paused) {
         await loadSessionState();
@@ -560,7 +566,11 @@ export const QuizTaking = () => {
       }
 
       // Get fresh state after saving
+      const perfBeforeGetState = performance.now();
       const updatedState = await getSessionState(sessionToken);
+      const perfAfterGetState = performance.now();
+      console.log(`[PERF] Get session state after save completed in ${(perfAfterGetState - perfBeforeGetState).toFixed(2)}ms`);
+      
       setSessionData(updatedState);
       
       // Update timing from fresh state
@@ -586,6 +596,9 @@ export const QuizTaking = () => {
       if (isLastQuestion) {
         setLastQuestionAnswerSaved(true);
       }
+
+      const perfEnd = performance.now();
+      console.log(`[PERF] Total save answer operation completed in ${(perfEnd - perfStart).toFixed(2)}ms`);
 
       return { autoPaused: false };
     } catch (error) {
@@ -659,6 +672,9 @@ export const QuizTaking = () => {
   };
 
   const handleNavigate = async (direction) => {
+    const perfNavStart = performance.now();
+    console.log(`[PERF] Starting navigation - direction: ${direction}`);
+    
     if (isWaitingForAutoSubmit) {
       return;
     }
@@ -717,7 +733,10 @@ export const QuizTaking = () => {
                            selectedAnswer;
 
     if (shouldAutoSave) {
+      const perfBeforeAutoSave = performance.now();
       const saveResult = await handleSaveAnswer();
+      const perfAfterAutoSave = performance.now();
+      console.log(`[PERF] Auto-save on navigation completed in ${(perfAfterAutoSave - perfBeforeAutoSave).toFixed(2)}ms`);
       setIsAnswerModified(false);
       
       if (saveResult?.autoPaused) {
@@ -726,7 +745,10 @@ export const QuizTaking = () => {
     }
 
     if (isGoingForward && selectedAnswer) {
+      const perfBeforeSave = performance.now();
       const saveResult = await handleSaveAnswer();
+      const perfAfterSave = performance.now();
+      console.log(`[PERF] Save on Next button completed in ${(perfAfterSave - perfBeforeSave).toFixed(2)}ms`);
       setIsAnswerModified(false);
 
       if (saveResult?.autoPaused) {
@@ -778,9 +800,17 @@ export const QuizTaking = () => {
       }
 
       if (!isWaitingForAutoSubmit) {
+        const perfBeforeNavigate = performance.now();
         await navigateToQuestion(sessionToken, newIndex + 1);
+        const perfAfterNavigate = performance.now();
+        console.log(`[PERF] Navigate to question API call completed in ${(perfAfterNavigate - perfBeforeNavigate).toFixed(2)}ms`);
+        
         // Get fresh state after navigation
+        const perfBeforeGetState = performance.now();
         const updatedState = await getSessionState(sessionToken);
+        const perfAfterGetState = performance.now();
+        console.log(`[PERF] Get session state after navigation completed in ${(perfAfterGetState - perfBeforeGetState).toFixed(2)}ms`);
+        
         setSessionData(updatedState);
 
         // Update timing from fresh state
@@ -807,6 +837,9 @@ export const QuizTaking = () => {
             setLastQuestionAnswerSaved(false);
           }
         }
+        
+        const perfNavEnd = performance.now();
+        console.log(`[PERF] Total navigation operation completed in ${(perfNavEnd - perfNavStart).toFixed(2)}ms`);
         return;
       }
 
