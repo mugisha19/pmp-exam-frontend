@@ -19,6 +19,7 @@ import {
   AdminExamManagementPage,
   AdminExamDetailsPage,
   AdminExamEditPage,
+  AdminExamQuestionsManage,
   AdminGroupsPage,
   AdminGroupDetailsPage,
   QuizAttemptDetails,
@@ -60,6 +61,7 @@ export const adminRoutes = (
     <Route path="exams" element={<AdminExamManagementPage />} />
     <Route path="exams/:examId" element={<AdminExamDetailsPage />} />
     <Route path="exams/:examId/edit" element={<AdminExamEditPage />} />
+    <Route path="exams/:examId/questions/manage" element={<AdminExamQuestionsManage />} />
     <Route path="exams/:examId/attempt/:attemptId" element={<QuizAttemptDetails />} />
     
     {/* Shared routes - Groups */}

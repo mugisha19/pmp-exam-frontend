@@ -22,6 +22,7 @@ import {
   AdminExamManagementPage,
   AdminExamDetailsPage,
   AdminExamEditPage,
+  AdminExamQuestionsManage,
   AdminGroupsPage,
   AdminGroupDetailsPage,
   QuizAttemptDetails,
@@ -64,6 +65,7 @@ export const managementRoutes = (
       <Route path="/exams" element={<AdminExamManagementPage />} />
       <Route path="/exams/:examId" element={<AdminExamDetailsPage />} />
       <Route path="/exams/:examId/edit" element={<AdminExamEditPage />} />
+      <Route path="/exams/:examId/questions/manage" element={<AdminExamQuestionsManage />} />
       <Route path="/exams/:examId/attempt/:attemptId" element={<QuizAttemptDetails />} />
       
       {/* Shared routes - Groups */}
@@ -96,10 +98,5 @@ export const managementRoutes = (
       <Route path="/profile" element={<AdminProfilePage />} />
       <Route path="/system" element={<AdminOnlyRoute><SystemSettingsPage /></AdminOnlyRoute>} />
     </Route>
-    
-    {/* Redirect /admin/* to new paths for backward compatibility */}
-    <Route path="/admin" element={<Navigate to="/dashboard" replace />} />
-    <Route path="/admin/dashboard" element={<Navigate to="/dashboard" replace />} />
-    <Route path="/admin/*" element={<Navigate to="/dashboard" replace />} />
   </>
 );

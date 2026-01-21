@@ -288,6 +288,87 @@ export const getAttemptReview = async (quizId, attemptId) => {
   }
 };
 
+/**
+ * Get quiz questions (admin only)
+ * @param {string} quizId - Quiz ID
+ * @param {Object} params - Query parameters
+ * @param {number} [params.skip] - Pagination skip
+ * @param {number} [params.limit] - Pagination limit
+ * @param {string} [params.topic_id] - Filter by topic
+ * @param {string} [params.question_type] - Filter by question type
+ * @param {string} [params.sort_order] - Sort order (asc/desc)
+ * @returns {Promise<Object>} Paginated list of quiz questions
+ */
+export const getQuizQuestions = async (quizId, params = {}) => {
+  try {
+    const response = await api.get(`/quizzes/${quizId}/questions`, { params });
+    return response.data;
+  } catch (error) {
+    throw handleQuizError(error);
+  }
+};
+
+/**
+ * Get unique topics from quiz questions (admin only)
+ * @param {string} quizId - Quiz ID
+ * @returns {Promise<Array>} List of topics
+ */
+export const getQuizTopics = async (quizId) => {
+  try {
+    const response = await api.get(`/quizzes/${quizId}/questions/topics`);
+    return response.data;
+  } catch (error) {
+    throw handleQuizError(error);
+  }
+};
+
+/**
+ * Add question to quiz from question bank (admin only)
+ * @param {string} quizId - Quiz ID
+ * @param {string} questionId - Question ID from question bank
+ * @returns {Promise<Object>} Result
+ */
+export const addQuestionToQuiz = async (quizId, questionId) => {
+  try {
+    const response = await api.post(`/quizzes/${quizId}/questions`, {
+      question_id: questionId
+    });
+    return response.data;
+  } catch (error) {
+    throw handleQuizError(error);
+  }
+};
+
+/**
+ * Update quiz question (admin only)
+ * @param {string} quizId - Quiz ID
+ * @param {string} quizQuestionId - Quiz question ID
+ * @param {Object} data - Update data
+ * @returns {Promise<Object>} Result
+ */
+export const updateQuizQuestion = async (quizId, quizQuestionId, data) => {
+  try {
+    const response = await api.put(`/quizzes/${quizId}/questions/${quizQuestionId}`, data);
+    return response.data;
+  } catch (error) {
+    throw handleQuizError(error);
+  }
+};
+
+/**
+ * Delete quiz question (admin only)
+ * @param {string} quizId - Quiz ID
+ * @param {string} quizQuestionId - Quiz question ID
+ * @returns {Promise<void>}
+ */
+export const deleteQuizQuestion = async (quizId, quizQuestionId) => {
+  try {
+    await api.delete(`/quizzes/${quizId}/questions/${quizQuestionId}`);
+  } catch (error) {
+    throw handleQuizError(error);
+  }
+};
+
 const handleQuizError = (error) => {
   if (error.response) {
     const { status, data } = error.response;
@@ -335,4 +416,9 @@ export default {
   getAllQuizAttempts,
   getQuizAttempts,
   getAttemptReview,
+  getQuizQuestions,
+  getQuizTopics,
+  addQuestionToQuiz,
+  updateQuizQuestion,
+  deleteQuizQuestion,
 };

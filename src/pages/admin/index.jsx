@@ -22,6 +22,7 @@ export { default as AdminQuizBankDetailsPage } from "./QuizBankDetails";
 export { default as AdminExamManagementPage } from "./ExamManagement";
 export { default as AdminExamDetailsPage } from "./ExamDetails";
 export { default as AdminExamEditPage } from "./ExamEdit";
+export { default as AdminExamQuestionsManage } from "./ExamQuestionsManage";
 export { Analytics as AnalyticsPage } from "./Analytics";
 export { Settings as SystemSettingsPage } from "./Settings";
 export { Notifications as NotificationsPage } from "./Notifications";

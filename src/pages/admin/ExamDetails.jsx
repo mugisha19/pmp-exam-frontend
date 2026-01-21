@@ -24,6 +24,8 @@ import {
   CheckSquare,
   Trash2,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useAuthStore } from "@/stores/auth.store";
@@ -42,6 +44,8 @@ import {
   getAllQuizAttempts,
   updateQuizStatus,
   deleteQuiz,
+  getQuizQuestions,
+  getQuizTopics,
 } from "@/services/quiz.service";
 
 const formatDate = (dateStr) => {
@@ -99,6 +103,13 @@ export default function ExamDetails() {
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
   const statusDropdownRef = useRef(null);
+  const [questionPage, setQuestionPage] = useState(1);
+  const [questionPageSize] = useState(10);
+  const [questionFilters, setQuestionFilters] = useState({
+    topic_id: "",
+    question_type: "",
+    sort_order: "asc",
+  });
 
   const { data: exam, isLoading: loadingExam } = useQuery({
     queryKey: ["exam", examId],
@@ -123,6 +134,31 @@ export default function ExamDetails() {
     queryFn: () => getAllQuizAttempts(examId),
     enabled: !!examId && activeTab === "attempts",
   });
+
+  const { data: questions, isLoading: loadingQuestions } = useQuery({
+    queryKey: ["exam-questions", examId, questionPage, questionFilters],
+    queryFn: () => {
+      const params = {
+        skip: (questionPage - 1) * questionPageSize,
+        limit: questionPageSize,
+        sort_order: questionFilters.sort_order,
+      };
+      // Only add filters if they have values
+      if (questionFilters.topic_id) params.topic_id = questionFilters.topic_id;
+      if (questionFilters.question_type) params.question_type = questionFilters.question_type;
+      return getQuizQuestions(examId, params);
+    },
+    enabled: !!examId && activeTab === "questions",
+  });
+
+  const { data: topics } = useQuery({
+    queryKey: ["exam-topics", examId],
+    queryFn: () => getQuizTopics(examId),
+    enabled: !!examId && activeTab === "questions",
+  });
+
+  const questionCount = questions?.total || 0;
+  const questionItems = questions?.items || [];
 
   const statusMutation = useMutation({
     mutationFn: ({ status }) => updateQuizStatus(examId, status),
@@ -312,7 +348,7 @@ export default function ExamDetails() {
           size="sm"
           onClick={(e) => {
             e.stopPropagation();
-            navigate(`/exams/${examId}/attempt/${attempt.attempt_id}`);
+            navigate(`/admin/exams/${examId}/attempt/${attempt.attempt_id}`);
           }}
         >
           Review
@@ -323,7 +359,7 @@ export default function ExamDetails() {
 
   // Add onRowClick to navigate to attempt details
   const handleAttemptRowClick = (attempt) => {
-    navigate(`/exams/${examId}/attempt/${attempt.attempt_id}`);
+    navigate(`/admin/exams/${examId}/attempt/${attempt.attempt_id}`);
   };
 
   if (loadingExam) {
@@ -349,6 +385,7 @@ export default function ExamDetails() {
 
   const tabs = [
     { id: "overview", label: "Overview", icon: BookOpen },
+    { id: "questions", label: "Questions", icon: Target },
     { id: "leaderboard", label: "Leaderboard", icon: Award },
     { id: "attempts", label: "All Attempts", icon: Users },
   ];
@@ -389,7 +426,7 @@ export default function ExamDetails() {
           <div className="flex gap-2">
             <Button
               variant="secondary"
-              onClick={() => navigate("/exams")}
+              onClick={() => navigate("/admin/exams")}
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Exams
@@ -398,7 +435,7 @@ export default function ExamDetails() {
               <>
                 <Button
                   variant="outline"
-                  onClick={() => navigate(`/exams/${examId}/edit`)}
+                  onClick={() => navigate(`/admin/exams/${examId}/edit`)}
                 >
                   <Edit2 className="w-4 h-4 mr-2" />
                   Edit
@@ -653,6 +690,141 @@ export default function ExamDetails() {
               icon={Trophy}
               title="No scores yet"
               description="No students have completed this exam yet"
+            />
+          )}
+        </Card>
+      )}
+
+      {activeTab === "questions" && (
+        <Card className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Quiz Questions ({questionCount})
+            </h3>
+            <Button
+              onClick={() => navigate(`/exams/${examId}/questions/manage`)}
+            >
+              Manage Questions
+            </Button>
+          </div>
+
+          {/* Filters */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Topic
+              </label>
+              <select
+                value={questionFilters.topic_id}
+                onChange={(e) => {
+                  setQuestionFilters({ ...questionFilters, topic_id: e.target.value });
+                  setQuestionPage(1);
+                }}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="">All Topics</option>
+                {topics?.map((topic) => (
+                  <option key={topic.topic_id} value={topic.topic_id}>
+                    {topic.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Question Type
+              </label>
+              <select
+                value={questionFilters.question_type}
+                onChange={(e) => {
+                  setQuestionFilters({ ...questionFilters, question_type: e.target.value });
+                  setQuestionPage(1);
+                }}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="">All Types</option>
+                <option value="multiple_choice">Multiple Choice</option>
+                <option value="multiple_response">Multiple Response</option>
+                <option value="true_false">True/False</option>
+                <option value="matching">Matching</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Sort Order
+              </label>
+              <select
+                value={questionFilters.sort_order}
+                onChange={(e) => {
+                  setQuestionFilters({ ...questionFilters, sort_order: e.target.value });
+                  setQuestionPage(1);
+                }}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="asc">Oldest First</option>
+                <option value="desc">Newest First</option>
+              </select>
+            </div>
+          </div>
+
+          {loadingQuestions ? (
+            <Spinner />
+          ) : questionItems.length > 0 ? (
+            <>
+              <div className="space-y-2">
+                {questionItems.map((q, idx) => (
+                  <div key={q.quiz_question_id} className="p-4 border border-gray-200 rounded-lg">
+                    <div className="flex items-start gap-3">
+                      <span className="font-semibold text-gray-500">
+                        #{(questionPage - 1) * questionPageSize + idx + 1}
+                      </span>
+                      <div className="flex-1">
+                        <p className="text-gray-900">{q.question_text}</p>
+                        <div className="flex gap-2 mt-2">
+                          <Badge variant="default" size="sm">{q.question_type}</Badge>
+                          {q.topic_name && <Badge variant="secondary" size="sm">{q.topic_name}</Badge>}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Pagination */}
+              {questionCount > questionPageSize && (
+                <div className="flex items-center justify-between mt-6 pt-4 border-t">
+                  <div className="text-sm text-gray-600">
+                    Showing {(questionPage - 1) * questionPageSize + 1} to{" "}
+                    {Math.min(questionPage * questionPageSize, questionCount)} of {questionCount}
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setQuestionPage(questionPage - 1)}
+                      disabled={questionPage === 1}
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                      Previous
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setQuestionPage(questionPage + 1)}
+                      disabled={questionPage * questionPageSize >= questionCount}
+                    >
+                      Next
+                      <ChevronRight className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </>
+          ) : (
+            <EmptyState
+              icon={Target}
+              title="No questions"
+              description="This quiz has no questions yet"
             />
           )}
         </Card>
