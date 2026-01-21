@@ -369,6 +369,23 @@ export const deleteQuizQuestion = async (quizId, quizQuestionId) => {
   }
 };
 
+/**
+ * Get most failed questions for a quiz (admin only)
+ * @param {string} quizId - Quiz ID
+ * @param {number} [limit=10] - Number of questions to return
+ * @returns {Promise<Array>} List of most failed questions with statistics
+ */
+export const getFailedQuestions = async (quizId, limit = 10) => {
+  try {
+    const response = await api.get(`/statistics/admin/quiz/${quizId}/failed-questions`, {
+      params: { limit }
+    });
+    return response.data;
+  } catch (error) {
+    throw handleQuizError(error);
+  }
+};
+
 const handleQuizError = (error) => {
   if (error.response) {
     const { status, data } = error.response;
@@ -421,4 +438,5 @@ export default {
   addQuestionToQuiz,
   updateQuizQuestion,
   deleteQuizQuestion,
+  getFailedQuestions,
 };

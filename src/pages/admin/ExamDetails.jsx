@@ -46,6 +46,7 @@ import {
   deleteQuiz,
   getQuizQuestions,
   getQuizTopics,
+  getFailedQuestions,
 } from "@/services/quiz.service";
 
 const formatDate = (dateStr) => {
@@ -121,6 +122,12 @@ export default function ExamDetails() {
     queryKey: ["exam-stats", examId],
     queryFn: () => getQuizStats(examId),
     enabled: !!examId,
+  });
+
+  const { data: failedQuestions, isLoading: loadingFailedQuestions } = useQuery({
+    queryKey: ["exam-failed-questions", examId],
+    queryFn: () => getFailedQuestions(examId, 10),
+    enabled: !!examId && activeTab === "overview",
   });
 
   const { data: leaderboard, isLoading: loadingLeaderboard } = useQuery({
@@ -631,6 +638,52 @@ export default function ExamDetails() {
                 </div>
               </Card>
             )}
+
+            {/* Most Failed Questions */}
+            <Card className="p-6">
+              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <XCircle className="w-5 h-5 text-red-500" />
+                Most Failed Questions
+              </h3>
+              {loadingFailedQuestions ? (
+                <Spinner />
+              ) : failedQuestions?.questions?.length > 0 ? (
+                <div className="space-y-3">
+                  {failedQuestions.questions.map((q, idx) => (
+                    <div key={q.question_id} className="p-4 border border-gray-200 rounded-lg hover:border-red-200 transition-colors">
+                      <div className="flex items-start gap-3">
+                        <div className="flex-shrink-0">
+                          <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
+                            <span className="text-sm font-bold text-red-600">#{idx + 1}</span>
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm text-gray-900 mb-2 line-clamp-2" dangerouslySetInnerHTML={{ __html: q.question_text }} />
+                          <div className="flex items-center gap-3 text-xs">
+                            <div className="flex items-center gap-1">
+                              <span className="text-gray-600">Failure Rate:</span>
+                              <Badge variant="error" size="sm">
+                                {q.failure_rate?.toFixed(1)}%
+                              </Badge>
+                            </div>
+                            <div className="text-gray-500">
+                              {q.total_attempts} attempt{q.total_attempts !== 1 ? 's' : ''}
+                            </div>
+                            {q.topic_name && (
+                              <Badge variant="secondary" size="sm">
+                                {q.topic_name}
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500">No data available yet. Questions will appear here once students start taking the exam.</p>
+              )}
+            </Card>
           </div>
 
           <div className="space-y-4">
