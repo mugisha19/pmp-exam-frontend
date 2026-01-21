@@ -92,6 +92,7 @@ export const QuizTaking = () => {
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
   const [submittedAttemptId, setSubmittedAttemptId] = useState(null);
+  const [isNavigating, setIsNavigating] = useState(false);
   const [showAnswer, setShowAnswer] = useState(false);
 
   // Load session state from backend
@@ -680,7 +681,6 @@ export const QuizTaking = () => {
         return;
       }
 
-      // Prevent navigation to unanswered questions ahead of current position
       if (newIndex > currentQuestionIndex) {
         const targetQuestion = sessionData.questions[newIndex];
         if (!targetQuestion.is_answered && !targetQuestion.is_flagged) {
@@ -695,10 +695,8 @@ export const QuizTaking = () => {
       return;
     }
 
-    // Only save answer when going forward (Next button)
     const isGoingForward = direction === "next";
     
-    // Auto-save when navigating away from a modified answered question (not using Next)
     const currentQ = sessionData.questions[currentQuestionIndex];
     const isNavigatingByClick = typeof direction === "number";
     const isNavigatingBack = direction === "prev";
@@ -707,11 +705,14 @@ export const QuizTaking = () => {
                            isAnswerModified && 
                            selectedAnswer;
 
+    setIsNavigating(true);
+
     if (shouldAutoSave) {
       const saveResult = await handleSaveAnswer();
       setIsAnswerModified(false);
       
       if (saveResult?.autoPaused) {
+        setIsNavigating(false);
         return;
       }
     }
@@ -721,6 +722,7 @@ export const QuizTaking = () => {
       setIsAnswerModified(false);
 
       if (saveResult?.autoPaused) {
+        setIsNavigating(false);
         return;
       }
 
@@ -735,6 +737,7 @@ export const QuizTaking = () => {
             currentState.pause_info.pause_remaining_seconds
           );
         }
+        setIsNavigating(false);
         return;
       }
       setSessionData(currentState);
@@ -753,6 +756,7 @@ export const QuizTaking = () => {
         if (latestState.pause_info?.is_paused) {
           setPauseTimeRemaining(latestState.pause_info.pause_remaining_seconds);
         }
+        setIsNavigating(false);
         return;
       }
 
@@ -764,6 +768,7 @@ export const QuizTaking = () => {
         sessionStorage.removeItem("quiz_session_token");
         sessionStorage.removeItem("quiz_session_data");
         navigate(`/my-exams/${quizId}`);
+        setIsNavigating(false);
         return;
       }
 
@@ -794,6 +799,7 @@ export const QuizTaking = () => {
             setLastQuestionAnswerSaved(false);
           }
         }
+        setIsNavigating(false);
         return;
       }
 
@@ -833,6 +839,8 @@ export const QuizTaking = () => {
       }
 
       showToast.error("Navigation Failed", "Failed to navigate to question");
+    } finally {
+      setIsNavigating(false);
     }
   };
 
@@ -1856,26 +1864,33 @@ export const QuizTaking = () => {
 
               {/* Question Content */}
               <div className="p-6">
-                {/* Question Text */}
-                <div className="mb-8">
-                  <div 
-                    className="text-lg text-gray-800 leading-relaxed font-medium"
-                    dangerouslySetInnerHTML={{ __html: currentQ?.question_text }}
-                  />
-                  {currentQ?.image_url && (
-                    <img
-                      src={currentQ.image_url}
-                      alt="Question"
-                      className="mt-4 rounded-xl border border-gray-200 max-w-full"
-                    />
-                  )}
-                </div>
+                {isNavigating ? (
+                  <div className="flex flex-col items-center justify-center py-20">
+                    <div className="w-12 h-12 border-4 border-[#6EC1E4] border-t-transparent rounded-full animate-spin mb-4" />
+                    <p className="text-gray-600 font-medium">Loading next question...</p>
+                  </div>
+                ) : (
+                  <>
+                    {/* Question Text */}
+                    <div className="mb-8">
+                      <div 
+                        className="text-lg text-gray-800 leading-relaxed font-medium"
+                        dangerouslySetInnerHTML={{ __html: currentQ?.question_text }}
+                      />
+                      {currentQ?.image_url && (
+                        <img
+                          src={currentQ.image_url}
+                          alt="Question"
+                          className="mt-4 rounded-xl border border-gray-200 max-w-full"
+                        />
+                      )}
+                    </div>
 
-                {/* Answer Options */}
-                <div className="mb-8">{renderQuestionOptions()}</div>
+                    {/* Answer Options */}
+                    <div className="mb-8">{renderQuestionOptions()}</div>
 
-                {/* Show Answer Button (Practice Mode Only) */}
-                {!isExamMode && (
+                    {/* Show Answer Button (Practice Mode Only) */}
+                    {!isExamMode && (
                   <div className="mb-4">
                     <button
                       onClick={() => setShowAnswer(!showAnswer)}
@@ -2047,6 +2062,8 @@ export const QuizTaking = () => {
                     </div>
                   </div>
                 )}
+                  </>
+                )}
               </div>
 
               {/* Navigation Footer */}
@@ -2054,7 +2071,7 @@ export const QuizTaking = () => {
                 <div className="flex items-center justify-between">
                   <button
                     onClick={() => handleNavigate("prev")}
-                    disabled={currentQuestionIndex === 0 || isSaving}
+                    disabled={currentQuestionIndex === 0 || isSaving || isNavigating}
                     className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-gray-700 transition-colors"
                   >
                     <ChevronLeft className="w-5 h-5" />
@@ -2104,6 +2121,7 @@ export const QuizTaking = () => {
                       }}
                       disabled={
                         isSaving ||
+                        isNavigating ||
                         isWaitingForAutoSubmit ||
                         sessionData.pause_info?.is_paused ||
                         !selectedAnswer ||
@@ -2111,10 +2129,10 @@ export const QuizTaking = () => {
                       }
                       className="flex items-center gap-2 px-5 py-2.5 bg-[#6EC1E4] text-white rounded-lg hover:bg-[#5AAFD0] disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-colors"
                     >
-                      {isSaving ? (
+                      {isSaving || isNavigating ? (
                         <>
                           <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                          Saving...
+                          {isNavigating ? 'Loading...' : 'Saving...'}
                         </>
                       ) : (
                         <>
@@ -2128,15 +2146,16 @@ export const QuizTaking = () => {
                       onClick={() => handleNavigate("next")}
                       disabled={
                         isSaving ||
+                        isNavigating ||
                         isWaitingForAutoSubmit ||
                         sessionData.pause_info?.is_paused
                       }
                       className="flex items-center gap-2 px-5 py-2.5 bg-[#6EC1E4] text-white rounded-lg hover:bg-[#5AAFD0] disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-colors"
                     >
-                      {isSaving ? (
+                      {isSaving || isNavigating ? (
                         <>
                           <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                          Saving...
+                          {isNavigating ? 'Loading...' : 'Saving...'}
                         </>
                       ) : (
                         <>
