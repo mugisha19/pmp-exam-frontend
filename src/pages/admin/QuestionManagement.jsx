@@ -76,9 +76,10 @@ export default function QuestionManagement() {
   const [questionType, setQuestionType] = useState("");
   const [status, setStatus] = useState("");
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(100);
   const [showFilters, setShowFilters] = useState(true);
   const [expandedTopics, setExpandedTopics] = useState(new Set());
+  const [topicPages, setTopicPages] = useState({});
 
   // Selection state
   const [selectedQuestions, setSelectedQuestions] = useState([]);
@@ -144,6 +145,11 @@ export default function QuestionManagement() {
       }
       return newSet;
     });
+  };
+
+  const getTopicPage = (topicName) => topicPages[topicName] || 1;
+  const setTopicPage = (topicName, page) => {
+    setTopicPages(prev => ({ ...prev, [topicName]: page }));
   };
 
   // Selection handlers
@@ -236,9 +242,9 @@ export default function QuestionManagement() {
         key: "question_text",
         header: "Question",
         render: (_, question) => (
-          <div className="min-w-0">
+          <div className="min-w-0 max-w-md">
             <div
-              className="text-sm text-gray-900 line-clamp-2"
+              className="text-sm text-gray-900 line-clamp-2 overflow-hidden text-ellipsis"
               dangerouslySetInnerHTML={{
                 __html: question?.question_text || "",
               }}
@@ -579,6 +585,13 @@ export default function QuestionManagement() {
           <div className="space-y-4">
             {Object.entries(groupedQuestions).map(([topicName, topicQuestions]) => {
               const isExpanded = expandedTopics.has(topicName);
+              const topicPage = getTopicPage(topicName);
+              const topicPageSize = 10;
+              const startIdx = (topicPage - 1) * topicPageSize;
+              const endIdx = startIdx + topicPageSize;
+              const paginatedQuestions = topicQuestions.slice(startIdx, endIdx);
+              const totalPages = Math.ceil(topicQuestions.length / topicPageSize);
+
               return (
                 <div key={topicName} className="border border-gray-200 rounded-lg bg-white shadow-sm">
                   <button
@@ -599,19 +612,49 @@ export default function QuestionManagement() {
                     </div>
                   </button>
                   {isExpanded && (
-                    <div className="border-t border-gray-200">
-                      <DataTable
-                        data={topicQuestions}
-                        columns={columns}
-                        loading={false}
-                        rowKey="question_id"
-                        paginated={false}
-                        emptyMessage="No questions in this topic"
-                        onRowClick={(question) => {
-                          navigate(`/questions/${question.question_id}`);
-                        }}
-                      />
-                    </div>
+                    <>
+                      <div className="border-t border-gray-200">
+                        <DataTable
+                          data={paginatedQuestions}
+                          columns={columns}
+                          loading={false}
+                          rowKey="question_id"
+                          paginated={false}
+                          emptyMessage="No questions in this topic"
+                          onRowClick={(question) => {
+                            navigate(`/questions/${question.question_id}`);
+                          }}
+                        />
+                      </div>
+                      {topicQuestions.length > topicPageSize && (
+                        <div className="border-t border-gray-200 px-4 py-3 flex items-center justify-between bg-gray-50">
+                          <div className="text-sm text-gray-700">
+                            Showing {startIdx + 1} to {Math.min(endIdx, topicQuestions.length)} of {topicQuestions.length}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setTopicPage(topicName, Math.max(1, topicPage - 1))}
+                              disabled={topicPage === 1}
+                            >
+                              Previous
+                            </Button>
+                            <span className="text-sm text-gray-700">
+                              Page {topicPage} of {totalPages}
+                            </span>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setTopicPage(topicName, topicPage + 1)}
+                              disabled={topicPage >= totalPages}
+                            >
+                              Next
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
               );
@@ -624,7 +667,7 @@ export default function QuestionManagement() {
             )}
           </div>
 
-          {/* Pagination */}
+          {/* Global Pagination */}
           {totalCount > pageSize && (
             <div className="mt-6 flex items-center justify-between bg-white rounded-lg border border-gray-200 px-4 py-3">
               <div className="text-sm text-gray-700">
