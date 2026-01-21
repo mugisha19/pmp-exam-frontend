@@ -530,7 +530,6 @@ export const QuizTaking = () => {
 
     setIsSaving(true);
     
-    // Store the current answer and index before any state changes
     const currentAnswer = selectedAnswer;
     const currentIndex = currentQuestionIndexRef.current;
     const isLastQuestion = currentIndex === sessionData.questions.length - 1;
@@ -538,14 +537,10 @@ export const QuizTaking = () => {
     try {
       const currentQ = sessionData.questions[currentIndex];
       
-      // Validate that we have a valid question before saving
       if (!currentQ || !currentQ.quiz_question_id) {
         console.error("Invalid question data:", currentQ);
         return { autoPaused: false };
       }
-      
-      const perfStart = performance.now();
-      console.log('[PERF] Starting save answer request');
       
       const response = await saveAnswer(sessionToken, {
         quiz_question_id: currentQ.quiz_question_id,
@@ -554,9 +549,6 @@ export const QuizTaking = () => {
         time_spent_seconds: currentQ.time_spent_seconds || 0,
         is_flagged: currentQ.is_flagged || false,
       });
-      
-      const perfSaveAnswer = performance.now();
-      console.log(`[PERF] Save answer API call completed in ${(perfSaveAnswer - perfStart).toFixed(2)}ms`);
 
       if (response.auto_paused) {
         await loadSessionState();
@@ -564,36 +556,29 @@ export const QuizTaking = () => {
         return { autoPaused: true };
       }
 
-      // Update state optimistically - no need to fetch
-      if (sessionData) {
-        const updatedQuestions = [...sessionData.questions];
-        if (updatedQuestions[currentIndex]) {
-          updatedQuestions[currentIndex] = {
-            ...updatedQuestions[currentIndex],
-            user_answer: currentAnswer,
-            is_answered: true,
-          };
-        }
-        
-        const answeredCount = updatedQuestions.filter(q => q.is_answered).length;
-        
-        setSessionData({
-          ...sessionData,
-          questions: updatedQuestions,
-          progress: {
-            ...sessionData.progress,
-            answered_count: answeredCount,
-            unanswered_count: sessionData.progress.total_questions - answeredCount,
-          },
-        });
+      const updatedState = await getSessionState(sessionToken);
+      setSessionData(updatedState);
+      
+      if (updatedState.timing) {
+        setTimeRemaining(updatedState.timing.time_remaining_seconds);
+        setExamTimeElapsed(updatedState.timing.time_elapsed_seconds || 0);
+        setPauseTimeElapsed(updatedState.timing.pause_time_seconds || 0);
+      }
+      
+      if (updatedState.pause_info?.is_paused) {
+        setPauseTimeRemaining(updatedState.pause_info.pause_remaining_seconds);
+        setSelectedAnswer(currentAnswer);
+        return { autoPaused: true };
+      }
+
+      const updatedQ = updatedState.questions?.[currentIndex];
+      if (updatedQ) {
+        setSelectedAnswer(updatedQ.user_answer || currentAnswer);
       }
 
       if (isLastQuestion) {
         setLastQuestionAnswerSaved(true);
       }
-
-      const perfEnd = performance.now();
-      console.log(`[PERF] Total save answer operation completed in ${(perfEnd - perfStart).toFixed(2)}ms`);
 
       return { autoPaused: false };
     } catch (error) {
@@ -615,7 +600,6 @@ export const QuizTaking = () => {
         return { autoPaused: false };
       }
       
-      // Show specific error message if available
       const errorMsg = error.response?.data?.detail || "Failed to save answer";
       showToast.error("Save Failed", errorMsg);
       return { autoPaused: false };
@@ -667,14 +651,10 @@ export const QuizTaking = () => {
   };
 
   const handleNavigate = async (direction) => {
-    const perfNavStart = performance.now();
-    console.log(`[PERF] Starting navigation - direction: ${direction}`);
-    
     if (isWaitingForAutoSubmit) {
       return;
     }
 
-    // Reset show answer when navigating
     setShowAnswer(false);
 
     if (!sessionData || sessionData.pause_info?.is_paused) {
@@ -728,10 +708,7 @@ export const QuizTaking = () => {
                            selectedAnswer;
 
     if (shouldAutoSave) {
-      const perfBeforeAutoSave = performance.now();
       const saveResult = await handleSaveAnswer();
-      const perfAfterAutoSave = performance.now();
-      console.log(`[PERF] Auto-save on navigation completed in ${(perfAfterAutoSave - perfBeforeAutoSave).toFixed(2)}ms`);
       setIsAnswerModified(false);
       
       if (saveResult?.autoPaused) {
@@ -740,44 +717,83 @@ export const QuizTaking = () => {
     }
 
     if (isGoingForward && selectedAnswer) {
-      const perfBeforeSave = performance.now();
+      const saveResult = await handleSaveAnswer();
       setIsAnswerModified(false);
-      
-      // Update UI immediately for instant response
-      setCurrentQuestionIndex(newIndex);
-      currentQuestionIndexRef.current = newIndex;
-      const newQ = sessionData.questions[newIndex];
-      setSelectedAnswer(newQ?.user_answer || null);
-      
-      const isLastQuestion = newIndex === sessionData.questions.length - 1;
-      setLastQuestionAnswerSaved(isLastQuestion && newQ?.user_answer);
-      
-      // Save in background (fire and forget)
-      handleSaveAnswer().catch(err => console.error('Background save failed:', err));
-      
-      const perfAfterSave = performance.now();
-      console.log(`[PERF] UI updated instantly in ${(perfAfterSave - perfBeforeSave).toFixed(2)}ms`);
-      
-      const perfNavEnd = performance.now();
-      console.log(`[PERF] Total navigation operation completed in ${(perfNavEnd - perfNavStart).toFixed(2)}ms`);
-      return;
+
+      if (saveResult?.autoPaused) {
+        return;
+      }
+
+      const currentState = await getSessionState(sessionToken);
+      if (currentState.pause_info?.is_paused) {
+        setSessionData(currentState);
+        if (currentState.timing) {
+          setTimeRemaining(currentState.timing.time_remaining_seconds);
+        }
+        if (currentState.pause_info?.is_paused) {
+          setPauseTimeRemaining(
+            currentState.pause_info.pause_remaining_seconds
+          );
+        }
+        return;
+      }
+      setSessionData(currentState);
     }
 
     try {
-      // Check for pause/expiry without fetching full state
+      const latestState = await getSessionState(sessionToken);
+
+      if (latestState.pause_info?.is_paused) {
+        setSessionData(latestState);
+        if (latestState.timing) {
+          setTimeRemaining(latestState.timing.time_remaining_seconds);
+          setExamTimeElapsed(latestState.timing.time_elapsed_seconds || 0);
+          setPauseTimeElapsed(latestState.timing.pause_time_seconds || 0);
+        }
+        if (latestState.pause_info?.is_paused) {
+          setPauseTimeRemaining(latestState.pause_info.pause_remaining_seconds);
+        }
+        return;
+      }
+
+      if (
+        latestState.status === "expired" ||
+        latestState.status === "submitted" ||
+        latestState.status === "auto_submitted"
+      ) {
+        sessionStorage.removeItem("quiz_session_token");
+        sessionStorage.removeItem("quiz_session_data");
+        navigate(`/my-exams/${quizId}`);
+        return;
+      }
+
       if (!isWaitingForAutoSubmit) {
-        // Update UI immediately
+        await navigateToQuestion(sessionToken, newIndex + 1);
+        const updatedState = await getSessionState(sessionToken);
+        setSessionData(updatedState);
+
+        if (updatedState.timing) {
+          setTimeRemaining(updatedState.timing.time_remaining_seconds);
+          setExamTimeElapsed(updatedState.timing.time_elapsed_seconds || 0);
+          setPauseTimeElapsed(updatedState.timing.pause_time_seconds || 0);
+        }
+
         setCurrentQuestionIndex(newIndex);
         currentQuestionIndexRef.current = newIndex;
-        const newQ = sessionData.questions[newIndex];
+        const newQ = updatedState.questions[newIndex];
         setSelectedAnswer(newQ?.user_answer || null);
         setIsAnswerModified(false);
 
-        const isLastQuestion = newIndex === sessionData.questions.length - 1;
-        setLastQuestionAnswerSaved(isLastQuestion && newQ?.user_answer);
-        
-        const perfNavEnd = performance.now();
-        console.log(`[PERF] Total navigation operation completed in ${(perfNavEnd - perfNavStart).toFixed(2)}ms`);
+        const isLastQuestion = newIndex === updatedState.questions.length - 1;
+        if (!isLastQuestion) {
+          setLastQuestionAnswerSaved(false);
+        } else {
+          if (newQ?.user_answer) {
+            setLastQuestionAnswerSaved(true);
+          } else {
+            setLastQuestionAnswerSaved(false);
+          }
+        }
         return;
       }
 
