@@ -741,51 +741,32 @@ export const QuizTaking = () => {
 
     if (isGoingForward && selectedAnswer) {
       const perfBeforeSave = performance.now();
+      setIsAnswerModified(false);
       
-      // Run save and navigate in parallel
-      const [saveResult] = await Promise.all([
-        handleSaveAnswer(),
-        navigateToQuestion(sessionToken, newIndex + 1)
-      ]);
+      // Update UI immediately for instant response
+      setCurrentQuestionIndex(newIndex);
+      currentQuestionIndexRef.current = newIndex;
+      const newQ = sessionData.questions[newIndex];
+      setSelectedAnswer(newQ?.user_answer || null);
+      
+      const isLastQuestion = newIndex === sessionData.questions.length - 1;
+      setLastQuestionAnswerSaved(isLastQuestion && newQ?.user_answer);
+      
+      // Save in background (fire and forget)
+      handleSaveAnswer().catch(err => console.error('Background save failed:', err));
       
       const perfAfterSave = performance.now();
-      console.log(`[PERF] Save + Navigate (parallel) completed in ${(perfAfterSave - perfBeforeSave).toFixed(2)}ms`);
-      setIsAnswerModified(false);
-
-      if (saveResult?.autoPaused) {
-        return;
-      }
+      console.log(`[PERF] UI updated instantly in ${(perfAfterSave - perfBeforeSave).toFixed(2)}ms`);
+      
+      const perfNavEnd = performance.now();
+      console.log(`[PERF] Total navigation operation completed in ${(perfNavEnd - perfNavStart).toFixed(2)}ms`);
+      return;
     }
 
     try {
-      const latestState = await getSessionState(sessionToken);
-
-      if (latestState.pause_info?.is_paused) {
-        setSessionData(latestState);
-        if (latestState.timing) {
-          setTimeRemaining(latestState.timing.time_remaining_seconds);
-          setExamTimeElapsed(latestState.timing.time_elapsed_seconds || 0);
-          setPauseTimeElapsed(latestState.timing.pause_time_seconds || 0);
-        }
-        if (latestState.pause_info?.is_paused) {
-          setPauseTimeRemaining(latestState.pause_info.pause_remaining_seconds);
-        }
-        return;
-      }
-
-      if (
-        latestState.status === "expired" ||
-        latestState.status === "submitted" ||
-        latestState.status === "auto_submitted"
-      ) {
-        sessionStorage.removeItem("quiz_session_token");
-        sessionStorage.removeItem("quiz_session_data");
-        navigate(`/my-exams/${quizId}`);
-        return;
-      }
-
+      // Check for pause/expiry without fetching full state
       if (!isWaitingForAutoSubmit) {
-        // Update state optimistically and immediately
+        // Update UI immediately
         setCurrentQuestionIndex(newIndex);
         currentQuestionIndexRef.current = newIndex;
         const newQ = sessionData.questions[newIndex];
@@ -793,15 +774,7 @@ export const QuizTaking = () => {
         setIsAnswerModified(false);
 
         const isLastQuestion = newIndex === sessionData.questions.length - 1;
-        if (!isLastQuestion) {
-          setLastQuestionAnswerSaved(false);
-        } else {
-          if (newQ?.user_answer) {
-            setLastQuestionAnswerSaved(true);
-          } else {
-            setLastQuestionAnswerSaved(false);
-          }
-        }
+        setLastQuestionAnswerSaved(isLastQuestion && newQ?.user_answer);
         
         const perfNavEnd = performance.now();
         console.log(`[PERF] Total navigation operation completed in ${(perfNavEnd - perfNavStart).toFixed(2)}ms`);
