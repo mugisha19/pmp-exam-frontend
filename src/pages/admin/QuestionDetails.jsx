@@ -441,31 +441,6 @@ export const QuestionDetails = () => {
         </CardContent>
       </Card>
 
-      {/* Explanation - Always show */}
-      <Card className="bg-blue-50 border-blue-200">
-        <CardContent className="p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <BookOpen className="w-5 h-5 text-blue-600" />
-            <h3 className="text-lg font-semibold text-gray-900">
-              Explanation
-            </h3>
-          </div>
-          {(() => {
-            const explanation = question.explanation || getExplanation(question);
-            return explanation ? (
-              <div
-                className="prose max-w-none text-gray-800 bg-white p-4 rounded-lg border border-blue-100"
-                dangerouslySetInnerHTML={{ __html: explanation }}
-              />
-            ) : (
-              <div className="bg-white p-4 rounded-lg border border-blue-100">
-                <p className="text-gray-500 italic">No explanation provided for this question.</p>
-              </div>
-            );
-          })()}
-        </CardContent>
-      </Card>
-
       {/* Metadata */}
       {question.metadata && Object.keys(question.metadata).length > 0 && (
         <Card>
