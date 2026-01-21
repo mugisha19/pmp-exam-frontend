@@ -560,37 +560,32 @@ export const QuizTaking = () => {
 
       if (response.auto_paused) {
         await loadSessionState();
-        // Restore the answer after loading state since we're staying on the same question
         setSelectedAnswer(currentAnswer);
         return { autoPaused: true };
       }
 
-      // Get fresh state after saving
-      const perfBeforeGetState = performance.now();
-      const updatedState = await getSessionState(sessionToken);
-      const perfAfterGetState = performance.now();
-      console.log(`[PERF] Get session state after save completed in ${(perfAfterGetState - perfBeforeGetState).toFixed(2)}ms`);
-      
-      setSessionData(updatedState);
-      
-      // Update timing from fresh state
-      if (updatedState.timing) {
-        setTimeRemaining(updatedState.timing.time_remaining_seconds);
-        setExamTimeElapsed(updatedState.timing.time_elapsed_seconds || 0);
-        setPauseTimeElapsed(updatedState.timing.pause_time_seconds || 0);
-      }
-      
-      if (updatedState.pause_info?.is_paused) {
-        setPauseTimeRemaining(updatedState.pause_info.pause_remaining_seconds);
-        // Restore the answer since we're staying on the same question
-        setSelectedAnswer(currentAnswer);
-        return { autoPaused: true };
-      }
-
-      // Restore the selected answer from the updated state for current question
-      const updatedQ = updatedState.questions?.[currentIndex];
-      if (updatedQ) {
-        setSelectedAnswer(updatedQ.user_answer || currentAnswer);
+      // Update state optimistically - no need to fetch
+      if (sessionData) {
+        const updatedQuestions = [...sessionData.questions];
+        if (updatedQuestions[currentIndex]) {
+          updatedQuestions[currentIndex] = {
+            ...updatedQuestions[currentIndex],
+            user_answer: currentAnswer,
+            is_answered: true,
+          };
+        }
+        
+        const answeredCount = updatedQuestions.filter(q => q.is_answered).length;
+        
+        setSessionData({
+          ...sessionData,
+          questions: updatedQuestions,
+          progress: {
+            ...sessionData.progress,
+            answered_count: answeredCount,
+            unanswered_count: sessionData.progress.total_questions - answeredCount,
+          },
+        });
       }
 
       if (isLastQuestion) {
@@ -746,30 +741,20 @@ export const QuizTaking = () => {
 
     if (isGoingForward && selectedAnswer) {
       const perfBeforeSave = performance.now();
-      const saveResult = await handleSaveAnswer();
+      
+      // Run save and navigate in parallel
+      const [saveResult] = await Promise.all([
+        handleSaveAnswer(),
+        navigateToQuestion(sessionToken, newIndex + 1)
+      ]);
+      
       const perfAfterSave = performance.now();
-      console.log(`[PERF] Save on Next button completed in ${(perfAfterSave - perfBeforeSave).toFixed(2)}ms`);
+      console.log(`[PERF] Save + Navigate (parallel) completed in ${(perfAfterSave - perfBeforeSave).toFixed(2)}ms`);
       setIsAnswerModified(false);
 
       if (saveResult?.autoPaused) {
         return;
       }
-
-      // Get fresh state after saving
-      const currentState = await getSessionState(sessionToken);
-      if (currentState.pause_info?.is_paused) {
-        setSessionData(currentState);
-        if (currentState.timing) {
-          setTimeRemaining(currentState.timing.time_remaining_seconds);
-        }
-        if (currentState.pause_info?.is_paused) {
-          setPauseTimeRemaining(
-            currentState.pause_info.pause_remaining_seconds
-          );
-        }
-        return;
-      }
-      setSessionData(currentState);
     }
 
     try {
@@ -800,34 +785,14 @@ export const QuizTaking = () => {
       }
 
       if (!isWaitingForAutoSubmit) {
-        const perfBeforeNavigate = performance.now();
-        await navigateToQuestion(sessionToken, newIndex + 1);
-        const perfAfterNavigate = performance.now();
-        console.log(`[PERF] Navigate to question API call completed in ${(perfAfterNavigate - perfBeforeNavigate).toFixed(2)}ms`);
-        
-        // Get fresh state after navigation
-        const perfBeforeGetState = performance.now();
-        const updatedState = await getSessionState(sessionToken);
-        const perfAfterGetState = performance.now();
-        console.log(`[PERF] Get session state after navigation completed in ${(perfAfterGetState - perfBeforeGetState).toFixed(2)}ms`);
-        
-        setSessionData(updatedState);
-
-        // Update timing from fresh state
-        if (updatedState.timing) {
-          setTimeRemaining(updatedState.timing.time_remaining_seconds);
-          setExamTimeElapsed(updatedState.timing.time_elapsed_seconds || 0);
-          setPauseTimeElapsed(updatedState.timing.pause_time_seconds || 0);
-        }
-
-        // Set the selected answer and current index from the updated state
+        // Update state optimistically and immediately
         setCurrentQuestionIndex(newIndex);
         currentQuestionIndexRef.current = newIndex;
-        const newQ = updatedState.questions[newIndex];
+        const newQ = sessionData.questions[newIndex];
         setSelectedAnswer(newQ?.user_answer || null);
         setIsAnswerModified(false);
 
-        const isLastQuestion = newIndex === updatedState.questions.length - 1;
+        const isLastQuestion = newIndex === sessionData.questions.length - 1;
         if (!isLastQuestion) {
           setLastQuestionAnswerSaved(false);
         } else {
