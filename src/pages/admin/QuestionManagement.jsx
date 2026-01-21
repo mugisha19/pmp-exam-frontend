@@ -76,7 +76,7 @@ export default function QuestionManagement() {
   const [questionType, setQuestionType] = useState("");
   const [status, setStatus] = useState("");
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(5);
+  const [pageSize, setPageSize] = useState(10);
   const [showFilters, setShowFilters] = useState(true);
   const [expandedTopics, setExpandedTopics] = useState(new Set());
 
@@ -575,53 +575,85 @@ export default function QuestionManagement() {
       {isLoading ? (
         <div className="text-center py-8">Loading...</div>
       ) : (
-        <div className="space-y-4">
-          {Object.entries(groupedQuestions).map(([topicName, topicQuestions]) => {
-            const isExpanded = expandedTopics.has(topicName);
-            return (
-              <div key={topicName} className="border border-gray-200 rounded-lg bg-white shadow-sm">
-                <button
-                  onClick={() => toggleTopic(topicName)}
-                  className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    {isExpanded ? (
-                      <ChevronDown className="w-5 h-5 text-gray-500" />
-                    ) : (
-                      <ChevronRight className="w-5 h-5 text-gray-500" />
-                    )}
-                    <BookOpen className="w-5 h-5 text-blue-600" />
-                    <span className="font-semibold text-gray-900">{topicName}</span>
-                    <Badge variant="default" size="sm">
-                      {topicQuestions.length} {topicQuestions.length === 1 ? 'question' : 'questions'}
-                    </Badge>
-                  </div>
-                </button>
-                {isExpanded && (
-                  <div className="border-t border-gray-200">
-                    <DataTable
-                      data={topicQuestions}
-                      columns={columns}
-                      loading={false}
-                      rowKey="question_id"
-                      paginated={false}
-                      emptyMessage="No questions in this topic"
-                      onRowClick={(question) => {
-                        navigate(`/questions/${question.question_id}`);
-                      }}
-                    />
-                  </div>
-                )}
+        <>
+          <div className="space-y-4">
+            {Object.entries(groupedQuestions).map(([topicName, topicQuestions]) => {
+              const isExpanded = expandedTopics.has(topicName);
+              return (
+                <div key={topicName} className="border border-gray-200 rounded-lg bg-white shadow-sm">
+                  <button
+                    onClick={() => toggleTopic(topicName)}
+                    className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      {isExpanded ? (
+                        <ChevronDown className="w-5 h-5 text-gray-500" />
+                      ) : (
+                        <ChevronRight className="w-5 h-5 text-gray-500" />
+                      )}
+                      <BookOpen className="w-5 h-5 text-blue-600" />
+                      <span className="font-semibold text-gray-900">{topicName}</span>
+                      <Badge variant="default" size="sm">
+                        {topicQuestions.length} {topicQuestions.length === 1 ? 'question' : 'questions'}
+                      </Badge>
+                    </div>
+                  </button>
+                  {isExpanded && (
+                    <div className="border-t border-gray-200">
+                      <DataTable
+                        data={topicQuestions}
+                        columns={columns}
+                        loading={false}
+                        rowKey="question_id"
+                        paginated={false}
+                        emptyMessage="No questions in this topic"
+                        onRowClick={(question) => {
+                          navigate(`/questions/${question.question_id}`);
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+            {Object.keys(groupedQuestions).length === 0 && (
+              <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
+                <FileQuestion className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                <p className="text-gray-500">No questions found. Create your first question to get started.</p>
               </div>
-            );
-          })}
-          {Object.keys(groupedQuestions).length === 0 && (
-            <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
-              <FileQuestion className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500">No questions found. Create your first question to get started.</p>
+            )}
+          </div>
+
+          {/* Pagination */}
+          {totalCount > pageSize && (
+            <div className="mt-6 flex items-center justify-between bg-white rounded-lg border border-gray-200 px-4 py-3">
+              <div className="text-sm text-gray-700">
+                Showing {Math.min((page - 1) * pageSize + 1, totalCount)} to {Math.min(page * pageSize, totalCount)} of {totalCount} questions
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                >
+                  Previous
+                </Button>
+                <span className="text-sm text-gray-700">
+                  Page {page} of {Math.ceil(totalCount / pageSize)}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage(p => p + 1)}
+                  disabled={page >= Math.ceil(totalCount / pageSize)}
+                >
+                  Next
+                </Button>
+              </div>
             </div>
           )}
-        </div>
+        </>
       )}
 
       {/* Create Question Modal */}
