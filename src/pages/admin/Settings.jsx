@@ -104,7 +104,6 @@ export function Settings() {
   const onProfileSubmit = async (data) => {
     try {
       await updateProfileMutation.mutateAsync(data);
-      toast.success("Profile updated successfully");
     } catch (error) {
       toast.error(error.message || "Failed to update profile");
     }
@@ -121,7 +120,6 @@ export function Settings() {
       // Update password_changed_at in global state
       updateUser({ password_changed_at: new Date().toISOString() });
 
-      toast.success("Password changed successfully");
       resetPasswordForm();
       setShowPasswordForm(false);
     } catch (error) {

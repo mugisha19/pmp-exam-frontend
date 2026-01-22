@@ -181,7 +181,6 @@ export function Profile() {
       }
 
       await updateProfileMutation.mutateAsync(updateData);
-      toast.success("Profile updated successfully!");
       setIsEditing(false);
       setAvatarPreview(null);
       setSelectedFile(null);
