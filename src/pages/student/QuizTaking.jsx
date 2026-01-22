@@ -246,6 +246,7 @@ export const QuizTaking = () => {
   // Exam timer countdown
   useEffect(() => {
     if (!sessionData || !sessionData.timing?.has_time_limit) return;
+    if (sessionData.quiz_mode !== "exam") return; // Only auto-submit in exam mode
     if (sessionData.pause_info?.is_paused) return;
     if (timeRemaining === null || timeRemaining <= 0) {
       if (timeRemaining === 0 && !isWaitingForAutoSubmit) {
@@ -372,8 +373,12 @@ export const QuizTaking = () => {
           return;
         }
 
+        // Only trigger auto-submit for exam mode when time runs out
+        // Practice mode has null time_remaining_seconds
         if (
+          sessionData?.quiz_mode === "exam" &&
           response.time_remaining_seconds !== undefined &&
+          response.time_remaining_seconds !== null &&
           response.time_remaining_seconds <= 0
         ) {
           setIsWaitingForAutoSubmit(true);
