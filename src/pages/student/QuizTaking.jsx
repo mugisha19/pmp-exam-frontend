@@ -171,16 +171,12 @@ export const QuizTaking = () => {
           }
         }
 
+        // Navigate to next unanswered on initial load only
         if (!state.pause_info?.is_paused && state.status !== "expired") {
-          try {
-            await navigateToQuestion(sessionToken, qIndex + 1);
-          } catch (error) {
-            console.error("Failed to navigate to next unanswered:", error);
-          }
+          // Just update local state, no API call needed
+          setCurrentQuestionIndex(qIndex);
+          currentQuestionIndexRef.current = qIndex;
         }
-
-        setCurrentQuestionIndex(qIndex);
-        currentQuestionIndexRef.current = qIndex;
         const updatedQ = state.questions?.[qIndex];
         setSelectedAnswer(updatedQ?.user_answer || null);
       }
@@ -772,37 +768,7 @@ export const QuizTaking = () => {
         return;
       }
 
-      if (!isWaitingForAutoSubmit) {
-        await navigateToQuestion(sessionToken, newIndex + 1);
-        const updatedState = await getSessionState(sessionToken);
-        setSessionData(updatedState);
-
-        if (updatedState.timing) {
-          setTimeRemaining(updatedState.timing.time_remaining_seconds);
-          setExamTimeElapsed(updatedState.timing.time_elapsed_seconds || 0);
-          setPauseTimeElapsed(updatedState.timing.pause_time_seconds || 0);
-        }
-
-        setCurrentQuestionIndex(newIndex);
-        currentQuestionIndexRef.current = newIndex;
-        const newQ = updatedState.questions[newIndex];
-        setSelectedAnswer(newQ?.user_answer || null);
-        setIsAnswerModified(false);
-
-        const isLastQuestion = newIndex === updatedState.questions.length - 1;
-        if (!isLastQuestion) {
-          setLastQuestionAnswerSaved(false);
-        } else {
-          if (newQ?.user_answer) {
-            setLastQuestionAnswerSaved(true);
-          } else {
-            setLastQuestionAnswerSaved(false);
-          }
-        }
-        setIsNavigating(false);
-        return;
-      }
-
+      // Navigate locally without API call - all questions already cached
       setCurrentQuestionIndex(newIndex);
       currentQuestionIndexRef.current = newIndex;
       const newQ = sessionData.questions[newIndex];
@@ -933,13 +899,9 @@ export const QuizTaking = () => {
           }
         }
         
-        // Navigate to the next question if different from current
+        // Navigate to next question after resume
         if (nextIndex !== currentIndex) {
-          try {
-            await navigateToQuestion(sessionToken, nextIndex + 1);
-          } catch (error) {
-            console.error("Failed to navigate after resume:", error);
-          }
+          // Just update local state, no API call needed
           setCurrentQuestionIndex(nextIndex);
           currentQuestionIndexRef.current = nextIndex;
         }
