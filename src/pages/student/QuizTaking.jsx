@@ -110,16 +110,18 @@ export const QuizTaking = () => {
     try {
       const state = await getSessionState(sessionToken);
 
-      // Handle submitted/auto-submitted sessions
-      if (state.status === "submitted" || state.status === "auto_submitted") {
+      // Handle submitted/auto-submitted sessions (case-insensitive)
+      const status = state.status?.toLowerCase();
+      if (status === "submitted" || status === "auto_submitted") {
         isQuizSubmittedRef.current = true;
         sessionStorage.removeItem("quiz_session_token");
         sessionStorage.removeItem("quiz_session_data");
+        setIsWaitingForAutoSubmit(false);
 
         // Try to show feedback modal if we have an attempt_id
         const attemptId = state.result?.attempt_id || state.attempt_id;
         if (attemptId) {
-          if (state.status === "auto_submitted") {
+          if (status === "auto_submitted") {
             showToast.info("Time's up!", "Quiz was auto-submitted.");
           }
           setSubmittedAttemptId(attemptId);
@@ -128,7 +130,7 @@ export const QuizTaking = () => {
         }
 
         // No attempt_id, navigate to quiz detail
-        if (state.status === "auto_submitted") {
+        if (status === "auto_submitted") {
           showToast.info("Time's up!", "Quiz was auto-submitted.");
         } else {
           showToast.info(
@@ -350,10 +352,9 @@ export const QuizTaking = () => {
           await loadSessionState();
         }
 
-        if (
-          response.status === "auto_submitted" ||
-          response.status === "expired"
-        ) {
+        // Check for submitted status (case-insensitive)
+        const status = response.status?.toLowerCase();
+        if (status === "auto_submitted" || status === "submitted" || status === "expired") {
           // Mark as submitted to prevent other effects from running
           isQuizSubmittedRef.current = true;
           clearInterval(heartbeat);
@@ -363,8 +364,10 @@ export const QuizTaking = () => {
           showToast.info("Time's up!", "Quiz was auto-submitted.");
 
           // Try to get attempt_id from the response
-          if (response.attempt_id) {
-            setSubmittedAttemptId(response.attempt_id);
+          const attemptId = response.result?.attempt_id || response.attempt_id;
+          if (attemptId) {
+            setSubmittedAttemptId(attemptId);
+            setIsWaitingForAutoSubmit(false);
             setShowFeedbackModal(true);
           } else {
             // Set waiting for auto-submit to trigger polling which should get the attempt_id
@@ -400,15 +403,22 @@ export const QuizTaking = () => {
     let pollCount = 0;
     const maxPolls = 30; // Maximum 60 seconds (30 * 2s)
 
+    console.log("Starting auto-submit poll...");
+
     const pollInterval = setInterval(async () => {
       if (isQuizSubmittedRef.current) {
+        console.log("Quiz already submitted, clearing poll");
         clearInterval(pollInterval);
         return;
       }
 
       pollCount++;
+      console.log(`Auto-submit poll #${pollCount}`);
+      
       if (pollCount > maxPolls) {
+        console.log("Max polls reached, timing out");
         clearInterval(pollInterval);
+        setIsWaitingForAutoSubmit(false);
         sessionStorage.removeItem("quiz_session_token");
         sessionStorage.removeItem("quiz_session_data");
         showToast.error("Timeout", "Quiz submission took too long. Redirecting...");
@@ -418,9 +428,14 @@ export const QuizTaking = () => {
 
       try {
         const state = await getSessionState(sessionToken);
+        console.log(`Poll response: status=${state.status}, attempt_id=${state.result?.attempt_id || state.attempt_id}`);
 
-        if (state.status === "auto_submitted" || state.status === "submitted") {
+        // Check for submitted/auto_submitted status (case-insensitive)
+        const status = state.status?.toLowerCase();
+        if (status === "auto_submitted" || status === "submitted") {
+          console.log("Quiz auto-submitted successfully!");
           isQuizSubmittedRef.current = true;
+          clearInterval(pollInterval);
 
           sessionStorage.removeItem("quiz_session_token");
           sessionStorage.removeItem("quiz_session_data");
@@ -444,53 +459,72 @@ export const QuizTaking = () => {
           const attemptId = state.result?.attempt_id || state.attempt_id;
 
           if (attemptId) {
+            console.log(`Got attempt_id: ${attemptId}, showing feedback modal`);
             setSubmittedAttemptId(attemptId);
             setIsWaitingForAutoSubmit(false);
             setShowFeedbackModal(true);
-            clearInterval(pollInterval);
           } else {
-            // Even without attempt_id, navigate to quiz detail
-            // User can provide feedback from there if needed
-            clearInterval(pollInterval);
+            console.log("No attempt_id, navigating to quiz detail");
+            setIsWaitingForAutoSubmit(false);
             navigate(`/my-exams/${quizId}`);
           }
           return;
         }
 
-        if (state.status === "expired" || !state.session_id) {
+        // Check for expired status
+        if (status === "expired" || !state.session_id) {
+          console.log("Session expired or no session_id");
           isQuizSubmittedRef.current = true;
           clearInterval(pollInterval);
           sessionStorage.removeItem("quiz_session_token");
           sessionStorage.removeItem("quiz_session_data");
           showToast.error("Session Expired", "Quiz was auto-submitted.");
 
-          // Try to get attempt_id even from expired state
           const attemptId = state.result?.attempt_id || state.attempt_id;
           if (attemptId) {
             setSubmittedAttemptId(attemptId);
             setIsWaitingForAutoSubmit(false);
             setShowFeedbackModal(true);
           } else {
+            setIsWaitingForAutoSubmit(false);
             navigate(`/my-exams/${quizId}`);
           }
           return;
         }
+        
+        // If backend still shows active/paused, keep waiting
+        console.log(`Poll ${pollCount}: status=${state.status}, time_remaining=${state.timing?.time_remaining_seconds}`);
       } catch (error) {
+        console.error("Poll error:", error);
         if (error.response?.status === 404 || error.response?.status === 410) {
+          console.log("Got 404/410, session was submitted");
           isQuizSubmittedRef.current = true;
           clearInterval(pollInterval);
           sessionStorage.removeItem("quiz_session_token");
           sessionStorage.removeItem("quiz_session_data");
           showToast.info("Time's up!", "Quiz was auto-submitted.");
-          // For 404/410 errors, we don't have the attempt_id, so navigate
+          setIsWaitingForAutoSubmit(false);
           navigate(`/my-exams/${quizId}`);
         } else {
           console.error("Failed to poll session status:", error);
+          // On repeated errors, also exit after some time
+          if (pollCount >= 10 && error.response?.status >= 500) {
+            console.log("Too many server errors, giving up");
+            clearInterval(pollInterval);
+            setIsWaitingForAutoSubmit(false);
+            sessionStorage.removeItem("quiz_session_token");
+            sessionStorage.removeItem("quiz_session_data");
+            showToast.error("Server Error", "Could not complete submission. Please check your results.");
+            navigate(`/my-exams/${quizId}`);
+          }
         }
       }
     }, 2000);
 
-    return () => clearInterval(pollInterval);
+    return () => {
+      console.log("Cleaning up poll interval");
+      clearInterval(pollInterval);
+    };
   }, [isWaitingForAutoSubmit, sessionToken, quizId, navigate, queryClient]);
 
   const handleAnswerChange = (answer) => {
