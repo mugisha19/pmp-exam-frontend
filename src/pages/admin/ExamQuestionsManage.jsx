@@ -25,6 +25,7 @@ import {
 import { toast } from "react-hot-toast";
 import { Spinner } from "@/components/ui";
 import { PageHeader } from "@/components/shared/PageHeader";
+import { RichTextEditor } from "@/components/ui/RichTextEditor";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
@@ -47,6 +48,7 @@ export default function ExamQuestionsManage() {
   const [deleteDialog, setDeleteDialog] = useState({ isOpen: false, question: null });
   const [editDialog, setEditDialog] = useState({ isOpen: false, question: null });
   const [editUnlocked, setEditUnlocked] = useState(false);
+  const [questionText, setQuestionText] = useState("");
   const [addDialog, setAddDialog] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
@@ -154,6 +156,7 @@ export default function ExamQuestionsManage() {
   const handleEdit = (question) => {
     setEditDialog({ isOpen: true, question });
     setEditUnlocked(false);
+    setQuestionText(question.question_text || "");
   };
 
   const handleUpdateQuestion = (e) => {
@@ -256,7 +259,7 @@ export default function ExamQuestionsManage() {
     }
     
     const data = {
-      question_text: formData.get("question_text"),
+      question_text: questionText,
       image_url: formData.get("image_url") || null,
       difficulty: formData.get("difficulty"),
       topic_id: formData.get("topic_id"),
@@ -457,7 +460,7 @@ export default function ExamQuestionsManage() {
                       #{(page - 1) * pageSize + idx + 1}
                     </span>
                     <div className="flex-1">
-                      <p className="text-gray-900 mb-2">{q.question_text}</p>
+                      <div className="text-gray-900 mb-2 prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: q.question_text }} />
                       <div className="flex gap-2">
                         <Badge variant="default" size="sm">
                           {q.question_type}
@@ -538,7 +541,7 @@ export default function ExamQuestionsManage() {
 
       {/* Add Question Dialog */}
       {addDialog && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-gray-900/40 backdrop-blur-md flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
             <div className="p-6 border-b">
               <div className="flex items-center justify-between">
@@ -648,7 +651,7 @@ export default function ExamQuestionsManage() {
                             )}
                           </button>
                           <div className="flex-1">
-                            <p className="text-sm text-gray-900 mb-2">{q.question_text}</p>
+                            <div className="text-sm text-gray-900 mb-2 prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: q.question_text }} />
                             <div className="flex gap-2">
                               <Badge variant="default" size="sm">
                                 {q.question_type}
@@ -738,7 +741,7 @@ export default function ExamQuestionsManage() {
 
       {/* Edit Question Dialog */}
       {editDialog.isOpen && editDialog.question && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-gray-900/40 backdrop-blur-md flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
             <div className="p-6 border-b">
               <div className="flex items-center justify-between">
@@ -758,12 +761,10 @@ export default function ExamQuestionsManage() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Question Text
                   </label>
-                  <textarea
-                    name="question_text"
-                    defaultValue={editDialog.question.question_text}
-                    rows={4}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    required
+                  <RichTextEditor
+                    value={questionText}
+                    onChange={setQuestionText}
+                    placeholder="Enter question text..."
                   />
                 </div>
 
