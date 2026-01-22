@@ -517,9 +517,9 @@ export const QuizDetail = () => {
                         <div className="flex flex-wrap gap-3">
                           <button
                             onClick={() => {
-                              const sessionToken =
-                                sessionStorage.getItem("quiz_session_token");
-                              if (sessionToken) {
+                              if (activeQuizError.session_token) {
+                                // Store the token and navigate
+                                sessionStorage.setItem("quiz_session_token", activeQuizError.session_token);
                                 navigate(
                                   `/my-exams/${activeQuizError.quiz_id}/take`
                                 );
@@ -536,11 +536,9 @@ export const QuizDetail = () => {
                           </button>
                           <button
                             onClick={async () => {
-                              const sessionToken =
-                                sessionStorage.getItem("quiz_session_token");
-                              if (sessionToken) {
+                              if (activeQuizError.session_token) {
                                 try {
-                                  await abandonQuiz(sessionToken);
+                                  await abandonQuiz(activeQuizError.session_token);
                                   sessionStorage.removeItem(
                                     "quiz_session_token"
                                   );
