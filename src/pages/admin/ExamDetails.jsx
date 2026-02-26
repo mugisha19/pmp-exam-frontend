@@ -26,6 +26,8 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  MessageSquare,
+  Star,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useAuthStore } from "@/stores/auth.store";
@@ -48,6 +50,7 @@ import {
   getQuizTopics,
   getFailedQuestions,
 } from "@/services/quiz.service";
+import { getQuizFeedback } from "@/services/feedback.service";
 
 const formatDate = (dateStr) => {
   if (!dateStr) return "N/A";
@@ -162,6 +165,12 @@ export default function ExamDetails() {
     queryKey: ["exam-topics", examId],
     queryFn: () => getQuizTopics(examId),
     enabled: !!examId && activeTab === "questions",
+  });
+
+  const { data: feedbackData, isLoading: loadingFeedback } = useQuery({
+    queryKey: ["exam-feedback", examId],
+    queryFn: () => getQuizFeedback(examId, { limit: 100 }),
+    enabled: !!examId && activeTab === "feedback",
   });
 
   const questionCount = questions?.total || 0;
@@ -355,7 +364,7 @@ export default function ExamDetails() {
           size="sm"
           onClick={(e) => {
             e.stopPropagation();
-            navigate(`/admin/exams/${examId}/attempt/${attempt.attempt_id}`);
+            navigate(`/exams/${examId}/attempt/${attempt.attempt_id}`);
           }}
         >
           Review
@@ -366,7 +375,7 @@ export default function ExamDetails() {
 
   // Add onRowClick to navigate to attempt details
   const handleAttemptRowClick = (attempt) => {
-    navigate(`/admin/exams/${examId}/attempt/${attempt.attempt_id}`);
+    navigate(`/exams/${examId}/attempt/${attempt.attempt_id}`);
   };
 
   if (loadingExam) {
@@ -395,6 +404,7 @@ export default function ExamDetails() {
     { id: "questions", label: "Questions", icon: Target },
     { id: "leaderboard", label: "Leaderboard", icon: Award },
     { id: "attempts", label: "All Attempts", icon: Users },
+    { id: "feedback", label: "Feedback", icon: MessageSquare },
   ];
 
   const handleStatusSelect = (newStatus) => {
@@ -956,6 +966,65 @@ export default function ExamDetails() {
               icon={Users}
               title="No attempts yet"
               description="No students have attempted this exam yet"
+            />
+          )}
+        </Card>
+      )}
+
+      {activeTab === "feedback" && (
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            Student Feedback
+          </h3>
+          {loadingFeedback ? (
+            <Spinner />
+          ) : feedbackData?.feedbacks?.length > 0 ? (
+            <div className="space-y-4">
+              {feedbackData.feedbacks.map((feedback) => (
+                <div
+                  key={feedback.feedback_id}
+                  className="p-5 bg-white border border-gray-200 rounded-lg"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+                      <Users className="w-5 h-5 text-gray-500" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className="font-medium text-gray-900">
+                          {feedback.user_name || "Anonymous"}
+                        </span>
+                        <div className="flex items-center gap-1">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              className={`w-4 h-4 ${
+                                i < feedback.rating
+                                  ? "fill-yellow-400 text-yellow-400"
+                                  : "text-gray-300"
+                              }`}
+                            />
+                          ))}
+                        </div>
+                        <span className="text-sm text-gray-500">
+                          {new Date(feedback.created_at).toLocaleDateString()}
+                        </span>
+                      </div>
+                      {feedback.comment && (
+                        <p className="text-gray-600 text-sm">
+                          {feedback.comment}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <EmptyState
+              icon={MessageSquare}
+              title="No feedback yet"
+              description="Student feedback will appear here after they complete the exam"
             />
           )}
         </Card>

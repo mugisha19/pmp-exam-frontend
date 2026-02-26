@@ -3,7 +3,7 @@ export { default as Home } from "./Home";
 export { Groups } from "./Groups";
 export { GroupDetail } from "./GroupDetail";
 export { MyExams } from "./MyExams";
-export { QuizDetail } from "./QuizDetail";
+export { default as QuizDetail } from "./QuizDetail";
 export { default as QuizTaking } from "./QuizTaking";
 export { default as AttemptReview } from "./AttemptReview";
 export { default as Profile } from "./Profile";

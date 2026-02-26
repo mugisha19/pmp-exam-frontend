@@ -13,6 +13,17 @@ export const submitFeedback = async (attemptId, rating, comment) => {
   return response.data;
 };
 
+export const getQuizFeedback = async (quizId, params = {}) => {
+  const response = await api.get("/feedback/admin/feedbacks", {
+    params: {
+      quiz_id: quizId,
+      ...params,
+    },
+  });
+  return response.data;
+};
+
 export default {
   submitFeedback,
+  getQuizFeedback,
 };

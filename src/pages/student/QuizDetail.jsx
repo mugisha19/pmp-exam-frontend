@@ -12,6 +12,7 @@ import {
   checkNetworkStatus,
   abandonQuiz,
 } from "@/services/session.service";
+import { getQuizFeedback } from "@/services/feedback.service";
 import toast from "react-hot-toast";
 import { QuizModeModal } from "@/components/features/quizzes/QuizModeModal";
 import {
@@ -36,10 +37,12 @@ import {
   Info,
   Shield,
   RefreshCw,
+  MessageSquare,
+  Star,
 } from "lucide-react";
 import { cn } from "@/utils/cn";
 
-export const QuizDetail = () => {
+const QuizDetail = () => {
   const { quizId } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = React.useState("overview");
@@ -74,6 +77,14 @@ export const QuizDetail = () => {
     refetchOnMount: true,
     refetchOnWindowFocus: true,
     staleTime: 0,
+  });
+
+  // Fetch feedback for this quiz
+  const { data: feedbackData, isLoading: loadingFeedback } = useQuery({
+    queryKey: ["quiz-feedback", quizId],
+    queryFn: () => getQuizFeedback(quizId, { limit: 100 }),
+    enabled: !!quizId && activeTab === "feedback",
+    refetchOnMount: true,
   });
 
   const handleStartQuiz = () => {
@@ -492,6 +503,23 @@ export const QuizDetail = () => {
                   </span>
                 )}
               </button>
+              <button
+                onClick={() => setActiveTab("feedback")}
+                className={cn(
+                  "flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors",
+                  activeTab === "feedback"
+                    ? "border-[#FF5100] text-[#FF5100]"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                )}
+              >
+                <MessageSquare className="w-4 h-4" />
+                Feedback
+                {feedbackData?.feedbacks?.length > 0 && (
+                  <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full text-xs font-semibold">
+                    {feedbackData.feedbacks.length}
+                  </span>
+                )}
+              </button>
             </div>
 
             {/* Tab Content */}
@@ -802,6 +830,74 @@ export const QuizDetail = () => {
                         </div>
                       );
                     })}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {activeTab === "feedback" && (
+              <div>
+                {loadingFeedback ? (
+                  <div className="flex items-center justify-center py-16">
+                    <div className="flex flex-col items-center gap-4">
+                      <div className="w-10 h-10 border-4 border-[rgba(255,81,0,0.2)] border-t-[#FF5100] rounded-full animate-spin" />
+                      <p className="text-sm text-gray-500">
+                        Loading feedback...
+                      </p>
+                    </div>
+                  </div>
+                ) : !feedbackData?.feedbacks || feedbackData.feedbacks.length === 0 ? (
+                  <div className="text-center py-16 bg-gray-50 rounded-lg border border-gray-200">
+                    <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      No feedback yet
+                    </h3>
+                    <p className="text-gray-600">
+                      Feedback from students will appear here
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {feedbackData.feedbacks.map((feedback) => (
+                      <div
+                        key={feedback.feedback_id}
+                        className="bg-white border border-gray-200 rounded-lg p-5"
+                      >
+                        <div className="flex items-start gap-4">
+                          <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+                            <User className="w-5 h-5 text-gray-500" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-3 mb-2">
+                              <span className="font-medium text-gray-900">
+                                {feedback.user_name || "Anonymous"}
+                              </span>
+                              <div className="flex items-center gap-1">
+                                {[...Array(5)].map((_, i) => (
+                                  <Star
+                                    key={i}
+                                    className={cn(
+                                      "w-4 h-4",
+                                      i < feedback.rating
+                                        ? "fill-yellow-400 text-yellow-400"
+                                        : "text-gray-300"
+                                    )}
+                                  />
+                                ))}
+                              </div>
+                              <span className="text-sm text-gray-500">
+                                {new Date(feedback.created_at).toLocaleDateString()}
+                              </span>
+                            </div>
+                            {feedback.comment && (
+                              <p className="text-gray-600 text-sm">
+                                {feedback.comment}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
