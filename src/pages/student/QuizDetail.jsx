@@ -177,28 +177,25 @@ export const QuizDetail = () => {
     : null;
 
   const canStartQuiz = () => {
-    if (typeof quiz.is_available === "boolean") {
-      return (
-        quiz.is_available &&
-        quiz.status !== "cancelled" &&
-        quiz.status !== "completed"
-      );
+    // First check status
+    if (quiz.status === "cancelled" || quiz.status === "completed") {
+      return false;
     }
 
+    // If backend provides is_available, trust it
+    if (typeof quiz.is_available === "boolean") {
+      return quiz.is_available;
+    }
+
+    // Fallback: check schedule manually (shouldn't reach here)
     if (quiz.scheduling_enabled && quiz.starts_at && quiz.ends_at) {
       const now = new Date();
       const startDate = new Date(quiz.starts_at);
       const endDate = new Date(quiz.ends_at);
-
-      return (
-        quiz.status !== "cancelled" &&
-        quiz.status !== "completed" &&
-        now >= startDate &&
-        now <= endDate
-      );
+      return now >= startDate && now <= endDate;
     }
 
-    return quiz.status === "active" && quiz.status !== "cancelled";
+    return quiz.status === "active";
   };
 
   const canRetake =
