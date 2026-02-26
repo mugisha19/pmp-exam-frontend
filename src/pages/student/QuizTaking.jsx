@@ -2031,7 +2031,7 @@ export const QuizTaking = () => {
                               <div className="mt-3 pt-3 border-t border-[rgba(110,193,228,0.3)]">
                                 <p className="text-sm font-semibold text-[#5AAFD0] mb-2">
                                   Explanations:
-                                </p>
+                               </p>
                                 {currentQ.options.correct_matches
                                   .filter((pair) => pair.explanation)
                                   .map((pair, idx) => {

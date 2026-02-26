@@ -28,6 +28,8 @@ import {
   Bell,
   Lock,
   LogOut,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -80,6 +82,9 @@ export function Profile() {
   const [isEditing, setIsEditing] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [isPasswordLoading, setIsPasswordLoading] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const fileInputRef = useRef(null);
@@ -517,17 +522,26 @@ export function Profile() {
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Current Password
                       </label>
-                      <input
-                        {...registerPassword("current_password")}
-                        type="password"
-                        placeholder="Enter current password"
-                        className={cn(
-                          "w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-[rgba(255,81,0,0.2)] focus:border-[#FF5100] outline-none transition-all",
-                          passwordErrors.current_password
-                            ? "border-red-300 focus:border-red-500 focus:ring-red-500/20"
-                            : "border-gray-300"
-                        )}
-                      />
+                      <div className="relative">
+                        <input
+                          {...registerPassword("current_password")}
+                          type={showCurrentPassword ? "text" : "password"}
+                          placeholder="Enter current password"
+                          className={cn(
+                            "w-full px-4 py-2.5 pr-12 border rounded-lg focus:ring-2 focus:ring-[rgba(255,81,0,0.2)] focus:border-[#FF5100] outline-none transition-all",
+                            passwordErrors.current_password
+                              ? "border-red-300 focus:border-red-500 focus:ring-red-500/20"
+                              : "border-gray-300"
+                          )}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        >
+                          {showCurrentPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                        </button>
+                      </div>
                       {passwordErrors.current_password && (
                         <p className="mt-1 text-sm text-red-600">
                           {passwordErrors.current_password.message}
@@ -539,17 +553,26 @@ export function Profile() {
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         New Password
                       </label>
-                      <input
-                        {...registerPassword("new_password")}
-                        type="password"
-                        placeholder="Enter new password"
-                        className={cn(
-                          "w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-[rgba(255,81,0,0.2)] focus:border-[#FF5100] outline-none transition-all",
-                          passwordErrors.new_password
-                            ? "border-red-300 focus:border-red-500 focus:ring-red-500/20"
-                            : "border-gray-300"
-                        )}
-                      />
+                      <div className="relative">
+                        <input
+                          {...registerPassword("new_password")}
+                          type={showNewPassword ? "text" : "password"}
+                          placeholder="Enter new password"
+                          className={cn(
+                            "w-full px-4 py-2.5 pr-12 border rounded-lg focus:ring-2 focus:ring-[rgba(255,81,0,0.2)] focus:border-[#FF5100] outline-none transition-all",
+                            passwordErrors.new_password
+                              ? "border-red-300 focus:border-red-500 focus:ring-red-500/20"
+                              : "border-gray-300"
+                          )}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowNewPassword(!showNewPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        >
+                          {showNewPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                        </button>
+                      </div>
                       {passwordErrors.new_password && (
                         <p className="mt-1 text-sm text-red-600">
                           {passwordErrors.new_password.message}
@@ -561,17 +584,26 @@ export function Profile() {
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Confirm New Password
                       </label>
-                      <input
-                        {...registerPassword("confirm_password")}
-                        type="password"
-                        placeholder="Confirm new password"
-                        className={cn(
-                          "w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-[rgba(255,81,0,0.2)] focus:border-[#FF5100] outline-none transition-all",
-                          passwordErrors.confirm_password
-                            ? "border-red-300 focus:border-red-500 focus:ring-red-500/20"
-                            : "border-gray-300"
-                        )}
-                      />
+                      <div className="relative">
+                        <input
+                          {...registerPassword("confirm_password")}
+                          type={showConfirmPassword ? "text" : "password"}
+                          placeholder="Confirm new password"
+                          className={cn(
+                            "w-full px-4 py-2.5 pr-12 border rounded-lg focus:ring-2 focus:ring-[rgba(255,81,0,0.2)] focus:border-[#FF5100] outline-none transition-all",
+                            passwordErrors.confirm_password
+                              ? "border-red-300 focus:border-red-500 focus:ring-red-500/20"
+                              : "border-gray-300"
+                          )}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        >
+                          {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                        </button>
+                      </div>
                       {passwordErrors.confirm_password && (
                         <p className="mt-1 text-sm text-red-600">
                           {passwordErrors.confirm_password.message}
