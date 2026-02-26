@@ -1,8 +1,3 @@
-/**
- * OAuthCallback Page
- * Handle OAuth callback and complete sign in
- */
-
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Spinner } from "@/components/ui";
