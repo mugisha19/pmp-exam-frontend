@@ -57,7 +57,6 @@ export const AddMemberModal = ({ isOpen, onClose, group }) => {
         skip: pageParam,
         limit: 20,
       };
-      console.log('Fetching available users with params:', params);
       return getAvailableUsers(groupId, params);
     },
     getNextPageParam: (lastPage, pages) => {
@@ -69,12 +68,6 @@ export const AddMemberModal = ({ isOpen, onClose, group }) => {
   });
 
   const users = data?.pages.flatMap((page) => page.users || []) || [];
-  
-  console.log('Available users data:', { 
-    totalPages: data?.pages?.length, 
-    totalUsers: users.length,
-    filters: { searchQuery, joinedFrom, joinedTo }
-  });
 
   // Set up intersection observer for infinite scroll
   useEffect(() => {
