@@ -11,30 +11,18 @@ import { queryKeys } from "@/lib/query-client";
 
 /**
  * Get dashboard statistics
- * Aggregates data from multiple services
+ * Uses the new /api/v1/users/stats endpoint
  */
 export const useAdminDashboardStats = (options = {}) => {
   return useQuery({
     queryKey: ["admin", "dashboard", "stats"],
     queryFn: async () => {
-      // Fetch all users and groups data
-      const [usersData, groupsData, instructorsData, studentsData] = await Promise.all([
-        userService.getUsers({ limit: 1 }),
-        groupService.getGroups({ limit: 1, status: "active" }),
-        userService.getUsers({ role: "instructor", limit: 1 }),
-        userService.getUsers({ role: "student", limit: 1 }),
-      ]);
-
-      const totalUsers = usersData?.total || 0;
-      const totalGroups = groupsData?.total || 0;
-      const totalInstructors = instructorsData?.total || 0;
-      const totalStudents = studentsData?.total || 0;
-
+      const stats = await userService.getUserStats();
       return {
-        totalUsers,
-        totalInstructors,
-        totalStudents,
-        activeGroups: totalGroups,
+        totalUsers: stats.total_users || 0,
+        totalInstructors: stats.instructors || 0,
+        totalStudents: stats.students || 0,
+        activeGroups: stats.active_groups || 0,
       };
     },
     staleTime: 5 * 60 * 1000, // 5 minutes

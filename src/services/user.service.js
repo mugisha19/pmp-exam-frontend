@@ -125,6 +125,19 @@ export const getUsers = async (params = {}) => {
 export const listUsers = getUsers;
 
 /**
+ * Get user statistics for dashboard
+ * @returns {Promise<Object>} User statistics
+ */
+export const getUserStats = async () => {
+  try {
+    const response = await api.get(`${USER_ENDPOINTS.LIST_USERS}/stats`);
+    return response.data;
+  } catch (error) {
+    throw handleUserError(error);
+  }
+};
+
+/**
  * Create new user (admin only)
  * @param {Object} userData - User data
  * @param {string} userData.email - User email
@@ -284,6 +297,7 @@ export default {
   getUserById,
   getUsers,
   listUsers,
+  getUserStats,
   createUser,
   updateUser,
   deleteUser,

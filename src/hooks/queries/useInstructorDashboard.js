@@ -105,6 +105,30 @@ export function useInstructorGroupCount() {
 }
 
 /**
+ * Hook to fetch user statistics (total users, instructors, students, groups)
+ */
+export function useUserStats() {
+  return useQuery({
+    queryKey: ["user-stats"],
+    queryFn: async () => {
+      try {
+        const userService = (await import("@/services/user.service")).default;
+        return await userService.getUserStats();
+      } catch {
+        return {
+          total_users: 0,
+          instructors: 0,
+          students: 0,
+          admins: 0,
+          active_groups: 0,
+        };
+      }
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
+/**
  * Hook to fetch instructor's active quizzes list
  */
 export function useInstructorActiveQuizzes(limit = 5) {

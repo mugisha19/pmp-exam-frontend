@@ -139,6 +139,7 @@ export function Dashboard() {
   const { user } = useAuthStore();
 
   // Fetch dashboard data
+  const { data: userStats, isLoading: userStatsLoading } = useUserStats();
   const { stats, isLoading: statsLoading } = useInstructorStats();
   const { data: activeQuizzes, isLoading: quizzesLoading } =
     useInstructorActiveQuizzes(5);
@@ -162,7 +163,7 @@ export function Dashboard() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {statsLoading ? (
+        {userStatsLoading ? (
           <>
             <StatsCardSkeleton />
             <StatsCardSkeleton />
@@ -172,33 +173,33 @@ export function Dashboard() {
         ) : (
           <>
             <StatsCard
-              title="My Questions"
-              value={stats.questions}
-              subtitle="In question bank"
-              icon={HelpCircle}
+              title="Total Users"
+              value={userStats?.total_users || 0}
+              subtitle="Platform users"
+              icon={Users}
               iconColor="text-blue-400"
               iconBgColor="bg-blue-500/10"
             />
             <StatsCard
-              title="Quiz Banks"
-              value={stats.quizBanks}
-              subtitle="Templates created"
-              icon={Library}
+              title="Instructors"
+              value={userStats?.instructors || 0}
+              subtitle="Teaching staff"
+              icon={Users}
               iconColor="text-teal-600"
               iconBgColor="bg-teal-500/10"
             />
             <StatsCard
-              title="Active Quizzes"
-              value={stats.activeQuizzes}
-              subtitle="Currently running"
-              icon={FileText}
+              title="Students"
+              value={userStats?.students || 0}
+              subtitle="Active learners"
+              icon={Users}
               iconColor="text-emerald-400"
               iconBgColor="bg-emerald-500/10"
             />
             <StatsCard
-              title="My Groups"
-              value={stats.groups}
-              subtitle="Groups managed"
+              title="Active Groups"
+              value={userStats?.active_groups || 0}
+              subtitle="Learning groups"
               icon={Users}
               iconColor="text-amber-400"
               iconBgColor="bg-amber-500/10"
