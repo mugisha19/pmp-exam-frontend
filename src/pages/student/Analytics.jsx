@@ -231,28 +231,34 @@ export const Analytics = () => {
                 <Clock className="w-6 h-6 text-orange-600" />
               </div>
               <div className="text-right">
-                <div className="text-3xl font-bold text-gray-900">
-                  {Math.round(
-                    (performanceData?.attempts?.reduce(
-                      (sum, a) => sum + (a.time_spent_minutes || 0),
-                      0
-                    ) || 0) / 60
-                  )}
-                  h
-                </div>
-                <div className="text-sm text-gray-500 mt-1">Study Time</div>
+                {(() => {
+                  const totalMinutes = performanceData?.attempts?.reduce(
+                    (sum, a) => sum + (a.time_spent_minutes || 0),
+                    0
+                  ) || 0;
+                  const hours = Math.floor(totalMinutes / 60);
+                  const mins = Math.round(totalMinutes % 60);
+                  return (
+                    <>
+                      <div className="text-3xl font-bold text-gray-900">
+                        {hours > 0 ? `${hours}h ${mins}m` : `${mins}m`}
+                      </div>
+                      <div className="text-sm text-gray-500 mt-1">Study Time</div>
+                    </>
+                  );
+                })()}
               </div>
             </div>
             <div className="flex items-center gap-2 text-xs text-gray-600">
               <Calendar className="w-4 h-4" />
               <span>
                 {Math.round(
-                  (performanceData?.attempts?.reduce(
+                  performanceData?.attempts?.reduce(
                     (sum, a) => sum + (a.time_spent_minutes || 0),
                     0
-                  ) || 0) % 60
+                  ) || 0
                 )}
-                m total
+                min across all sessions
               </span>
             </div>
           </div>
@@ -304,6 +310,8 @@ export const Analytics = () => {
               color="#10b981"
               height={300}
               showGrid={true}
+              valueLabel="Score"
+              valueSuffix="%"
             />
           </div>
 
@@ -330,6 +338,8 @@ export const Analytics = () => {
                 innerRadius={70}
                 outerRadius={110}
                 title=""
+                embedded={true}
+                valueSuffix=" quizzes"
               />
             ) : (
               <div className="flex items-center justify-center h-[280px] text-gray-400">
@@ -376,23 +386,43 @@ export const Analytics = () => {
                 </div>
               </div>
 
-              {/* Horizontal Bar Chart Visualization */}
-              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">Topic Mastery Comparison</h3>
-                {topicChartData.length > 0 ? (
-                  <BarChartComponent
-                    data={topicChartData}
-                    dataKey="mastery"
-                    xAxisKey="name"
-                    color="#3b82f6"
-                    height={400}
-                    showGrid={true}
-                  />
-                ) : (
-                  <div className="text-center py-8 text-gray-500">
-                    <p>Not enough data to display chart</p>
-                  </div>
-                )}
+              {/* Radar + Bar Chart Visualization */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">Topic Radar</h3>
+                  {topicChartData.length > 0 ? (
+                    <RadarChartComponent
+                      data={topicChartData}
+                      dataKey="mastery"
+                      nameKey="name"
+                      color="#3b82f6"
+                      height={350}
+                    />
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">
+                      <p>Not enough data to display chart</p>
+                    </div>
+                  )}
+                </div>
+                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">Topic Mastery Comparison</h3>
+                  {topicChartData.length > 0 ? (
+                    <BarChartComponent
+                      data={topicChartData}
+                      dataKey="mastery"
+                      xAxisKey="name"
+                      color="#3b82f6"
+                      height={350}
+                      showGrid={true}
+                      valueLabel="Mastery"
+                      valueSuffix="%"
+                    />
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">
+                      <p>Not enough data to display chart</p>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Horizontal Progress Bars */}

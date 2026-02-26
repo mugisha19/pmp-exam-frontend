@@ -35,6 +35,7 @@ export function PieChartComponent({
   innerRadius = 60,
   outerRadius = 100,
   embedded = false,
+  valueSuffix = "%",
 }) {
   if (!data || data.length === 0) {
     const Wrapper = embedded ? "div" : ({ children }) => (
@@ -94,7 +95,7 @@ export function PieChartComponent({
               borderRadius: "8px",
               boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
             }}
-            formatter={(value, name) => [`${typeof value === 'number' ? value.toFixed(1) : value}%`, name]}
+            formatter={(value, name) => [`${typeof value === 'number' ? value.toFixed(1) : value}${valueSuffix}`, name]}
           />
           {showLegend && (
             <Legend
