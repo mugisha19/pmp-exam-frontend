@@ -13,7 +13,7 @@ export const ProgressCard = ({
   className,
   onClick 
 }) => {
-  const progress = total > 0 ? (completed / total) * 100 : 0;
+  const progress = total > 0 ? Math.min(100, (completed / total) * 100) : 0;
 
   return (
     <div

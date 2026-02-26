@@ -255,7 +255,7 @@ export const MyExams = () => {
                 </span>
                 <span className="text-sm font-semibold text-[#6EC1E4]">
                   {stats.total > 0
-                    ? Math.round((stats.completed / stats.total) * 100)
+                    ? Math.min(100, Math.round((stats.completed / stats.total) * 100))
                     : 0}
                   %
                 </span>
@@ -266,7 +266,7 @@ export const MyExams = () => {
                   style={{
                     width: `${
                       stats.total > 0
-                        ? Math.round((stats.completed / stats.total) * 100)
+                        ? Math.min(100, Math.round((stats.completed / stats.total) * 100))
                         : 0
                     }%`,
                   }}

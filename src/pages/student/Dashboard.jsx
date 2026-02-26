@@ -182,11 +182,13 @@ export const Dashboard = () => {
 
     // Calculate progress percentage (unique quizzes completed / total available)
     const totalQuizzes = allQuizzes.length;
-    const completedQuizIds = new Set(attempts.map((att) => att.quiz_id));
+    const completedQuizIds = new Set(
+      attempts.filter((att) => att.score !== null && att.score !== undefined).map((att) => att.quiz_id)
+    );
     const completedQuizzes = completedQuizIds.size;
     const progressPercentage =
       totalQuizzes > 0
-        ? Math.round((completedQuizzes / totalQuizzes) * 100)
+        ? Math.min(100, Math.round((completedQuizzes / totalQuizzes) * 100))
         : 0;
 
     console.log("Dashboard stats:", {

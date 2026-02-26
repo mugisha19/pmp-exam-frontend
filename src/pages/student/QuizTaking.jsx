@@ -1687,10 +1687,10 @@ export const QuizTaking = () => {
   const currentQ = sessionData.questions[currentQuestionIndex];
   const isExamMode = sessionData.quiz_mode === "exam";
   const hasTimeLimit = sessionData.timing?.has_time_limit;
-  const progressPercentage =
+  const progressPercentage = Math.min(100,
     ((sessionData.progress?.answered_count || 0) /
       (sessionData.progress?.total_questions || 1)) *
-    100;
+    100);
 
   return (
     <div className="min-h-screen bg-gray-50">

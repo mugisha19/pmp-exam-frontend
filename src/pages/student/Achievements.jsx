@@ -20,7 +20,7 @@ export const Achievements = () => {
   const userLevel = 12;
   const xpCurrent = 850;
   const xpRequired = 1000;
-  const xpProgress = (xpCurrent / xpRequired) * 100;
+  const xpProgress = Math.min(100, (xpCurrent / xpRequired) * 100);
 
   const achievements = [
     {

@@ -51,8 +51,8 @@ const QuestionNavigator = ({
   const pageStartIndex = currentPage * QUESTIONS_PER_PAGE;
 
   // Progress percentage
-  const progressPercentage =
-    ((progress?.answered_count || 0) / (progress?.total_questions || 1)) * 100;
+  const progressPercentage = Math.min(100,
+    ((progress?.answered_count || 0) / (progress?.total_questions || 1)) * 100);
 
   // Handle search/jump to question
   const handleJumpToQuestion = (e) => {
@@ -435,7 +435,7 @@ const QuestionNavigator = ({
           <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
             <div
               className="h-full bg-[#6EC1E4] rounded-full transition-all duration-500"
-              style={{ width: `${progressPercentage}%` }}
+              style={{ width: `${Math.min(100, progressPercentage)}%` }}
             />
           </div>
           <div className="grid grid-cols-3 gap-2 pt-2">

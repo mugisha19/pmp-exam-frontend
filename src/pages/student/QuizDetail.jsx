@@ -846,7 +846,7 @@ export const QuizDetail = () => {
                               ? "bg-[#6EC1E4]"
                               : "bg-[#FF5100]"
                           )}
-                          style={{ width: `${bestScore || 0}%` }}
+                          style={{ width: `${Math.min(100, bestScore || 0)}%` }}
                         />
                       </div>
                       {quiz.passing_score && (

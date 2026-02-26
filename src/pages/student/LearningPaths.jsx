@@ -75,7 +75,7 @@ export const LearningPaths = () => {
     },
   ].map(path => ({
     ...path,
-    progress: Math.round((path.quizzes.filter(q => q.completed).length / path.quizzes.length) * 100)
+    progress: Math.min(100, Math.round((path.quizzes.filter(q => q.completed).length / path.quizzes.length) * 100))
   }));
 
   const [selectedPath, setSelectedPath] = useState(learningPaths[1]); // Planning phase

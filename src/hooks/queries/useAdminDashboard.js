@@ -17,23 +17,23 @@ export const useAdminDashboardStats = (options = {}) => {
   return useQuery({
     queryKey: ["admin", "dashboard", "stats"],
     queryFn: async () => {
-      // Fetch data in parallel
-      const [usersData, groupsData] = await Promise.all([
-        userService.getUsers({ limit: 1000 }),
+      // Fetch all users and groups data
+      const [usersData, groupsData, instructorsData, studentsData] = await Promise.all([
+        userService.getUsers({ limit: 1 }),
         groupService.getGroups({ limit: 1, status: "active" }),
+        userService.getUsers({ role: "instructor", limit: 1 }),
+        userService.getUsers({ role: "student", limit: 1 }),
       ]);
 
-      const users = usersData?.users || [];
-      const totalUsers = usersData?.total || users.length || 0;
+      const totalUsers = usersData?.total || 0;
       const totalGroups = groupsData?.total || 0;
-
-      const instructorCount = users.filter(u => u.role === "instructor").length;
-      const studentCount = users.filter(u => u.role === "student").length;
+      const totalInstructors = instructorsData?.total || 0;
+      const totalStudents = studentsData?.total || 0;
 
       return {
         totalUsers,
-        totalInstructors: instructorCount,
-        totalStudents: studentCount,
+        totalInstructors,
+        totalStudents,
         activeGroups: totalGroups,
       };
     },
