@@ -90,7 +90,12 @@ export const Home = () => {
     const learningHours = Math.round(totalMinutes / 60);
 
     const totalQuizzes = allQuizzes.length;
-    const completedQuizIds = new Set(attempts.map((att) => att.quiz_id));
+    // Only count unique quizzes that have been completed (not in-progress)
+    const completedQuizIds = new Set(
+      attempts
+        .filter((att) => att.score !== null && att.score !== undefined)
+        .map((att) => att.quiz_id)
+    );
     const completedQuizzes = completedQuizIds.size;
 
     return {
@@ -273,11 +278,11 @@ export const Home = () => {
                 </span>
                 <span className="text-xs sm:text-sm font-semibold text-[#6EC1E4]">
                   {dashboardStats.totalQuizzes > 0
-                    ? Math.round(
+                    ? Math.min(100, Math.round(
                         (dashboardStats.completedQuizzes /
                           dashboardStats.totalQuizzes) *
                           100
-                      )
+                      ))
                     : 0}
                   %
                 </span>
@@ -288,11 +293,11 @@ export const Home = () => {
                   style={{
                     width: `${
                       dashboardStats.totalQuizzes > 0
-                        ? Math.round(
+                        ? Math.min(100, Math.round(
                             (dashboardStats.completedQuizzes /
                               dashboardStats.totalQuizzes) *
                               100
-                          )
+                          ))
                         : 0
                     }%`,
                   }}
