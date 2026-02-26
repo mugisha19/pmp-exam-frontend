@@ -32,6 +32,8 @@ const ROLE_OPTIONS = [
 
 export const AddMemberModal = ({ isOpen, onClose, group }) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [joinedFrom, setJoinedFrom] = useState("");
+  const [joinedTo, setJoinedTo] = useState("");
   const addMemberMutation = useAddMemberMutation();
   const queryClient = useQueryClient();
   const observerTarget = useRef(null);
@@ -45,14 +47,18 @@ export const AddMemberModal = ({ isOpen, onClose, group }) => {
     isFetchingNextPage,
     isLoading: usersLoading,
   } = useInfiniteQuery({
-    queryKey: ["available-users", group?.group_id || group?.id, searchQuery],
+    queryKey: ["available-users", group?.group_id || group?.id, searchQuery, joinedFrom, joinedTo],
     queryFn: ({ pageParam = 0 }) => {
       const groupId = group?.group_id || group?.id;
-      return getAvailableUsers(groupId, {
+      const params = {
         search: searchQuery,
+        joined_from: joinedFrom ? `${joinedFrom}T00:00:00Z` : undefined,
+        joined_to: joinedTo ? `${joinedTo}T23:59:59Z` : undefined,
         skip: pageParam,
         limit: 20,
-      });
+      };
+      console.log('Fetching available users with params:', params);
+      return getAvailableUsers(groupId, params);
     },
     getNextPageParam: (lastPage, pages) => {
       const totalFetched = pages.reduce((acc, page) => acc + (page.users?.length || 0), 0);
@@ -63,6 +69,12 @@ export const AddMemberModal = ({ isOpen, onClose, group }) => {
   });
 
   const users = data?.pages.flatMap((page) => page.users || []) || [];
+  
+  console.log('Available users data:', { 
+    totalPages: data?.pages?.length, 
+    totalUsers: users.length,
+    filters: { searchQuery, joinedFrom, joinedTo }
+  });
 
   // Set up intersection observer for infinite scroll
   useEffect(() => {
@@ -129,6 +141,8 @@ export const AddMemberModal = ({ isOpen, onClose, group }) => {
   const handleClose = () => {
     reset();
     setSearchQuery("");
+    setJoinedFrom("");
+    setJoinedTo("");
     onClose();
   };
 
@@ -165,6 +179,30 @@ export const AddMemberModal = ({ isOpen, onClose, group }) => {
             onChange={(e) => setSearchQuery(e.target.value)}
             leftIcon={<Search className="w-4 h-4" />}
           />
+        </div>
+
+        {/* Date Filters */}
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-700">
+              Registered From
+            </label>
+            <Input
+              type="date"
+              value={joinedFrom}
+              onChange={(e) => setJoinedFrom(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-700">
+              Registered To
+            </label>
+            <Input
+              type="date"
+              value={joinedTo}
+              onChange={(e) => setJoinedTo(e.target.value)}
+            />
+          </div>
         </div>
 
         {/* User List */}
