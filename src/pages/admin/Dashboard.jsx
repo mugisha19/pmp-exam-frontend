@@ -527,78 +527,47 @@ export const Dashboard = () => {
         </div>
       </div>
 
-      {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
+      {/* Quiz Attempts Chart - Full Width */}
+      <Card>
+        <CardContent className="pt-6">
           <LineChartComponent
             title="Quiz Attempts by Day"
             data={attemptsData}
             color="#3b82f6"
             height={280}
           />
-        </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <BarChartComponent
-            title="Quiz Attempts"
-            data={attemptsData}
-            color="#10b981"
-            height={280}
-          />
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
-      {/* Topic Performance & Strengths/Weaknesses */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        {/* Excellent Performance - Strengths */}
+      {/* Topic Performance Overview (Pie) & Group Performance */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Topic Performance Overview - Pie Chart */}
         <Card>
-          <CardHeader>
-            <CardTitle className="text-base font-semibold flex items-center gap-2">
-              <CheckCircle className="w-4 h-4 text-green-500" />
-              Excellent Performance (Strengths)
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {strengthsData.length > 0 ? (
-              <BarChartComponent
-                data={strengthsData}
-                color="#22c55e"
-                height={220}
+          <CardContent className="pt-6">
+            {topicPerformanceData.length > 0 ? (
+              <PieChartComponent
+                title="Topic Performance Overview"
+                data={topicPerformanceData}
+                height={300}
+                innerRadius={55}
+                outerRadius={100}
+                embedded
               />
             ) : (
-              <div className="flex items-center justify-center h-[220px] text-gray-500 text-sm">
-                No topic data available
+              <div>
+                <h3 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <BookOpen className="w-4 h-4 text-blue-500" />
+                  Topic Performance Overview
+                </h3>
+                <div className="flex items-center justify-center h-[260px] text-gray-500 text-sm">
+                  No topic data available
+                </div>
               </div>
             )}
           </CardContent>
         </Card>
 
-        {/* Areas to Improve */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base font-semibold flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-orange-500" />
-              Areas to Improve
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {needsImprovementData.length > 0 ? (
-              <BarChartComponent
-                data={needsImprovementData}
-                color="#f97316"
-                height={220}
-              />
-            ) : (
-              <div className="flex items-center justify-center h-[220px] text-gray-500 text-sm">
-                No improvement areas identified
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Group Performance & Topic Overview */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        {/* Group Performance */}
+        {/* Group Performance - Bar Chart */}
         <Card>
           <CardHeader>
             <CardTitle className="text-base font-semibold flex items-center gap-2">
@@ -611,39 +580,72 @@ export const Dashboard = () => {
               <BarChartComponent
                 data={groupPerformanceData}
                 color="#8b5cf6"
-                height={220}
+                height={260}
+                valueLabel="Avg Score"
+                valueSuffix="%"
               />
             ) : (
-              <div className="flex items-center justify-center h-[220px] text-gray-500 text-sm">
+              <div className="flex items-center justify-center h-[260px] text-gray-500 text-sm">
                 No group data available
               </div>
             )}
           </CardContent>
         </Card>
-
-        {/* Topic Performance Overview */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base font-semibold flex items-center gap-2">
-              <BookOpen className="w-4 h-4 text-blue-500" />
-              Topic Performance Overview
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {topicPerformanceData.length > 0 ? (
-              <BarChartComponent
-                data={topicPerformanceData}
-                color="#3b82f6"
-                height={220}
-              />
-            ) : (
-              <div className="flex items-center justify-center h-[220px] text-gray-500 text-sm">
-                No topic data available
-              </div>
-            )}
-          </CardContent>
-        </Card>
       </div>
+
+      {/* Areas to Improve - Full Width with topic details */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base font-semibold flex items-center gap-2">
+            <TrendingUp className="w-4 h-4 text-orange-500" />
+            Areas to Improve
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {needsImprovementData.length > 0 ? (
+            <div className="space-y-4">
+              <BarChartComponent
+                data={needsImprovementData}
+                color="#f97316"
+                height={220}
+                valueLabel="Accuracy"
+                valueSuffix="%"
+              />
+              <div className="border-t border-gray-100 pt-4">
+                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">Topics that need attention</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {needsImprovementData.map((topic, index) => (
+                    <div key={index} className="flex items-center gap-3 p-3 bg-orange-50 rounded-lg border border-orange-100">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center">
+                        <span className="text-xs font-bold text-orange-600">{index + 1}</span>
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-gray-900 truncate" title={topic.fullName}>
+                          {topic.fullName || topic.name}
+                        </p>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <div className="flex-1 h-1.5 bg-orange-200 rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-orange-500 rounded-full" 
+                              style={{ width: `${Math.min(topic.value, 100)}%` }}
+                            />
+                          </div>
+                          <span className="text-xs font-semibold text-orange-600 whitespace-nowrap">{topic.value?.toFixed(1)}%</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center h-[180px] text-gray-500 text-sm">
+              <CheckCircle className="w-8 h-8 text-green-400 mb-2" />
+              <p>All topics are performing well!</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Top Performers */}
       {topPerformers.length > 0 && (

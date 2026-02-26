@@ -23,6 +23,8 @@ export function BarChartComponent({
   height = 280,
   showGrid = true,
   showLegend = false,
+  valueLabel = "Value",
+  valueSuffix = "",
 }) {
   if (!data || data.length === 0) {
     return (
@@ -62,7 +64,7 @@ export function BarChartComponent({
               borderRadius: "8px",
               boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
             }}
-            formatter={(value) => [value, "Attempts"]}
+            formatter={(value) => [`${value}${valueSuffix}`, valueLabel]}
           />
           {showLegend && <Legend />}
           <Bar dataKey={dataKey} fill={color} radius={[4, 4, 0, 0]} />
