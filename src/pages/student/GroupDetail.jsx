@@ -4,6 +4,7 @@ import { getGroupById } from "@/services/group.service";
 import { getQuizzes } from "@/services/quiz.service";
 import { Spinner } from "@/components/ui";
 import { ExamCard } from "@/components/shared/ExamCard";
+import { useState, useMemo } from "react";
 import {
   ArrowLeft,
   Users,
@@ -15,6 +16,7 @@ import {
 export const GroupDetail = () => {
   const { groupId } = useParams();
   const navigate = useNavigate();
+  const [filter, setFilter] = useState("active");
 
   // Fetch group details
   const { data: group, isLoading: loadingGroup } = useQuery({
@@ -43,6 +45,16 @@ export const GroupDetail = () => {
       quizzes = quizzesData.quizzes;
     }
   }
+
+  // Separate active and completed quizzes based on status
+  const { activeQuizzes, completedQuizzes } = useMemo(() => {
+    return {
+      activeQuizzes: quizzes.filter(q => q.status === "active"),
+      completedQuizzes: quizzes.filter(q => q.status === "completed" || q.status === "cancelled")
+    };
+  }, [quizzes]);
+
+  const displayedQuizzes = filter === "active" ? activeQuizzes : completedQuizzes;
 
   if (isLoading) {
     return (
@@ -134,21 +146,50 @@ export const GroupDetail = () => {
 
       {/* Quizzes Section */}
       <div>
-        <div className="border-b-2 border-gray-200 pb-3 mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Available Quizzes <span className="text-accent-primary">({quizzes.length})</span></h2>
+        <div className="border-b-2 border-gray-200 pb-3 mb-6 flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-gray-900">
+            {filter === "active" ? "Available Quizzes" : "Completed Quizzes"} 
+            <span className="text-accent-primary">({displayedQuizzes.length})</span>
+          </h2>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setFilter("active")}
+              className={`px-4 py-2 rounded-lg font-semibold transition-all duration-200 ${
+                filter === "active"
+                  ? "bg-accent-primary text-white shadow-md"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              }`}
+            >
+              Active ({activeQuizzes.length})
+            </button>
+            <button
+              onClick={() => setFilter("completed")}
+              className={`px-4 py-2 rounded-lg font-semibold transition-all duration-200 ${
+                filter === "completed"
+                  ? "bg-accent-primary text-white shadow-md"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              }`}
+            >
+              Completed ({completedQuizzes.length})
+            </button>
+          </div>
         </div>
         
-        {quizzes.length === 0 ? (
+        {displayedQuizzes.length === 0 ? (
           <div className="text-center py-16 bg-gradient-to-br from-white to-gray-50/50 rounded-2xl border-2 border-gray-200 shadow-lg">
             <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center shadow-inner">
               <BookOpen className="w-12 h-12 text-gray-400" />
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">No quizzes available</h3>
-            <p className="text-sm text-gray-600 font-medium">Check back later for new quizzes</p>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">
+              {filter === "active" ? "No active quizzes" : "No completed quizzes"}
+            </h3>
+            <p className="text-sm text-gray-600 font-medium">
+              {filter === "active" ? "Check back later for new quizzes" : "Complete some quizzes to see them here"}
+            </p>
           </div>
         ) : (
           <div className="space-y-4">
-            {quizzes.map((quiz) => (
+            {displayedQuizzes.map((quiz) => (
               <ExamCard
                 key={quiz.quiz_id}
                 quiz={quiz}
