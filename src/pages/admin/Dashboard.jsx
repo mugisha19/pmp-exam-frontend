@@ -821,7 +821,7 @@ export const Dashboard = () => {
                         </td>
                         <td className="py-3 px-2">
                           <StatusBadge
-                            status={user.is_active ? "active" : "inactive"}
+                            status={user.active ? "active" : "inactive"}
                             size="sm"
                           />
                         </td>
