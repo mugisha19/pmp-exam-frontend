@@ -50,19 +50,7 @@ const profileSchema = z.object({
     .string()
     .min(1, "Last name is required")
     .min(2, "Last name must be at least 2 characters"),
-  avatar_url: z
-    .string()
-    .optional()
-    .refine(
-      (val) =>
-        !val ||
-        val === "" ||
-        val === "file_upload_pending" ||
-        val.startsWith("http://") ||
-        val.startsWith("https://") ||
-        val.startsWith("/api/"),
-      "Please enter a valid image URL (http:// or https://)"
-    ),
+
 });
 
 const passwordSchema = z.object({
@@ -103,7 +91,6 @@ export function Profile() {
     defaultValues: {
       first_name: user?.first_name || "",
       last_name: user?.last_name || "",
-      avatar_url: user?.avatar_url || "",
     },
   });
 
@@ -121,74 +108,14 @@ export function Profile() {
     },
   });
 
-  const currentAvatarUrl = watch("avatar_url");
 
-  const handleFileSelect = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (!file.type.startsWith("image/")) {
-        toast.error("Please select an image file");
-        return;
-      }
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error("File size must be less than 5MB");
-        return;
-      }
-      setSelectedFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setAvatarPreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-      setValue("avatar_url", "file_upload_pending", { shouldDirty: true });
-    }
-  };
 
-  const handleRemoveAvatar = () => {
-    setAvatarPreview(null);
-    setSelectedFile(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-    setValue("avatar_url", "", { shouldDirty: true });
-  };
+
 
   const onSubmit = async (data) => {
     try {
-      if (selectedFile) {
-        const formData = new FormData();
-        formData.append("file", selectedFile);
-
-        const response = await api.post("/users/me/avatar", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
-
-        const avatarUrl = response.data.avatar_url;
-        data.avatar_url = avatarUrl;
-
-        const fullAvatarUrl = avatarUrl.startsWith("http")
-          ? avatarUrl
-          : `${API_BASE_URL.replace('/api/v1', '')}${avatarUrl}`;
-        updateUser({ avatar_url: fullAvatarUrl });
-      } else if (data.avatar_url === "file_upload_pending") {
-        data.avatar_url = "";
-      }
-
-      const updateData = {
-        first_name: data.first_name,
-        last_name: data.last_name,
-      };
-
-      if (data.avatar_url && data.avatar_url !== "file_upload_pending") {
-        updateData.avatar_url = data.avatar_url;
-      }
-
-      await updateProfileMutation.mutateAsync(updateData);
+      await updateProfileMutation.mutateAsync(data);
       setIsEditing(false);
-      setAvatarPreview(null);
-      setSelectedFile(null);
     } catch (error) {
       if (error.response?.status === 401) {
         toast.error("Session expired. Please log in again.");
@@ -206,14 +133,8 @@ export function Profile() {
     reset({
       first_name: user?.first_name || "",
       last_name: user?.last_name || "",
-      avatar_url: user?.avatar_url || "",
     });
     setIsEditing(false);
-    setAvatarPreview(null);
-    setSelectedFile(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
   };
 
   const onPasswordSubmit = async (data) => {
@@ -244,7 +165,7 @@ export function Profile() {
     });
   };
 
-  const displayAvatar = avatarPreview || currentAvatarUrl || user?.avatar_url;
+  const displayAvatar = user?.avatar_url;
 
   return (
     <div className="min-h-screen bg-white">
@@ -279,37 +200,6 @@ export function Profile() {
                 {/* Online Status */}
                 <div className="absolute bottom-2 right-2 w-5 h-5 bg-[#6EC1E4] border-3 border-white rounded-full shadow-sm" />
               </div>
-
-              {/* Edit Avatar Button */}
-              {isEditing && (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="absolute -bottom-2 -right-2 p-3 bg-[#FF5100] rounded-xl shadow-lg hover:bg-[#E64800] hover:shadow-xl transition-all"
-                    title="Upload photo"
-                  >
-                    <Camera className="w-5 h-5 text-white" />
-                  </button>
-                  {displayAvatar && (
-                    <button
-                      type="button"
-                      onClick={handleRemoveAvatar}
-                      className="absolute -top-2 -right-2 p-2 bg-white border border-gray-200 rounded-xl shadow-lg hover:bg-red-50 hover:border-red-200 transition-all"
-                      title="Remove photo"
-                    >
-                      <X className="w-4 h-4 text-red-500" />
-                    </button>
-                  )}
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileSelect}
-                    className="hidden"
-                  />
-                </>
-              )}
             </div>
 
             {/* User Info */}
@@ -457,10 +347,7 @@ export function Profile() {
                   <div className="flex items-center gap-3 mt-8 pt-6 border-t border-gray-100">
                     <button
                       type="submit"
-                      disabled={
-                        (!isDirty && !selectedFile) ||
-                        updateProfileMutation.isPending
-                      }
+                      disabled={!isDirty || updateProfileMutation.isPending}
                       className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#FF5100] text-white font-semibold rounded-lg hover:bg-[#E64800] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       {updateProfileMutation.isPending ? (
