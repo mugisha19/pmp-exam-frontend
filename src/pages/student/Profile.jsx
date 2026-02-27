@@ -556,18 +556,7 @@ export function Profile() {
               </div>
             </div>
 
-            {/* Danger Zone */}
-            <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-              <div className="px-5 py-4 border-b border-gray-100">
-                <h3 className="font-semibold text-gray-900">Account</h3>
-              </div>
-              <div className="p-5">
-                <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 border border-red-200 text-red-600 font-medium rounded-lg hover:bg-red-50 transition-colors">
-                  <LogOut className="w-4 h-4" />
-                  Sign Out
-                </button>
-              </div>
-            </div>
+
           </div>
         </div>
       </div>
