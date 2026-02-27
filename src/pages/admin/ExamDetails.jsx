@@ -842,7 +842,11 @@ export default function ExamDetails() {
                         #{(questionPage - 1) * questionPageSize + idx + 1}
                       </span>
                       <div className="flex-1">
-                        <p className="text-gray-900">{q.question_text}</p>
+                        {/* <p className="text-gray-900">{q.question_text}</p> */}
+                        <p
+                          className="text-gray-900"
+                          dangerouslySetInnerHTML={{ __html: q.question_text }}>
+                        </p>
                         <div className="flex gap-2 mt-2">
                           <Badge variant="default" size="sm">{q.question_type}</Badge>
                           {q.topic_name && <Badge variant="secondary" size="sm">{q.topic_name}</Badge>}
